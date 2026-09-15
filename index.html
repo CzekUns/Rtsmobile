@@ -1,99 +1,83 @@
 <!doctype html>
 <html lang="it">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#1f2c1f">
-<title>RTS Mobile Pilot</title>
-<style>
-:root{color-scheme:dark;--bg:#151a16;--panel:#202820;--panel2:#2c362c;--line:#465246;--text:#f2f0e6;--muted:#b7b9ae;--accent:#d6a94c;--danger:#cc6658}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,sans-serif;overflow:hidden;touch-action:none}body{display:flex;justify-content:center}.app{width:min(100%,900px);height:100dvh;display:grid;grid-template-rows:auto 1fr auto;background:#111611}.top{display:grid;grid-template-columns:1fr auto;gap:8px;padding:8px 10px;background:var(--panel);border-bottom:1px solid var(--line);font-size:13px}.stats{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.pill{padding:5px 8px;border:1px solid var(--line);border-radius:999px;background:var(--panel2)}button{font:inherit;color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:10px;min-height:44px;padding:8px 10px}button:active{transform:scale(.98)}button.active{outline:2px solid var(--accent);background:#3a3525}.stage{position:relative;min-height:0;background:#31412e}.stage canvas{display:block;width:100%;height:100%;touch-action:none}.hint{position:absolute;left:8px;top:8px;max-width:min(82%,430px);padding:7px 9px;border-radius:9px;background:#101610cc;border:1px solid #ffffff22;color:#eee;font-size:12px;pointer-events:none}.toast{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);padding:8px 12px;border-radius:9px;background:#0d130ddd;border:1px solid #ffffff22;font-size:12px;opacity:0;transition:.2s;pointer-events:none}.toast.show{opacity:1}.toolbar{padding:8px;background:var(--panel);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}.tool{padding:6px 4px;font-size:11px;line-height:1.1}.tool b{display:block;font-size:18px;margin-bottom:2px}.tool small{display:block;color:var(--muted);font-size:9px;margin-top:2px}.wave{background:#3b2924;border-color:#79544b}.reset{background:#25252b}.gameover{position:absolute;inset:0;display:none;place-items:center;background:#090c09dd;padding:20px;text-align:center}.gameover.show{display:grid}.card{max-width:340px;padding:20px;border:1px solid var(--line);border-radius:14px;background:#1d251d}.card h2{margin:0 0 8px}.card p{color:var(--muted);font-size:14px}@media(max-width:520px){.toolbar{grid-template-columns:repeat(3,1fr)}.top{font-size:12px}.pill{padding:4px 6px}}@media(orientation:landscape) and (max-height:600px){.app{grid-template-columns:1fr 210px;grid-template-rows:auto 1fr}.top{grid-column:1/3}.stage{grid-column:1}.toolbar{grid-column:2;grid-row:2;grid-template-columns:repeat(2,1fr);align-content:start;overflow:auto}.tool{min-height:54px}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="theme-color" content="#171a16">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./app.css">
+  <title>Terra Italica — RTS Mobile</title>
 </head>
 <body>
-<div class="app" id="app">
-  <div class="top">
-    <div class="stats">
-      <span class="pill">🪵 <b id="wood">35</b></span>
-      <span class="pill">🏛️ <b id="coreHp">250</b> HP</span>
-      <span class="pill">⚔️ Ondata <b id="waveNo">0</b></span>
-      <span class="pill">👣 <b id="porters">0</b></span>
-    </div>
-    <button id="waveBtn" class="wave" type="button">Avvia ondata</button>
-  </div>
-  <div class="stage" id="stage">
-    <canvas id="game" aria-label="Mappa di gioco"></canvas>
-    <div class="hint" id="hint">Costruisci una strada dal villaggio a un bosco, poi piazza un boscaiolo sul margine del bosco.</div>
-    <div class="toast" id="toast"></div>
-    <div class="gameover" id="gameover"><div class="card"><h2>L'oppidum è caduto</h2><p>Il pilota serve proprio a capire se il loop funziona. Ritenta e prova una rete più corta.</p><button id="retry" type="button">Ricomincia</button></div></div>
-  </div>
-  <div class="toolbar" id="toolbar">
-    <button class="tool active" data-tool="road" type="button"><b>🟫</b>Sentiero<small>1 legno</small></button>
-    <button class="tool" data-tool="woodcutter" type="button"><b>🪓</b>Boscaiolo<small>10 legno</small></button>
-    <button class="tool" data-tool="tower" type="button"><b>🏹</b>Torre<small>18 legno</small></button>
-    <button class="tool" data-tool="wall" type="button"><b>🪵</b>Palizzata<small>4 legno</small></button>
-    <button class="tool" data-tool="erase" type="button"><b>✖️</b>Demolisci<small>gratis</small></button>
-    <button class="tool reset" id="reset" type="button"><b>↻</b>Reset<small>pilota</small></button>
-  </div>
-</div>
-<script>
-(()=>{
-'use strict';
-const canvas=document.getElementById('game'),ctx=canvas.getContext('2d'),stage=document.getElementById('stage');
-const woodEl=document.getElementById('wood'),hpEl=document.getElementById('coreHp'),waveEl=document.getElementById('waveNo'),porterEl=document.getElementById('porters'),hint=document.getElementById('hint'),toast=document.getElementById('toast'),gameover=document.getElementById('gameover');
-const COLS=24,ROWS=30,CORE={x:12,y:15}; let cell=24,ox=0,oy=0,last=0,selected='road',wood=35,coreHp=250,wave=0,gameEnded=false,nextWave=false;
-let tiles=[],porters=[],enemies=[],shots=[]; let waveQueue=0,waveSpawn=0;
-const costs={road:1,woodcutter:10,tower:18,wall:4};
-const dirs=[[1,0],[-1,0],[0,1],[0,-1]];
-function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a}
-function key(x,y){return x+','+y}
-function inb(x,y){return x>=0&&y>=0&&x<COLS&&y<ROWS}
-function t(x,y){return tiles[y][x]}
-function toastMsg(s){toast.textContent=s;toast.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>toast.classList.remove('show'),1200)}
-function init(){wood=35;coreHp=250;wave=0;gameEnded=false;porters=[];enemies=[];shots=[];waveQueue=0;nextWave=false;gameover.classList.remove('show');tiles=Array.from({length:ROWS},(_,y)=>Array.from({length:COLS},(_,x)=>({x,y,type:'grass',hp:0,prod:0,stock:0})));
-  // clustered forests, deliberately away from core
-  [[4,5,4],[19,6,3],[5,23,4],[19,24,4]].forEach(([cx,cy,r])=>{for(let y=cy-r;y<=cy+r;y++)for(let x=cx-r;x<=cx+r;x++)if(inb(x,y)&&Math.hypot(x-cx,y-cy)<r+Math.random()*1.2)t(x,y).type='forest'});
-  t(CORE.x,CORE.y).type='core';t(CORE.x,CORE.y).hp=250;
-  // free initial road around the core
-  [[0,1],[0,-1],[1,0],[-1,0]].forEach(([dx,dy])=>t(CORE.x+dx,CORE.y+dy).type='road');
-  hint.textContent='Costruisci una strada dal villaggio a un bosco, poi piazza un boscaiolo sul margine del bosco.'; updateUI();resize();}
-function resize(){const r=stage.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.max(1,Math.floor(r.width*dpr));canvas.height=Math.max(1,Math.floor(r.height*dpr));canvas.style.width=r.width+'px';canvas.style.height=r.height+'px';ctx.setTransform(dpr,0,0,dpr,0,0);cell=Math.max(12,Math.min(r.width/COLS,r.height/ROWS));ox=(r.width-COLS*cell)/2;oy=(r.height-ROWS*cell)/2}
-function updateUI(){woodEl.textContent=Math.floor(wood);hpEl.textContent=Math.max(0,Math.ceil(coreHp));waveEl.textContent=wave;porterEl.textContent=porters.length}
-function roadPass(x,y){return inb(x,y)&&['road','core','woodcutter','tower'].includes(t(x,y).type)}
-function pathToCore(sx,sy){const q=[[sx,sy]],prev=new Map([[key(sx,sy),null]]);let found=null;while(q.length){const [x,y]=q.shift();if(x===CORE.x&&y===CORE.y){found=[x,y];break}for(const [dx,dy] of dirs){const nx=x+dx,ny=y+dy,k=key(nx,ny);if(!prev.has(k)&&roadPass(nx,ny)){prev.set(k,[x,y]);q.push([nx,ny])}}}if(!found)return null;let p=[];for(let cur=found;cur;cur=prev.get(key(cur[0],cur[1])))p.push(cur);return p.reverse()}
-function adjacentRoad(x,y){return dirs.some(([dx,dy])=>inb(x+dx,y+dy)&&['road','core'].includes(t(x+dx,y+dy).type))}
-function build(x,y){if(!inb(x,y)||gameEnded)return;const tile=t(x,y);if(selected==='erase'){if(['road','woodcutter','tower','wall'].includes(tile.type)){tile.type='grass';tile.hp=0;tile.stock=0;toastMsg('Demolito')}return}
-  if(x===CORE.x&&y===CORE.y)return;
-  const cost=costs[selected]||0;if(wood<cost){toastMsg('Legno insufficiente');return}
-  if(selected==='road'){if(tile.type==='grass'){tile.type='road';wood-=cost}else if(tile.type==='forest')toastMsg('Il sentiero non attraversa il bosco nel pilota');}
-  if(selected==='woodcutter'){if(tile.type!=='grass'||!adjacentRoad(x,y)){toastMsg('Piazzalo su terreno libero accanto a un sentiero');return}const nearForest=dirs.some(([dx,dy])=>inb(x+dx,y+dy)&&t(x+dx,y+dy).type==='forest');if(!nearForest){toastMsg('Serve un bosco adiacente');return}tile.type='woodcutter';tile.prod=0;wood-=cost;hint.textContent='Il boscaiolo produce legna. Se è collegato al villaggio da sentieri, compariranno portatori.'}
-  if(selected==='tower'){if(tile.type!=='grass'||!adjacentRoad(x,y)){toastMsg('La torre deve toccare un sentiero');return}tile.type='tower';tile.hp=90;tile.cool=0;wood-=cost}
-  if(selected==='wall'){if(tile.type!=='grass'){toastMsg('Casella occupata');return}tile.type='wall';tile.hp=100;wood-=cost}
-  updateUI()}
-function spawnPorter(x,y,amount){const path=pathToCore(x,y);if(!path||path.length<2)return false;porters.push({x:x+.5,y:y+.5,path,i:0,p:0,amount});return true}
-function production(dt){for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){const a=t(x,y);if(a.type==='woodcutter'){a.prod+=dt;if(a.prod>3.2){a.prod=0;if(spawnPorter(x,y,4))a.stock=0;else{a.stock=Math.min(12,(a.stock||0)+4)}}if(a.stock>=4&&spawnPorter(x,y,4))a.stock-=4}}
-  for(const p of porters){if(p.i>=p.path.length-1)continue;p.p+=dt*1.5;if(p.p>=1){p.p-=1;p.i++;const [nx,ny]=p.path[p.i];p.x=nx+.5;p.y=ny+.5}}
-  for(let i=porters.length-1;i>=0;i--){const p=porters[i];if(p.i>=p.path.length-1){wood+=p.amount;porters.splice(i,1)}}}
-function startWave(){if(gameEnded||waveQueue>0||enemies.length){toastMsg('Ondata già in corso');return}wave++;waveQueue=4+wave*2;waveSpawn=0;hint.textContent='Difendi la rocca. Le torri colpiscono automaticamente; le palizzate rallentano i razziatori.';updateUI()}
-function spawnEnemy(){const side=rand(0,3);let x,y;if(side===0){x=Math.random()*COLS;y=-.3}else if(side===1){x=COLS+.3;y=Math.random()*ROWS}else if(side===2){x=Math.random()*COLS;y=ROWS+.3}else{x=-.3;y=Math.random()*ROWS}enemies.push({x,y,hp:28+wave*6,speed:.55+wave*.03,hit:0})}
-function waves(dt){if(waveQueue>0){waveSpawn-=dt;if(waveSpawn<=0){spawnEnemy();waveQueue--;waveSpawn=.65}}
-  if(wave>0&&waveQueue===0&&enemies.length===0&&!nextWave){nextWave=true;setTimeout(()=>{if(!gameEnded){wood+=8+wave*2;toastMsg('Ondata respinta: tributo + legno');nextWave=false;updateUI()}},500)}}
-function obstacleAt(ex,ey){const x=Math.floor(ex),y=Math.floor(ey);if(!inb(x,y))return null;const a=t(x,y);return ['wall','woodcutter','tower'].includes(a.type)?a:null}
-function enemyLogic(dt){for(const e of enemies){const dx=CORE.x+.5-e.x,dy=CORE.y+.5-e.y,d=Math.hypot(dx,dy)||1;const nx=e.x+dx/d*e.speed*dt,ny=e.y+dy/d*e.speed*dt;const ob=obstacleAt(nx,ny);e.hit-=dt;if(ob){if(e.hit<=0){ob.hp-=10;e.hit=.55;if(ob.hp<=0){ob.type='grass';ob.hp=0}}}else{e.x=nx;e.y=ny}if(Math.hypot(dx,dy)<.7&&e.hit<=0){coreHp-=12;e.hit=.5}}
-  enemies=enemies.filter(e=>e.hp>0&&coreHp>0);if(coreHp<=0&&!gameEnded){gameEnded=true;gameover.classList.add('show')}updateUI()}
-function towers(dt){for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){const a=t(x,y);if(a.type!=='tower')continue;a.cool=(a.cool||0)-dt;if(a.cool>0)continue;let best=null,bd=5.2;for(const e of enemies){const d=Math.hypot(e.x-(x+.5),e.y-(y+.5));if(d<bd){bd=d;best=e}}if(best){a.cool=.65;best.hp-=11;shots.push({x1:x+.5,y1:y+.5,x2:best.x,y2:best.y,life:.12})}}
-  for(const s of shots)s.life-=dt;shots=shots.filter(s=>s.life>0)}
-function tileColor(a,x,y){if(a.type==='grass')return (x+y)%2?'#596d45':'#61764b';if(a.type==='forest')return '#29452c';if(a.type==='road')return '#8b6f4e';if(a.type==='core')return '#aa8748';if(a.type==='woodcutter')return '#72522e';if(a.type==='tower')return '#69564b';if(a.type==='wall')return '#8a6844';return '#555'}
-function draw(){const r=stage.getBoundingClientRect();ctx.clearRect(0,0,r.width,r.height);ctx.fillStyle='#253422';ctx.fillRect(0,0,r.width,r.height);for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){const a=t(x,y),px=ox+x*cell,py=oy+y*cell;ctx.fillStyle=tileColor(a,x,y);ctx.fillRect(px,py,cell+.5,cell+.5);ctx.strokeStyle='#00000013';ctx.strokeRect(px,py,cell,cell);if(a.type==='forest'){ctx.fillStyle='#18361f';ctx.beginPath();ctx.arc(px+cell*.5,py+cell*.46,cell*.33,0,Math.PI*2);ctx.fill();ctx.fillStyle='#6c5131';ctx.fillRect(px+cell*.46,py+cell*.52,cell*.09,cell*.25)}if(a.type==='core'){ctx.fillStyle='#e1c17e';ctx.fillRect(px+cell*.22,py+cell*.2,cell*.56,cell*.58);ctx.fillStyle='#5b402e';ctx.fillRect(px+cell*.42,py+cell*.48,cell*.16,cell*.3)}if(a.type==='woodcutter'){ctx.fillStyle='#d8b16a';ctx.fillRect(px+cell*.2,py+cell*.28,cell*.6,cell*.48);ctx.fillStyle='#3b2b1f';ctx.fillRect(px+cell*.42,py+cell*.52,cell*.16,cell*.24)}if(a.type==='tower'){ctx.fillStyle='#c8b397';ctx.beginPath();ctx.arc(px+cell*.5,py+cell*.5,cell*.3,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#3a2720';ctx.lineWidth=Math.max(1,cell*.08);ctx.beginPath();ctx.moveTo(px+cell*.5,py+cell*.5);ctx.lineTo(px+cell*.82,py+cell*.35);ctx.stroke()}if(a.type==='wall'){ctx.fillStyle='#5e3f28';ctx.fillRect(px+cell*.1,py+cell*.22,cell*.8,cell*.56)}}
-  for(const p of porters){ctx.fillStyle='#f0d4a0';ctx.beginPath();ctx.arc(ox+p.x*cell,oy+p.y*cell,Math.max(2,cell*.16),0,Math.PI*2);ctx.fill();ctx.fillStyle='#5f432b';ctx.fillRect(ox+(p.x-.22)*cell,oy+(p.y-.05)*cell,cell*.16,cell*.18)}
-  for(const e of enemies){ctx.fillStyle='#b6473d';ctx.beginPath();ctx.arc(ox+e.x*cell,oy+e.y*cell,Math.max(3,cell*.22),0,Math.PI*2);ctx.fill();ctx.fillStyle='#2b1512';ctx.fillRect(ox+(e.x-.24)*cell,oy+(e.y-.32)*cell,cell*.48,Math.max(2,cell*.05))}
-  ctx.strokeStyle='#f4d16c';ctx.lineWidth=2;for(const s of shots){ctx.beginPath();ctx.moveTo(ox+s.x1*cell,oy+s.y1*cell);ctx.lineTo(ox+s.x2*cell,oy+s.y2*cell);ctx.stroke()}}
-function frame(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;if(!gameEnded){production(dt);waves(dt);enemyLogic(dt);towers(dt)}draw();requestAnimationFrame(frame)}
-function point(ev){const r=canvas.getBoundingClientRect(),cx=ev.clientX-r.left,cy=ev.clientY-r.top;return{x:Math.floor((cx-ox)/cell),y:Math.floor((cy-oy)/cell)}}
-canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture?.(e.pointerId);const p=point(e);build(p.x,p.y)});
-document.getElementById('toolbar').addEventListener('click',e=>{const b=e.target.closest('[data-tool]');if(!b)return;selected=b.dataset.tool;document.querySelectorAll('[data-tool]').forEach(x=>x.classList.toggle('active',x===b));});
-document.getElementById('waveBtn').addEventListener('click',startWave);document.getElementById('reset').addEventListener('click',init);document.getElementById('retry').addEventListener('click',init);addEventListener('resize',resize);init();requestAnimationFrame(frame);
-})();
-</script>
+  <main id="app" class="app-shell">
+    <header class="hud-top" aria-label="Stato della comunità">
+      <div class="identity">
+        <strong>TERRA ITALICA</strong>
+        <span id="dateLabel">1 Marzo · 1000 a.C.</span>
+      </div>
+      <div class="resources" id="resourceBar">
+        <span><i class="dot food"></i><b id="foodVal">0</b><small>cibo</small></span>
+        <span><i class="dot wood"></i><b id="woodVal">0</b><small>legno</small></span>
+        <span><i class="dot stone"></i><b id="stoneVal">0</b><small>pietra</small></span>
+        <span><i class="dot iron"></i><b id="ironVal">0</b><small>ferro</small></span>
+      </div>
+    </header>
+
+    <section class="world-wrap" id="worldWrap">
+      <canvas id="world" aria-label="Mappa di gioco"></canvas>
+      <div class="map-controls" aria-label="Controlli mappa">
+        <button id="zoomIn" type="button" aria-label="Aumenta zoom">+</button>
+        <button id="zoomOut" type="button" aria-label="Riduci zoom">−</button>
+        <button id="pauseBtn" type="button" aria-label="Pausa">Ⅱ</button>
+      </div>
+      <div id="message" class="message" role="status"></div>
+      <div id="selectionCard" class="selection-card hidden"></div>
+      <div id="gameOver" class="game-over hidden">
+        <div>
+          <small>FINE DELLA COMUNITÀ</small>
+          <h1>L'insediamento è caduto</h1>
+          <p>Il mondo resta deterministico: puoi ricominciare dalla stessa geografia o generare un territorio nuovo.</p>
+          <button id="restartSame" type="button">Ricomincia</button>
+          <button id="restartNew" type="button" class="secondary">Nuovo territorio</button>
+        </div>
+      </div>
+    </section>
+
+    <nav class="command-dock" aria-label="Comandi">
+      <div class="dock-tabs">
+        <button class="dock-tab active" data-panel="people" type="button">Comunità</button>
+        <button class="dock-tab" data-panel="orders" type="button">Ordini</button>
+        <button class="dock-tab" data-panel="build" type="button">Costruisci</button>
+        <button class="dock-tab" data-panel="world" type="button">Mondo</button>
+      </div>
+      <div id="people" class="dock-panel active"></div>
+      <div id="orders" class="dock-panel">
+        <button data-order="move" type="button"><b>Sposta</b><span>tocca il terreno</span></button>
+        <button data-order="gather" type="button"><b>Raccogli</b><span>tocca una risorsa</span></button>
+        <button data-order="farm" type="button"><b>Coltiva</b><span>tocca un campo</span></button>
+        <button data-order="tame" type="button"><b>Domestica</b><span>tocca una pecora</span></button>
+        <button data-order="attack" type="button"><b>Attacca</b><span>tocca una minaccia</span></button>
+        <button data-order="cancel" type="button"><b>Libera</b><span>annulla il compito</span></button>
+      </div>
+      <div id="build" class="dock-panel">
+        <button data-build="road" type="button"><b>Sentiero</b><span>1 legno</span></button>
+        <button data-build="warehouse" type="button"><b>Magazzino</b><span>18L · 8P</span></button>
+        <button data-build="house" type="button"><b>Distretto</b><span>24L · 10P</span></button>
+        <button data-build="farm" type="button"><b>Campo</b><span>6 legno</span></button>
+        <button data-build="palisade" type="button"><b>Palizzata</b><span>4 legno</span></button>
+        <button data-build="tower" type="button"><b>Torre</b><span>14L · 8P</span></button>
+      </div>
+      <div id="world" class="dock-panel world-actions">
+        <button id="saveBtn" type="button"><b>Salva</b><span>locale sul dispositivo</span></button>
+        <button id="loadBtn" type="button"><b>Carica</b><span>ultimo salvataggio</span></button>
+        <button id="newWorldBtn" type="button"><b>Nuovo mondo</b><span>genera nuova mappa</span></button>
+        <button id="centerBtn" type="button"><b>Centro</b><span>torna al villaggio</span></button>
+      </div>
+    </nav>
+  </main>
+
+  <script type="module" src="./game.js"></script>
 </body>
 </html>
