@@ -1,17 +1,19 @@
-# RTS Mobile — pilot
+# Terra Italica — RTS Mobile
 
-Prototype mobile-first, top-down, pre-Roman RTS/logistics game.
+RTS sandbox mobile-first ambientato nell'Italia preromana. Il progetto è una riscrittura indipendente ispirata alle premesse di simulazione della versione PC `rts`, ma con visuale top-down e interazione progettata per smartphone.
 
-This repository is intentionally disposable. The pilot exists only to validate touch controls and the core loop: production → transport → defense. If the concept works, the final project will be rebuilt from a clean codebase instead of extending this prototype.
+## Avvio
+Non richiede build, Node o installazioni. GitHub Pages pubblica direttamente la branch `main` tramite GitHub Actions.
 
-## Pilot features
-- portrait/landscape mobile layout
-- top-down grid
-- village core
-- wood resources and woodcutters
-- roads and porters
-- watchtowers and palisades
-- hostile waves
-- touch-first building toolbar
+## Controlli touch
+- trascina con un dito per muovere la mappa;
+- pinch oppure `+ / −` per lo zoom;
+- seleziona un abitante dalla scheda **Comunità**;
+- in **Ordini** scegli raccolta, coltivazione, domesticazione, spostamento o attacco e poi tocca il bersaglio;
+- in **Costruisci** scegli una struttura e tocca il terreno;
+- il gioco effettua autosave locale e offre Salva/Carica nella scheda **Mondo**.
 
-No build step is required. Open `index.html` directly or publish the repository with GitHub Pages.
+## Stato attuale
+La build contiene già la vertical slice completa del loop di base: mondo procedurale, cinque abitanti individuali, inventari, skill, risorse fisiche, logistica di deposito, costruzioni, strade, agricoltura stagionale, fauna, domesticazione, combattimento, incursioni, crescita della popolazione e salvataggi.
+
+Vedi `DESIGN.md` per i principi che devono guidare le prossime iterazioni.
