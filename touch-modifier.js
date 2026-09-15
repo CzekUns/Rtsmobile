@@ -1,5 +1,5 @@
-// Experimental RTS mobile modifier: hold the on-screen MOD pad with one finger
-// while dragging another finger on the map to draw a PC-style selection box.
+// RTS mobile input grammar
+// Free finger = left mouse button. Hold MOD = right mouse button / secondary layer.
 (() => {
   'use strict';
 
@@ -49,86 +49,232 @@
     }
   });
 
-  const originalPointerDown = Game.prototype.pointerDown;
-  const originalPointerMove = Game.prototype.pointerMove;
-  const originalPointerUp = Game.prototype.pointerUp;
   const originalDraw = Game.prototype.draw;
   const originalDrawHuman = Game.prototype.drawHuman;
-  const originalHandleTap = Game.prototype.handleTap;
 
-  Game.prototype.pointerDown = function(e) {
-    if (!modifierHeld || this.modifierBoxSelect?.active || this.pointer.size > 0) {
-      return originalPointerDown.call(this, e);
+  const clearUnitSelection = game => {
+    game.groupSelection = [];
+    for (const u of game.units) u.selected = false;
+  };
+
+  const selectUnits = (game, units) => {
+    const alive = units.filter(u => u.health > 0);
+    clearUnitSelection(game);
+    game.groupSelection = alive;
+    for (const u of alive) u.selected = true;
+    game.selected = alive[0] || null;
+    if (alive[0]) game.lastSelectedUnit = alive[0];
+    game.updateUI();
+  };
+
+  const selectedUnits = game => {
+    const group = (game.groupSelection || []).filter(u => u.health > 0);
+    if (group.length) return group;
+    return game.selected instanceof Unit && game.selected.health > 0 ? [game.selected] : [];
+  };
+
+  const localPoint = (game, e) => {
+    const r = game.canvas.getBoundingClientRect();
+    return {x:e.clientX-r.left, y:e.clientY-r.top};
+  };
+
+  Game.prototype.rtsLeftTap = function(sx, sy) {
+    const w = this.screenToWorld(sx, sy);
+    const tx = Math.floor(w.x / TILE), ty = Math.floor(w.y / TILE);
+    if (tx < 0 || ty < 0 || tx >= this.world.size || ty >= this.world.size) return;
+
+    // Building placement remains a deliberate tool action.
+    if (this.buildMode) {
+      this.placeBuild(this.buildMode, tx, ty);
+      return;
     }
 
+    const pos = {x:w.x/TILE, y:w.y/TILE};
+    const entity = this.pickEntity(pos);
+    clearUnitSelection(this);
+
+    if (entity) {
+      this.selected = entity;
+      if (entity instanceof Unit) {
+        entity.selected = true;
+        this.groupSelection = [entity];
+        this.lastSelectedUnit = entity;
+      }
+    } else {
+      this.selected = null;
+    }
+    this.orderMode = null;
+    this.syncModeButtons();
+    this.updateUI();
+  };
+
+  Game.prototype.rtsContextTap = function(sx, sy) {
+    const group = selectedUnits(this);
+    if (!group.length) {
+      this.message('Seleziona prima uno o più abitanti.');
+      return;
+    }
+
+    const w = this.screenToWorld(sx, sy);
+    const tx = Math.floor(w.x / TILE), ty = Math.floor(w.y / TILE);
+    if (tx < 0 || ty < 0 || tx >= this.world.size || ty >= this.world.size) return;
+    const pos = {x:w.x/TILE, y:w.y/TILE};
+    const entity = this.pickEntity(pos);
+
+    if (entity instanceof ResourceNode) {
+      for (const u of group) this.assignGather(u, entity);
+      this.message(`${group.length} abitanti: raccolta ${this.resourceName(entity.type)}.`);
+    } else if (entity instanceof Raider || (entity instanceof Animal && entity.type === 'wolf')) {
+      for (const u of group) this.assignAttack(u, entity);
+      this.message(`${group.length} abitanti attaccano la minaccia.`);
+    } else if (entity instanceof Animal && entity.type === 'sheep' && entity.owner === -1) {
+      for (const u of group) this.assignTame(u, entity);
+      this.message(`${group.length} abitanti tentano la domesticazione.`);
+    } else if (entity instanceof Building && entity.type === 'farm' && entity.built) {
+      for (const u of group) this.assignFarm(u, entity);
+      this.message(`${group.length} abitanti assegnati al campo.`);
+    } else if (entity instanceof Building && !entity.built) {
+      for (const u of group) this.assignBuild(u, entity);
+      this.message(`${group.length} abitanti assegnati al cantiere.`);
+    } else {
+      for (const u of group) this.assignMove(u, tx, ty);
+      this.message(`${group.length} abitanti si spostano.`);
+    }
+
+    this.orderMode = null;
+    this.syncModeButtons();
+    this.updateUI();
+  };
+
+  Game.prototype.rtsFinishBoxSelection = function(box) {
+    const left = Math.min(box.startX, box.x);
+    const right = Math.max(box.startX, box.x);
+    const top = Math.min(box.startY, box.y);
+    const bottom = Math.max(box.startY, box.y);
+    const units = this.units.filter(u => {
+      if (u.health <= 0) return false;
+      const p = this.worldToScreen(u.x*TILE, u.y*TILE);
+      return p.x >= left && p.x <= right && p.y >= top && p.y <= bottom;
+    });
+    selectUnits(this, units);
+    this.message(units.length ? `${units.length} abitanti selezionati.` : 'Nessun abitante nel riquadro.');
+  };
+
+  // Full replacement of the canvas pointer grammar:
+  // free tap = select; free drag = box-select; MOD tap = context command;
+  // MOD drag = camera pan; two free fingers = pinch zoom.
+  Game.prototype.pointerDown = function(e) {
     this.canvas.setPointerCapture(e.pointerId);
-    const r = this.canvas.getBoundingClientRect();
-    const x = e.clientX - r.left;
-    const y = e.clientY - r.top;
-    this.modifierBoxSelect = {
-      pointerId: e.pointerId,
-      startX: x,
-      startY: y,
-      x,
-      y,
-      active: true
+    this.rtsPointers ||= new Map();
+    const p = localPoint(this, e);
+    this.rtsPointers.set(e.pointerId, {
+      id:e.pointerId,
+      x:e.clientX, y:e.clientY,
+      localX:p.x, localY:p.y,
+      startX:e.clientX, startY:e.clientY,
+      startLocalX:p.x, startLocalY:p.y,
+      lastX:e.clientX, lastY:e.clientY
+    });
+
+    if (!modifierHeld && this.rtsPointers.size === 2) {
+      const pts = [...this.rtsPointers.values()];
+      this.rtsGesture = {
+        type:'pinch',
+        prevDist:Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y)
+      };
+      this.rtsSelectionBox = null;
+      e.preventDefault();
+      return;
+    }
+
+    if (this.rtsPointers.size > 1) {
+      e.preventDefault();
+      return;
+    }
+
+    this.rtsGesture = {
+      type: modifierHeld ? 'modCandidate' : 'leftCandidate',
+      pointerId:e.pointerId
     };
-    this.dragging = false;
+    this.rtsSelectionBox = null;
     e.preventDefault();
   };
 
   Game.prototype.pointerMove = function(e) {
-    const box = this.modifierBoxSelect;
-    if (box?.active && box.pointerId === e.pointerId) {
-      const r = this.canvas.getBoundingClientRect();
-      box.x = e.clientX - r.left;
-      box.y = e.clientY - r.top;
+    if (!this.rtsPointers?.has(e.pointerId)) return;
+    const p = this.rtsPointers.get(e.pointerId);
+    const lp = localPoint(this, e);
+    p.x=e.clientX; p.y=e.clientY; p.localX=lp.x; p.localY=lp.y;
+
+    if (!modifierHeld && this.rtsPointers.size === 2) {
+      const pts=[...this.rtsPointers.values()];
+      const d=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
+      if (this.rtsGesture?.type !== 'pinch') this.rtsGesture={type:'pinch',prevDist:d};
+      const prev=this.rtsGesture.prevDist || d;
+      if (Math.abs(d-prev)>1) this.camera.zoom=clamp(this.camera.zoom*(d/prev),.48,2.3);
+      this.rtsGesture.prevDist=d;
+      p.lastX=e.clientX; p.lastY=e.clientY;
       e.preventDefault();
       return;
     }
-    return originalPointerMove.call(this, e);
+
+    const g=this.rtsGesture;
+    if (!g || g.pointerId !== e.pointerId) return;
+    const moved=Math.hypot(e.clientX-p.startX, e.clientY-p.startY);
+
+    if (g.type === 'leftCandidate' && moved > 7) {
+      g.type='leftBox';
+      this.rtsSelectionBox={
+        startX:p.startLocalX,startY:p.startLocalY,
+        x:lp.x,y:lp.y,active:true
+      };
+    } else if (g.type === 'leftBox') {
+      this.rtsSelectionBox.x=lp.x;
+      this.rtsSelectionBox.y=lp.y;
+    } else if (g.type === 'modCandidate' && moved > 7) {
+      g.type='modPan';
+    }
+
+    if (g.type === 'modPan') {
+      const dx=e.clientX-p.lastX, dy=e.clientY-p.lastY;
+      this.camera.x-=dx/this.camera.zoom;
+      this.camera.y-=dy/this.camera.zoom;
+    }
+
+    p.lastX=e.clientX; p.lastY=e.clientY;
+    e.preventDefault();
   };
 
   Game.prototype.pointerUp = function(e) {
-    const box = this.modifierBoxSelect;
-    if (box?.active && box.pointerId === e.pointerId) {
-      const r = this.canvas.getBoundingClientRect();
-      box.x = e.clientX - r.left;
-      box.y = e.clientY - r.top;
+    const p=this.rtsPointers?.get(e.pointerId);
+    if (!p) return;
+    const lp=localPoint(this,e);
+    p.x=e.clientX;p.y=e.clientY;p.localX=lp.x;p.localY=lp.y;
+    const g=this.rtsGesture;
 
-      const left = Math.min(box.startX, box.x);
-      const right = Math.max(box.startX, box.x);
-      const top = Math.min(box.startY, box.y);
-      const bottom = Math.max(box.startY, box.y);
+    this.rtsPointers.delete(e.pointerId);
 
-      const selected = this.units.filter(u => {
-        if (u.health <= 0) return false;
-        const p = this.worldToScreen(u.x * TILE, u.y * TILE);
-        return p.x >= left && p.x <= right && p.y >= top && p.y <= bottom;
-      });
-
-      this.groupSelection = selected;
-      for (const u of this.units) u.selected = selected.includes(u);
-      this.selected = selected[0] || null;
-      if (selected[0]) this.lastSelectedUnit = selected[0];
-      this.modifierBoxSelect = null;
-      this.dragging = false;
-      this.updateUI();
-      this.message(selected.length
-        ? `${selected.length} abitanti selezionati.`
-        : 'Nessun abitante nel riquadro.');
+    if (g?.type === 'pinch') {
+      if (this.rtsPointers.size < 2) this.rtsGesture=null;
       e.preventDefault();
       return;
     }
-    return originalPointerUp.call(this, e);
-  };
 
-  Game.prototype.handleTap = function(...args) {
-    if (this.groupSelection?.length) {
-      this.groupSelection = [];
-      for (const u of this.units) u.selected = false;
+    if (g?.pointerId === e.pointerId) {
+      if (g.type === 'leftBox' && this.rtsSelectionBox) {
+        this.rtsSelectionBox.x=lp.x;
+        this.rtsSelectionBox.y=lp.y;
+        this.rtsFinishBoxSelection(this.rtsSelectionBox);
+      } else if (g.type === 'leftCandidate') {
+        this.rtsLeftTap(lp.x,lp.y);
+      } else if (g.type === 'modCandidate') {
+        this.rtsContextTap(lp.x,lp.y);
+      }
     }
-    return originalHandleTap.apply(this, args);
+
+    this.rtsSelectionBox=null;
+    this.rtsGesture=null;
+    e.preventDefault();
   };
 
   Game.prototype.drawHuman = function(u, hostile) {
@@ -136,28 +282,24 @@
     if (hostile || !this.groupSelection?.length) return;
     if (this.selected?.id === u.id) return;
     if (!this.groupSelection.some(x => x.id === u.id)) return;
-    const p = this.worldToScreen(u.x * TILE, u.y * TILE);
-    this.selectionRing(p.x, p.y, 11 * this.camera.zoom);
+    const p=this.worldToScreen(u.x*TILE,u.y*TILE);
+    this.selectionRing(p.x,p.y,11*this.camera.zoom);
   };
 
   Game.prototype.draw = function() {
     originalDraw.call(this);
-    const box = this.modifierBoxSelect;
+    const box=this.rtsSelectionBox;
     if (!box?.active) return;
-
-    const ctx = this.ctx;
-    const x = Math.min(box.startX, box.x);
-    const y = Math.min(box.startY, box.y);
-    const w = Math.abs(box.x - box.startX);
-    const h = Math.abs(box.y - box.startY);
-
+    const ctx=this.ctx;
+    const x=Math.min(box.startX,box.x), y=Math.min(box.startY,box.y);
+    const w=Math.abs(box.x-box.startX), h=Math.abs(box.y-box.startY);
     ctx.save();
-    ctx.fillStyle = 'rgba(209,182,109,.12)';
-    ctx.strokeStyle = '#d1b66d';
-    ctx.lineWidth = 1.5;
+    ctx.fillStyle='rgba(209,182,109,.12)';
+    ctx.strokeStyle='#d1b66d';
+    ctx.lineWidth=1.5;
     ctx.setLineDash([6,4]);
-    ctx.fillRect(x, y, w, h);
-    ctx.strokeRect(x, y, w, h);
+    ctx.fillRect(x,y,w,h);
+    ctx.strokeRect(x,y,w,h);
     ctx.restore();
   };
 })();
