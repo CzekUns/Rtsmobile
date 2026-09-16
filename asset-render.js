@@ -13,7 +13,7 @@
   };
 
   const SPRITES = {
-    human: load('./assets/p16/units/unit_human_p16.png?v=26'),
+    human: load('./assets/p16/units/unit_human_p16.png?v=27'),
     raider: load('./assets/p16/units/unit_raider_p16.png?v=24'),
     sheep: load('./assets/p16/animals/animal_sheep_p16.png?v=24'),
     wolf: load('./assets/p16/animals/animal_wolf_p16.png?v=24'),
