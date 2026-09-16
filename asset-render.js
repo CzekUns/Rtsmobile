@@ -13,14 +13,19 @@
   };
 
   const SPRITES = {
-    human: load('./assets/p16/units/unit_human_p16.png?v=23'),
-    raider: load('./assets/p16/units/unit_raider_p16.png?v=23'),
-    sheep: load('./assets/p16/animals/animal_sheep_p16.png?v=23'),
-    wolf: load('./assets/p16/animals/animal_wolf_p16.png?v=23'),
-    wood: load('./assets/p16/resources/resource_tree_p16.png?v=23'),
-    stone: load('./assets/p16/resources/resource_stone_p16.png?v=23'),
-    iron: load('./assets/p16/resources/resource_iron_p16.png?v=23'),
-    food: load('./assets/p16/resources/resource_berry_p16.png?v=23')
+    human: load('./assets/p16/units/unit_human_p16.png?v=24'),
+    raider: load('./assets/p16/units/unit_raider_p16.png?v=24'),
+    sheep: load('./assets/p16/animals/animal_sheep_p16.png?v=24'),
+    wolf: load('./assets/p16/animals/animal_wolf_p16.png?v=24'),
+    wood: load('./assets/p16/resources/resource_tree_p16.png?v=24'),
+    stone: load('./assets/p16/resources/resource_stone_p16.png?v=24'),
+    iron: load('./assets/p16/resources/resource_iron_p16.png?v=24'),
+    food: load('./assets/p16/resources/resource_berry_p16.png?v=24'),
+    house: load('./assets/p16/buildings/building_house_p16.png?v=24'),
+    farm: load('./assets/p16/buildings/building_farm_p16.png?v=24'),
+    warehouse: load('./assets/p16/buildings/building_warehouse_p16.png?v=24'),
+    tower: load('./assets/p16/buildings/building_tower_p16.png?v=24'),
+    palisade: load('./assets/p16/buildings/building_palisade_p16.png?v=24')
   };
 
   window.TERRA_P16_SPRITES = SPRITES;
@@ -57,7 +62,7 @@
       dy = entity.ty - entity.y;
     }
 
-    let angle = prev?.angle ?? 0; // source PNG faces south/down.
+    let angle = prev?.angle ?? 0;
     if (Math.hypot(dx, dy) >= 0.001) {
       const raw = Math.atan2(dy, dx) - Math.PI / 2;
       angle = Math.round(raw / OCTANT) * OCTANT;
@@ -81,6 +86,7 @@
   const oldDrawResource = Game.prototype.drawResource;
   const oldDrawHuman = Game.prototype.drawHuman;
   const oldDrawAnimal = Game.prototype.drawAnimal;
+  const oldDrawBuilding = Game.prototype.drawBuilding;
 
   Game.prototype.drawResource = function(r) {
     const p = this.worldToScreen(r.x * TILE, r.y * TILE);
@@ -133,5 +139,46 @@
     }
 
     if (this.selected?.id === a.id) this.selectionRing(p.x, p.y, 12 * z);
+  };
+
+  Game.prototype.drawBuilding = function(b) {
+    const img = SPRITES[b.type];
+    if (!b.built || !ready(img)) return oldDrawBuilding.call(this, b);
+
+    const p = this.worldToScreen(b.x * TILE, b.y * TILE);
+    const z = this.camera.zoom;
+    const dims = {
+      house: [64, 66],
+      farm: [64, 68],
+      warehouse: [68, 62],
+      tower: [42, 78],
+      palisade: [54, 20]
+    }[b.type];
+
+    if (!dims) return oldDrawBuilding.call(this, b);
+
+    const ctx = this.ctx;
+    ctx.save();
+    ctx.fillStyle = '#0000003f';
+    ctx.beginPath();
+    ctx.ellipse(p.x, p.y + (b.type === 'tower' ? 14 : 10) * z,
+      Math.max(8, dims[0] * .28) * z,
+      Math.max(3, dims[1] * .07) * z,
+      0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    drawCentered(ctx, img, p.x, p.y, dims[0] * z, dims[1] * z);
+
+    if (this.selected?.id === b.id) this.selectionRing(p.x, p.y, Math.max(15, dims[0] * .28) * z);
+    if (b.health < b.maxHealth) {
+      const ratio = Math.max(0, b.health / b.maxHealth);
+      const barW = Math.min(32, dims[0] * .55) * z;
+      const barY = p.y - (dims[1] * .5 + 5) * z;
+      ctx.fillStyle = '#171717';
+      ctx.fillRect(p.x - barW / 2, barY, barW, 3 * z);
+      ctx.fillStyle = '#70835d';
+      ctx.fillRect(p.x - barW / 2, barY, barW * ratio, 3 * z);
+    }
   };
 })();
