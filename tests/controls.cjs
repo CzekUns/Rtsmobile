@@ -1,0 +1,32 @@
+const {readFileSync}=require('node:fs');
+const vm=require('node:vm');
+const assert=require('node:assert/strict');
+const path=require('node:path');
+const root=path.join(__dirname,'..');
+const html=readFileSync(path.join(root,'index.html'),'utf8');
+const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
+assert.equal(new Set(ids).size,ids.length,'HTML IDs must be unique');
+const context2d=new Proxy({}, {get:(o,k)=>o[k]||(()=>{}),set:(o,k,v)=>(o[k]=v,true)});
+function node(dataset={}){const classes=new Set();return {dataset,style:{},classList:{add:x=>classes.add(x),remove:x=>classes.delete(x),contains:x=>classes.has(x),toggle:(x,on)=>on?classes.add(x):classes.delete(x)},addEventListener(){},setAttribute(){},setPointerCapture(){},getBoundingClientRect:()=>({left:0,top:0,width:390,height:600}),getContext:()=>context2d,querySelectorAll(){return [...(this.innerHTML||'').matchAll(/data-person="([^"]+)"/g)].map(m=>node({person:m[1]}))}}}
+const byId=Object.fromEntries(ids.map(id=>[id,node()]));
+const tabs=[...html.matchAll(/data-panel="([^"]+)"/g)].map(m=>node({panel:m[1]}));
+const orders=[...html.matchAll(/data-order="([^"]+)"/g)].map(m=>node({order:m[1]}));
+const builds=[...html.matchAll(/data-build="([^"]+)"/g)].map(m=>node({build:m[1]}));
+const lists={'.dock-tab':tabs,'.dock-panel':tabs.map(t=>byId[t.dataset.panel]),'[data-order]':orders,'[data-build]':builds,'[data-order],[data-build]':[...orders,...builds]};
+const storage=new Map();
+const sandbox={console,performance,Math,Date,setTimeout:()=>0,clearTimeout(){},devicePixelRatio:1,crypto:require('node:crypto').webcrypto,requestAnimationFrame(){},addEventListener(){},navigator:{},confirm:()=>true,localStorage:{setItem:(k,v)=>storage.set(k,v),getItem:k=>storage.get(k)},document:{querySelector:s=>byId[s.slice(1)],querySelectorAll:s=>lists[s]||[],getElementById:id=>byId[id],addEventListener(){}},Image:class{constructor(){this.complete=true;this.naturalWidth=16}}};
+sandbox.window=sandbox;vm.createContext(sandbox);
+for(const m of html.matchAll(/<script src="\.\/([^?]+)\?[^\"]+"><\/script>/g)){let code=readFileSync(path.join(root,m[1]),'utf8');if(m[1]==='game.js')code=code.replace('new Game();','globalThis.game=new Game();');vm.runInContext(code,sandbox,{filename:m[1]});}
+const g=sandbox.game;g.paused=true;
+tabs.find(t=>t.dataset.panel==='worldPanel').onclick();assert(byId.worldPanel.classList.contains('active'));assert(!byId.world.classList.contains('active'));
+const [a,b]=g.units;g.groupSelection=[a,b];g.selected=a;
+let rings=0;g.selectionRing=()=>rings++;g.drawHuman(a,false);g.drawHuman(b,false);assert.equal(rings,2,'both PNG units must display selection rings');
+const ev=(id,x,y)=>({pointerId:id,clientX:x,clientY:y,preventDefault(){}});
+g.screenToWorld=(x,y)=>({x:x*30,y:y*30});
+orders.find(o=>o.dataset.order==='move').onclick();g.rtsLeftTap(42,42);assert.equal(a.task.type,'move');assert.equal(b.task.type,'move');assert.equal(g.selected,a);assert.equal(g.orderMode,null);
+orders.find(o=>o.dataset.order==='cancel').onclick();assert.equal(a.task,null);assert.equal(b.task,null);
+g.pointerDown(ev(1,50,50));g.pointerCancel();g.pointerUp(ev(1,50,50));assert.equal(a.task,null);assert.equal(g.rtsGesture,null);
+g.worldToScreen=(x,y)=>({x,y});g.rtsFinishBoxSelection({startX:0,startY:0,x:10000,y:10000});assert.equal(g.rtsSelectedUnits().length,5);
+g.save();const old=g.units[0];assert(g.load());assert(!g.rtsSelectedUnits().includes(old));assert.equal(g.rtsSelectedUnits().length,1);
+g.groupSelection=[...g.units];g.newGame(123);assert.equal(g.groupSelection.length,0);assert.equal(g.rtsSelectedUnits().length,1);
+console.log('PASS: unique IDs, World tab, PNG group rings, group orders/cancel, pointer cancellation, box selection, load/new-game selection reset.');

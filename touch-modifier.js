@@ -68,10 +68,12 @@
   };
 
   const selectedUnits = game => {
-    const group = (game.groupSelection || []).filter(u => u.health > 0);
+    const group = game.selected instanceof Unit ? (game.groupSelection || []).filter(u => u.health > 0 && game.units.includes(u)) : [];
     if (group.length) return group;
     return game.selected instanceof Unit && game.selected.health > 0 ? [game.selected] : [];
   };
+
+  Game.prototype.rtsSelectedUnits = function() { return selectedUnits(this); };
 
   const localPoint = (game, e) => {
     const r = game.canvas.getBoundingClientRect();
@@ -90,6 +92,13 @@
     }
 
     const pos = {x:w.x/TILE, y:w.y/TILE};
+    if (this.orderMode) {
+      const group = selectedUnits(this);
+      if (!group.length) { this.message('Seleziona prima uno o più abitanti.'); return; }
+      const order = this.orderMode;
+      for (const u of group) this.applyOrder(order, pos, tx, ty, u);
+      return;
+    }
     const entity = this.pickEntity(pos);
     clearUnitSelection(this);
 
@@ -303,3 +312,4 @@
     ctx.restore();
   };
 })();
+
