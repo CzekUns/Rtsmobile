@@ -15,29 +15,25 @@ P16 is the canonical art grammar for Terra Italica.
 
 ## Directional unit standard
 
-Units and animals do **not** require walk-cycle animation frames for the base implementation. Movement is simulated by switching between eight static directional PNG assets according to the current movement vector:
+Units and animals do **not** require walk-cycle animation frames for the base implementation and do not require eight separate directional files.
 
-- `N` = facing up
-- `NE` = facing upper-right
-- `E` = facing right
-- `SE` = facing lower-right
-- `S` = facing down
-- `SW` = facing lower-left
-- `W` = facing left
-- `NW` = facing upper-left
+Each subject uses one clean top-down PNG with a stable centre anchor. The renderer derives the current movement vector and rotates the PNG to the nearest of eight compass directions:
 
-All eight variants of the same subject must use:
+- `N` = up
+- `NE` = upper-right
+- `E` = right
+- `SE` = lower-right
+- `S` = down
+- `SW` = lower-left
+- `W` = left
+- `NW` = upper-left
 
-- the same canvas dimensions;
-- the same visual scale;
-- the same bottom-centre ground anchor;
-- the same apparent body footprint;
-- identical pixel density and lighting.
-
-Only orientation changes between variants. The engine selects the directional PNG from the movement vector. When a unit is stationary, it keeps the last valid facing direction. This avoids visual jumping when the displayed asset changes.
+The source PNG is authored facing `S` (down). Rotation is quantised in 45° steps, so movement reads directionally without a walk-cycle. When an entity becomes stationary it keeps the last valid facing direction. Scale, centre point and footprint therefore remain stable while moving.
 
 ## Engine mapping
 
 The current gameplay engine still uses its existing logical tile size. P16 is an **art-space standard**, intentionally decoupled from gameplay coordinates while controls and simulation are still evolving.
 
-When the sprite pipeline becomes authoritative, the intended target is a 32 px render tile at 1× presentation scale, i.e. 2 screen pixels per art-pixel, with integer-scale presentation wherever practical.
+The current production PNG pipeline uses small native transparent assets and nearest-neighbour rendering. Terrain remains procedural/noise-based and is not replaced by terrain PNG tiles.
+
+The intended long-term presentation target remains a 32 px render tile at 1× presentation scale, i.e. 2 screen pixels per art-pixel, with integer-scale presentation wherever practical.
