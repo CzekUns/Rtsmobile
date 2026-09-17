@@ -1,9 +1,14 @@
 {
-  "active_task": "T02",
+  "active_task": "T03",
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "lease": null,
+  "lease": {
+    "run_id": "run-20260917T120000Z",
+    "task": "T03",
+    "observed_head": "69d1b76af9d6f38585ba534ebfa1665a3cf7bc2e",
+    "expires_at": "2026-09-17T13:30:00Z"
+  },
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
   "runs": [
@@ -15,12 +20,12 @@
     },
     {
       "at": "2026-09-17T11:05:07Z",
+      "branch": "work/T02-persistent-people",
+      "commit": "8c8d408ab2cf232acd07d1877d64beea19302e43",
+      "next": "Recheck workflow 35213852536. If successful mark T02 done, then implement T03. T01 remains blocked.",
       "notes": "Restored missing remote plan/register from prepared local documents on unchanged build-32 baseline; acquired non-forced lease. T01 Chromium executable missing. Implemented T02 and v4 migration; all Node suites pass.",
       "result": "awaiting_deploy",
-      "task": "T01/T02",
-      "commit": "8c8d408ab2cf232acd07d1877d64beea19302e43",
-      "branch": "work/T02-persistent-people",
-      "next": "Recheck workflow 35213852536. If successful mark T02 done, then implement T03. T01 remains blocked."
+      "task": "T01/T02"
     }
   ],
   "schema_version": 1,
@@ -77,14 +82,13 @@
       "evidence": [
         "6 persistent-person regression cases PASS; 17 simulation cases PASS; controls, debug, selection-scroll PASS. Tested using current remote renderer sources; Node VM/DOM only.",
         "Build 33 commit 8c8d408ab2cf232acd07d1877d64beea19302e43; JavaScript syntax checks PASS.",
-        "Pages workflow 35213852536 in_progress at 2026-09-17T11:05:51Z; not counted as deployed."
+        "Pages workflow 35213852536 in_progress at 2026-09-17T11:05:51Z; not counted as deployed.",
+        "GitHub Pages workflow 35213852536 completed successfully at 2026-09-17T11:05:40Z."
       ],
       "id": "T02",
-      "last_attempt_at": "2026-09-17T11:05:07Z",
-      "remaining": [
-        "Verify GitHub Pages deployment of build 33; then T03 residents."
-      ],
-      "status": "awaiting_deploy",
+      "last_attempt_at": "2026-09-17T12:00:00Z",
+      "remaining": [],
+      "status": "done",
       "title": "Modello unico degli abitanti e migrazione"
     },
     {
@@ -537,5 +541,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-17T11:05:51Z"
+  "updated_at": "2026-09-17T12:00:00Z"
 }
