@@ -58,6 +58,14 @@
       "notes": "Verified Build 36 deployment; implemented unique equipment ledger, atomic transfers, local access and capacity, death drops, conservative v5 load.",
       "result": "awaiting_deploy",
       "task": "T05/T06"
+    },
+    {
+      "at": "2026-09-17T17:17:38.991Z",
+      "task": "T01/T07",
+      "result": "awaiting_deploy",
+      "branch": "work/T07-paperdoll",
+      "notes": "Cloud browser resolves T01 blocker. Implemented identity-bound Character dialog, local object transfers and responsive layout test fixture.",
+      "next": "Verify Build 38 Pages and real UI, then T08 separate Skills."
     }
   ],
   "schema_version": 1,
@@ -85,19 +93,19 @@
         "Avviare il gioco in un browser disponibile e verificare loop, errori console, selezione, movimento e ripresa.",
         "Provare i comandi attraverso eventi UI e percorsi raggiungibili, oltre ai test con DOM simulato; registrare browser e viewport."
       ],
-      "blocker": "Playwright Chromium executable missing; previous download failed. No repeated installation attempted.",
+      "blocker": null,
       "branch": null,
-      "commit": null,
+      "commit": "1a47a2a6cecfea56323df9e1ebf08a2edba6f58a",
       "depends_on": [
         "T00"
       ],
-      "evidence": [],
-      "id": "T01",
-      "last_attempt_at": "2026-09-17T11:02:00Z",
-      "remaining": [
-        "Real browser launch, console, UI events, movement and resume; browser + viewport evidence."
+      "evidence": [
+        "Cloud Chrome, viewport 1363x936, Build 37: UI selection Neria; Sposta + canvas click; physical displacement observed in screenshots; pause/resume and calendar advancement; UI save/load restored same person in pause. No app-origin console errors; extension metadata errors excluded. This is desktop browser, not touch/hardware certification."
       ],
-      "status": "blocked_external",
+      "id": "T01",
+      "last_attempt_at": "2026-09-17T17:17:38.991Z",
+      "remaining": [],
+      "status": "done",
       "title": "Avvio reale e regressioni di movimento"
     },
     {
@@ -219,13 +227,15 @@
       "depends_on": [
         "T06"
       ],
-      "evidence": [],
-      "id": "T07",
-      "last_attempt_at": "2026-09-17T17:12:55.631Z",
-      "remaining": [
-        "Implement dedicated identity-bound paperdoll and verify UI."
+      "evidence": [
+        "8 character regressions PASS; 11 equipment and all previous Node VM/DOM suites PASS; syntax and diff checks PASS."
       ],
-      "status": "in_progress",
+      "id": "T07",
+      "last_attempt_at": "2026-09-17T17:17:38.991Z",
+      "remaining": [
+        "Verify Build 38 Pages; inspect character viewport and transfer UI in real browser."
+      ],
+      "status": "awaiting_deploy",
       "title": "Vista Personaggio e paperdoll"
     },
     {
@@ -588,5 +598,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-17T17:12:55.631Z"
+  "updated_at": "2026-09-17T17:17:38.991Z"
 }
