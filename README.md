@@ -15,7 +15,7 @@ Non richiede build, Node o installazioni. GitHub Pages pubblica direttamente la 
 - In **Costruisci**, scegli una struttura e tocca il terreno.
 - In **Mondo**, salva/carica la partita locale, genera un territorio o torna al villaggio.
 
-## Stato attuale — Build 31
+## Stato attuale — Build 32
 Mondo procedurale, cinque abitanti, raccolta, costruzioni, fauna, combattimento e prima filiera fisica **campo → mulino → forno → Casa comune**. Gli edifici hanno scorte locali, gli abitanti trasportano le merci e il salvataggio conserva i viaggi in corso.
 
 Apri **Mondo → Filiera** per inventari e rotte. Il pannello mette in pausa la simulazione. Dopo sospensione o caricamento premi ▶ per riprendere. I salvataggi precedenti vengono importati conservando l'originale.
@@ -40,3 +40,6 @@ I test usano DOM/canvas simulati; non sostituiscono una prova touch e prestazion
 
 ## Build 31 — ripresa visibile
 Dopo il caricamento e il ritorno dal background compare un avviso sulla mappa con **Riprendi partita**. Gli ordini impartiti durante la pausa rimangono in attesa e partono alla ripresa.
+
+## Build 32 — selezione oltre lo schermo
+Durante il trascinamento del riquadro, tieni il dito sul bordo sinistro, destro o superiore: la mappa scorre e la selezione resta ancorata al terreno. Lo scorrimento funziona anche in pausa e si ferma al rilascio, con il pinch o ai confini della mappa.

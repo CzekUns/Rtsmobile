@@ -182,6 +182,7 @@
       localX:p.x, localY:p.y,
       startX:e.clientX, startY:e.clientY,
       startLocalX:p.x, startLocalY:p.y,
+      startWorld:this.screenToWorld(p.x,p.y),
       lastX:e.clientX, lastY:e.clientY
     });
 
@@ -235,6 +236,7 @@
       g.type='leftBox';
       this.rtsSelectionBox={
         startX:p.startLocalX,startY:p.startLocalY,
+        startWorld:p.startWorld,
         x:lp.x,y:lp.y,active:true
       };
     } else if (g.type === 'leftBox') {
@@ -273,6 +275,7 @@
       if (g.type === 'leftBox' && this.rtsSelectionBox) {
         this.rtsSelectionBox.x=lp.x;
         this.rtsSelectionBox.y=lp.y;
+        this.rtsSyncSelectionBox();
         this.rtsFinishBoxSelection(this.rtsSelectionBox);
       } else if (g.type === 'leftCandidate') {
         this.rtsLeftTap(lp.x,lp.y);
@@ -284,6 +287,41 @@
     this.rtsSelectionBox=null;
     this.rtsGesture=null;
     e.preventDefault();
+  };
+
+  // Keep the selection anchored to the terrain while the camera moves.
+  Game.prototype.rtsSyncSelectionBox = function() {
+    const box=this.rtsSelectionBox;
+    if (!box?.startWorld) return;
+    const start=this.worldToScreen(box.startWorld.x,box.startWorld.y);
+    box.startX=start.x; box.startY=start.y;
+    box.x=clamp(box.x,0,this.viewW); box.y=clamp(box.y,0,this.viewH);
+  };
+
+  Game.prototype.rtsScrollSelection = function(dt) {
+    const box=this.rtsSelectionBox,gesture=this.rtsGesture;
+    if (!box?.active || gesture?.type!=='leftBox' || this.rtsPointers?.size!==1 || modifierHeld || this.suspended || this.gameEnded) return;
+    const pointer=this.rtsPointers.get(gesture.pointerId);
+    if (!pointer) return;
+    // A small edge zone also works on phones where a finger cannot leave the screen.
+    const edge=Math.min(24,this.viewW/4,this.viewH/4);
+    const x=pointer.localX,y=pointer.localY;
+    const vx=x<edge?-clamp((edge-x)/edge,0,1):x>this.viewW-edge?clamp((x-this.viewW+edge)/edge,0,1):0;
+    const vy=y<edge?-clamp((edge-y)/edge,0,1):0;
+    const step=300*clamp(dt,0,.05)/this.camera.zoom;
+    const extent=this.world.size*TILE;
+    const halfW=Math.min(extent/2,this.viewW/(2*this.camera.zoom));
+    const halfH=Math.min(extent/2,this.viewH/(2*this.camera.zoom));
+    if(vx)this.camera.x=clamp(this.camera.x+vx*step,halfW,extent-halfW);
+    if(vy)this.camera.y=clamp(this.camera.y+vy*step,halfH,extent-halfH);
+    box.x=x;box.y=y;
+    this.rtsSyncSelectionBox();
+  };
+
+  const originalLoop=Game.prototype.loop;
+  Game.prototype.loop=function(now) {
+    this.rtsScrollSelection((now-this.lastFrame)/1000||0);
+    originalLoop.call(this,now);
   };
 
   Game.prototype.drawHuman = function(u, hostile) {
