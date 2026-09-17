@@ -1,13 +1,13 @@
 {
-  "active_task": "T05",
+  "active_task": "T06",
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
   "lease": {
-    "expires_at": "2026-09-17T14:02:44.235Z",
-    "observed_head": "94d267874dc0cab0d65e61aa8bd02df171cbfbd9",
-    "run_id": "manual-T04-community-20260917",
-    "task": "T05"
+    "run_id": "hourly-T06-20260917T1705",
+    "task": "T06",
+    "observed_head": "48dc00421e21cff035771226240b2de32fdc543f",
+    "expires_at": "2026-09-17T18:35:20.913Z"
   },
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
@@ -165,19 +165,18 @@
       ],
       "blocker": null,
       "branch": "work/T05-population",
-      "commit": null,
+      "commit": "48dc00421e21cff035771226240b2de32fdc543f",
       "depends_on": [
         "T04"
       ],
       "evidence": [
-        "9 population regressions PASS; 9 community, 7 residents, 6 people, 17 simulation plus controls/debug/selection-scroll PASS. Syntax and whitespace checks PASS. Node VM/DOM only."
+        "9 population regressions PASS; 9 community, 7 residents, 6 people, 17 simulation plus controls/debug/selection-scroll PASS. Syntax and whitespace checks PASS. Node VM/DOM only.",
+        "Pages workflow 35222138245 completed successfully; checked 2026-09-17T17:05Z."
       ],
       "id": "T05",
       "last_attempt_at": "2026-09-17T12:35:54.980Z",
-      "remaining": [
-        "Verify Pages deployment of Build 36."
-      ],
-      "status": "awaiting_deploy",
+      "remaining": [],
+      "status": "done",
       "title": "Popolazione, alloggi e consumi"
     },
     {
@@ -186,16 +185,16 @@
         "Documentare slot minimi come scelta provvisoria, non requisito già approvato; testare equipaggia/rimuovi/reload senza duplicare oggetti."
       ],
       "blocker": null,
-      "branch": null,
+      "branch": "work/T06-equipment",
       "commit": null,
       "depends_on": [
         "T02"
       ],
       "evidence": [],
       "id": "T06",
-      "last_attempt_at": null,
+      "last_attempt_at": "2026-09-17T17:05:20.908Z",
       "remaining": [],
-      "status": "pending",
+      "status": "in_progress",
       "title": "Dati individuali di equipaggiamento"
     },
     {
@@ -576,5 +575,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-17T12:35:54.980Z"
+  "updated_at": "2026-09-17T17:05:20.908Z"
 }
