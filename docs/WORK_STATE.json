@@ -1,5 +1,5 @@
 {
-  "active_task": "T06",
+  "active_task": "T07",
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
@@ -7,7 +7,7 @@
     "expires_at": "2026-09-17T18:35:20.913Z",
     "observed_head": "48dc00421e21cff035771226240b2de32fdc543f",
     "run_id": "hourly-T06-20260917T1705",
-    "task": "T06"
+    "task": "T07"
   },
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
@@ -194,19 +194,18 @@
       ],
       "blocker": null,
       "branch": "work/T06-equipment",
-      "commit": null,
+      "commit": "1a47a2a6cecfea56323df9e1ebf08a2edba6f58a",
       "depends_on": [
         "T02"
       ],
       "evidence": [
-        "11 equipment cases PASS; all previous Node VM/DOM suites PASS; JavaScript syntax and git diff --check PASS. No browser/hardware certification."
+        "11 equipment cases PASS; all previous Node VM/DOM suites PASS; JavaScript syntax and git diff --check PASS. No browser/hardware certification.",
+        "Pages workflow 35250987612 success; Build 37 opened in cloud Chrome."
       ],
       "id": "T06",
       "last_attempt_at": "2026-09-17T17:08:41.879Z",
-      "remaining": [
-        "Publish Build 37 and verify GitHub Pages."
-      ],
-      "status": "awaiting_deploy",
+      "remaining": [],
+      "status": "done",
       "title": "Dati individuali di equipaggiamento"
     },
     {
@@ -215,16 +214,18 @@
         "Cambio selezione, residente nascosto e chiusura pannello non cambiano il proprietario dei dati."
       ],
       "blocker": null,
-      "branch": null,
+      "branch": "work/T07-paperdoll",
       "commit": null,
       "depends_on": [
         "T06"
       ],
       "evidence": [],
       "id": "T07",
-      "last_attempt_at": null,
-      "remaining": [],
-      "status": "pending",
+      "last_attempt_at": "2026-09-17T17:12:55.631Z",
+      "remaining": [
+        "Implement dedicated identity-bound paperdoll and verify UI."
+      ],
+      "status": "in_progress",
       "title": "Vista Personaggio e paperdoll"
     },
     {
@@ -587,5 +588,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-17T17:08:41.879Z"
+  "updated_at": "2026-09-17T17:12:55.631Z"
 }
