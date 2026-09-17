@@ -3,13 +3,7 @@
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "lease": {
-    "run_id": "automation-20260917T1757Z-T08",
-    "task": "T08",
-    "head_observed": "779e99588ba9beb5f22b643ff235538d11ef6f18",
-    "acquired_at": "2026-09-17T17:57:19Z",
-    "expires_at": "2026-09-17T19:27:19Z"
-  },
+  "lease": null,
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
   "runs": [
@@ -77,6 +71,15 @@
       "verification_commit": "69209884cef27f1c51296beca4a6fb777649b9f9",
       "notes": "Completed real-browser T01 after discovering cloud Chrome, verified T06 equipment and T07 Character. Build 38 deployed and UI transfer/persistence tested. Narrow iframe CSS layouts checked; physical devices, touch and item art layers remain unverified/not implemented. Lease released.",
       "next": "T08 separate Skills dialog, progress through use and persistence; then T09 construction knowledge."
+    },
+    {
+      "at": "2026-09-17T18:16:00Z",
+      "task": "T08",
+      "result": "awaiting_deploy",
+      "branch": "work/T08-skills",
+      "commit": "adf3d7fa75f038bbb188d51514e766239504ae27",
+      "notes": "Implemented separate identity-bound Skill dialog, visible levels and XP progress, overflow-preserving multi-level gain, configurable provisional cap/thresholds, resident inspection and persistence. Eight new Skill regressions and all prior Node VM/DOM suites pass; syntax and diff checks pass. Browser/hardware checks not yet counted.",
+      "next": "Verify Build 39 Pages deployment and real browser Skill dialog; then mark T08 done and begin T09."
     }
   ],
   "schema_version": 1,
@@ -254,16 +257,21 @@
         "Verificare progressione attraverso uso e persistenza; cap/lock non definiti restano parametri provvisori documentati."
       ],
       "blocker": null,
-      "branch": null,
-      "commit": null,
+      "branch": "work/T08-skills",
+      "commit": "adf3d7fa75f038bbb188d51514e766239504ae27",
       "depends_on": [
         "T07"
       ],
-      "evidence": [],
+      "evidence": [
+        "8 Skill regressions PASS: separate dialog, identity picker, real gain() progression and overflow, multi-level gain, invalid gains, save/reload, resident identity, pause/background and configurable cap. All prior Node VM/DOM suites PASS; syntax and diff checks PASS.",
+        "Build 39 published to main; GitHub Pages deployment pending and not counted as successful."
+      ],
       "id": "T08",
-      "last_attempt_at": null,
-      "remaining": [],
-      "status": "pending",
+      "last_attempt_at": "2026-09-17T18:16:00Z",
+      "remaining": [
+        "Verify GitHub Pages success and exercise Skill dialog in a real browser."
+      ],
+      "status": "awaiting_deploy",
       "title": "Vista Skill separata"
     },
     {
@@ -608,5 +616,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-17T17:24:22.742Z"
+  "updated_at": "2026-09-17T18:16:00Z"
 }
