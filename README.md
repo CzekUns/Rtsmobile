@@ -15,7 +15,7 @@ Non richiede build, Node o installazioni. GitHub Pages pubblica direttamente la 
 - In **Costruisci**, scegli una struttura e tocca il terreno.
 - In **Mondo**, salva/carica la partita locale, genera un territorio o torna al villaggio.
 
-## Stato attuale — Build 29
+## Stato attuale — Build 30
 Mondo procedurale, cinque abitanti, raccolta, costruzioni, fauna, combattimento e prima filiera fisica **campo → mulino → forno → Casa comune**. Gli edifici hanno scorte locali, gli abitanti trasportano le merci e il salvataggio conserva i viaggi in corso.
 
 Apri **Mondo → Filiera** per inventari e rotte. Il pannello mette in pausa la simulazione. Dopo sospensione o caricamento premi ▶ per riprendere. I salvataggi precedenti vengono importati conservando l'originale.
@@ -28,6 +28,12 @@ Con Node.js:
 ```sh
 node tests/controls.cjs
 node tests/simulation.cjs
+node tests/debug.cjs
 ```
 
 I test usano DOM/canvas simulati; non sostituiscono una prova touch e prestazionale su dispositivo.
+
+## Correzioni Build 30
+- I sentieri non possono spendere legna prenotata dai trasporti.
+- I percorsi controllano nuovi ostacoli prima di ogni passo: una nuova palizzata ferma il passaggio; i trasporti ricalcolano il percorso.
+- Piazzare un edificio elimina la precedente selezione di gruppo e i relativi indicatori.
