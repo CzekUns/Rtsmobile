@@ -36,6 +36,7 @@
       check(u.inventory&&finite(u.inventory.cap,1)&&Number.isSafeInteger(u.inventory.amount)&&u.inventory.amount>=0&&u.inventory.amount<=u.inventory.cap,'carico');
       check(u.inventory.amount===0||materials.has(u.inventory.type),'merce');
       check(u.skills&&u.xp&&['wood','food','stone','iron','farming','construction','taming','combat'].every(k=>finite(u.skills[k],1)),'skill');
+      check(u.personalKnowledge===undefined||Array.isArray(u.personalKnowledge)&&u.personalKnowledge.every(k=>typeof k==='string'),'sapere personale');
       check(Object.values(u.xp).every(v=>finite(v,0)),'XP');check(finite(u.workTimer)&&finite(u.attackCooldown,0),'timer unità');
       check(['idle','moving','gathering','building','taming','combat','farming','hauling'].includes(u.state),'stato');
       if(u.location.kind==='resident')check(u.task===null&&u.state==='idle'&&u.path.length===0,'stato residente');
@@ -44,6 +45,8 @@
         if(u.task.type==='haul')check(typeof u.task.source==='string'&&typeof u.task.destination==='string'&&materials.has(u.task.good)&&['waiting','source','destination'].includes(u.task.phase)&&Number.isSafeInteger(u.task.amount)&&u.task.amount>=0&&u.task.amount<=u.inventory.cap&&typeof u.task.repeat==='boolean'&&finite(u.task.retry,0),'trasporto');
       }
     }
+    check(d.constructionRules===undefined||d.constructionRules===1,'regole sapere edilizio');
+    check(d.tribalKnowledge===undefined||Array.isArray(d.tribalKnowledge)&&d.tribalKnowledge.every(k=>typeof k==='string'),'sapere tribale');
     check(d.equipmentRules===undefined||d.equipmentRules===1,'regole equipaggiamento');
     if(d.equipmentRules===undefined)check(d.gear===undefined,'equipaggiamento senza versione');
     else {
@@ -158,7 +161,7 @@
       }
       for(const b of buildings)b.assigned=b.assigned.filter(id=>units.some(u=>u.id===id&&u.health>0&&(u.task?.type==='farm'&&u.task.target===b.id||u.task?.after?.type==='farm'&&u.task.after.target===b.id)));
       const clock=Object.fromEntries(['day','month','year','totalDays','nextRaidDay','raidLevel','dayAccumulator'].map(k=>[k,d.clock[k]]));
-      Object.assign(this,{seed:d.seed,world,rng,buildings,units,animals,raiders,gear:d.gear||[],...clock,camera:d.camera});
+      Object.assign(this,{seed:d.seed,world,rng,buildings,units,animals,raiders,gear:d.gear||[],tribalKnowledge:d.tribalKnowledge,...clock,camera:d.camera});
       this.ensureInventories();this.groupSelection=units.filter(u=>u.health>0&&u.location.kind==='world'&&d.selection.includes(u.id));
       this.selected=entities.find(e=>e.id===d.selectedId)||this.groupSelection[0]||units[0]||null;
       for(const u of units)u.selected=this.groupSelection.includes(u);
