@@ -3,7 +3,12 @@
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "lease": null,
+  "lease": {
+    "run_id": "manual-T04-community-20260917",
+    "task": "T04",
+    "observed_head": "94d267874dc0cab0d65e61aa8bd02df171cbfbd9",
+    "expires_at": "2026-09-17T13:56:46.750Z"
+  },
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
   "runs": [
@@ -25,11 +30,11 @@
     {
       "at": "2026-09-17T12:12:00Z",
       "branch": "work/T03-residents",
+      "commit": "2f3c15a249c7cccaf69eaae6e9dea679f8696817",
       "next": "Publish Build 34, verify Pages, then mark T03 done and begin T04 community panel.",
       "notes": "Confirmed Build 33 Pages deployment success. Implemented resident entry/exit, capacity, persistent identity/cargo, destroyed-district evacuation and blocked-exit handling with v5 save migration.",
       "result": "awaiting_deploy",
       "task": "T02/T03",
-      "commit": "2f3c15a249c7cccaf69eaae6e9dea679f8696817",
       "workflow": 35219603988
     }
   ],
@@ -551,5 +556,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-17T12:14:00Z"
+  "updated_at": "2026-09-17T12:26:46.750Z"
 }
