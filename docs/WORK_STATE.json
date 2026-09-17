@@ -3,12 +3,7 @@
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "lease": {
-    "expires_at": "2026-09-17T12:30:43Z",
-    "observed_head": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-    "run_id": "run-20260917T110043Z",
-    "task": "T02"
-  },
+  "lease": null,
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
   "runs": [
@@ -20,9 +15,12 @@
     },
     {
       "at": "2026-09-17T11:05:07Z",
-      "task": "T01/T02",
+      "notes": "Restored missing remote plan/register from prepared local documents on unchanged build-32 baseline; acquired non-forced lease. T01 Chromium executable missing. Implemented T02 and v4 migration; all Node suites pass.",
       "result": "awaiting_deploy",
-      "notes": "Restored missing remote plan/register from prepared local documents on unchanged build-32 baseline; acquired non-forced lease. T01 Chromium executable missing. Implemented T02 and v4 migration; all Node suites pass."
+      "task": "T01/T02",
+      "commit": "8c8d408ab2cf232acd07d1877d64beea19302e43",
+      "branch": "work/T02-persistent-people",
+      "next": "Recheck workflow 35213852536. If successful mark T02 done, then implement T03. T01 remains blocked."
     }
   ],
   "schema_version": 1,
@@ -72,12 +70,14 @@
       ],
       "blocker": null,
       "branch": "work/T02-persistent-people",
-      "commit": null,
+      "commit": "8c8d408ab2cf232acd07d1877d64beea19302e43",
       "depends_on": [
         "T00"
       ],
       "evidence": [
-        "6 persistent-person regression cases PASS; 17 simulation cases PASS; controls, debug, selection-scroll PASS. Tested using current remote renderer sources; Node VM/DOM only."
+        "6 persistent-person regression cases PASS; 17 simulation cases PASS; controls, debug, selection-scroll PASS. Tested using current remote renderer sources; Node VM/DOM only.",
+        "Build 33 commit 8c8d408ab2cf232acd07d1877d64beea19302e43; JavaScript syntax checks PASS.",
+        "Pages workflow 35213852536 in_progress at 2026-09-17T11:05:51Z; not counted as deployed."
       ],
       "id": "T02",
       "last_attempt_at": "2026-09-17T11:05:07Z",
@@ -537,5 +537,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-17T11:05:07Z"
+  "updated_at": "2026-09-17T11:05:51Z"
 }
