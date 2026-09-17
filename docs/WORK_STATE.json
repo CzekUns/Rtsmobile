@@ -1,15 +1,9 @@
 {
-  "active_task": "T08",
+  "active_task": "T09",
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "lease": {
-    "run_id": "automation-20260917T2258Z-T09",
-    "task": "T09",
-    "head_observed": "5a254a91c10f62d107ccb2f0a440555ff284d4d3",
-    "acquired_at": "2026-09-17T22:58:56Z",
-    "expires_at": "2026-09-18T00:28:56Z"
-  },
+  "lease": null,
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
   "runs": [
@@ -86,6 +80,15 @@
       "commit": "adf3d7fa75f038bbb188d51514e766239504ae27",
       "notes": "Implemented separate identity-bound Skill dialog, visible levels and XP progress, overflow-preserving multi-level gain, configurable provisional cap/thresholds, resident inspection and persistence. Eight new Skill regressions and all prior Node VM/DOM suites pass; syntax and diff checks pass. Browser/hardware checks not yet counted.",
       "next": "Verify Build 39 Pages deployment and real browser Skill dialog; then mark T08 done and begin T09."
+    },
+    {
+      "at": "2026-09-17T23:06:31Z",
+      "task": "T08/T09",
+      "result": "awaiting_deploy",
+      "branch": "work/T09-construction-knowledge",
+      "commit": "57f149e0fff0882eda354a825d6fa713c5a280f8",
+      "notes": "Verified Build 39 Pages success and exercised the separate Skill dialog in real cloud Chrome. Implemented Build 40 personal/tribal construction knowledge, configurable thresholds, visible locks, pre-spend competence checks, knowledge transfer on completion and conservative save compatibility. Nine new regressions and all prior suites pass; syntax/diff checks pass. Local real-browser attempt was unavailable because the Playwright browser binary is absent; no hardware claim.",
+      "next": "Verify Build 40 Pages deployment, then mark T09 done and begin T10 worker assignment and factory jobs."
     }
   ],
   "schema_version": 1,
@@ -270,14 +273,12 @@
       ],
       "evidence": [
         "8 Skill regressions PASS: separate dialog, identity picker, real gain() progression and overflow, multi-level gain, invalid gains, save/reload, resident identity, pause/background and configurable cap. All prior Node VM/DOM suites PASS; syntax and diff checks PASS.",
-        "Build 39 published to main; GitHub Pages deployment pending and not counted as successful."
+        "Build 39 Pages workflow 35256623727 succeeded. Real cloud Chrome: separate Skill dialog opened for the selected persistent ID, Character stayed closed, 8 skill rows and XP progress were visible, and the game paused while open."
       ],
       "id": "T08",
-      "last_attempt_at": "2026-09-17T18:16:00Z",
-      "remaining": [
-        "Verify GitHub Pages success and exercise Skill dialog in a real browser."
-      ],
-      "status": "awaiting_deploy",
+      "last_attempt_at": "2026-09-17T23:06:31Z",
+      "remaining": [],
+      "status": "done",
       "title": "Vista Skill separata"
     },
     {
@@ -286,16 +287,21 @@
         "Cantieri validano competenza e mostrano requisiti mancanti; sapere sopravvive a migrazione/reload."
       ],
       "blocker": null,
-      "branch": null,
-      "commit": null,
+      "branch": "work/T09-construction-knowledge",
+      "commit": "57f149e0fff0882eda354a825d6fa713c5a280f8",
       "depends_on": [
         "T08"
       ],
-      "evidence": [],
+      "evidence": [
+        "9 construction-knowledge regressions PASS: separation from skills, personal thresholds, tribal defaults/transfer, missing-requirement rejection before spending, assignment revalidation, identity, save/reload, legacy v5 migration and distinct knowledge UI. All prior suites PASS; JavaScript syntax and diff checks PASS.",
+        "Build 40 prepared on work/T09-construction-knowledge; Pages deployment pending and not counted as successful."
+      ],
       "id": "T09",
-      "last_attempt_at": null,
-      "remaining": [],
-      "status": "pending",
+      "last_attempt_at": "2026-09-17T23:06:31Z",
+      "remaining": [
+        "Verify GitHub Pages success for Build 40."
+      ],
+      "status": "awaiting_deploy",
       "title": "Conoscenze edilizie personali e tribali"
     },
     {
@@ -622,5 +628,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-17T18:16:00Z"
+  "updated_at": "2026-09-17T23:06:31Z"
 }
