@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./app.css?v=29">
+  <link rel="stylesheet" href="./app.css?v=31">
   <style>
     .selection-card{
       left:auto!important;
@@ -23,7 +23,7 @@
   <main id="app" class="app-shell">
     <header class="hud-top" aria-label="Stato della comunità">
       <div class="identity">
-        <strong>TERRA ITALICA <small style="font-size:8px;opacity:.55;letter-spacing:.08em">BUILD 30</small></strong>
+        <strong>TERRA ITALICA <small style="font-size:8px;opacity:.55;letter-spacing:.08em">BUILD 31</small></strong>
         <span id="sessionState" role="status"></span><span id="dateLabel">1 Marzo · 1000 a.C.</span>
       </div>
       <div class="resources" id="resourceBar">
@@ -36,6 +36,7 @@
 
     <section class="world-wrap" id="worldWrap">
       <canvas id="world" aria-label="Mappa di gioco"></canvas>
+      <div id="pauseNotice" class="pause-notice hidden" role="status"><strong>Partita in pausa</strong><span>Gli ordini partiranno quando riprendi.</span><button id="resumeGame" type="button">Riprendi partita ▶</button></div>
       <div class="map-controls" aria-label="Controlli mappa">
         <button id="zoomIn" type="button" aria-label="Aumenta zoom">+</button>
         <button id="zoomOut" type="button" aria-label="Riduci zoom">−</button>
@@ -112,7 +113,7 @@
   <script src="./asset-render.js?v=28"></script>
   <script src="./touch-modifier.js?v=28"></script>
   <script src="./logistics.js?v=29"></script>
-  <script src="./persistence.js?v=29"></script>
+  <script src="./persistence.js?v=31"></script>
   <script src="./boot.js?v=29"></script>
 </body>
 </html>

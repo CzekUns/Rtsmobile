@@ -123,10 +123,11 @@
     }catch(e){console.warn(e.message);this.message('Salvataggio non valido: la partita attuale è rimasta intatta.');return false;}
   };
   Game.prototype.setPaused=function(paused){this.paused=paused;this.lastFrame=performance.now();$('#pauseBtn').textContent=paused?'▶':'Ⅱ';$('#pauseBtn').setAttribute('aria-label',paused?'Riprendi':'Pausa');this.refreshSessionState();};
-  Game.prototype.refreshSessionState=function(){const el=$('#sessionState');if(el)el.textContent=this.suspended?'Sospesa':this.paused?'In pausa · premi ▶ per riprendere':'';};
+  Game.prototype.refreshSessionState=function(){const el=$('#sessionState');if(el)el.textContent=this.suspended?'Sospesa':this.paused?'In pausa · premi ▶ per riprendere':'';const notice=$('#pauseNotice');if(notice)notice.classList.toggle('hidden',!this.paused||this.suspended||this.gameEnded);};
   Game.prototype.suspend=function(){if(this.suspended)return;this.suspended=true;this.pointerCancel();this.orderMode=null;this.buildMode=null;this.syncModeButtons();this.lastFrame=performance.now();this.save(true);this.refreshSessionState();};
   Game.prototype.resumeFromBackground=function(){if(!this.suspended)return;this.suspended=false;this.setPaused(true);this.message('Partita in pausa. Premi ▶ per riprendere.');};
   Game.prototype.installLifecycle=function(){
+    $('#resumeGame').onclick=()=>this.setPaused(false);
     document.addEventListener('visibilitychange',()=>document.hidden?this.suspend():this.resumeFromBackground());
     addEventListener('pagehide',()=>this.suspend());addEventListener('pageshow',()=>{if(!document.hidden)this.resumeFromBackground()});
     addEventListener('blur',()=>this.pointerCancel());
