@@ -1,7 +1,7 @@
 // Mobile snapshots are separate from the original v2 slot, which is never overwritten.
 (() => {
   'use strict';
-  const SLOT='terra-italica-save-v3', BACKUP=SLOT+'-backup', TEMP=SLOT+'-pending';
+  const SLOT='terra-italica-save-v4', PREVIOUS='terra-italica-save-v3', BACKUP=SLOT+'-backup', TEMP=SLOT+'-pending';
   const clone=value=>JSON.parse(JSON.stringify(value));
   const finite=(v,min=-Infinity,max=Infinity)=>typeof v==='number'&&Number.isFinite(v)&&v>=min&&v<=max;
   const check=(ok,label)=>{if(!ok)throw new Error('Salvataggio non valido: '+label)};
@@ -9,7 +9,7 @@
   const itemsValid=items=>items&&typeof items==='object'&&!Array.isArray(items)&&Object.entries(items).every(([k,v])=>materials.has(k)&&Number.isSafeInteger(v)&&v>=0);
 
   function validate(d) {
-    check(d&&d.version===3,'versione');check(Number.isInteger(d.seed),'seed');
+    check(d&&d.version===4,'versione');check(Number.isInteger(d.seed),'seed');
     for(const key of ['units','buildings','animals','raiders','resources','roads'])check(Array.isArray(d[key]),key);
     const ids=new Set();
     for(const e of [...d.units,...d.buildings,...d.animals,...d.raiders,...d.resources]){
@@ -26,6 +26,9 @@
       if(b.batch){const recipe=window.TERRA_RECIPES[b.type];check(recipe&&b.batch.input===recipe.input&&b.batch.output===recipe.output&&b.batch.amount===recipe.amount&&finite(b.batch.remaining,0,recipe.seconds),'ricetta');}
     }
     for(const u of d.units){
+      check(u.owner===0,'proprietario abitante');
+      check(u.location?.kind==='world'&&u.location.settlementId===null,'collocazione abitante');
+      check(u.occupation===(u.task?.type||'idle'),'occupazione abitante');
       check(typeof u.name==='string'&&u.name.length<=80&&!/[<>]/.test(u.name),'nome');
       check(u.inventory&&finite(u.inventory.cap,1)&&Number.isSafeInteger(u.inventory.amount)&&u.inventory.amount>=0&&u.inventory.amount<=u.inventory.cap,'carico');
       check(u.inventory.amount===0||materials.has(u.inventory.type),'merce');
@@ -66,12 +69,20 @@
     base.inventory.items={...d.stock};base.inventory.capacity=Math.max(base.inventory.capacity,Object.values(d.stock).reduce((a,b)=>a+b,0));
     // Old harvests could exceed carrying capacity. Preserve all existing goods.
     for(const u of d.units){u.inventory.cap=Math.max(u.inventory.cap,u.inventory.amount);u.workTimer=Math.max(0,u.workTimer||0);u.attackCooldown=Math.max(0,u.attackCooldown||0);}
+    return migrateV3(d);
+  }
+
+  function migrateV3(old){
+    check(old&&old.version===3,'versione precedente');
+    const d=clone(old);d.version=4;
+    check(Array.isArray(d.units),'abitanti precedenti');
+    for(const u of d.units){u.owner=0;u.location={kind:'world',settlementId:null};u.occupation=u.task?.type||'idle';}
     return validate(d);
   }
 
   Game.prototype.snapshot=function(){
     this.ensureInventories();
-    return {version:3,seed:this.seed,rngState:this.rng.s,paused:this.paused,gameEnded:this.gameEnded,
+    return {version:4,seed:this.seed,rngState:this.rng.s,paused:this.paused,gameEnded:this.gameEnded,
       clock:{day:this.day,month:this.month,year:this.year,totalDays:this.totalDays,nextRaidDay:this.nextRaidDay,raidLevel:this.raidLevel,dayAccumulator:this.dayAccumulator},
       roads:this.world.tiles.filter(t=>t.road).map(t=>[t.x,t.y]),resources:this.world.resources,buildings:this.buildings,units:this.units,animals:this.animals,raiders:this.raiders,camera:this.camera,
       selection:(this.rtsSelectedUnits?.()||[]).map(u=>u.id),selectedId:this.selected?.id||null};
@@ -88,16 +99,17 @@
   Game.prototype.load=function(){
     try{
       let d, recovered=false;
-      const current=localStorage.getItem(SLOT),legacy=localStorage.getItem(SAVE_KEY);
-      if(!current&&!legacy){this.message('Nessun salvataggio presente.');return false;}
+      const current=localStorage.getItem(SLOT),previous=localStorage.getItem(PREVIOUS),legacy=localStorage.getItem(SAVE_KEY);
+      if(!current&&!previous&&!legacy){this.message('Nessun salvataggio presente.');return false;}
       if(current){try{d=validate(JSON.parse(current))}catch(e){const backup=localStorage.getItem(BACKUP);if(!backup)throw e;d=validate(JSON.parse(backup));recovered=true;}}
+      else if(previous){try{d=migrateV3(JSON.parse(previous))}catch(e){const backup=localStorage.getItem(PREVIOUS+'-backup');if(!backup)throw e;d=migrateV3(JSON.parse(backup));recovered=true;}}
       else d=migrate(JSON.parse(legacy));
       // Construct and resolve everything before replacing the running world.
       const world=new World(d.seed),rng=new RNG(d.seed);
       for(const [x,y] of d.roads)world.tile(x,y).road=true;
       world.resources=d.resources.map(o=>Object.assign(new ResourceNode(o.type,o.x,o.y,o.amount),o));
       const buildings=d.buildings.map(o=>Object.assign(new Building(o.type,Math.floor(o.x),Math.floor(o.y),o.owner,o.progress>=1),o));
-      const units=d.units.map(o=>Object.assign(new Unit(o.name,o.x,o.y,rng),o));
+      const units=d.units.map(({occupation,...o})=>Object.assign(new Unit(o.name,o.x,o.y,rng),o));
       const animals=d.animals.map(o=>Object.assign(new Animal(o.type,o.x,o.y,o.owner),o));
       const raiders=d.raiders.map(o=>Object.assign(new Raider(o.x,o.y),o));rng.s=d.rngState;
       const entities=[...units,...buildings,...animals,...raiders,...world.resources],existing=new Set(entities.map(e=>e.id));

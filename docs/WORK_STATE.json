@@ -1,465 +1,488 @@
 {
-  "schema_version": 1,
+  "active_task": "T02",
+  "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
+  "baseline_build": 32,
+  "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
+  "lease": {
+    "expires_at": "2026-09-17T12:30:43Z",
+    "observed_head": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
+    "run_id": "run-20260917T110043Z",
+    "task": "T02"
+  },
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
-  "timezone": "Europe/Rome",
-  "updated_at": "2026-09-17T11:00:43Z",
-  "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "baseline_build": 32,
-  "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
-  "active_task": null,
-  "lease": {
-    "run_id": "run-20260917T110043Z",
-    "task": "T01",
-    "observed_head": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-    "expires_at": "2026-09-17T12:30:43Z"
-  },
+  "runs": [
+    {
+      "at": "2026-09-17T07:39:07.903363+02:00",
+      "notes": "Audit iniziale concluso; test locali della base passano. Pianificazione e automazione in preparazione.",
+      "result": "done",
+      "task": "T00"
+    },
+    {
+      "at": "2026-09-17T11:05:07Z",
+      "task": "T01/T02",
+      "result": "awaiting_deploy",
+      "notes": "Restored missing remote plan/register from prepared local documents on unchanged build-32 baseline; acquired non-forced lease. T01 Chromium executable missing. Implemented T02 and v4 migration; all Node suites pass."
+    }
+  ],
+  "schema_version": 1,
   "tasks": [
     {
-      "id": "T00",
-      "title": "Verifica della base pubblicata",
-      "depends_on": [],
-      "status": "done",
       "acceptance": [
         "Identificare commit/build correnti e leggere handoff e codice.",
         "Eseguire le quattro suite esistenti e registrare esiti e limiti."
       ],
+      "blocker": null,
       "branch": null,
       "commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
+      "depends_on": [],
       "evidence": [
         "17 simulation regressions + controls, debug and selection-scroll: PASS; DOM/canvas simulati, nessuna certificazione hardware."
       ],
+      "id": "T00",
+      "last_attempt_at": "2026-09-17T07:39:07.903363+02:00",
       "remaining": [],
-      "blocker": null,
-      "last_attempt_at": "2026-09-17T07:39:07.903363+02:00"
+      "status": "done",
+      "title": "Verifica della base pubblicata"
     },
     {
-      "id": "T01",
-      "title": "Avvio reale e regressioni di movimento",
-      "depends_on": [
-        "T00"
-      ],
-      "status": "pending",
       "acceptance": [
         "Avviare il gioco in un browser disponibile e verificare loop, errori console, selezione, movimento e ripresa.",
         "Provare i comandi attraverso eventi UI e percorsi raggiungibili, oltre ai test con DOM simulato; registrare browser e viewport."
       ],
+      "blocker": "Playwright Chromium executable missing; previous download failed. No repeated installation attempted.",
       "branch": null,
       "commit": null,
-      "evidence": [],
-      "remaining": [],
-      "blocker": null,
-      "last_attempt_at": null
-    },
-    {
-      "id": "T02",
-      "title": "Modello unico degli abitanti e migrazione",
       "depends_on": [
         "T00"
       ],
-      "status": "pending",
+      "evidence": [],
+      "id": "T01",
+      "last_attempt_at": "2026-09-17T11:02:00Z",
+      "remaining": [
+        "Real browser launch, console, UI events, movement and resume; browser + viewport evidence."
+      ],
+      "status": "blocked_external",
+      "title": "Avvio reale e regressioni di movimento"
+    },
+    {
       "acceptance": [
         "Definire record persistenti con ID, collocazione, occupazione, salute, skill e carico senza duplicare abitanti.",
         "Migrare il salvataggio corrente conservando originale; verificare conteggio persone e round trip."
       ],
-      "branch": null,
-      "commit": null,
-      "evidence": [],
-      "remaining": [],
       "blocker": null,
-      "last_attempt_at": null
+      "branch": "work/T02-persistent-people",
+      "commit": null,
+      "depends_on": [
+        "T00"
+      ],
+      "evidence": [
+        "6 persistent-person regression cases PASS; 17 simulation cases PASS; controls, debug, selection-scroll PASS. Tested using current remote renderer sources; Node VM/DOM only."
+      ],
+      "id": "T02",
+      "last_attempt_at": "2026-09-17T11:05:07Z",
+      "remaining": [
+        "Verify GitHub Pages deployment of build 33; then T03 residents."
+      ],
+      "status": "awaiting_deploy",
+      "title": "Modello unico degli abitanti e migrazione"
     },
     {
-      "id": "T03",
-      "title": "Residenti e ingresso/uscita dal villaggio",
-      "depends_on": [
-        "T02"
-      ],
-      "status": "pending",
       "acceptance": [
         "Ingresso e uscita conservano stesso ID, skill, salute ed eventuale carico senza duplicazioni.",
         "Gestire villaggio pieno, distrutto e uscita senza terreno libero con esito visibile."
       ],
+      "blocker": null,
       "branch": null,
       "commit": null,
+      "depends_on": [
+        "T02"
+      ],
       "evidence": [],
+      "id": "T03",
+      "last_attempt_at": null,
       "remaining": [],
-      "blocker": null,
-      "last_attempt_at": null
+      "status": "pending",
+      "title": "Residenti e ingresso/uscita dal villaggio"
     },
     {
-      "id": "T04",
-      "title": "Pannello comunità e mobilitazione",
-      "depends_on": [
-        "T03"
-      ],
-      "status": "pending",
       "acceptance": [
         "Mostrare residenti, occupati, disponibili e mobilitati con conteggi coerenti.",
         "Consentire scelta nominale e mobilitazione come trasferimento di persone, non generazione di copie."
       ],
+      "blocker": null,
       "branch": null,
       "commit": null,
+      "depends_on": [
+        "T03"
+      ],
       "evidence": [],
+      "id": "T04",
+      "last_attempt_at": null,
       "remaining": [],
-      "blocker": null,
-      "last_attempt_at": null
+      "status": "pending",
+      "title": "Pannello comunità e mobilitazione"
     },
     {
-      "id": "T05",
-      "title": "Popolazione, alloggi e consumi",
-      "depends_on": [
-        "T04"
-      ],
-      "status": "pending",
       "acceptance": [
         "Separare capienza, popolazione effettiva e consumi; sostituire la crescita a solo timer con regole esplicite configurabili.",
         "Verificare carenza cibo, limite alloggi, nuova popolazione e salvataggi; documentare parametri provvisori."
       ],
+      "blocker": null,
       "branch": null,
       "commit": null,
+      "depends_on": [
+        "T04"
+      ],
       "evidence": [],
+      "id": "T05",
+      "last_attempt_at": null,
       "remaining": [],
-      "blocker": null,
-      "last_attempt_at": null
+      "status": "pending",
+      "title": "Popolazione, alloggi e consumi"
     },
     {
-      "id": "T06",
-      "title": "Dati individuali di equipaggiamento",
-      "depends_on": [
-        "T02"
-      ],
-      "status": "pending",
       "acceptance": [
         "Separare equipaggiamento, inventario trasportato e scorte; definire ID oggetto e trasferimenti atomici.",
         "Documentare slot minimi come scelta provvisoria, non requisito già approvato; testare equipaggia/rimuovi/reload senza duplicare oggetti."
       ],
+      "blocker": null,
       "branch": null,
       "commit": null,
+      "depends_on": [
+        "T02"
+      ],
       "evidence": [],
+      "id": "T06",
+      "last_attempt_at": null,
       "remaining": [],
-      "blocker": null,
-      "last_attempt_at": null
+      "status": "pending",
+      "title": "Dati individuali di equipaggiamento"
     },
     {
-      "id": "T07",
-      "title": "Vista Personaggio e paperdoll",
-      "depends_on": [
-        "T06"
-      ],
-      "status": "pending",
       "acceptance": [
         "Vista dedicata dello stesso ID selezionato con figura, equipaggiamento e statistiche leggibili su telefono.",
         "Cambio selezione, residente nascosto e chiusura pannello non cambiano il proprietario dei dati."
       ],
+      "blocker": null,
       "branch": null,
       "commit": null,
+      "depends_on": [
+        "T06"
+      ],
       "evidence": [],
+      "id": "T07",
+      "last_attempt_at": null,
       "remaining": [],
-      "blocker": null,
-      "last_attempt_at": null
+      "status": "pending",
+      "title": "Vista Personaggio e paperdoll"
     },
     {
-      "id": "T08",
-      "title": "Vista Skill separata",
-      "depends_on": [
-        "T07"
-      ],
-      "status": "pending",
       "acceptance": [
         "Finestra distinta dal paperdoll con skill, livello e progresso del medesimo ID.",
         "Verificare progressione attraverso uso e persistenza; cap/lock non definiti restano parametri provvisori documentati."
       ],
+      "blocker": null,
       "branch": null,
       "commit": null,
+      "depends_on": [
+        "T07"
+      ],
       "evidence": [],
+      "id": "T08",
+      "last_attempt_at": null,
       "remaining": [],
-      "blocker": null,
-      "last_attempt_at": null
+      "status": "pending",
+      "title": "Vista Skill separata"
     },
     {
-      "id": "T09",
-      "title": "Conoscenze edilizie personali e tribali",
-      "depends_on": [
-        "T08"
-      ],
-      "status": "pending",
       "acceptance": [
         "Tenere sapere edilizio separato dalle skill; definire sblocchi configurabili.",
         "Cantieri validano competenza e mostrano requisiti mancanti; sapere sopravvive a migrazione/reload."
       ],
+      "blocker": null,
       "branch": null,
       "commit": null,
-      "evidence": [],
-      "remaining": [],
-      "blocker": null,
-      "last_attempt_at": null
-    },
-    {
-      "id": "T10",
-      "title": "Lavoratori e mestieri nelle fabbriche",
       "depends_on": [
-        "T04",
         "T08"
       ],
+      "evidence": [],
+      "id": "T09",
+      "last_attempt_at": null,
+      "remaining": [],
       "status": "pending",
+      "title": "Conoscenze edilizie personali e tribali"
+    },
+    {
       "acceptance": [
         "Assegnare persone a produzione: una persona non svolge due lavori contemporanei.",
         "Produzione dipende da lavoratori e input locali; interruzione e sostituzione non duplicano batch."
       ],
+      "blocker": null,
       "branch": null,
       "commit": null,
+      "depends_on": [
+        "T04",
+        "T08"
+      ],
       "evidence": [],
+      "id": "T10",
+      "last_attempt_at": null,
       "remaining": [],
-      "blocker": null,
-      "last_attempt_at": null
+      "status": "pending",
+      "title": "Lavoratori e mestieri nelle fabbriche"
     },
     {
-      "id": "T11",
-      "title": "Materiali ai cantieri e riparazioni",
-      "depends_on": [
-        "T09",
-        "T10"
-      ],
-      "status": "pending",
       "acceptance": [
         "Portare materiali al cantiere fisicamente prima dell’utilizzo; prenotare non equivale a consumare.",
         "Riparazioni richiedono lavoro/materiali; annullamento, distruzione, morte e reload conservano o contabilizzano tutte le merci."
       ],
+      "blocker": null,
       "branch": null,
       "commit": null,
-      "evidence": [],
-      "remaining": [],
-      "blocker": null,
-      "last_attempt_at": null
-    },
-    {
-      "id": "T12",
-      "title": "Colture differenziate e stagioni",
       "depends_on": [
+        "T09",
         "T10"
       ],
+      "evidence": [],
+      "id": "T11",
+      "last_attempt_at": null,
+      "remaining": [],
       "status": "pending",
+      "title": "Materiali ai cantieri e riparazioni"
+    },
+    {
       "acceptance": [
         "Grano, orzo, vite e olivo producono beni distinti con tempi e rese configurabili.",
         "Il raccolto intero resta locale; terreno, acqua e stagione influiscono senza accrediti globali o eccedenze perdute."
       ],
+      "blocker": null,
       "branch": null,
       "commit": null,
+      "depends_on": [
+        "T10"
+      ],
       "evidence": [],
+      "id": "T12",
+      "last_attempt_at": null,
       "remaining": [],
-      "blocker": null,
-      "last_attempt_at": null
+      "status": "pending",
+      "title": "Colture differenziate e stagioni"
     },
     {
-      "id": "T13",
-      "title": "Allevamento con animali persistenti",
-      "depends_on": [
-        "T12"
-      ],
-      "status": "pending",
       "acceptance": [
         "Collegare recinti ad animali posseduti, lavoratori e foraggio, con quantità/produzione verificabili.",
         "Salvare ID animali e prodotti; niente latte/uova generati dal solo numero di operai senza animali."
       ],
+      "blocker": null,
       "branch": null,
       "commit": null,
+      "depends_on": [
+        "T12"
+      ],
       "evidence": [],
+      "id": "T13",
+      "last_attempt_at": null,
       "remaining": [],
-      "blocker": null,
-      "last_attempt_at": null
+      "status": "pending",
+      "title": "Allevamento con animali persistenti"
     },
     {
-      "id": "T14",
-      "title": "Catalogo merci e altre ricette",
-      "depends_on": [
-        "T11",
-        "T13"
-      ],
-      "status": "pending",
       "acceptance": [
         "Definire catalogo coerente per input/output, ingombri e prodotti richiesti dalle colture/animali.",
         "Testare ogni nuova ricetta con input assente, output pieno, carico interrotto e reload."
       ],
+      "blocker": null,
       "branch": null,
       "commit": null,
+      "depends_on": [
+        "T11",
+        "T13"
+      ],
       "evidence": [],
+      "id": "T14",
+      "last_attempt_at": null,
       "remaining": [],
-      "blocker": null,
-      "last_attempt_at": null
+      "status": "pending",
+      "title": "Catalogo merci e altre ricette"
     },
     {
-      "id": "T15",
-      "title": "Mercati locali e prezzi",
-      "depends_on": [
-        "T14"
-      ],
-      "status": "pending",
       "acceptance": [
         "Mercati con ID, merci, denaro e prezzi locali legati a scorte/domanda documentate.",
         "Vendite e acquisti non leggono merci remote della Casa comune; liquidità e disponibilità sono vincoli effettivi."
       ],
+      "blocker": null,
       "branch": null,
       "commit": null,
+      "depends_on": [
+        "T14"
+      ],
       "evidence": [],
+      "id": "T15",
+      "last_attempt_at": null,
       "remaining": [],
-      "blocker": null,
-      "last_attempt_at": null
+      "status": "pending",
+      "title": "Mercati locali e prezzi"
     },
     {
-      "id": "T16",
-      "title": "Scambio touch e carico commerciale",
-      "depends_on": [
-        "T15",
-        "T06"
-      ],
-      "status": "pending",
       "acceptance": [
         "Mostrare inventario personale/carovana, mercato, quantità e saldo prima della conferma.",
         "Conferma idempotente: doppio tap/reload non duplica; equipaggiamento e riserve non venduti implicitamente."
       ],
+      "blocker": null,
       "branch": null,
       "commit": null,
+      "depends_on": [
+        "T15",
+        "T06"
+      ],
       "evidence": [],
+      "id": "T16",
+      "last_attempt_at": null,
       "remaining": [],
-      "blocker": null,
-      "last_attempt_at": null
+      "status": "pending",
+      "title": "Scambio touch e carico commerciale"
     },
     {
-      "id": "T17",
-      "title": "Carovane e rotte fisiche",
-      "depends_on": [
-        "T16"
-      ],
-      "status": "pending",
       "acceptance": [
         "Mercante e merci raggiungono davvero il mercato e tornano; percorso raggiungibile e capacità verificati.",
         "Stop, minaccia, morte, mercato rimosso e ripresa app gestiti senza doppia spesa."
       ],
+      "blocker": null,
       "branch": null,
       "commit": null,
+      "depends_on": [
+        "T16"
+      ],
       "evidence": [],
+      "id": "T17",
+      "last_attempt_at": null,
       "remaining": [],
-      "blocker": null,
-      "last_attempt_at": null
+      "status": "pending",
+      "title": "Carovane e rotte fisiche"
     },
     {
-      "id": "T18",
-      "title": "Insediamenti neutrali ed economia",
-      "depends_on": [
-        "T05",
-        "T15"
-      ],
-      "status": "pending",
       "acceptance": [
         "Neutrali con proprietari, popolazione e scorte separati; attività AI verificabili e persistenti.",
         "Consumi e domanda dipendono da popolazione reale; impedire accesso a inventari non autorizzati."
       ],
+      "blocker": null,
       "branch": null,
       "commit": null,
+      "depends_on": [
+        "T05",
+        "T15"
+      ],
       "evidence": [],
+      "id": "T18",
+      "last_attempt_at": null,
       "remaining": [],
-      "blocker": null,
-      "last_attempt_at": null
+      "status": "pending",
+      "title": "Insediamenti neutrali ed economia"
     },
     {
-      "id": "T19",
-      "title": "Lealtà, influenza e diplomazia",
-      "depends_on": [
-        "T18"
-      ],
-      "status": "pending",
       "acceptance": [
         "Definire e mostrare lealtà/resistenza/influenza e relazioni con effetti osservabili, parametri documentati.",
         "Transizioni politiche preservano ID, merci e appartenenze; testare persistenza e stati incompatibili."
       ],
+      "blocker": null,
       "branch": null,
       "commit": null,
-      "evidence": [],
-      "remaining": [],
-      "blocker": null,
-      "last_attempt_at": null
-    },
-    {
-      "id": "T20",
-      "title": "Obiettivi militari e fine partita",
       "depends_on": [
-        "T11",
         "T18"
       ],
+      "evidence": [],
+      "id": "T19",
+      "last_attempt_at": null,
+      "remaining": [],
       "status": "pending",
+      "title": "Lealtà, influenza e diplomazia"
+    },
+    {
       "acceptance": [
         "Campi ostili, predoni e difese con condizioni di vittoria: nessun campo e nessun nemico rimanente.",
         "Sconfitta conteggia persone residenti/mobilitate correttamente e depositi; fine partita arresta simulazione e si salva."
       ],
+      "blocker": null,
       "branch": null,
       "commit": null,
+      "depends_on": [
+        "T11",
+        "T18"
+      ],
       "evidence": [],
+      "id": "T20",
+      "last_attempt_at": null,
       "remaining": [],
-      "blocker": null,
-      "last_attempt_at": null
+      "status": "pending",
+      "title": "Obiettivi militari e fine partita"
     },
     {
-      "id": "T21",
-      "title": "Gruppi, inattivi e minimappa",
-      "depends_on": [
-        "T04"
-      ],
-      "status": "pending",
       "acceptance": [
         "Gruppi persistenti per ID e selezione prossimo/tutti inattivi da touch; richiamo camera.",
         "Minimappa sintetica e navigabile; selezione MOD/edge-scroll e pinch non impartiscono ordini accidentali."
       ],
+      "blocker": null,
       "branch": null,
       "commit": null,
+      "depends_on": [
+        "T04"
+      ],
       "evidence": [],
+      "id": "T21",
+      "last_attempt_at": null,
       "remaining": [],
-      "blocker": null,
-      "last_attempt_at": null
+      "status": "pending",
+      "title": "Gruppi, inattivi e minimappa"
     },
     {
-      "id": "T22",
-      "title": "Streaming del mondo e budget simulazione",
+      "acceptance": [
+        "Generazione/caricamento per blocchi, cache limitate e pathfinding con budget; conservare risorse consumate fuori vista.",
+        "Lavori, persone residenti e trasporti fuori schermo continuano senza dipendere dal rendering; salvataggio copre snapshot."
+      ],
+      "blocker": null,
+      "branch": null,
+      "commit": null,
       "depends_on": [
         "T17",
         "T20",
         "T21"
       ],
-      "status": "pending",
-      "acceptance": [
-        "Generazione/caricamento per blocchi, cache limitate e pathfinding con budget; conservare risorse consumate fuori vista.",
-        "Lavori, persone residenti e trasporti fuori schermo continuano senza dipendere dal rendering; salvataggio copre snapshot."
-      ],
-      "branch": null,
-      "commit": null,
       "evidence": [],
+      "id": "T22",
+      "last_attempt_at": null,
       "remaining": [],
-      "blocker": null,
-      "last_attempt_at": null
+      "status": "pending",
+      "title": "Streaming del mondo e budget simulazione"
     },
     {
-      "id": "T23",
-      "title": "Integrazione degli asset approvati",
+      "acceptance": [
+        "Inventariare Drive Terra Italica/Assets P16 e mappare asset approvati alle entità realmente implementate.",
+        "Verificare trasparenza, scala nativa, P16 e ancoraggi; niente tavole riepilogative usate come sprite o nuovo terreno PNG."
+      ],
+      "blocker": null,
+      "branch": null,
+      "commit": null,
       "depends_on": [
         "T07",
         "T14",
         "T20"
       ],
-      "status": "pending",
-      "acceptance": [
-        "Inventariare Drive Terra Italica/Assets P16 e mappare asset approvati alle entità realmente implementate.",
-        "Verificare trasparenza, scala nativa, P16 e ancoraggi; niente tavole riepilogative usate come sprite o nuovo terreno PNG."
-      ],
-      "branch": null,
-      "commit": null,
       "evidence": [],
+      "id": "T23",
+      "last_attempt_at": null,
       "remaining": [],
-      "blocker": null,
-      "last_attempt_at": null
+      "status": "pending",
+      "title": "Integrazione degli asset approvati"
     },
     {
-      "id": "T24",
-      "title": "Collaudo UI telefono e tablet",
+      "acceptance": [
+        "Verificare orientazioni, safe area, testo, pannelli, tap sovrapposti e flusso intero senza mouse/tastiera.",
+        "Registrare screenshot e risultati da browser reale/emulazione distinguendoli dai test su dispositivo fisico."
+      ],
+      "blocker": null,
+      "branch": null,
+      "commit": null,
       "depends_on": [
         "T01",
         "T17",
@@ -467,63 +490,52 @@
         "T21",
         "T23"
       ],
-      "status": "pending",
-      "acceptance": [
-        "Verificare orientazioni, safe area, testo, pannelli, tap sovrapposti e flusso intero senza mouse/tastiera.",
-        "Registrare screenshot e risultati da browser reale/emulazione distinguendoli dai test su dispositivo fisico."
-      ],
-      "branch": null,
-      "commit": null,
       "evidence": [],
+      "id": "T24",
+      "last_attempt_at": null,
       "remaining": [],
-      "blocker": null,
-      "last_attempt_at": null
+      "status": "pending",
+      "title": "Collaudo UI telefono e tablet"
     },
     {
-      "id": "T25",
-      "title": "Collaudo fisico e prestazioni",
-      "depends_on": [
-        "T22",
-        "T24"
-      ],
-      "status": "pending",
       "acceptance": [
         "Su hardware reale misurare frame mediani/p95, memoria e sessioni prolungate con raccolta, guerra e commercio.",
         "Verificare blocco schermo, background, riapertura e perdita processo. Se hardware non disponibile: blocked_external, mai done."
       ],
+      "blocker": null,
       "branch": null,
       "commit": null,
+      "depends_on": [
+        "T22",
+        "T24"
+      ],
       "evidence": [],
+      "id": "T25",
+      "last_attempt_at": null,
       "remaining": [],
-      "blocker": null,
-      "last_attempt_at": null
+      "status": "pending",
+      "title": "Collaudo fisico e prestazioni"
     },
     {
-      "id": "T26",
-      "title": "Audit finale e chiusura del piano",
-      "depends_on": [
-        "T19",
-        "T25"
-      ],
-      "status": "pending",
       "acceptance": [
         "Confrontare tutte le accettazioni dell’handoff con evidenze e stato effettivo, risolvere regressioni e verificare ultimo deploy.",
         "Disattivare il ciclo soltanto a piano completo; se resta un blocco esterno registrarlo e segnalare ciò che serve senza dichiarare finito."
       ],
+      "blocker": null,
       "branch": null,
       "commit": null,
+      "depends_on": [
+        "T19",
+        "T25"
+      ],
       "evidence": [],
+      "id": "T26",
+      "last_attempt_at": null,
       "remaining": [],
-      "blocker": null,
-      "last_attempt_at": null
+      "status": "pending",
+      "title": "Audit finale e chiusura del piano"
     }
   ],
-  "runs": [
-    {
-      "at": "2026-09-17T07:39:07.903363+02:00",
-      "task": "T00",
-      "result": "done",
-      "notes": "Audit iniziale concluso; test locali della base passano. Pianificazione e automazione in preparazione."
-    }
-  ]
+  "timezone": "Europe/Rome",
+  "updated_at": "2026-09-17T11:05:07Z"
 }

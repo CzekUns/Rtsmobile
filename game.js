@@ -68,6 +68,11 @@ class Building{
   get built(){return this.progress>=1}
 }
 class Unit{
+  owner=0;
+  location={kind:'world',settlementId:null};
+  // The unit is the person record, never a second copy of inventory or skills.
+  get occupation(){return this.task?.type||'idle'}
+  toJSON(){return {...this,occupation:this.occupation}}
   constructor(name,x,y,rng){this.id=crypto.randomUUID?.()||Math.random().toString(36).slice(2);this.name=name;this.x=x;this.y=y;this.tx=x;this.ty=y;this.path=[];this.speed=1.55;this.health=100;this.maxHealth=100;this.strength=rng.int(7,15);this.intelligence=rng.int(6,18);this.stamina=100;this.inventory={type:null,amount:0,cap:10+Math.floor(this.strength/2)};this.skills={wood:1,food:1,stone:1,iron:1,farming:1,construction:1,taming:1,combat:1};this.xp={};this.task=null;this.state='idle';this.attackCooldown=0;this.workTimer=0;this.selected=false;this.stance='defensive'}
   gain(skill,n=1){this.xp[skill]=(this.xp[skill]||0)+n;if(this.xp[skill]>=this.skills[skill]*20){this.xp[skill]=0;this.skills[skill]++}}
 }
@@ -191,4 +196,3 @@ class Game{
 }
 
 // Boot runs after simulation extensions are installed.
-
