@@ -159,7 +159,7 @@
     const label=b=>`${BUILD_LABEL[b.type]} (${Math.floor(b.x)}, ${Math.floor(b.y)})`;
     $('#inventoryList').innerHTML=buildings.map(b=>`<article><b>${label(b)}</b><span>${total(b.inventory.items)}/${b.inventory.capacity} · ${Object.entries(b.inventory.items).filter(([,n])=>n).map(([k,n])=>`${this.resourceName(k)}: ${n}`).join(' · ')||'vuoto'}</span>${b.batch?`<span>In lavorazione: ${b.batch.amount} ${this.resourceName(b.batch.output)}</span>`:''}</article>`).join('');
     const populate=(id,entries)=>{const el=$(id),old=el.value;el.innerHTML=entries.map(([id,label])=>`<option value="${id}">${label}</option>`).join('');if(entries.some(([id])=>id===old))el.value=old;};
-    populate('#carrierSelect',this.units.filter(u=>u.health>0).map(u=>[u.id,`${u.name} · ${this.unitStatus(u)} · carico ${u.inventory.amount}/${u.inventory.cap}`]));
+    populate('#carrierSelect',this.units.filter(u=>u.health>0&&u.location.kind==='world').map(u=>[u.id,`${u.name} · ${this.unitStatus(u)} · carico ${u.inventory.amount}/${u.inventory.cap}`]));
     populate('#sourceSelect',buildings.map(b=>[b.id,label(b)]));populate('#destinationSelect',buildings.map(b=>[b.id,label(b)]));
     $('#routeList').innerHTML=this.units.filter(u=>u.task?.type==='haul').map(u=>{const t=u.task,source=this.findById(buildings,t.source),dest=this.findById(buildings,t.destination);return `<p><b>${u.name}</b>: ${source?label(source):'origine perduta'} → ${dest?label(dest):'destinazione perduta'} · ${this.resourceName(t.good)} · ${this.unitStatus(u)} · prenotati ${t.amount}</p>`;}).join('')||'<p>Nessun trasporto assegnato.</p>';
   };

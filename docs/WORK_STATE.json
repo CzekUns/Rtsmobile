@@ -4,10 +4,10 @@
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
   "lease": {
-    "run_id": "run-20260917T120000Z",
-    "task": "T03",
+    "expires_at": "2026-09-17T13:30:00Z",
     "observed_head": "69d1b76af9d6f38585ba534ebfa1665a3cf7bc2e",
-    "expires_at": "2026-09-17T13:30:00Z"
+    "run_id": "run-20260917T120000Z",
+    "task": "T03"
   },
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
@@ -26,6 +26,14 @@
       "notes": "Restored missing remote plan/register from prepared local documents on unchanged build-32 baseline; acquired non-forced lease. T01 Chromium executable missing. Implemented T02 and v4 migration; all Node suites pass.",
       "result": "awaiting_deploy",
       "task": "T01/T02"
+    },
+    {
+      "at": "2026-09-17T12:12:00Z",
+      "task": "T02/T03",
+      "result": "awaiting_deploy",
+      "notes": "Confirmed Build 33 Pages deployment success. Implemented resident entry/exit, capacity, persistent identity/cargo, destroyed-district evacuation and blocked-exit handling with v5 save migration.",
+      "branch": "work/T03-residents",
+      "next": "Publish Build 34, verify Pages, then mark T03 done and begin T04 community panel."
     }
   ],
   "schema_version": 1,
@@ -97,16 +105,20 @@
         "Gestire villaggio pieno, distrutto e uscita senza terreno libero con esito visibile."
       ],
       "blocker": null,
-      "branch": null,
+      "branch": "work/T03-residents",
       "commit": null,
       "depends_on": [
         "T02"
       ],
-      "evidence": [],
+      "evidence": [
+        "7 resident regressions PASS; 6 persistent-person regressions PASS; 17 simulation regressions PASS; controls, debug and selection-scroll PASS; JavaScript syntax checks PASS. Node VM/DOM only."
+      ],
       "id": "T03",
-      "last_attempt_at": null,
-      "remaining": [],
-      "status": "pending",
+      "last_attempt_at": "2026-09-17T12:12:00Z",
+      "remaining": [
+        "Verify GitHub Pages deployment of build 34."
+      ],
+      "status": "awaiting_deploy",
       "title": "Residenti e ingresso/uscita dal villaggio"
     },
     {
@@ -541,5 +553,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-17T12:00:00Z"
+  "updated_at": "2026-09-17T12:12:00Z"
 }

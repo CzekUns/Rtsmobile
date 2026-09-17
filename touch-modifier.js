@@ -68,7 +68,7 @@
   };
 
   const selectedUnits = game => {
-    const group = game.selected instanceof Unit ? (game.groupSelection || []).filter(u => u.health > 0 && game.units.includes(u)) : [];
+    const group = game.selected instanceof Unit ? (game.groupSelection || []).filter(u => u.health > 0 && u.location.kind === 'world' && game.units.includes(u)) : [];
     if (group.length) return group;
     return game.selected instanceof Unit && game.selected.health > 0 ? [game.selected] : [];
   };
@@ -161,7 +161,7 @@
     const top = Math.min(box.startY, box.y);
     const bottom = Math.max(box.startY, box.y);
     const units = this.units.filter(u => {
-      if (u.health <= 0) return false;
+      if (u.health <= 0 || u.location.kind !== 'world') return false;
       const p = this.worldToScreen(u.x*TILE, u.y*TILE);
       return p.x >= left && p.x <= right && p.y >= top && p.y <= bottom;
     });

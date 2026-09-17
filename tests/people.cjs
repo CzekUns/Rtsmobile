@@ -1,9 +1,9 @@
 const assert=require('node:assert/strict');
 const make=require('./harness.cjs');
-const SLOT='terra-italica-save-v4', OLD='terra-italica-save-v3';
+const SLOT='terra-italica-save-v5', OLD='terra-italica-save-v4';
 let count=0;
 function test(name,fn){fn();console.log('PASS',name);count++;}
-function legacy(g){const d=JSON.parse(JSON.stringify(g.snapshot()));d.version=3;for(const u of d.units){delete u.owner;delete u.location;delete u.occupation;}return JSON.stringify(d);}
+function legacy(g){const d=JSON.parse(JSON.stringify(g.snapshot()));d.version=4;for(const b of d.buildings)delete b.residents;return JSON.stringify(d);}
 test('one authoritative person owns identity, skills and cargo',()=>{
   const {g}=make(),u=g.units[0];u.inventory={type:'grain',amount:4,cap:15};u.skills.wood=7;u.xp.wood=12;u.health=67;
   g.groupSelection=[u];u.selected=true;
@@ -17,15 +17,15 @@ test('occupation follows orders and cancellation without a second job record',()
   assert(g.save());assert(g.load());assert.equal(g.units[0].occupation,'move');
   g.cancelTask(g.units[0]);assert.equal(g.units[0].occupation,'idle');
 });
-test('v3 migration retains original bytes, identities, cargo, skills and order',()=>{
+test('v4 migration retains original bytes, identities, cargo, skills and order',()=>{
   const {g,storage}=make(),u=g.units[0];u.inventory={type:'wood',amount:5,cap:15};u.skills.construction=9;u.task={type:'move',x:u.x,y:u.y};
   const old=legacy(g),ids=g.units.map(u=>u.id);storage.set(OLD,old);
   assert(g.load());assert(g.paused);assert.deepEqual(g.units.map(u=>u.id),ids);assert.equal(g.units[0].inventory.amount,5);
   assert.equal(g.units[0].skills.construction,9);assert.equal(g.units[0].occupation,'move');assert(g.save());
-  assert.equal(storage.get(OLD),old);assert.equal(JSON.parse(storage.get(SLOT)).version,4);
+  assert.equal(storage.get(OLD),old);assert.equal(JSON.parse(storage.get(SLOT)).version,5);
   assert(g.load());assert.deepEqual(g.units.map(u=>u.id),ids);
 });
-test('startup migrates v3 and prefers v4 on following startup',()=>{
+test('startup migrates v4 and prefers v5 on following startup',()=>{
   const first=make(),old=legacy(first.g),second=make([[OLD,old]]);
   assert.equal(second.g.units[0].id,first.g.units[0].id);assert(second.g.paused);
   second.g.units[0].health=51;assert(second.g.save());const third=make([...second.storage]);
@@ -37,7 +37,7 @@ test('invalid person records are rejected before live state changes',()=>{
     assert.equal(g.load(),false);assert.equal(g.world,world);assert.equal(g.units[0],person);
   }
 });
-test('corrupt v3 uses valid v3 backup without overwriting either original',()=>{
+test('corrupt v4 uses valid v4 backup without overwriting either original',()=>{
   const {g,storage}=make(),old=legacy(g);storage.set(OLD,'broken');storage.set(OLD+'-backup',old);assert(g.load());assert(g.save());
   assert.equal(storage.get(OLD),'broken');assert.equal(storage.get(OLD+'-backup'),old);
 });

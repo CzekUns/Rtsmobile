@@ -1,7 +1,7 @@
 // Mobile snapshots are separate from the original v2 slot, which is never overwritten.
 (() => {
   'use strict';
-  const SLOT='terra-italica-save-v4', PREVIOUS='terra-italica-save-v3', BACKUP=SLOT+'-backup', TEMP=SLOT+'-pending';
+  const SLOT='terra-italica-save-v5', PREVIOUS='terra-italica-save-v4', OLDER='terra-italica-save-v3', BACKUP=SLOT+'-backup', TEMP=SLOT+'-pending';
   const clone=value=>JSON.parse(JSON.stringify(value));
   const finite=(v,min=-Infinity,max=Infinity)=>typeof v==='number'&&Number.isFinite(v)&&v>=min&&v<=max;
   const check=(ok,label)=>{if(!ok)throw new Error('Salvataggio non valido: '+label)};
@@ -9,7 +9,7 @@
   const itemsValid=items=>items&&typeof items==='object'&&!Array.isArray(items)&&Object.entries(items).every(([k,v])=>materials.has(k)&&Number.isSafeInteger(v)&&v>=0);
 
   function validate(d) {
-    check(d&&d.version===4,'versione');check(Number.isInteger(d.seed),'seed');
+    check(d&&d.version===5,'versione');check(Number.isInteger(d.seed),'seed');
     for(const key of ['units','buildings','animals','raiders','resources','roads'])check(Array.isArray(d[key]),key);
     const ids=new Set();
     for(const e of [...d.units,...d.buildings,...d.animals,...d.raiders,...d.resources]){
@@ -21,13 +21,14 @@
     for(const b of d.buildings){
       check(Object.hasOwn(BUILD_LABEL,b.type),'edificio');check(finite(b.progress,0,1)&&finite(b.growth,0)&&finite(b.birthDays,0)&&finite(b.cooldown,0),'progresso edificio');
       check(Array.isArray(b.assigned)&&b.assigned.every(id=>typeof id==='string'),'lavoratori');
+      check(Array.isArray(b.residents)&&b.residents.length<=(b.type==='house'?5:0)&&b.residents.every(id=>typeof id==='string'),'residenti edificio');
       check(b.inventory&&itemsValid(b.inventory.items)&&finite(b.inventory.capacity,1),'inventario edificio');
       check(Object.values(b.inventory.items).reduce((s,n)=>s+n,0)<=b.inventory.capacity,'capacità edificio');
       if(b.batch){const recipe=window.TERRA_RECIPES[b.type];check(recipe&&b.batch.input===recipe.input&&b.batch.output===recipe.output&&b.batch.amount===recipe.amount&&finite(b.batch.remaining,0,recipe.seconds),'ricetta');}
     }
     for(const u of d.units){
       check(u.owner===0,'proprietario abitante');
-      check(u.location?.kind==='world'&&u.location.settlementId===null,'collocazione abitante');
+      check(u.location&&(u.location.kind==='world'&&u.location.settlementId===null||u.location.kind==='resident'&&typeof u.location.settlementId==='string'),'collocazione abitante');
       check(u.occupation===(u.task?.type||'idle'),'occupazione abitante');
       check(typeof u.name==='string'&&u.name.length<=80&&!/[<>]/.test(u.name),'nome');
       check(u.inventory&&finite(u.inventory.cap,1)&&Number.isSafeInteger(u.inventory.amount)&&u.inventory.amount>=0&&u.inventory.amount<=u.inventory.cap,'carico');
@@ -35,11 +36,16 @@
       check(u.skills&&u.xp&&['wood','food','stone','iron','farming','construction','taming','combat'].every(k=>finite(u.skills[k],1)),'skill');
       check(Object.values(u.xp).every(v=>finite(v,0)),'XP');check(finite(u.workTimer)&&finite(u.attackCooldown,0),'timer unità');
       check(['idle','moving','gathering','building','taming','combat','farming','hauling'].includes(u.state),'stato');
+      if(u.location.kind==='resident')check(u.task===null&&u.state==='idle'&&u.path.length===0,'stato residente');
       check(Array.isArray(u.path)&&u.path.every(p=>finite(p.x,0,WORLD_SIZE)&&finite(p.y,0,WORLD_SIZE)),'percorso');
-      if(u.task){check(['move','gather','return','build','farm','tame','attack','haul'].includes(u.task.type),'ordine');
+      if(u.task){check(['move','gather','return','build','farm','enter','tame','attack','haul'].includes(u.task.type),'ordine');
         if(u.task.type==='haul')check(typeof u.task.source==='string'&&typeof u.task.destination==='string'&&materials.has(u.task.good)&&['waiting','source','destination'].includes(u.task.phase)&&Number.isSafeInteger(u.task.amount)&&u.task.amount>=0&&u.task.amount<=u.inventory.cap&&typeof u.task.repeat==='boolean'&&finite(u.task.retry,0),'trasporto');
       }
     }
+    const residentIds=d.buildings.flatMap(b=>b.residents);
+    check(new Set(residentIds).size===residentIds.length,'residente duplicato');
+    for(const u of d.units)if(u.location.kind==='resident')check(residentIds.includes(u.id)&&d.buildings.some(b=>b.id===u.location.settlementId&&b.type==='house'&&b.residents.includes(u.id)),'legame residente');
+    check(residentIds.every(id=>d.units.some(u=>u.id===id&&u.location.kind==='resident')),'elenco residenti');
     for(const a of d.animals)check(['sheep','wolf'].includes(a.type)&&finite(a.vx)&&finite(a.vy)&&finite(a.wander)&&finite(a.attackCooldown,0),'animale');
     for(const r of d.raiders)check(finite(r.speed,0)&&finite(r.repath)&&finite(r.attackCooldown,0)&&Array.isArray(r.path)&&r.path.every(p=>finite(p.x,0,WORLD_SIZE)&&finite(p.y,0,WORLD_SIZE)),'razziatore');
     for(const r of d.resources)check(materials.has(r.type)&&Number.isSafeInteger(r.amount)&&r.amount>=0&&finite(r.max,r.amount),'risorsa');
@@ -69,7 +75,7 @@
     base.inventory.items={...d.stock};base.inventory.capacity=Math.max(base.inventory.capacity,Object.values(d.stock).reduce((a,b)=>a+b,0));
     // Old harvests could exceed carrying capacity. Preserve all existing goods.
     for(const u of d.units){u.inventory.cap=Math.max(u.inventory.cap,u.inventory.amount);u.workTimer=Math.max(0,u.workTimer||0);u.attackCooldown=Math.max(0,u.attackCooldown||0);}
-    return migrateV3(d);
+    return migrateV4(migrateV3(d));
   }
 
   function migrateV3(old){
@@ -77,12 +83,19 @@
     const d=clone(old);d.version=4;
     check(Array.isArray(d.units),'abitanti precedenti');
     for(const u of d.units){u.owner=0;u.location={kind:'world',settlementId:null};u.occupation=u.task?.type||'idle';}
+    return d;
+  }
+
+  function migrateV4(old){
+    check(old&&old.version===4,'versione precedente');
+    const d=clone(old);d.version=5;
+    for(const b of d.buildings)b.residents=[];
     return validate(d);
   }
 
   Game.prototype.snapshot=function(){
     this.ensureInventories();
-    return {version:4,seed:this.seed,rngState:this.rng.s,paused:this.paused,gameEnded:this.gameEnded,
+    return {version:5,seed:this.seed,rngState:this.rng.s,paused:this.paused,gameEnded:this.gameEnded,
       clock:{day:this.day,month:this.month,year:this.year,totalDays:this.totalDays,nextRaidDay:this.nextRaidDay,raidLevel:this.raidLevel,dayAccumulator:this.dayAccumulator},
       roads:this.world.tiles.filter(t=>t.road).map(t=>[t.x,t.y]),resources:this.world.resources,buildings:this.buildings,units:this.units,animals:this.animals,raiders:this.raiders,camera:this.camera,
       selection:(this.rtsSelectedUnits?.()||[]).map(u=>u.id),selectedId:this.selected?.id||null};
@@ -99,10 +112,11 @@
   Game.prototype.load=function(){
     try{
       let d, recovered=false;
-      const current=localStorage.getItem(SLOT),previous=localStorage.getItem(PREVIOUS),legacy=localStorage.getItem(SAVE_KEY);
-      if(!current&&!previous&&!legacy){this.message('Nessun salvataggio presente.');return false;}
+      const current=localStorage.getItem(SLOT),previous=localStorage.getItem(PREVIOUS),older=localStorage.getItem(OLDER),legacy=localStorage.getItem(SAVE_KEY);
+      if(!current&&!previous&&!older&&!legacy){this.message('Nessun salvataggio presente.');return false;}
       if(current){try{d=validate(JSON.parse(current))}catch(e){const backup=localStorage.getItem(BACKUP);if(!backup)throw e;d=validate(JSON.parse(backup));recovered=true;}}
-      else if(previous){try{d=migrateV3(JSON.parse(previous))}catch(e){const backup=localStorage.getItem(PREVIOUS+'-backup');if(!backup)throw e;d=migrateV3(JSON.parse(backup));recovered=true;}}
+      else if(previous){try{d=migrateV4(JSON.parse(previous))}catch(e){const backup=localStorage.getItem(PREVIOUS+'-backup');if(!backup)throw e;d=migrateV4(JSON.parse(backup));recovered=true;}}
+      else if(older){try{d=migrateV4(migrateV3(JSON.parse(older)))}catch(e){const backup=localStorage.getItem(OLDER+'-backup');if(!backup)throw e;d=migrateV4(migrateV3(JSON.parse(backup)));recovered=true;}}
       else d=migrate(JSON.parse(legacy));
       // Construct and resolve everything before replacing the running world.
       const world=new World(d.seed),rng=new RNG(d.seed);
@@ -124,7 +138,7 @@
       for(const b of buildings)b.assigned=b.assigned.filter(id=>units.some(u=>u.id===id&&u.health>0&&(u.task?.type==='farm'&&u.task.target===b.id||u.task?.after?.type==='farm'&&u.task.after.target===b.id)));
       const clock=Object.fromEntries(['day','month','year','totalDays','nextRaidDay','raidLevel','dayAccumulator'].map(k=>[k,d.clock[k]]));
       Object.assign(this,{seed:d.seed,world,rng,buildings,units,animals,raiders,...clock,camera:d.camera});
-      this.ensureInventories();this.groupSelection=units.filter(u=>u.health>0&&d.selection.includes(u.id));
+      this.ensureInventories();this.groupSelection=units.filter(u=>u.health>0&&u.location.kind==='world'&&d.selection.includes(u.id));
       this.selected=entities.find(e=>e.id===d.selectedId)||this.groupSelection[0]||units[0]||null;
       for(const u of units)u.selected=this.groupSelection.includes(u);
       this.lastSelectedUnit=this.selected instanceof Unit?this.selected:units[0]||null;
