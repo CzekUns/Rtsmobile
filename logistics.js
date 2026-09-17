@@ -116,11 +116,7 @@
       const amount=Math.max(5,Math.round(15*BIOME[tile.biome].fertility*water*seasonMod));
       if(b.growth>=1&&this.freeSpace(b)>=amount){b.inventory.items.grain=(b.inventory.items.grain||0)+amount;b.growth=0;for(const u of workers)u.gain('farming',5);this.message(`Raccolto: ${amount} grano nel campo. Assegna il trasporto al mulino.`);}
     }
-    if(b.type==='house'){
-      b.birthDays++;const base=this.buildings.find(b=>b.type==='base'&&b.alive);if(!base)return;
-      const bread=this.available(base,'bread'),food=this.available(base,'food');
-      if(b.birthDays>150&&this.units.length<this.populationCap()&&bread+food>=28){b.birthDays=0;const used=Math.min(18,bread);this.pay({bread:used,food:18-used});this.units.push(new Unit(NAMES[this.rng.int(0,NAMES.length-1)],b.x+.3,b.y+.3,this.rng));this.message('Un nuovo abitante entra nella comunità.');}
-    }
+
   };
   const updateBuilding=Game.prototype.updateBuilding;
   Game.prototype.updateBuilding=function(b,dt){

@@ -4,10 +4,10 @@
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
   "lease": {
-    "run_id": "manual-T04-community-20260917",
-    "task": "T05",
+    "expires_at": "2026-09-17T14:02:44.235Z",
     "observed_head": "94d267874dc0cab0d65e61aa8bd02df171cbfbd9",
-    "expires_at": "2026-09-17T14:02:44.235Z"
+    "run_id": "manual-T04-community-20260917",
+    "task": "T05"
   },
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
@@ -39,10 +39,17 @@
     },
     {
       "at": "2026-09-17T12:30:30.560803+00:00",
-      "task": "T04",
-      "result": "awaiting_deploy",
+      "next": "Confirm Build 35 Pages then T05 population.",
       "notes": "Community panel and nominal mobilization; additive optional mobilized flag in v5. Also prevented hidden residents from being auto-assigned to construction.",
-      "next": "Confirm Build 35 Pages then T05 population."
+      "result": "awaiting_deploy",
+      "task": "T04"
+    },
+    {
+      "at": "2026-09-17T12:35:54.980Z",
+      "next": "Confirm Build 36 deploy; T06 equipment data next.",
+      "notes": "Conditional housed arrivals, actual-person food consumption, local unreserved food, housing and requirements UI; provisional configurable balance documented.",
+      "result": "awaiting_deploy",
+      "task": "T05"
     }
   ],
   "schema_version": 1,
@@ -157,16 +164,20 @@
         "Verificare carenza cibo, limite alloggi, nuova popolazione e salvataggi; documentare parametri provvisori."
       ],
       "blocker": null,
-      "branch": null,
+      "branch": "work/T05-population",
       "commit": null,
       "depends_on": [
         "T04"
       ],
-      "evidence": [],
+      "evidence": [
+        "9 population regressions PASS; 9 community, 7 residents, 6 people, 17 simulation plus controls/debug/selection-scroll PASS. Syntax and whitespace checks PASS. Node VM/DOM only."
+      ],
       "id": "T05",
-      "last_attempt_at": null,
-      "remaining": [],
-      "status": "in_progress",
+      "last_attempt_at": "2026-09-17T12:35:54.980Z",
+      "remaining": [
+        "Verify Pages deployment of Build 36."
+      ],
+      "status": "awaiting_deploy",
       "title": "Popolazione, alloggi e consumi"
     },
     {
@@ -565,5 +576,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-17T12:32:44.235Z"
+  "updated_at": "2026-09-17T12:35:54.980Z"
 }

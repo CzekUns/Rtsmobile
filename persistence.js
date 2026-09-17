@@ -9,7 +9,7 @@
   const itemsValid=items=>items&&typeof items==='object'&&!Array.isArray(items)&&Object.entries(items).every(([k,v])=>materials.has(k)&&Number.isSafeInteger(v)&&v>=0);
 
   function validate(d) {
-    check(d&&d.version===5,'versione');check(Number.isInteger(d.seed),'seed');
+    check(d&&d.version===5,'versione');check(d.populationRules===undefined||d.populationRules===1,'regole popolazione');check(Number.isInteger(d.seed),'seed');
     for(const key of ['units','buildings','animals','raiders','resources','roads'])check(Array.isArray(d[key]),key);
     const ids=new Set();
     for(const e of [...d.units,...d.buildings,...d.animals,...d.raiders,...d.resources]){
@@ -97,7 +97,7 @@
 
   Game.prototype.snapshot=function(){
     this.ensureInventories();
-    return {version:5,seed:this.seed,rngState:this.rng.s,paused:this.paused,gameEnded:this.gameEnded,
+    return {version:5,populationRules:1,seed:this.seed,rngState:this.rng.s,paused:this.paused,gameEnded:this.gameEnded,
       clock:{day:this.day,month:this.month,year:this.year,totalDays:this.totalDays,nextRaidDay:this.nextRaidDay,raidLevel:this.raidLevel,dayAccumulator:this.dayAccumulator},
       roads:this.world.tiles.filter(t=>t.road).map(t=>[t.x,t.y]),resources:this.world.resources,buildings:this.buildings,units:this.units,animals:this.animals,raiders:this.raiders,camera:this.camera,
       selection:(this.rtsSelectedUnits?.()||[]).map(u=>u.id),selectedId:this.selected?.id||null};
@@ -125,6 +125,7 @@
       for(const [x,y] of d.roads)world.tile(x,y).road=true;
       world.resources=d.resources.map(o=>Object.assign(new ResourceNode(o.type,o.x,o.y,o.amount),o));
       const buildings=d.buildings.map(o=>Object.assign(new Building(o.type,Math.floor(o.x),Math.floor(o.y),o.owner,o.progress>=1),o));
+      if(d.populationRules!==1)for(const b of buildings)if(b.type==='house')b.birthDays=0;
       const units=d.units.map(({occupation,...o})=>Object.assign(new Unit(o.name,o.x,o.y,rng),o));
       const animals=d.animals.map(o=>Object.assign(new Animal(o.type,o.x,o.y,o.owner),o));
       const raiders=d.raiders.map(o=>Object.assign(new Raider(o.x,o.y),o));rng.s=d.rngState;

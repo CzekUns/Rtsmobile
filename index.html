@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./app.css?v=35">
+  <link rel="stylesheet" href="./app.css?v=36">
   <style>
     .selection-card{
       left:auto!important;
@@ -23,7 +23,7 @@
   <main id="app" class="app-shell">
     <header class="hud-top" aria-label="Stato della comunità">
       <div class="identity">
-        <strong>TERRA ITALICA <small style="font-size:8px;opacity:.55;letter-spacing:.08em">BUILD 35</small></strong>
+        <strong>TERRA ITALICA <small style="font-size:8px;opacity:.55;letter-spacing:.08em">BUILD 36</small></strong>
         <span id="sessionState" role="status"></span><span id="dateLabel">1 Marzo · 1000 a.C.</span>
       </div>
       <div class="resources" id="resourceBar">
@@ -99,6 +99,7 @@
     <p>La partita è in pausa. Mobilita una persona disponibile per portarla sulla mappa e assegnarle ordini.</p>
     <p id="communitySummary"></p>
     <p>I residenti indicano dove si trovano le persone. Disponibili, occupati e mobilitati indicano il loro impiego e insieme formano la popolazione totale.</p>
+    <p id="populationSummary"></p><div id="populationDistricts"></div>
     <div id="communityRoster"></div><p id="communityStatus" role="status"></p>
   </dialog>
   <dialog id="logisticsDialog" aria-labelledby="logisticsTitle">
@@ -114,15 +115,16 @@
       <button type="submit">Assegna trasporto</button>
     </form>
     <p id="transportStatus" role="status"></p><div id="routeList"></div>
-    <p>Le scorte nella Casa comune finanziano le costruzioni. Merci nei magazzini, nelle fabbriche o in viaggio restano locali. Porta il pane alla Casa comune per alimentare la crescita attuale.</p>
+    <p>Le scorte nella Casa comune finanziano le costruzioni. Merci nei magazzini, nelle fabbriche o in viaggio restano locali. Porta il pane alla Casa comune per le razioni e l’accoglienza. In Comunità trovi consumi e requisiti dei Distretti.</p>
   </dialog>
-  <script src="./game.js?v=35"></script>
+  <script src="./game.js?v=36"></script>
   <script src="./p16-render.js?v=24"></script>
   <script src="./asset-render.js?v=28"></script>
-  <script src="./touch-modifier.js?v=35"></script>
-  <script src="./logistics.js?v=35"></script>
-  <script src="./persistence.js?v=35"></script>
-  <script src="./community.js?v=35"></script>
-  <script src="./boot.js?v=35"></script>
+  <script src="./touch-modifier.js?v=36"></script>
+  <script src="./logistics.js?v=36"></script>
+  <script src="./persistence.js?v=36"></script>
+  <script src="./community.js?v=36"></script>
+  <script src="./population.js?v=36"></script>
+  <script src="./boot.js?v=36"></script>
 </body>
 </html>
