@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./app.css?v=39">
+  <link rel="stylesheet" href="./app.css?v=40">
   <style>
     .selection-card{
       left:auto!important;
@@ -23,7 +23,7 @@
   <main id="app" class="app-shell">
     <header class="hud-top" aria-label="Stato della comunità">
       <div class="identity">
-        <strong>TERRA ITALICA <small style="font-size:8px;opacity:.55;letter-spacing:.08em">BUILD 39</small></strong>
+        <strong>TERRA ITALICA <small style="font-size:8px;opacity:.55;letter-spacing:.08em">BUILD 40</small></strong>
         <span id="sessionState" role="status"></span><span id="dateLabel">1 Marzo · 1000 a.C.</span>
       </div>
       <div class="resources" id="resourceBar">
@@ -87,6 +87,7 @@
       <div id="worldPanel" class="dock-panel world-actions">
         <button id="characterBtn" type="button"><b>Personaggio</b><span>abitante selezionato</span></button>
         <button id="skillsBtn" type="button"><b>Skill</b><span>livelli e progresso</span></button>
+        <button id="knowledgeBtn" type="button"><b>Saperi</b><span>personali e tribali</span></button>
         <button id="logisticsBtn" type="button"><b>Filiera</b><span>inventari e trasporti</span></button>
         <button id="saveBtn" type="button"><b>Salva</b><span>locale sul dispositivo</span></button>
         <button id="loadBtn" type="button"><b>Carica</b><span>ultimo salvataggio</span></button>
@@ -125,6 +126,13 @@
     <p id="populationSummary"></p><div id="populationDistricts"></div>
     <div id="communityRoster"></div><p id="communityStatus" role="status"></p>
   </dialog>
+  <dialog id="knowledgeDialog" aria-labelledby="knowledgeTitle">
+    <header><h2 id="knowledgeTitle">Saperi edilizi</h2><button id="closeKnowledge" type="button">Chiudi</button></header>
+    <p>Separati dalle skill: determinano quali cantieri una persona può avviare.</p>
+    <label>Abitante <select id="knowledgePeople"></select></label><h3 id="knowledgeIdentity"></h3>
+    <section class="knowledge-columns"><div><h4>Personali</h4><ul id="personalKnowledge"></ul></div><div><h4>Tribali</h4><ul id="tribalKnowledge"></ul></div></section>
+    <p id="knowledgeRules"></p>
+  </dialog>
   <dialog id="logisticsDialog" aria-labelledby="logisticsTitle">
     <header><h2 id="logisticsTitle">Scorte e trasporti</h2><button id="closeLogistics" type="button">Chiudi</button></header>
     <p>La partita è in pausa durante la gestione. Il campo produce grano; mulino e forno lavorano solo gli ingredienti consegnati.</p>
@@ -150,7 +158,8 @@
   <script src="./population.js?v=39"></script>
   <script src="./equipment.js?v=39"></script>
   <script src="./character.js?v=39"></script>
-  <script src="./skills.js?v=39"></script>
-  <script src="./boot.js?v=39"></script>
+  <script src="./skills.js?v=40"></script>
+  <script src="./construction-knowledge.js?v=40"></script>
+  <script src="./boot.js?v=40"></script>
 </body>
 </html>
