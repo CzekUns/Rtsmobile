@@ -1,6 +1,6 @@
-const CACHE='terra-italica-v11';
+const CACHE='terra-italica-v12';
 const ASSETS=[
-  './','./index.html','./app.css','./game.js','./touch-modifier.js','./p16-render.js','./asset-render.js','./manifest.webmanifest',
+  './','./index.html','./app.css','./game.js','./logistics.js','./persistence.js','./boot.js','./touch-modifier.js','./p16-render.js','./asset-render.js','./manifest.webmanifest',
   './assets/p16/units/unit_human_p16.png','./assets/p16/units/unit_raider_p16.png',
   './assets/p16/animals/animal_sheep_p16.png','./assets/p16/animals/animal_wolf_p16.png',
   './assets/p16/resources/resource_tree_p16.png','./assets/p16/resources/resource_stone_p16.png',

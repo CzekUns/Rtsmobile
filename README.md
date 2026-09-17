@@ -1,6 +1,6 @@
 # Terra Italica — RTS Mobile
 
-RTS sandbox mobile-first ambientato nell'Italia preromana. Il progetto è una riscrittura indipendente ispirata alle premesse di simulazione della versione PC `rts`, ma con visuale top-down e interazione progettata per smartphone.
+RTS sandbox mobile-first ambientato nell'Italia preromana. La direzione funzionale è descritta nel handoff Ver Sacrum desktop Godot; questa PWA ha visuale top-down e controlli dedicati agli smartphone, e non ha ancora parità di funzioni con il desktop.
 
 ## Avvio
 Non richiede build, Node o installazioni. GitHub Pages pubblica direttamente la branch `main` tramite GitHub Actions.
@@ -15,11 +15,19 @@ Non richiede build, Node o installazioni. GitHub Pages pubblica direttamente la 
 - In **Costruisci**, scegli una struttura e tocca il terreno.
 - In **Mondo**, salva/carica la partita locale, genera un territorio o torna al villaggio.
 
-## Stato attuale
-La build contiene già la vertical slice completa del loop di base: mondo procedurale, cinque abitanti individuali, inventari, skill, risorse fisiche, logistica di deposito, costruzioni, strade, agricoltura stagionale, fauna, domesticazione, combattimento, incursioni, crescita della popolazione e salvataggi.
+## Stato attuale — Build 29
+Mondo procedurale, cinque abitanti, raccolta, costruzioni, fauna, combattimento e prima filiera fisica **campo → mulino → forno → Casa comune**. Gli edifici hanno scorte locali, gli abitanti trasportano le merci e il salvataggio conserva i viaggi in corso.
 
-Vedi `DESIGN.md` per i principi che devono guidare le prossime iterazioni.
+Apri **Mondo → Filiera** per inventari e rotte. Il pannello mette in pausa la simulazione. Dopo sospensione o caricamento premi ▶ per riprendere. I salvataggi precedenti vengono importati conservando l'originale.
 
+Leggi [guida, stato e limiti della build](docs/BUILD_29.md) e [handoff funzionale](docs/HANDOFF_MOBILE.md). Villaggi evoluti, paperdoll, skill separate, mercati e carovane restano lavori successivi.
 
-## Verifica dei controlli
-Con Node.js: `node tests/controls.cjs`. Il test verifica i controlli e la selezione con DOM/canvas simulati; non sostituisce una prova touch su dispositivo.
+## Verifiche
+Con Node.js:
+
+```sh
+node tests/controls.cjs
+node tests/simulation.cjs
+```
+
+I test usano DOM/canvas simulati; non sostituiscono una prova touch e prestazionale su dispositivo.
