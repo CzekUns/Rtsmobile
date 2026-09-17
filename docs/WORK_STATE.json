@@ -1,13 +1,13 @@
 {
-  "active_task": "T04",
+  "active_task": "T05",
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
   "lease": {
     "run_id": "manual-T04-community-20260917",
-    "task": "T04",
+    "task": "T05",
     "observed_head": "94d267874dc0cab0d65e61aa8bd02df171cbfbd9",
-    "expires_at": "2026-09-17T13:56:46.750Z"
+    "expires_at": "2026-09-17T14:02:44.235Z"
   },
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
@@ -137,19 +137,18 @@
       ],
       "blocker": null,
       "branch": "work/T04-community",
-      "commit": null,
+      "commit": "3915c93b4dbd7a13a3d96174e1e797eb5145257e",
       "depends_on": [
         "T03"
       ],
       "evidence": [
-        "9 community regressions passed, covering identity, counts, blocked exits, duplicate taps, old saves and simulated dialog/background events. All prior suites passed. Browser/hardware checks remain separate."
+        "9 community regressions passed, covering identity, counts, blocked exits, duplicate taps, old saves and simulated dialog/background events. All prior suites passed. Browser/hardware checks remain separate.",
+        "Pages workflow 35221632354 success."
       ],
       "id": "T04",
       "last_attempt_at": "2026-09-17T12:30:30.560803+00:00",
-      "remaining": [
-        "Verify Pages deployment of Build 35."
-      ],
-      "status": "awaiting_deploy",
+      "remaining": [],
+      "status": "done",
       "title": "Pannello comunità e mobilitazione"
     },
     {
@@ -167,7 +166,7 @@
       "id": "T05",
       "last_attempt_at": null,
       "remaining": [],
-      "status": "pending",
+      "status": "in_progress",
       "title": "Popolazione, alloggi e consumi"
     },
     {
@@ -566,5 +565,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-17T12:30:30.560803+00:00"
+  "updated_at": "2026-09-17T12:32:44.235Z"
 }
