@@ -28,6 +28,8 @@
     }
     for(const u of d.units){
       check(u.owner===0,'proprietario abitante');
+      check(u.mobilized===undefined||typeof u.mobilized==='boolean','mobilitazione');
+      check(!u.mobilized||u.location?.kind==='world','mobilitato sulla mappa');
       check(u.location&&(u.location.kind==='world'&&u.location.settlementId===null||u.location.kind==='resident'&&typeof u.location.settlementId==='string'),'collocazione abitante');
       check(u.occupation===(u.task?.type||'idle'),'occupazione abitante');
       check(typeof u.name==='string'&&u.name.length<=80&&!/[<>]/.test(u.name),'nome');

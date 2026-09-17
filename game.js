@@ -69,6 +69,7 @@ class Building{
 }
 class Unit{
   owner=0;
+  mobilized=false;
   location={kind:'world',settlementId:null};
   // The unit is the person record, never a second copy of inventory or skills.
   get occupation(){return this.task?.type||'idle'}
@@ -131,7 +132,7 @@ class Game{
   canPay(cost){return Object.entries(cost).every(([k,v])=>(this.stock[k]||0)>=v)}
   pay(cost){for(const[k,v]of Object.entries(cost))this.stock[k]-=v}
   placeBuild(type,tx,ty){const t=this.world.tile(tx,ty);if(!t||!BIOME[t.biome].walk)return this.message('Terreno non edificabile.');if(type==='road'){if(t.road)return; if(!this.pay({wood:1}))return this.message('Legno disponibile insufficiente: una parte può essere prenotata.');t.road=true;this.updateUI();return}
-    if(this.buildings.some(b=>b.alive&&Math.floor(b.x)===tx&&Math.floor(b.y)===ty))return this.message('Spazio occupato.');const cost=BUILD_COSTS[type];if(!this.canPay(cost))return this.message('Risorse insufficienti per il cantiere.');this.pay(cost);const b=new Building(type,tx,ty);this.buildings.push(b);let builder=this.selected instanceof Unit?this.selected:this.units.find(u=>u.state==='idle');if(builder)this.assignBuild(builder,b);this.groupSelection=[];for(const u of this.units)u.selected=false;this.selected=b;this.updateUI();this.message(builder?`${builder.name} avvia il cantiere.`:'Cantiere aperto: assegna un abitante.');}
+    if(this.buildings.some(b=>b.alive&&Math.floor(b.x)===tx&&Math.floor(b.y)===ty))return this.message('Spazio occupato.');const cost=BUILD_COSTS[type];if(!this.canPay(cost))return this.message('Risorse insufficienti per il cantiere.');this.pay(cost);const b=new Building(type,tx,ty);this.buildings.push(b);let builder=this.selected instanceof Unit&&this.selected.location.kind==='world'?this.selected:this.units.find(u=>u.health>0&&u.location.kind==='world'&&!u.mobilized&&u.state==='idle');if(builder)this.assignBuild(builder,b);this.groupSelection=[];for(const u of this.units)u.selected=false;this.selected=b;this.updateUI();this.message(builder?`${builder.name} avvia il cantiere.`:'Cantiere aperto: assegna un abitante.');}
   cancelTask(u){if(u.task?.type==='farm'){const f=this.findById(this.buildings,u.task.target);if(f)f.assigned=f.assigned.filter(id=>id!==u.id)}u.task=null;u.state='idle';u.path=[];u.inventory.type=u.inventory.amount?u.inventory.type:null}
   assignMove(u,tx,ty){this.cancelTask(u);u.task={type:'move',x:tx,y:ty};u.path=this.findPath(u.x,u.y,tx,ty,1);u.state='moving'}
   assignGather(u,r){this.cancelTask(u);u.task={type:'gather',target:r.id,phase:'toResource'};u.path=this.findPath(u.x,u.y,Math.floor(r.x),Math.floor(r.y),1);u.state='moving';this.message(`${u.name}: raccolta ${this.resourceName(r.type)}.`)}

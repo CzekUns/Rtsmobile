@@ -1,5 +1,5 @@
 {
-  "active_task": "T03",
+  "active_task": "T04",
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
@@ -36,6 +36,13 @@
       "result": "awaiting_deploy",
       "task": "T02/T03",
       "workflow": 35219603988
+    },
+    {
+      "at": "2026-09-17T12:30:30.560803+00:00",
+      "task": "T04",
+      "result": "awaiting_deploy",
+      "notes": "Community panel and nominal mobilization; additive optional mobilized flag in v5. Also prevented hidden residents from being auto-assigned to construction.",
+      "next": "Confirm Build 35 Pages then T05 population."
     }
   ],
   "schema_version": 1,
@@ -114,14 +121,13 @@
       ],
       "evidence": [
         "7 resident regressions PASS; 6 persistent-person regressions PASS; 17 simulation regressions PASS; controls, debug and selection-scroll PASS; JavaScript syntax checks PASS. Node VM/DOM only.",
-        "Build 34 commit 2f3c15a249c7cccaf69eaae6e9dea679f8696817; Pages workflow 35219603988 queued and not counted as deployed."
+        "Build 34 commit 2f3c15a249c7cccaf69eaae6e9dea679f8696817; Pages workflow 35219603988 queued and not counted as deployed.",
+        "Successor Pages workflow 35219631851 succeeded on 94d2678, containing Build 34."
       ],
       "id": "T03",
       "last_attempt_at": "2026-09-17T12:12:00Z",
-      "remaining": [
-        "Verify GitHub Pages deployment of build 34."
-      ],
-      "status": "awaiting_deploy",
+      "remaining": [],
+      "status": "done",
       "title": "Residenti e ingresso/uscita dal villaggio"
     },
     {
@@ -130,16 +136,20 @@
         "Consentire scelta nominale e mobilitazione come trasferimento di persone, non generazione di copie."
       ],
       "blocker": null,
-      "branch": null,
+      "branch": "work/T04-community",
       "commit": null,
       "depends_on": [
         "T03"
       ],
-      "evidence": [],
+      "evidence": [
+        "9 community regressions passed, covering identity, counts, blocked exits, duplicate taps, old saves and simulated dialog/background events. All prior suites passed. Browser/hardware checks remain separate."
+      ],
       "id": "T04",
-      "last_attempt_at": null,
-      "remaining": [],
-      "status": "pending",
+      "last_attempt_at": "2026-09-17T12:30:30.560803+00:00",
+      "remaining": [
+        "Verify Pages deployment of Build 35."
+      ],
+      "status": "awaiting_deploy",
       "title": "Pannello comunità e mobilitazione"
     },
     {
@@ -556,5 +566,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-17T12:26:46.750Z"
+  "updated_at": "2026-09-17T12:30:30.560803+00:00"
 }
