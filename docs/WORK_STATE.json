@@ -1,14 +1,9 @@
 {
-  "active_task": "T07",
+  "active_task": "T08",
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "lease": {
-    "expires_at": "2026-09-17T18:35:20.913Z",
-    "observed_head": "48dc00421e21cff035771226240b2de32fdc543f",
-    "run_id": "hourly-T06-20260917T1705",
-    "task": "T07"
-  },
+  "lease": null,
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
   "runs": [
@@ -61,11 +56,21 @@
     },
     {
       "at": "2026-09-17T17:17:38.991Z",
-      "task": "T01/T07",
-      "result": "awaiting_deploy",
       "branch": "work/T07-paperdoll",
+      "next": "Verify Build 38 Pages and real UI, then T08 separate Skills.",
       "notes": "Cloud browser resolves T01 blocker. Implemented identity-bound Character dialog, local object transfers and responsive layout test fixture.",
-      "next": "Verify Build 38 Pages and real UI, then T08 separate Skills."
+      "result": "awaiting_deploy",
+      "task": "T01/T07"
+    },
+    {
+      "at": "2026-09-17T17:24:22.742Z",
+      "task": "T01/T06/T07",
+      "result": "done",
+      "branch": "work/T07-paperdoll",
+      "commit": "37bb617e782328fc34cb5e65867161b14abb5af0",
+      "verification_commit": "69209884cef27f1c51296beca4a6fb777649b9f9",
+      "notes": "Completed real-browser T01 after discovering cloud Chrome, verified T06 equipment and T07 Character. Build 38 deployed and UI transfer/persistence tested. Narrow iframe CSS layouts checked; physical devices, touch and item art layers remain unverified/not implemented. Lease released.",
+      "next": "T08 separate Skills dialog, progress through use and persistence; then T09 construction knowledge."
     }
   ],
   "schema_version": 1,
@@ -223,19 +228,18 @@
       ],
       "blocker": null,
       "branch": "work/T07-paperdoll",
-      "commit": null,
+      "commit": "37bb617e782328fc34cb5e65867161b14abb5af0",
       "depends_on": [
         "T06"
       ],
       "evidence": [
-        "8 character regressions PASS; 11 equipment and all previous Node VM/DOM suites PASS; syntax and diff checks PASS."
+        "8 character regressions PASS; 11 equipment and all previous Node VM/DOM suites PASS; syntax and diff checks PASS.",
+        "Pages workflow 35251855527 success (Build 38); fixture follow-up workflow 35252132295 success. Real cloud Chrome: open Character, remove/equip tunic, switch Neria/Aulo without ownership transfer, deposit/re-equip at local base, load and reopen. Real iframe layout 390x740, 320x640 and 740x390: dialog scrollWidth==clientWidth (335,265,523); 320px transfer controls work. No app-origin console errors. Not hardware/touch certification; figure is existing P16 portrait, no item sprite layers."
       ],
       "id": "T07",
-      "last_attempt_at": "2026-09-17T17:17:38.991Z",
-      "remaining": [
-        "Verify Build 38 Pages; inspect character viewport and transfer UI in real browser."
-      ],
-      "status": "awaiting_deploy",
+      "last_attempt_at": "2026-09-17T17:24:22.742Z",
+      "remaining": [],
+      "status": "done",
       "title": "Vista Personaggio e paperdoll"
     },
     {
@@ -598,5 +602,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-17T17:17:38.991Z"
+  "updated_at": "2026-09-17T17:24:22.742Z"
 }
