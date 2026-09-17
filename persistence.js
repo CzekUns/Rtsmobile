@@ -44,6 +44,24 @@
         if(u.task.type==='haul')check(typeof u.task.source==='string'&&typeof u.task.destination==='string'&&materials.has(u.task.good)&&['waiting','source','destination'].includes(u.task.phase)&&Number.isSafeInteger(u.task.amount)&&u.task.amount>=0&&u.task.amount<=u.inventory.cap&&typeof u.task.repeat==='boolean'&&finite(u.task.retry,0),'trasporto');
       }
     }
+    check(d.equipmentRules===undefined||d.equipmentRules===1,'regole equipaggiamento');
+    if(d.equipmentRules===undefined)check(d.gear===undefined,'equipaggiamento senza versione');
+    else {
+      check(Array.isArray(d.gear),'oggetti individuali');
+      const occupied=new Set(),counts=new Map(),rules=window.TERRA_EQUIPMENT.rules,catalog=window.TERRA_EQUIPMENT.catalog;
+      for(const item of d.gear){
+        check(item&&typeof item.id==='string'&&/^[a-zA-Z0-9_-]{1,100}$/.test(item.id)&&!ids.has(item.id),'ID oggetto');ids.add(item.id);
+        check(Object.hasOwn(catalog,item.type),'tipo oggetto');const l=item.location;
+        check(l&&['bag','equipped','storage','ground'].includes(l.kind),'posizione oggetto');
+        if(l.kind==='ground'){check(finite(l.x,0,WORLD_SIZE)&&finite(l.y,0,WORLD_SIZE)&&Object.keys(l).length===3,'oggetto a terra');continue;}
+        check(Object.keys(l).length===(l.kind==='equipped'?3:2),'proprietà posizione oggetto');
+        if(l.kind==='storage')check(d.buildings.some(b=>b.id===l.holder&&b.owner===0&&['base','warehouse','house'].includes(b.type)),'deposito oggetto');
+        else check(d.units.some(u=>u.id===l.holder),'persona oggetto');
+        const key=l.kind+':'+l.holder;
+        if(l.kind==='equipped'){check(rules.slots.includes(l.slot)&&catalog[item.type].slot===l.slot&&!occupied.has(key+':'+l.slot),'slot oggetto');occupied.add(key+':'+l.slot);}
+        else {counts.set(key,(counts.get(key)||0)+1);check(counts.get(key)<=(l.kind==='bag'?rules.bagCapacity:rules.rackCapacity),'capacità oggetti');}
+      }
+    }
     const residentIds=d.buildings.flatMap(b=>b.residents);
     check(new Set(residentIds).size===residentIds.length,'residente duplicato');
     for(const u of d.units)if(u.location.kind==='resident')check(residentIds.includes(u.id)&&d.buildings.some(b=>b.id===u.location.settlementId&&b.type==='house'&&b.residents.includes(u.id)),'legame residente');
@@ -97,7 +115,7 @@
 
   Game.prototype.snapshot=function(){
     this.ensureInventories();
-    return {version:5,populationRules:1,seed:this.seed,rngState:this.rng.s,paused:this.paused,gameEnded:this.gameEnded,
+    return {version:5,populationRules:1,equipmentRules:1,gear:this.gear||[],seed:this.seed,rngState:this.rng.s,paused:this.paused,gameEnded:this.gameEnded,
       clock:{day:this.day,month:this.month,year:this.year,totalDays:this.totalDays,nextRaidDay:this.nextRaidDay,raidLevel:this.raidLevel,dayAccumulator:this.dayAccumulator},
       roads:this.world.tiles.filter(t=>t.road).map(t=>[t.x,t.y]),resources:this.world.resources,buildings:this.buildings,units:this.units,animals:this.animals,raiders:this.raiders,camera:this.camera,
       selection:(this.rtsSelectedUnits?.()||[]).map(u=>u.id),selectedId:this.selected?.id||null};
@@ -140,7 +158,7 @@
       }
       for(const b of buildings)b.assigned=b.assigned.filter(id=>units.some(u=>u.id===id&&u.health>0&&(u.task?.type==='farm'&&u.task.target===b.id||u.task?.after?.type==='farm'&&u.task.after.target===b.id)));
       const clock=Object.fromEntries(['day','month','year','totalDays','nextRaidDay','raidLevel','dayAccumulator'].map(k=>[k,d.clock[k]]));
-      Object.assign(this,{seed:d.seed,world,rng,buildings,units,animals,raiders,...clock,camera:d.camera});
+      Object.assign(this,{seed:d.seed,world,rng,buildings,units,animals,raiders,gear:d.gear||[],...clock,camera:d.camera});
       this.ensureInventories();this.groupSelection=units.filter(u=>u.health>0&&u.location.kind==='world'&&d.selection.includes(u.id));
       this.selected=entities.find(e=>e.id===d.selectedId)||this.groupSelection[0]||units[0]||null;
       for(const u of units)u.selected=this.groupSelection.includes(u);

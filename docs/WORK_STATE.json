@@ -4,10 +4,10 @@
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
   "lease": {
-    "run_id": "hourly-T06-20260917T1705",
-    "task": "T06",
+    "expires_at": "2026-09-17T18:35:20.913Z",
     "observed_head": "48dc00421e21cff035771226240b2de32fdc543f",
-    "expires_at": "2026-09-17T18:35:20.913Z"
+    "run_id": "hourly-T06-20260917T1705",
+    "task": "T06"
   },
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
@@ -50,6 +50,14 @@
       "notes": "Conditional housed arrivals, actual-person food consumption, local unreserved food, housing and requirements UI; provisional configurable balance documented.",
       "result": "awaiting_deploy",
       "task": "T05"
+    },
+    {
+      "at": "2026-09-17T17:08:41.879Z",
+      "branch": "work/T06-equipment",
+      "next": "Verify Build 37 deployment, then T07 paperdoll.",
+      "notes": "Verified Build 36 deployment; implemented unique equipment ledger, atomic transfers, local access and capacity, death drops, conservative v5 load.",
+      "result": "awaiting_deploy",
+      "task": "T05/T06"
     }
   ],
   "schema_version": 1,
@@ -190,11 +198,15 @@
       "depends_on": [
         "T02"
       ],
-      "evidence": [],
+      "evidence": [
+        "11 equipment cases PASS; all previous Node VM/DOM suites PASS; JavaScript syntax and git diff --check PASS. No browser/hardware certification."
+      ],
       "id": "T06",
-      "last_attempt_at": "2026-09-17T17:05:20.908Z",
-      "remaining": [],
-      "status": "in_progress",
+      "last_attempt_at": "2026-09-17T17:08:41.879Z",
+      "remaining": [
+        "Publish Build 37 and verify GitHub Pages."
+      ],
+      "status": "awaiting_deploy",
       "title": "Dati individuali di equipaggiamento"
     },
     {
@@ -575,5 +587,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-17T17:05:20.908Z"
+  "updated_at": "2026-09-17T17:08:41.879Z"
 }
