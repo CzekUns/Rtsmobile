@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./app.css?v=38">
+  <link rel="stylesheet" href="./app.css?v=39">
   <style>
     .selection-card{
       left:auto!important;
@@ -23,7 +23,7 @@
   <main id="app" class="app-shell">
     <header class="hud-top" aria-label="Stato della comunità">
       <div class="identity">
-        <strong>TERRA ITALICA <small style="font-size:8px;opacity:.55;letter-spacing:.08em">BUILD 38</small></strong>
+        <strong>TERRA ITALICA <small style="font-size:8px;opacity:.55;letter-spacing:.08em">BUILD 39</small></strong>
         <span id="sessionState" role="status"></span><span id="dateLabel">1 Marzo · 1000 a.C.</span>
       </div>
       <div class="resources" id="resourceBar">
@@ -86,6 +86,7 @@
       </div>
       <div id="worldPanel" class="dock-panel world-actions">
         <button id="characterBtn" type="button"><b>Personaggio</b><span>abitante selezionato</span></button>
+        <button id="skillsBtn" type="button"><b>Skill</b><span>livelli e progresso</span></button>
         <button id="logisticsBtn" type="button"><b>Filiera</b><span>inventari e trasporti</span></button>
         <button id="saveBtn" type="button"><b>Salva</b><span>locale sul dispositivo</span></button>
         <button id="loadBtn" type="button"><b>Carica</b><span>ultimo salvataggio</span></button>
@@ -107,6 +108,14 @@
       <div class="character-actions"><button id="characterEquip" type="button">Equipaggia</button><button id="characterRemove" type="button">Metti in borsa</button></div>
       <label>Rastrelliera locale <select id="characterRacks"></select></label><button id="characterStore" type="button">Deposita oggetto</button>
     </div><p id="characterStatus" role="status"></p>
+  </dialog>
+  <dialog id="skillsDialog" aria-labelledby="skillsTitle">
+    <header><h2 id="skillsTitle">Skill</h2><button id="closeSkills" type="button">Chiudi</button></header>
+    <p>Partita in pausa · livelli personali ottenuti usando le abilità.</p>
+    <label>Abitante <select id="skillsPeople"></select></label>
+    <h3 id="skillsIdentity"></h3><small id="skillsId"></small>
+    <div id="skillsList"></div>
+    <p id="skillsRules"></p><p id="skillsStatus" role="status"></p>
   </dialog>
   <dialog id="communityDialog" aria-labelledby="communityTitle">
     <header><h2 id="communityTitle">La comunità</h2><button id="closeCommunity" type="button">Chiudi</button></header>
@@ -131,16 +140,17 @@
     <p id="transportStatus" role="status"></p><div id="routeList"></div>
     <p>Le scorte nella Casa comune finanziano le costruzioni. Merci nei magazzini, nelle fabbriche o in viaggio restano locali. Porta il pane alla Casa comune per le razioni e l’accoglienza. In Comunità trovi consumi e requisiti dei Distretti.</p>
   </dialog>
-  <script src="./game.js?v=38"></script>
+  <script src="./game.js?v=39"></script>
   <script src="./p16-render.js?v=24"></script>
   <script src="./asset-render.js?v=28"></script>
-  <script src="./touch-modifier.js?v=38"></script>
-  <script src="./logistics.js?v=38"></script>
-  <script src="./persistence.js?v=38"></script>
-  <script src="./community.js?v=38"></script>
-  <script src="./population.js?v=38"></script>
-  <script src="./equipment.js?v=38"></script>
-  <script src="./character.js?v=38"></script>
-  <script src="./boot.js?v=38"></script>
+  <script src="./touch-modifier.js?v=39"></script>
+  <script src="./logistics.js?v=39"></script>
+  <script src="./persistence.js?v=39"></script>
+  <script src="./community.js?v=39"></script>
+  <script src="./population.js?v=39"></script>
+  <script src="./equipment.js?v=39"></script>
+  <script src="./character.js?v=39"></script>
+  <script src="./skills.js?v=39"></script>
+  <script src="./boot.js?v=39"></script>
 </body>
 </html>
