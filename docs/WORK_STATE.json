@@ -3,7 +3,13 @@
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "lease": null,
+  "lease": {
+    "run_id": "automation-20260917T2258Z-T09",
+    "task": "T09",
+    "head_observed": "5a254a91c10f62d107ccb2f0a440555ff284d4d3",
+    "acquired_at": "2026-09-17T22:58:56Z",
+    "expires_at": "2026-09-18T00:28:56Z"
+  },
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
   "runs": [
