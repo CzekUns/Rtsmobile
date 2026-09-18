@@ -3,7 +3,13 @@
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "lease": null,
+  "lease": {
+    "run_id": "automation-20260918T0102Z-t11",
+    "task": "T11",
+    "observed_head": "a9bc287",
+    "acquired_at": "2026-09-18T01:02:31Z",
+    "expires_at": "2026-09-18T02:32:31Z"
+  },
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
   "runs": [
@@ -342,7 +348,7 @@
         "Riparazioni richiedono lavoro/materiali; annullamento, distruzione, morte e reload conservano o contabilizzano tutte le merci."
       ],
       "blocker": null,
-      "branch": null,
+      "branch": "work/T11-construction-logistics",
       "commit": null,
       "depends_on": [
         "T09",
@@ -350,9 +356,9 @@
       ],
       "evidence": [],
       "id": "T11",
-      "last_attempt_at": null,
+      "last_attempt_at": "2026-09-18T01:02:31Z",
       "remaining": [],
-      "status": "pending",
+      "status": "in_progress",
       "title": "Materiali ai cantieri e riparazioni"
     },
     {
