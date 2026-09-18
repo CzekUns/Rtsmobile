@@ -3,13 +3,7 @@
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "lease": {
-    "run_id": "automation-20260918T0000Z-T10",
-    "task": "T10",
-    "head_observed": "1719df0b1516161679ec5af378df7a4ad253f7e4",
-    "acquired_at": "2026-09-18T00:00:24Z",
-    "expires_at": "2026-09-18T01:30:24Z"
-  },
+  "lease": null,
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
   "runs": [
@@ -95,6 +89,15 @@
       "commit": "57f149e0fff0882eda354a825d6fa713c5a280f8",
       "notes": "Verified Build 39 Pages success and exercised the separate Skill dialog in real cloud Chrome. Implemented Build 40 personal/tribal construction knowledge, configurable thresholds, visible locks, pre-spend competence checks, knowledge transfer on completion and conservative save compatibility. Nine new regressions and all prior suites pass; syntax/diff checks pass. Local real-browser attempt was unavailable because the Playwright browser binary is absent; no hardware claim.",
       "next": "Verify Build 40 Pages deployment, then mark T09 done and begin T10 worker assignment and factory jobs."
+    },
+    {
+      "at": "2026-09-18T00:28:00Z",
+      "task": "T09/T10",
+      "result": "awaiting_deploy",
+      "branch": "work/T10-factory-workers",
+      "commit": "d92659abefec4f4d5501896112177614c0d8336c",
+      "notes": "Verified Build 40 Pages workflow 35285349592 success. Implemented Build 41 named factory professions, single-job assignment, local-input and physical-worker gating, persistent paused batches and safe replacement. Seven new tests plus every existing Node suite pass; syntax and diff checks pass. No hardware claim.",
+      "next": "Verify Build 41 Pages deployment, then mark T10 done and begin T11 physical construction materials and repairs."
     }
   ],
   "schema_version": 1,
@@ -315,17 +318,23 @@
         "Produzione dipende da lavoratori e input locali; interruzione e sostituzione non duplicano batch."
       ],
       "blocker": null,
-      "branch": null,
-      "commit": null,
+      "branch": "work/T10-factory-workers",
+      "commit": "d92659abefec4f4d5501896112177614c0d8336c",
       "depends_on": [
         "T04",
         "T08"
       ],
-      "evidence": [],
+      "evidence": [
+        "7 factory-worker regressions PASS: no worker/no batch, named assignment, single job, local input, interruption, replacement exactly once and reload.",
+        "All existing Node VM/DOM suites PASS; JavaScript syntax and git diff checks PASS.",
+        "Build 41 on main; Pages deployment pending and not counted as successful."
+      ],
       "id": "T10",
-      "last_attempt_at": null,
-      "remaining": [],
-      "status": "pending",
+      "last_attempt_at": "2026-09-18T00:28:00Z",
+      "remaining": [
+        "Verify GitHub Pages success for Build 41."
+      ],
+      "status": "awaiting_deploy",
       "title": "Lavoratori e mestieri nelle fabbriche"
     },
     {
@@ -633,5 +642,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-17T23:06:31Z"
+  "updated_at": "2026-09-18T00:28:00Z"
 }
