@@ -1,4 +1,4 @@
-const CACHE='terra-italica-v41';
+const CACHE='terra-italica-v42';
 const ASSETS=[
   './','./index.html','./app.css','./game.js','./logistics.js','./persistence.js','./boot.js','./community.js','./population.js','./equipment.js','./character.js','./skills.js','./construction-knowledge.js','./touch-modifier.js','./p16-render.js','./asset-render.js','./manifest.webmanifest',
   './assets/p16/units/unit_human_p16.png','./assets/p16/units/unit_raider_p16.png',
