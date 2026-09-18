@@ -1,5 +1,5 @@
 {
-  "active_task": "T10",
+  "active_task": "T11",
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
@@ -19,7 +19,7 @@
       "commit": "8c8d408ab2cf232acd07d1877d64beea19302e43",
       "next": "Recheck workflow 35213852536. If successful mark T02 done, then implement T03. T01 remains blocked.",
       "notes": "Restored missing remote plan/register from prepared local documents on unchanged build-32 baseline; acquired non-forced lease. T01 Chromium executable missing. Implemented T02 and v4 migration; all Node suites pass.",
-      "result": "awaiting_deploy",
+      "result": "done",
       "task": "T01/T02"
     },
     {
@@ -97,7 +97,8 @@
       "branch": "work/T10-factory-workers",
       "commit": "d92659abefec4f4d5501896112177614c0d8336c",
       "notes": "Verified Build 40 Pages workflow 35285349592 success. Implemented Build 41 named factory professions, single-job assignment, local-input and physical-worker gating, persistent paused batches and safe replacement. Seven new tests plus every existing Node suite pass; syntax and diff checks pass. No hardware claim.",
-      "next": "Verify Build 41 Pages deployment, then mark T10 done and begin T11 physical construction materials and repairs."
+      "next": "Begin T11 physical construction materials and repairs.",
+      "deploy_workflow": 35290011983
     }
   ],
   "schema_version": 1,
@@ -327,14 +328,12 @@
       "evidence": [
         "7 factory-worker regressions PASS: no worker/no batch, named assignment, single job, local input, interruption, replacement exactly once and reload.",
         "All existing Node VM/DOM suites PASS; JavaScript syntax and git diff checks PASS.",
-        "Build 41 on main; Pages deployment pending and not counted as successful."
+        "Build 41 on main; Pages workflow 35290011983 completed successfully."
       ],
       "id": "T10",
       "last_attempt_at": "2026-09-18T00:28:00Z",
-      "remaining": [
-        "Verify GitHub Pages success for Build 41."
-      ],
-      "status": "awaiting_deploy",
+      "remaining": [],
+      "status": "done",
       "title": "Lavoratori e mestieri nelle fabbriche"
     },
     {
