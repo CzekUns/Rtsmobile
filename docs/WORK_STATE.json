@@ -1,9 +1,15 @@
 {
-  "active_task": "T09",
+  "active_task": "T10",
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "lease": null,
+  "lease": {
+    "run_id": "automation-20260918T0000Z-T10",
+    "task": "T10",
+    "head_observed": "1719df0b1516161679ec5af378df7a4ad253f7e4",
+    "acquired_at": "2026-09-18T00:00:24Z",
+    "expires_at": "2026-09-18T01:30:24Z"
+  },
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
   "runs": [
@@ -294,14 +300,13 @@
       ],
       "evidence": [
         "9 construction-knowledge regressions PASS: separation from skills, personal thresholds, tribal defaults/transfer, missing-requirement rejection before spending, assignment revalidation, identity, save/reload, legacy v5 migration and distinct knowledge UI. All prior suites PASS; JavaScript syntax and diff checks PASS.",
-        "Build 40 prepared on work/T09-construction-knowledge; Pages deployment pending and not counted as successful."
+        "Build 40 prepared on work/T09-construction-knowledge; Pages deployment pending and not counted as successful.",
+        "Pages workflow 35285349592 completed successfully for main commit 1719df0b1516161679ec5af378df7a4ad253f7e4."
       ],
       "id": "T09",
       "last_attempt_at": "2026-09-17T23:06:31Z",
-      "remaining": [
-        "Verify GitHub Pages success for Build 40."
-      ],
-      "status": "awaiting_deploy",
+      "remaining": [],
+      "status": "done",
       "title": "Conoscenze edilizie personali e tribali"
     },
     {
