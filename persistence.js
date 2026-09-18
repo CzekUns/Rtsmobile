@@ -21,6 +21,7 @@
     for(const b of d.buildings){
       check(Object.hasOwn(BUILD_LABEL,b.type),'edificio');check(finite(b.progress,0,1)&&finite(b.growth,0)&&finite(b.birthDays,0)&&finite(b.cooldown,0),'progresso edificio');
       check(Array.isArray(b.assigned)&&b.assigned.every(id=>typeof id==='string'),'lavoratori');
+      check(b.workers===undefined||Array.isArray(b.workers)&&b.workers.every(id=>typeof id==='string'),'mestieri fabbrica');
       check(Array.isArray(b.residents)&&b.residents.length<=(b.type==='house'?5:0)&&b.residents.every(id=>typeof id==='string'),'residenti edificio');
       check(b.inventory&&itemsValid(b.inventory.items)&&finite(b.inventory.capacity,1),'inventario edificio');
       check(Object.values(b.inventory.items).reduce((s,n)=>s+n,0)<=b.inventory.capacity,'capacità edificio');
@@ -38,11 +39,12 @@
       check(u.skills&&u.xp&&['wood','food','stone','iron','farming','construction','taming','combat'].every(k=>finite(u.skills[k],1)),'skill');
       check(u.personalKnowledge===undefined||Array.isArray(u.personalKnowledge)&&u.personalKnowledge.every(k=>typeof k==='string'),'sapere personale');
       check(Object.values(u.xp).every(v=>finite(v,0)),'XP');check(finite(u.workTimer)&&finite(u.attackCooldown,0),'timer unità');
-      check(['idle','moving','gathering','building','taming','combat','farming','hauling'].includes(u.state),'stato');
+      check(['idle','moving','gathering','building','taming','combat','farming','hauling','producing'].includes(u.state),'stato');
       if(u.location.kind==='resident')check(u.task===null&&u.state==='idle'&&u.path.length===0,'stato residente');
       check(Array.isArray(u.path)&&u.path.every(p=>finite(p.x,0,WORLD_SIZE)&&finite(p.y,0,WORLD_SIZE)),'percorso');
-      if(u.task){check(['move','gather','return','build','farm','enter','tame','attack','haul'].includes(u.task.type),'ordine');
+      if(u.task){check(['move','gather','return','build','farm','enter','tame','attack','haul','production'].includes(u.task.type),'ordine');
         if(u.task.type==='haul')check(typeof u.task.source==='string'&&typeof u.task.destination==='string'&&materials.has(u.task.good)&&['waiting','source','destination'].includes(u.task.phase)&&Number.isSafeInteger(u.task.amount)&&u.task.amount>=0&&u.task.amount<=u.inventory.cap&&typeof u.task.repeat==='boolean'&&finite(u.task.retry,0),'trasporto');
+        if(u.task.type==='production')check(typeof u.task.target==='string'&&['mugnaio','fornaio'].includes(u.task.profession),'mestiere');
       }
     }
     check(d.constructionRules===undefined||d.constructionRules===1,'regole sapere edilizio');
@@ -159,7 +161,7 @@
           else check(u.inventory.amount===0,'trasporto senza prelievo');
         }else if(u.task?.target&&!existing.has(u.task.target)){u.task=null;u.state='idle';u.path=[];}
       }
-      for(const b of buildings)b.assigned=b.assigned.filter(id=>units.some(u=>u.id===id&&u.health>0&&(u.task?.type==='farm'&&u.task.target===b.id||u.task?.after?.type==='farm'&&u.task.after.target===b.id)));
+      for(const b of buildings){b.assigned=b.assigned.filter(id=>units.some(u=>u.id===id&&u.health>0&&(u.task?.type==='farm'&&u.task.target===b.id||u.task?.after?.type==='farm'&&u.task.after.target===b.id)));b.workers=(b.workers||[]).filter(id=>units.some(u=>u.id===id&&u.health>0&&u.task?.type==='production'&&u.task.target===b.id));}
       const clock=Object.fromEntries(['day','month','year','totalDays','nextRaidDay','raidLevel','dayAccumulator'].map(k=>[k,d.clock[k]]));
       Object.assign(this,{seed:d.seed,world,rng,buildings,units,animals,raiders,gear:d.gear||[],tribalKnowledge:d.tribalKnowledge,...clock,camera:d.camera});
       this.ensureInventories();this.groupSelection=units.filter(u=>u.health>0&&u.location.kind==='world'&&d.selection.includes(u.id));

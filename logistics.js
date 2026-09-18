@@ -7,9 +7,25 @@
   const total=items=>Object.values(items).reduce((sum,n)=>sum+n,0);
   const storage=b=>b&&b.alive&&b.built&&(b.type==='base'||b.type==='warehouse');
   Game.prototype.ensureInventories=function(){
-    for(const b of this.buildings){if(!b.inventory)b.inventory={items:b.type==='base'?{...this.stock}:{},capacity:CAPACITY[b.type]||80};if(b.batch===undefined)b.batch=null;}
+    for(const b of this.buildings){if(!b.inventory)b.inventory={items:b.type==='base'?{...this.stock}:{},capacity:CAPACITY[b.type]||80};if(b.batch===undefined)b.batch=null;if(!Array.isArray(b.workers))b.workers=[];}
     const base=this.buildings.find(b=>b.type==='base');if(base)this.stock=base.inventory.items;
     for(const k of ['food','wood','stone','iron','bread'])if(this.stock[k]===undefined)this.stock[k]=0;
+  };
+  Game.prototype.factoryWorkers=function(b){
+    if(!b)return[];b.workers=(b.workers||[]).filter(id=>this.units.some(u=>u.id===id&&u.health>0&&u.task?.type==='production'&&u.task.target===b.id));
+    return b.workers.map(id=>this.findById(this.units,id)).filter(Boolean);
+  };
+  Game.prototype.assignProduction=function(u,b){
+    this.ensureInventories();const recipe=RECIPES[b?.type];
+    if(!u||u.health<=0||u.location?.kind!=='world'||!b?.alive||!b.built||!recipe)return 'Scegli un abitante libero e una fabbrica operativa.';
+    if(u.inventory.amount)return 'Deposita prima il carico dell’abitante.';
+    const path=this.pathToBuilding(u,b);if(path===null)return 'Fabbrica non raggiungibile.';
+    this.cancelTask(u);u.task={type:'production',target:b.id,profession:b.type==='mill'?'mugnaio':'fornaio'};u.state='producing';u.path=path;
+    if(!b.workers.includes(u.id))b.workers.push(u.id);this.message(`${u.name} ora lavora come ${u.task.profession}.`);return null;
+  };
+  Game.prototype.updateProduction=function(u,dt){
+    const b=this.findById(this.buildings,u.task?.target);if(!b?.alive||!b.built||!RECIPES[b.type]){this.cancelTask(u);return;}
+    if(dist(u,b)>1.15){if(!u.path.length){const path=this.pathToBuilding(u,b);if(path===null){this.cancelTask(u);return;}u.path=path;}this.followPath(u,dt,1.55);}
   };
   const newGame=Game.prototype.newGame;
   Game.prototype.newGame=function(seed){newGame.call(this,seed);this.ensureInventories();};
@@ -74,7 +90,7 @@
     }
   };
   const updateUnit=Game.prototype.updateUnit;
-  Game.prototype.updateUnit=function(u,dt){if(u.health<=0)return;if(u.state==='hauling'){this.updateHaul(u,dt);return;}updateUnit.call(this,u,dt);};
+  Game.prototype.updateUnit=function(u,dt){if(u.health<=0)return;if(u.state==='hauling'){this.updateHaul(u,dt);return;}if(u.state==='producing'){this.updateProduction(u,dt);return;}updateUnit.call(this,u,dt);};
   Game.prototype.nearestStorage=function(u){this.ensureInventories();return this.buildings.filter(b=>storage(b)&&this.freeSpace(b)>0).sort((a,b)=>dist(u,a)-dist(u,b)).find(b=>this.pathToBuilding(u,b)!==null)||null;};
   Game.prototype.returnToStorage=function(u,after,destination=null){
     this.ensureInventories();const b=destination||this.nearestStorage(u);
@@ -121,6 +137,7 @@
   const updateBuilding=Game.prototype.updateBuilding;
   Game.prototype.updateBuilding=function(b,dt){
     updateBuilding.call(this,b,dt);const recipe=RECIPES[b.type];if(!recipe||!b.built||!b.alive)return;
+    const workers=this.factoryWorkers(b).filter(u=>dist(u,b)<=1.15);if(!workers.length)return;
     if(b.batch){b.batch.remaining=Math.max(0,b.batch.remaining-dt);if(b.batch.remaining===0){b.inventory.items[recipe.output]=(b.inventory.items[recipe.output]||0)+b.batch.amount;b.batch=null;}return;}
     if(this.available(b,recipe.input)>=recipe.amount&&total(b.inventory.items)+this.reserved(b.id,null,'in')<=b.inventory.capacity){
       // Output reservation replaces consumed input, keeping capacity invariant.
@@ -135,7 +152,7 @@
   const resourceName=Game.prototype.resourceName;
   Game.prototype.resourceName=function(type){return({grain:'grano',flour:'farina',bread:'pane'})[type]||resourceName.call(this,type);};
   const unitStatus=Game.prototype.unitStatus;
-  Game.prototype.unitStatus=function(u){if(u.task?.type==='haul'){const t=u.task;return t.phase==='waiting'?'attende merci o spazio':t.phase==='source'?'va al prelievo':`trasporta ${this.resourceName(t.good)}`;}return unitStatus.call(this,u);};
+  Game.prototype.unitStatus=function(u){if(u.task?.type==='haul'){const t=u.task;return t.phase==='waiting'?'attende merci o spazio':t.phase==='source'?'va al prelievo':`trasporta ${this.resourceName(t.good)}`;}if(u.task?.type==='production'){const b=this.findById(this.buildings,u.task.target);return `${u.task.profession} · ${b&&dist(u,b)<=1.15?'al lavoro':'in cammino'}`;}return unitStatus.call(this,u);};
   const applyOrder=Game.prototype.applyOrder;
   Game.prototype.applyOrder=function(o,pos,tx,ty,u=this.selected){if(o==='deliver'){const b=this.nearestAt(this.buildings,pos,1,storage);if(!b||!u.inventory.amount){this.message('Serve un carico e un deposito completato.');return;}this.cancelTask(u);if(this.returnToStorage(u,null,b)){this.orderMode=null;this.syncModeButtons();}return;}return applyOrder.call(this,o,pos,tx,ty,u);};
   const orderHelp=Game.prototype.orderHelp;
@@ -144,7 +161,7 @@
   Game.prototype.rtsContextTap=function(sx,sy){const w=this.screenToWorld(sx,sy),pos={x:w.x/TILE,y:w.y/TILE},entity=this.pickEntity(pos),group=this.rtsSelectedUnits();if(storage(entity)&&group.some(u=>u.inventory.amount)){for(const u of group)if(u.inventory.amount){this.cancelTask(u);this.returnToStorage(u,null,entity);}return;}contextTap.call(this,sx,sy);};
 
   const selectionHTML=Game.prototype.selectionHTML;
-  Game.prototype.selectionHTML=function(e){let html=selectionHTML.call(this,e);if(e instanceof Building&&e.inventory){const items=Object.entries(e.inventory.items).filter(([,n])=>n>0).map(([k,n])=>`${this.resourceName(k)} ${n}`).join(' · ')||'vuoto';html+=`<p>Scorte locali ${total(e.inventory.items)}/${e.inventory.capacity}: ${items}</p>`;if(RECIPES[e.type])html+=`<p>${e.batch?'In lavorazione':this.available(e,RECIPES[e.type].input)<2?'In attesa di ingredienti':'Pronto'} · usa Mondo → Filiera per i trasporti</p>`;}return html;};
+  Game.prototype.selectionHTML=function(e){let html=selectionHTML.call(this,e);if(e instanceof Building&&e.inventory){const items=Object.entries(e.inventory.items).filter(([,n])=>n>0).map(([k,n])=>`${this.resourceName(k)} ${n}`).join(' · ')||'vuoto';html+=`<p>Scorte locali ${total(e.inventory.items)}/${e.inventory.capacity}: ${items}</p>`;if(RECIPES[e.type]){const names=this.factoryWorkers(e).map(u=>u.name).join(', ')||'nessuno';html+=`<p>Lavoratori: ${names}. ${e.batch?'In lavorazione':this.available(e,RECIPES[e.type].input)<2?'In attesa di ingredienti':'Pronto'} · usa Mondo → Filiera</p>`;}}return html;};
   const updateUI=Game.prototype.updateUI;
   Game.prototype.updateUI=function(){this.ensureInventories();updateUI.call(this);$('#foodVal').textContent=Math.floor((this.stock.food||0)+(this.stock.bread||0));};
   const drawBuilding=Game.prototype.drawBuilding;
@@ -156,6 +173,8 @@
     $('#inventoryList').innerHTML=buildings.map(b=>`<article><b>${label(b)}</b><span>${total(b.inventory.items)}/${b.inventory.capacity} · ${Object.entries(b.inventory.items).filter(([,n])=>n).map(([k,n])=>`${this.resourceName(k)}: ${n}`).join(' · ')||'vuoto'}</span>${b.batch?`<span>In lavorazione: ${b.batch.amount} ${this.resourceName(b.batch.output)}</span>`:''}</article>`).join('');
     const populate=(id,entries)=>{const el=$(id),old=el.value;el.innerHTML=entries.map(([id,label])=>`<option value="${id}">${label}</option>`).join('');if(entries.some(([id])=>id===old))el.value=old;};
     populate('#carrierSelect',this.units.filter(u=>u.health>0&&u.location.kind==='world').map(u=>[u.id,`${u.name} · ${this.unitStatus(u)} · carico ${u.inventory.amount}/${u.inventory.cap}`]));
+    populate('#workerSelect',this.units.filter(u=>u.health>0&&u.location.kind==='world'&&!u.inventory.amount).map(u=>[u.id,`${u.name} · ${this.unitStatus(u)}`]));
+    populate('#factorySelect',buildings.filter(b=>RECIPES[b.type]).map(b=>[b.id,label(b)]));
     populate('#sourceSelect',buildings.map(b=>[b.id,label(b)]));populate('#destinationSelect',buildings.map(b=>[b.id,label(b)]));
     $('#routeList').innerHTML=this.units.filter(u=>u.task?.type==='haul').map(u=>{const t=u.task,source=this.findById(buildings,t.source),dest=this.findById(buildings,t.destination);return `<p><b>${u.name}</b>: ${source?label(source):'origine perduta'} → ${dest?label(dest):'destinazione perduta'} · ${this.resourceName(t.good)} · ${this.unitStatus(u)} · prenotati ${t.amount}</p>`;}).join('')||'<p>Nessun trasporto assegnato.</p>';
   };
@@ -164,6 +183,7 @@
     $('#logisticsBtn').onclick=()=>{this.pauseBeforeLogistics=this.paused;this.setPaused(true);this.pointerCancel();this.renderLogistics();$('#transportStatus').textContent='';dialog.showModal();};
     $('#closeLogistics').onclick=()=>dialog.close();dialog.addEventListener('close',()=>{if(!this.suspended&&!this.backgroundDuringLogistics)this.setPaused(this.pauseBeforeLogistics);this.backgroundDuringLogistics=false;});
     $('#transportForm').onsubmit=e=>{e.preventDefault();const u=this.findById(this.units,$('#carrierSelect').value),source=this.findById(this.buildings,$('#sourceSelect').value),dest=this.findById(this.buildings,$('#destinationSelect').value);const error=this.assignHaul(u,source,dest,$('#goodsSelect').value,$('#repeatRoute').checked);$('#transportStatus').textContent=error||'Trasporto assegnato. Chiudi per riprendere.';if(!error){this.save(true);this.renderLogistics();}};
+    $('#productionForm').onsubmit=e=>{e.preventDefault();const u=this.findById(this.units,$('#workerSelect').value),b=this.findById(this.buildings,$('#factorySelect').value),error=this.assignProduction(u,b);$('#productionStatus').textContent=error||'Mestiere assegnato. Il ciclo parte solo con input locale.';if(!error){this.save(true);this.renderLogistics();}};
     document.addEventListener('visibilitychange',()=>{if(document.hidden&&dialog.open)this.backgroundDuringLogistics=true;});
   };
 })();
