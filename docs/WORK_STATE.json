@@ -1,5 +1,5 @@
 {
-  "active_task": "T14",
+  "active_task": "T15",
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
@@ -152,6 +152,15 @@
       "commit": "6c3728107af9b6b338df612c33402e0da36ae1ed",
       "notes": "Build 45 introduces the authoritative goods catalog with configurable volume and the physical barley → barley flour → barley bread chain. Local input, local capacity, persistent batches and conservative legacy-batch loading are enforced. Nine new regressions and all prior suites pass; syntax/diff checks pass. No browser or hardware claim.",
       "next": "Verify Pages workflow 35655701076; if successful mark T14 done and begin T15 local markets."
+    },
+    {
+      "at": "2026-09-21T21:13:00Z",
+      "task": "T14",
+      "result": "done",
+      "branch": "work/T14-goods-recipes",
+      "commit": "6c3728107af9b6b338df612c33402e0da36ae1ed",
+      "notes": "GitHub Pages workflow 35655701076 succeeded. T14 acceptance complete; browser and hardware checks were not claimed.",
+      "next": "T15 local markets, money and stock/demand-based local prices."
     }
   ],
   "schema_version": 1,
@@ -470,14 +479,12 @@
       "evidence": [
         "9 T14 regressions PASS: catalog coverage plus missing input, full output, interrupted load and reload for both new barley recipes.",
         "All prior Node VM/DOM suites PASS (45 test files/subtests reported by node:test plus existing custom suites); JavaScript syntax and git diff checks PASS. Browser/hardware not claimed.",
-        "Build 45 Pages workflow 35655701076 queued; deployment not yet counted as successful."
+        "GitHub Pages workflow 35655701076 completed successfully for Build 45 commit 6c3728107af9b6b338df612c33402e0da36ae1ed."
       ],
       "id": "T14",
       "last_attempt_at": "2026-09-21T21:12:00Z",
-      "remaining": [
-        "Confirm GitHub Pages workflow 35655701076 succeeds, then mark T14 done."
-      ],
-      "status": "awaiting_deploy",
+      "remaining": [],
+      "status": "done",
       "title": "Catalogo merci e altre ricette"
     },
     {
@@ -711,5 +718,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-21T21:12:00Z"
+  "updated_at": "2026-09-21T21:13:00Z"
 }
