@@ -1,9 +1,15 @@
 {
-  "active_task": "T12",
+  "active_task": "T13",
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "lease": null,
+  "lease": {
+    "run_id": "automation-20260921T200234Z-T13",
+    "task": "T13",
+    "head_observed": "094147a446b3d4f8f959daa1d917b30eb704a19f",
+    "acquired_at": "2026-09-21T20:02:34Z",
+    "expires_at": "2026-09-21T21:32:34Z"
+  },
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
   "runs": [
@@ -117,6 +123,14 @@
       "commit": "d105282c810c1535aad695684756dbf86571c2e7",
       "notes": "Confirmed the prior Build 42 verification record and implemented Build 43 differentiated crops. Grain, barley, grapes and olives have configurable base days/yields and crop-specific seasons; terrain, water and skill affect growth/yield. Whole harvests remain local or wait for capacity. Seven new regressions and every prior suite pass; syntax/diff checks pass. No hardware claim.",
       "next": "Verify Build 43 Pages, mark T12 done, then begin T13 persistent livestock."
+    },
+    {
+      "at": "2026-09-21T20:02:34Z",
+      "task": "T12/T13",
+      "result": "in_progress",
+      "branch": "work/T13-persistent-livestock",
+      "notes": "Confirmed Build 43 deployment: Pages workflow 35643713647 succeeded for d105282. Acquired T13 lease on unchanged main 094147a.",
+      "next": "Implement persistent animal IDs, pens, named workers, local forage and animal-dependent products; run regressions and publish only if coherent."
     }
   ],
   "schema_version": 1,
@@ -389,14 +403,13 @@
       ],
       "evidence": [
         "7 crop/season regressions PASS: catalog parameters, four distinct local goods, full-inventory blocking, terrain/water/season effects, crop-change guard, reload and legacy Grano migration.",
-        "All prior Node VM/DOM suites PASS; JavaScript syntax and git diff checks PASS. Browser/hardware not claimed."
+        "All prior Node VM/DOM suites PASS; JavaScript syntax and git diff checks PASS. Browser/hardware not claimed.",
+        "GitHub Pages workflow 35643713647 completed successfully for Build 43 commit d105282c810c1535aad695684756dbf86571c2e7."
       ],
       "id": "T12",
       "last_attempt_at": "2026-09-21T19:24:00Z",
-      "remaining": [
-        "Verify GitHub Pages deployment for Build 43 before marking done."
-      ],
-      "status": "awaiting_deploy",
+      "remaining": [],
+      "status": "done",
       "title": "Colture differenziate e stagioni"
     },
     {
@@ -405,16 +418,16 @@
         "Salvare ID animali e prodotti; niente latte/uova generati dal solo numero di operai senza animali."
       ],
       "blocker": null,
-      "branch": null,
+      "branch": "work/T13-persistent-livestock",
       "commit": null,
       "depends_on": [
         "T12"
       ],
       "evidence": [],
       "id": "T13",
-      "last_attempt_at": null,
+      "last_attempt_at": "2026-09-21T20:02:34Z",
       "remaining": [],
-      "status": "pending",
+      "status": "in_progress",
       "title": "Allevamento con animali persistenti"
     },
     {
@@ -667,5 +680,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-21T19:24:00Z"
+  "updated_at": "2026-09-21T20:02:34Z"
 }
