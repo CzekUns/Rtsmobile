@@ -3,13 +3,7 @@
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "lease": {
-    "run_id": "automation-20260921T200234Z-T13",
-    "task": "T13",
-    "head_observed": "094147a446b3d4f8f959daa1d917b30eb704a19f",
-    "acquired_at": "2026-09-21T20:02:34Z",
-    "expires_at": "2026-09-21T21:32:34Z"
-  },
+  "lease": null,
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
   "runs": [
@@ -131,6 +125,15 @@
       "branch": "work/T13-persistent-livestock",
       "notes": "Confirmed Build 43 deployment: Pages workflow 35643713647 succeeded for d105282. Acquired T13 lease on unchanged main 094147a.",
       "next": "Implement persistent animal IDs, pens, named workers, local forage and animal-dependent products; run regressions and publish only if coherent."
+    },
+    {
+      "at": "2026-09-21T20:24:00Z",
+      "task": "T13",
+      "result": "awaiting_deploy",
+      "branch": "work/T13-persistent-livestock",
+      "commit": "08ad3a868a815395fdc280cfd8646a45462739a9",
+      "notes": "Build 44 adds buildable pens, persistent animal-to-pen IDs, named livestock workers, local forage consumption and local milk output. Production requires live owned sheep, a present worker, forage and output capacity. Seven new livestock regressions and all prior Node suites pass; JavaScript syntax and diff checks pass. Lease released after fast-forward publication.",
+      "next": "Verify Build 44 Pages; if successful mark T13 done and begin T14 catalog and recipes."
     }
   ],
   "schema_version": 1,
@@ -419,15 +422,20 @@
       ],
       "blocker": null,
       "branch": "work/T13-persistent-livestock",
-      "commit": null,
+      "commit": "08ad3a868a815395fdc280cfd8646a45462739a9",
       "depends_on": [
         "T12"
       ],
-      "evidence": [],
+      "evidence": [
+        "7 livestock regressions PASS: worker-only/no animal, animal/no worker, exact forage and milk accounting, pen capacity/single ownership, full output, save/reload identity and dead-animal pruning.",
+        "All prior Node VM/DOM suites PASS; JavaScript syntax and git diff checks PASS. Browser/hardware not claimed."
+      ],
       "id": "T13",
       "last_attempt_at": "2026-09-21T20:02:34Z",
-      "remaining": [],
-      "status": "in_progress",
+      "remaining": [
+        "Verify GitHub Pages deployment for Build 44 before marking done."
+      ],
+      "status": "awaiting_deploy",
       "title": "Allevamento con animali persistenti"
     },
     {
@@ -680,5 +688,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-21T20:02:34Z"
+  "updated_at": "2026-09-21T20:24:00Z"
 }
