@@ -5,7 +5,7 @@
   const clone=value=>JSON.parse(JSON.stringify(value));
   const finite=(v,min=-Infinity,max=Infinity)=>typeof v==='number'&&Number.isFinite(v)&&v>=min&&v<=max;
   const check=(ok,label)=>{if(!ok)throw new Error('Salvataggio non valido: '+label)};
-  const materials=new Set(['food','wood','stone','iron','grain','barley','grapes','olives','flour','bread','forage','milk']);
+  const materials=new Set(Object.keys(window.TERRA_GOODS));
   const itemsValid=items=>items&&typeof items==='object'&&!Array.isArray(items)&&Object.entries(items).every(([k,v])=>materials.has(k)&&Number.isSafeInteger(v)&&v>=0);
 
   function validate(d) {
@@ -26,12 +26,12 @@
       check(b.livestockDays===undefined||Number.isSafeInteger(b.livestockDays)&&b.livestockDays>=0,'giorni allevamento');
       check(Array.isArray(b.residents)&&b.residents.length<=(b.type==='house'?5:0)&&b.residents.every(id=>typeof id==='string'),'residenti edificio');
       check(b.inventory&&itemsValid(b.inventory.items)&&finite(b.inventory.capacity,1),'inventario edificio');
-      check(Object.values(b.inventory.items).reduce((s,n)=>s+n,0)<=b.inventory.capacity,'capacità edificio');
+      check(Object.entries(b.inventory.items).reduce((s,[good,n])=>s+n*window.TERRA_GOODS[good].volume,0)<=b.inventory.capacity,'capacità edificio');
       check(b.requiredMaterials===undefined||b.requiredMaterials===null||itemsValid(b.requiredMaterials),'materiali cantiere');
       check(b.materialsConsumed===undefined||typeof b.materialsConsumed==='boolean','consumo cantiere');
       check(b.repairMaterialDebt===undefined||finite(b.repairMaterialDebt,0,1),'debito riparazione');
       if(b.type==='farm')check(b.crop===undefined||b.crop==='Grano'||typeof b.crop==='string'&&Object.hasOwn(window.TERRA_CROPS,b.crop),'coltura');
-      if(b.batch){const recipe=window.TERRA_RECIPES[b.type];check(recipe&&b.batch.input===recipe.input&&b.batch.output===recipe.output&&b.batch.amount===recipe.amount&&finite(b.batch.remaining,0,recipe.seconds),'ricetta');}
+      if(b.batch){const recipe=window.TERRA_RECIPES[b.type]?.find(r=>r.id===b.batch.recipeId)||window.TERRA_RECIPES[b.type]?.find(r=>b.batch.input===Object.keys(r.inputs)[0]&&b.batch.output===Object.keys(r.outputs)[0]);const inputs=b.batch.inputs||{[b.batch.input]:b.batch.amount},outputs=b.batch.outputs||{[b.batch.output]:b.batch.amount};check(recipe&&Object.entries(recipe.inputs).every(([k,n])=>inputs[k]===n)&&Object.entries(recipe.outputs).every(([k,n])=>outputs[k]===n)&&finite(b.batch.remaining,0,recipe.seconds),'ricetta');}
     }
     for(const u of d.units){
       check(u.owner===0,'proprietario abitante');
@@ -85,7 +85,7 @@
     for(const b of d.buildings){
       const jobs=d.units.filter(u=>u.health>0&&u.task?.type==='haul').map(u=>u.task);
       const incoming=jobs.filter(t=>t.destination===b.id&&['source','destination'].includes(t.phase)).reduce((n,t)=>n+t.amount,0);
-      check(Object.values(b.inventory.items).reduce((n,v)=>n+v,0)+(b.batch?.amount||0)+incoming<=b.inventory.capacity,'spazio prenotato');
+      check(Object.entries(b.inventory.items).reduce((n,[good,v])=>n+v*window.TERRA_GOODS[good].volume,0)+(b.batch?.outputVolume??b.batch?.amount??0)+incoming<=b.inventory.capacity,'spazio prenotato');
       for(const good of materials){const outgoing=jobs.filter(t=>t.source===b.id&&t.phase==='source'&&t.good===good).reduce((n,t)=>n+t.amount,0);check(outgoing<=(b.inventory.items[good]||0),'merce prenotata');}
     }
     check(d.roads.every(p=>Array.isArray(p)&&p.length===2&&p.every(v=>Number.isInteger(v)&&v>=0&&v<WORLD_SIZE)),'strade');
