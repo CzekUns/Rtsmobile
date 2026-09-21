@@ -161,6 +161,15 @@
       "commit": "6c3728107af9b6b338df612c33402e0da36ae1ed",
       "notes": "GitHub Pages workflow 35655701076 succeeded. T14 acceptance complete; browser and hardware checks were not claimed.",
       "next": "T15 local markets, money and stock/demand-based local prices."
+    },
+    {
+      "at": "2026-09-21T22:00:00Z",
+      "task": "T15",
+      "result": "awaiting_deploy",
+      "branch": "work/T15-local-markets",
+      "commit": "52050646c3713e7d9d58181c643dc99f82108fb9",
+      "notes": "Build 46 adds persistent local markets with market IDs, local stock, liquidity, per-good demand, stock-sensitive prices and carrier-based atomic trades. Six new market regressions and all 51 reported Node tests/subtests pass; JavaScript syntax and diff checks pass. Browser and hardware are not claimed.",
+      "next": "Verify Build 46 Pages deployment; if successful mark T15 done and begin T16 touch trade confirmation UI."
     }
   ],
   "schema_version": 1,
@@ -493,16 +502,19 @@
         "Vendite e acquisti non leggono merci remote della Casa comune; liquidità e disponibilità sono vincoli effettivi."
       ],
       "blocker": null,
-      "branch": null,
-      "commit": null,
+      "branch": "work/T15-local-markets",
+      "commit": "52050646c3713e7d9d58181c643dc99f82108fb9",
       "depends_on": [
         "T14"
       ],
-      "evidence": [],
+      "evidence": [
+        "6 T15 market regressions PASS: local ID/stock/liquidity, stock-sensitive prices, remote common-house isolation, hard stock/money/capacity constraints, idempotent transaction IDs and save/reload.",
+        "All 51 reported Node tests/subtests PASS; JavaScript syntax and git diff checks PASS. Browser/hardware not claimed."
+      ],
       "id": "T15",
-      "last_attempt_at": null,
+      "last_attempt_at": "2026-09-21T22:00:00Z",
       "remaining": [],
-      "status": "pending",
+      "status": "awaiting_deploy",
       "title": "Mercati locali e prezzi"
     },
     {

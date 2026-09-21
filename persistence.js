@@ -31,10 +31,12 @@
       check(b.materialsConsumed===undefined||typeof b.materialsConsumed==='boolean','consumo cantiere');
       check(b.repairMaterialDebt===undefined||finite(b.repairMaterialDebt,0,1),'debito riparazione');
       if(b.type==='farm')check(b.crop===undefined||b.crop==='Grano'||typeof b.crop==='string'&&Object.hasOwn(window.TERRA_CROPS,b.crop),'coltura');
+      if(b.type==='market'){check(Number.isSafeInteger(b.money)&&b.money>=0,'liquidità mercato');check(b.demand&&Object.keys(window.TERRA_GOODS).every(k=>finite(b.demand[k],.1,10)),'domanda mercato');check(Array.isArray(b.tradeLedger)&&b.tradeLedger.length<=50&&b.tradeLedger.every(x=>x&&typeof x.id==='string'&&x.ok===true&&['buy','sell'].includes(x.side)&&materials.has(x.good)&&Number.isSafeInteger(x.quantity)&&x.quantity>0&&Number.isSafeInteger(x.unitPrice)&&x.unitPrice>0&&x.total===x.quantity*x.unitPrice),'registro mercato');}
       if(b.batch){const recipe=window.TERRA_RECIPES[b.type]?.find(r=>r.id===b.batch.recipeId)||window.TERRA_RECIPES[b.type]?.find(r=>b.batch.input===Object.keys(r.inputs)[0]&&b.batch.output===Object.keys(r.outputs)[0]);const inputs=b.batch.inputs||{[b.batch.input]:b.batch.amount},outputs=b.batch.outputs||{[b.batch.output]:b.batch.amount};check(recipe&&Object.entries(recipe.inputs).every(([k,n])=>inputs[k]===n)&&Object.entries(recipe.outputs).every(([k,n])=>outputs[k]===n)&&finite(b.batch.remaining,0,recipe.seconds),'ricetta');}
     }
     for(const u of d.units){
       check(u.owner===0,'proprietario abitante');
+      check(u.money===undefined||Number.isSafeInteger(u.money)&&u.money>=0,'denaro abitante');
       check(u.mobilized===undefined||typeof u.mobilized==='boolean','mobilitazione');
       check(!u.mobilized||u.location?.kind==='world','mobilitato sulla mappa');
       check(u.location&&(u.location.kind==='world'&&u.location.settlementId===null||u.location.kind==='resident'&&typeof u.location.settlementId==='string'),'collocazione abitante');
@@ -126,7 +128,7 @@
   }
 
   Game.prototype.snapshot=function(){
-    this.ensureInventories();
+    this.ensureInventories();this.ensureMarkets?.();
     return {version:5,populationRules:1,equipmentRules:1,gear:this.gear||[],seed:this.seed,rngState:this.rng.s,paused:this.paused,gameEnded:this.gameEnded,
       clock:{day:this.day,month:this.month,year:this.year,totalDays:this.totalDays,nextRaidDay:this.nextRaidDay,raidLevel:this.raidLevel,dayAccumulator:this.dayAccumulator},
       roads:this.world.tiles.filter(t=>t.road).map(t=>[t.x,t.y]),resources:this.world.resources,buildings:this.buildings,units:this.units,animals:this.animals,raiders:this.raiders,camera:this.camera,

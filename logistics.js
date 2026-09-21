@@ -1,7 +1,7 @@
 // Local inventories and persistent carrier jobs; reservations are derived from jobs.
 (() => {
   'use strict';
-  const CAPACITY={base:800,warehouse:400,farm:240,mill:80,bakery:80,pen:120,house:40,tower:20,palisade:10};
+  const CAPACITY={base:800,warehouse:400,farm:240,mill:80,bakery:80,pen:120,market:240,house:40,tower:20,palisade:10};
   const REPAIR_COST_PER_HP=.04;
   const GOODS={
     food:{label:'cibo',volume:1},wood:{label:'legno',volume:1},stone:{label:'pietra',volume:1},iron:{label:'ferro',volume:1},
