@@ -1,5 +1,5 @@
 {
-  "active_task": "T13",
+  "active_task": "T14",
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
@@ -134,6 +134,15 @@
       "commit": "08ad3a868a815395fdc280cfd8646a45462739a9",
       "notes": "Build 44 adds buildable pens, persistent animal-to-pen IDs, named livestock workers, local forage consumption and local milk output. Production requires live owned sheep, a present worker, forage and output capacity. Seven new livestock regressions and all prior Node suites pass; JavaScript syntax and diff checks pass. Lease released after fast-forward publication.",
       "next": "Verify Build 44 Pages; if successful mark T13 done and begin T14 catalog and recipes."
+    },
+    {
+      "at": "2026-09-21T20:26:00Z",
+      "task": "T13",
+      "result": "done",
+      "branch": "work/T13-persistent-livestock",
+      "commit": "08ad3a868a815395fdc280cfd8646a45462739a9",
+      "notes": "GitHub Pages workflow 35649931839 succeeded for the runtime Build 44 commit. T13 acceptance complete; no browser or hardware claim added.",
+      "next": "Acquire a fresh lease and implement T14 catalog goods and recipes."
     }
   ],
   "schema_version": 1,
@@ -428,14 +437,13 @@
       ],
       "evidence": [
         "7 livestock regressions PASS: worker-only/no animal, animal/no worker, exact forage and milk accounting, pen capacity/single ownership, full output, save/reload identity and dead-animal pruning.",
-        "All prior Node VM/DOM suites PASS; JavaScript syntax and git diff checks PASS. Browser/hardware not claimed."
+        "All prior Node VM/DOM suites PASS; JavaScript syntax and git diff checks PASS. Browser/hardware not claimed.",
+        "GitHub Pages workflow 35649931839 completed successfully for Build 44 commit 08ad3a868a815395fdc280cfd8646a45462739a9."
       ],
       "id": "T13",
       "last_attempt_at": "2026-09-21T20:02:34Z",
-      "remaining": [
-        "Verify GitHub Pages deployment for Build 44 before marking done."
-      ],
-      "status": "awaiting_deploy",
+      "remaining": [],
+      "status": "done",
       "title": "Allevamento con animali persistenti"
     },
     {
@@ -688,5 +696,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-21T20:24:00Z"
+  "updated_at": "2026-09-21T20:26:00Z"
 }
