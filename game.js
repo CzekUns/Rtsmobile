@@ -10,9 +10,9 @@ const SAVE_KEY='terra-italica-save-v2';
 const NAMES=['Aulo','Neria','Tito','Velia','Maro','Tana','Silio','Ovia','Vibio','Larth','Atria','Festo','Tita','Numa','Ruma','Caio'];
 const BUILD_COSTS={
   mill:{wood:20,stone:12}, bakery:{wood:16,stone:16}, warehouse:{wood:18,stone:8}, house:{wood:24,stone:10}, farm:{wood:6},
-  palisade:{wood:4}, tower:{wood:14,stone:8}
+  pen:{wood:12,stone:4}, palisade:{wood:4}, tower:{wood:14,stone:8}
 };
-const BUILD_LABEL={mill:'Mulino',bakery:'Forno',base:'Casa comune',warehouse:'Magazzino',house:'Distretto',farm:'Campo',palisade:'Palizzata',tower:'Torre'};
+const BUILD_LABEL={mill:'Mulino',bakery:'Forno',base:'Casa comune',warehouse:'Magazzino',house:'Distretto',farm:'Campo',pen:'Recinto',palisade:'Palizzata',tower:'Torre'};
 const BIOME={
   sea:{name:'Mare',color:'#34484b',walk:false,fertility:0}, river:{name:'Fiume',color:'#48615f',walk:false,fertility:.2},
   beach:{name:'Spiaggia',color:'#9a8d69',walk:true,fertility:.35}, grass:{name:'Prateria',color:'#687454',walk:true,fertility:1},

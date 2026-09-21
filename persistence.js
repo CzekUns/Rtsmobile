@@ -5,7 +5,7 @@
   const clone=value=>JSON.parse(JSON.stringify(value));
   const finite=(v,min=-Infinity,max=Infinity)=>typeof v==='number'&&Number.isFinite(v)&&v>=min&&v<=max;
   const check=(ok,label)=>{if(!ok)throw new Error('Salvataggio non valido: '+label)};
-  const materials=new Set(['food','wood','stone','iron','grain','barley','grapes','olives','flour','bread']);
+  const materials=new Set(['food','wood','stone','iron','grain','barley','grapes','olives','flour','bread','forage','milk']);
   const itemsValid=items=>items&&typeof items==='object'&&!Array.isArray(items)&&Object.entries(items).every(([k,v])=>materials.has(k)&&Number.isSafeInteger(v)&&v>=0);
 
   function validate(d) {
@@ -22,6 +22,8 @@
       check(Object.hasOwn(BUILD_LABEL,b.type),'edificio');check(finite(b.progress,0,1)&&finite(b.growth,0)&&finite(b.birthDays,0)&&finite(b.cooldown,0),'progresso edificio');
       check(Array.isArray(b.assigned)&&b.assigned.every(id=>typeof id==='string'),'lavoratori');
       check(b.workers===undefined||Array.isArray(b.workers)&&b.workers.every(id=>typeof id==='string'),'mestieri fabbrica');
+      check(b.animalIds===undefined||Array.isArray(b.animalIds)&&new Set(b.animalIds).size===b.animalIds.length&&b.animalIds.every(id=>typeof id==='string'),'animali recinto');
+      check(b.livestockDays===undefined||Number.isSafeInteger(b.livestockDays)&&b.livestockDays>=0,'giorni allevamento');
       check(Array.isArray(b.residents)&&b.residents.length<=(b.type==='house'?5:0)&&b.residents.every(id=>typeof id==='string'),'residenti edificio');
       check(b.inventory&&itemsValid(b.inventory.items)&&finite(b.inventory.capacity,1),'inventario edificio');
       check(Object.values(b.inventory.items).reduce((s,n)=>s+n,0)<=b.inventory.capacity,'capacità edificio');
@@ -43,12 +45,13 @@
       check(u.skills&&u.xp&&['wood','food','stone','iron','farming','construction','taming','combat'].every(k=>finite(u.skills[k],1)),'skill');
       check(u.personalKnowledge===undefined||Array.isArray(u.personalKnowledge)&&u.personalKnowledge.every(k=>typeof k==='string'),'sapere personale');
       check(Object.values(u.xp).every(v=>finite(v,0)),'XP');check(finite(u.workTimer)&&finite(u.attackCooldown,0),'timer unità');
-      check(['idle','moving','gathering','building','taming','combat','farming','hauling','producing','repairing'].includes(u.state),'stato');
+      check(['idle','moving','gathering','building','taming','combat','farming','hauling','producing','repairing','livestock'].includes(u.state),'stato');
       if(u.location.kind==='resident')check(u.task===null&&u.state==='idle'&&u.path.length===0,'stato residente');
       check(Array.isArray(u.path)&&u.path.every(p=>finite(p.x,0,WORLD_SIZE)&&finite(p.y,0,WORLD_SIZE)),'percorso');
-      if(u.task){check(['move','gather','return','build','farm','enter','tame','attack','haul','production','repair'].includes(u.task.type),'ordine');
+      if(u.task){check(['move','gather','return','build','farm','enter','tame','attack','haul','production','repair','livestock'].includes(u.task.type),'ordine');
         if(u.task.type==='haul')check(typeof u.task.source==='string'&&typeof u.task.destination==='string'&&materials.has(u.task.good)&&['waiting','source','destination'].includes(u.task.phase)&&Number.isSafeInteger(u.task.amount)&&u.task.amount>=0&&u.task.amount<=u.inventory.cap&&typeof u.task.repeat==='boolean'&&finite(u.task.retry,0),'trasporto');
         if(u.task.type==='production')check(typeof u.task.target==='string'&&['mugnaio','fornaio'].includes(u.task.profession),'mestiere');
+        if(u.task.type==='livestock')check(typeof u.task.target==='string'&&u.task.profession==='allevatore','mestiere allevamento');
       }
     }
     check(d.constructionRules===undefined||d.constructionRules===1,'regole sapere edilizio');
@@ -75,7 +78,7 @@
     check(new Set(residentIds).size===residentIds.length,'residente duplicato');
     for(const u of d.units)if(u.location.kind==='resident')check(residentIds.includes(u.id)&&d.buildings.some(b=>b.id===u.location.settlementId&&b.type==='house'&&b.residents.includes(u.id)),'legame residente');
     check(residentIds.every(id=>d.units.some(u=>u.id===id&&u.location.kind==='resident')),'elenco residenti');
-    for(const a of d.animals)check(['sheep','wolf'].includes(a.type)&&finite(a.vx)&&finite(a.vy)&&finite(a.wander)&&finite(a.attackCooldown,0),'animale');
+    for(const a of d.animals){check(['sheep','wolf'].includes(a.type)&&finite(a.vx)&&finite(a.vy)&&finite(a.wander)&&finite(a.attackCooldown,0),'animale');check(a.penId===undefined||a.penId===null||typeof a.penId==='string'&&d.buildings.some(b=>b.id===a.penId&&b.type==='pen'&&b.animalIds?.includes(a.id)),'recinto animale');}
     for(const r of d.raiders)check(finite(r.speed,0)&&finite(r.repath)&&finite(r.attackCooldown,0)&&Array.isArray(r.path)&&r.path.every(p=>finite(p.x,0,WORLD_SIZE)&&finite(p.y,0,WORLD_SIZE)),'razziatore');
     for(const r of d.resources)check(materials.has(r.type)&&Number.isSafeInteger(r.amount)&&r.amount>=0&&finite(r.max,r.amount),'risorsa');
     // Validate capacity reservations from jobs before any live-world mutation.
@@ -165,7 +168,7 @@
           else check(u.inventory.amount===0,'trasporto senza prelievo');
         }else if(u.task?.target&&!existing.has(u.task.target)){u.task=null;u.state='idle';u.path=[];}
       }
-      for(const b of buildings){b.assigned=b.assigned.filter(id=>units.some(u=>u.id===id&&u.health>0&&(u.task?.type==='farm'&&u.task.target===b.id||u.task?.after?.type==='farm'&&u.task.after.target===b.id)));b.workers=(b.workers||[]).filter(id=>units.some(u=>u.id===id&&u.health>0&&u.task?.type==='production'&&u.task.target===b.id));}
+      for(const b of buildings){b.assigned=b.assigned.filter(id=>units.some(u=>u.id===id&&u.health>0&&(u.task?.type==='farm'&&u.task.target===b.id||u.task?.after?.type==='farm'&&u.task.after.target===b.id)));b.workers=(b.workers||[]).filter(id=>units.some(u=>u.id===id&&u.health>0&&((u.task?.type==='production'||u.task?.type==='livestock')&&u.task.target===b.id)));if(b.type==='pen')b.animalIds=(b.animalIds||[]).filter(id=>animals.some(a=>a.id===id&&a.health>0&&a.owner===0));}
       const clock=Object.fromEntries(['day','month','year','totalDays','nextRaidDay','raidLevel','dayAccumulator'].map(k=>[k,d.clock[k]]));
       Object.assign(this,{seed:d.seed,world,rng,buildings,units,animals,raiders,gear:d.gear||[],tribalKnowledge:d.tribalKnowledge,...clock,camera:d.camera});
       this.ensureInventories();this.groupSelection=units.filter(u=>u.health>0&&u.location.kind==='world'&&d.selection.includes(u.id));

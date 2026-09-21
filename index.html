@@ -23,7 +23,7 @@
   <main id="app" class="app-shell">
     <header class="hud-top" aria-label="Stato della comunità">
       <div class="identity">
-        <strong>TERRA ITALICA <small style="font-size:8px;opacity:.55;letter-spacing:.08em">BUILD 43</small></strong>
+        <strong>TERRA ITALICA <small style="font-size:8px;opacity:.55;letter-spacing:.08em">BUILD 44</small></strong>
         <span id="sessionState" role="status"></span><span id="dateLabel">1 Marzo · 1000 a.C.</span>
       </div>
       <div class="resources" id="resourceBar">
@@ -81,6 +81,7 @@
         <button data-build="mill" type="button"><b>Mulino</b><span>20L · 12P</span></button>
         <button data-build="bakery" type="button"><b>Forno</b><span>16L · 16P</span></button>
         <button data-build="farm" type="button"><b>Campo</b><span>6 legno</span></button>
+        <button data-build="pen" type="button"><b>Recinto</b><span>12L · 4P</span></button>
         <button data-build="palisade" type="button"><b>Palizzata</b><span>4 legno</span></button>
         <button data-build="tower" type="button"><b>Torre</b><span>14L · 8P</span></button>
       </div>
@@ -135,32 +136,33 @@
   </dialog>
   <dialog id="logisticsDialog" aria-labelledby="logisticsTitle">
     <header><h2 id="logisticsTitle">Scorte e trasporti</h2><button id="closeLogistics" type="button">Chiudi</button></header>
-    <p>La partita è in pausa durante la gestione. Il campo produce grano; mulino e forno lavorano solo gli ingredienti consegnati.</p>
+      <p>La partita è in pausa durante la gestione. Campi, fabbriche e recinti dipendono da scorte e lavoratori locali.</p>
     <div id="inventoryList"></div>
     <form id="transportForm">
       <label>Abitante<select id="carrierSelect" required></select></label>
       <label>Preleva da<select id="sourceSelect" required></select></label>
       <label>Consegna a<select id="destinationSelect" required></select></label>
-      <label>Merce<select id="goodsSelect"><option value="grain">Grano</option><option value="barley">Orzo</option><option value="grapes">Uva</option><option value="olives">Olive</option><option value="flour">Farina</option><option value="bread">Pane</option><option value="food">Cibo</option><option value="wood">Legna</option><option value="stone">Pietra</option><option value="iron">Ferro</option></select></label>
+      <label>Merce<select id="goodsSelect"><option value="grain">Grano</option><option value="barley">Orzo</option><option value="grapes">Uva</option><option value="olives">Olive</option><option value="flour">Farina</option><option value="bread">Pane</option><option value="forage">Foraggio</option><option value="milk">Latte</option><option value="food">Cibo</option><option value="wood">Legna</option><option value="stone">Pietra</option><option value="iron">Ferro</option></select></label>
       <label class="route-option"><input id="repeatRoute" type="checkbox" checked> Ripeti il trasporto finché non cambio ordine</label>
       <button type="submit">Assegna trasporto</button>
     </form>
     <p id="transportStatus" role="status"></p><div id="routeList"></div>
     <form id="productionForm">
-      <h3>Mestieri nelle fabbriche</h3>
+      <h3>Mestieri e allevamento</h3>
       <label>Abitante<select id="workerSelect" required></select></label>
-      <label>Fabbrica<select id="factorySelect" required></select></label>
+      <label>Attività<select id="factorySelect" required></select></label>
       <button type="submit">Assegna mestiere</button>
     </form>
     <p id="productionStatus" role="status"></p>
     <p>I materiali da costruzione e riparazione devono essere consegnati fisicamente al cantiere o edificio. Merci nei magazzini, nelle fabbriche o in viaggio restano locali. Porta il pane alla Casa comune per le razioni e l’accoglienza.</p>
   </dialog>
-  <script src="./game.js?v=42"></script>
+  <script src="./game.js?v=44"></script>
   <script src="./p16-render.js?v=24"></script>
   <script src="./asset-render.js?v=28"></script>
   <script src="./touch-modifier.js?v=39"></script>
-  <script src="./logistics.js?v=42"></script>
-  <script src="./persistence.js?v=42"></script>
+  <script src="./logistics.js?v=44"></script>
+  <script src="./livestock.js?v=44"></script>
+  <script src="./persistence.js?v=44"></script>
   <script src="./community.js?v=39"></script>
   <script src="./population.js?v=39"></script>
   <script src="./equipment.js?v=39"></script>

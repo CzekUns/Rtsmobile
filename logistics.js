@@ -1,7 +1,7 @@
 // Local inventories and persistent carrier jobs; reservations are derived from jobs.
 (() => {
   'use strict';
-  const CAPACITY={base:800,warehouse:400,farm:240,mill:80,bakery:80,house:40,tower:20,palisade:10};
+  const CAPACITY={base:800,warehouse:400,farm:240,mill:80,bakery:80,pen:120,house:40,tower:20,palisade:10};
   const REPAIR_COST_PER_HP=.04;
   const RECIPES={mill:{input:'grain',output:'flour',amount:2,seconds:6},bakery:{input:'flour',output:'bread',amount:2,seconds:8}};
   const CROPS={
@@ -16,7 +16,7 @@
   Game.prototype.ensureInventories=function(){
     for(const b of this.buildings){if(!b.inventory)b.inventory={items:b.type==='base'?{...this.stock}:{},capacity:CAPACITY[b.type]||80};if(b.type==='farm'){b.crop=Object.hasOwn(CROPS,b.crop)?b.crop:'grain';if(b.inventory.capacity===80)b.inventory.capacity=CAPACITY.farm;}if(b.requiredMaterials===undefined)b.requiredMaterials=b.built?null:{...(BUILD_COSTS[b.type]||{})};if(!b.built&&b.requiredMaterials)b.inventory.capacity=Math.max(b.inventory.capacity,Object.values(b.requiredMaterials).reduce((n,v)=>n+v,0));if(b.batch===undefined)b.batch=null;if(!Array.isArray(b.workers))b.workers=[];}
     const base=this.buildings.find(b=>b.type==='base');if(base)this.stock=base.inventory.items;
-    for(const k of ['food','wood','stone','iron','bread'])if(this.stock[k]===undefined)this.stock[k]=0;
+    for(const k of ['food','wood','stone','iron','bread','forage','milk'])if(this.stock[k]===undefined)this.stock[k]=0;
   };
   Game.prototype.factoryWorkers=function(b){
     if(!b)return[];b.workers=(b.workers||[]).filter(id=>this.units.some(u=>u.id===id&&u.health>0&&u.task?.type==='production'&&u.task.target===b.id));
@@ -57,7 +57,7 @@
   Game.prototype.assignHaul=function(u,source,destination,good,repeat=true){
     this.ensureInventories();
     if(!u||u.health<=0||!source?.alive||!source.built||!destination?.alive||source.id===destination.id)return 'Scegli un abitante, un’origine operativa e una destinazione valida.';
-    if(!['grain','barley','grapes','olives','flour','bread','food','wood','stone','iron'].includes(good))return 'Merce non valida.';
+    if(!['grain','barley','grapes','olives','flour','bread','forage','milk','food','wood','stone','iron'].includes(good))return 'Merce non valida.';
     if(u.inventory.amount)return 'L’abitante ha già un carico: usa Consegna prima di assegnare una rotta.';
     if(this.pathToBuilding(u,source)===null||this.pathToBuilding(source,destination)===null)return 'Percorso non raggiungibile fra abitante, origine e destinazione.';
     this.cancelTask(u);u.task={type:'haul',source:source.id,destination:destination.id,good,repeat,phase:'waiting',amount:0,retry:0};u.state='hauling';this.prepareHaul(u);return null;
@@ -167,7 +167,7 @@
   const update=Game.prototype.update;
   Game.prototype.update=function(dt){if(this.paused||this.suspended||this.gameEnded)return;this.ensureInventories();update.call(this,dt);};
   const resourceName=Game.prototype.resourceName;
-  Game.prototype.resourceName=function(type){return({grain:'grano',barley:'orzo',grapes:'uva',olives:'olive',flour:'farina',bread:'pane'})[type]||resourceName.call(this,type);};
+  Game.prototype.resourceName=function(type){return({grain:'grano',barley:'orzo',grapes:'uva',olives:'olive',flour:'farina',bread:'pane',forage:'foraggio',milk:'latte'})[type]||resourceName.call(this,type);};
   const unitStatus=Game.prototype.unitStatus;
   Game.prototype.unitStatus=function(u){if(u.task?.type==='haul'){const t=u.task;return t.phase==='waiting'?'attende merci o spazio':t.phase==='source'?'va al prelievo':`trasporta ${this.resourceName(t.good)}`;}if(u.task?.type==='production'){const b=this.findById(this.buildings,u.task.target);return `${u.task.profession} · ${b&&dist(u,b)<=1.15?'al lavoro':'in cammino'}`;}if(u.task?.type==='repair')return 'ripara edificio';return unitStatus.call(this,u);};
   const applyOrder=Game.prototype.applyOrder;

@@ -4,7 +4,7 @@
     initialTribal:['insediamento'],
     labels:{insediamento:'Tecniche d’insediamento',muratura:'Muratura',molitoria:'Molitoria',fornace:'Forni in muratura',fortificazione:'Fortificazione'},
     unlockAt:{muratura:2,molitoria:3,fornace:4,fortificazione:5},
-    requirements:{road:['insediamento'],warehouse:['insediamento'],house:['insediamento'],farm:['insediamento'],mill:['molitoria'],bakery:['fornace'],palisade:['fortificazione'],tower:['fortificazione','muratura']}
+    requirements:{road:['insediamento'],warehouse:['insediamento'],house:['insediamento'],farm:['insediamento'],pen:['insediamento'],mill:['molitoria'],bakery:['fornace'],palisade:['fortificazione'],tower:['fortificazione','muratura']}
   };
   window.TERRA_CONSTRUCTION=RULES;
   const unique=a=>[...new Set(a.filter(k=>Object.hasOwn(RULES.labels,k)))];
