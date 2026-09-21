@@ -3,14 +3,7 @@
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "lease": {
-    "run_id": "automation-20260921T230204Z-T16",
-    "task": "T16",
-    "branch": "work/T16-touch-trade",
-    "head_observed": "bc173952c044a827592039470982c7dd40121a55",
-    "acquired_at": "2026-09-21T23:02:04Z",
-    "expires_at": "2026-09-22T00:32:04Z"
-  },
+  "lease": null,
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
   "runs": [
@@ -186,6 +179,15 @@
       "commit": "e18b21fdcbfe74e2763db15d5fac1752d454dddb",
       "notes": "GitHub Pages workflows 35661144979 and 35661209538 completed successfully for Build 46 and its state commit. T15 acceptance complete; no browser or hardware claim added.",
       "next": "T16 touch trade view with explicit quantities, balances and confirmation."
+    },
+    {
+      "at": "2026-09-21T23:15:00Z",
+      "task": "T16",
+      "result": "awaiting_deploy",
+      "branch": "work/T16-touch-trade",
+      "commit": "9d2b097acc974d76ecd986c8dcba204da7cef727",
+      "notes": "Build 47 adds a touch-sized trade dialog with explicit trader/market/good/quantity selection, pre-confirmation price and balance preview, atomic receipt reuse for double taps, and cargo-only sales that do not touch equipment or reservations. Four new regressions and all 55 Node tests/subtests pass; JavaScript syntax passes. Browser and hardware are not claimed.",
+      "next": "Verify Build 47 Pages deployment; if successful mark T16 done and begin T17 physical caravans."
     }
   ],
   "schema_version": 1,
@@ -540,17 +542,22 @@
         "Conferma idempotente: doppio tap/reload non duplica; equipaggiamento e riserve non venduti implicitamente."
       ],
       "blocker": null,
-      "branch": null,
-      "commit": null,
+      "branch": "work/T16-touch-trade",
+      "commit": "9d2b097acc974d76ecd986c8dcba204da7cef727",
       "depends_on": [
         "T15",
         "T06"
       ],
-      "evidence": [],
+      "evidence": [
+        "4 new touch-trade regressions PASS: previewed quantities/prices/balances, idempotent double confirmation, cargo-only sales, pause/background lifecycle.",
+        "All 55 Node tests/subtests PASS; JavaScript syntax PASS. Browser and physical hardware not claimed."
+      ],
       "id": "T16",
-      "last_attempt_at": null,
-      "remaining": [],
-      "status": "pending",
+      "last_attempt_at": "2026-09-21T23:15:00Z",
+      "remaining": [
+        "Verify Build 47 GitHub Pages deployment before marking done."
+      ],
+      "status": "awaiting_deploy",
       "title": "Scambio touch e carico commerciale"
     },
     {
