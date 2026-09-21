@@ -3,14 +3,7 @@
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "lease": {
-    "run_id": "automation-20260921T210155Z-T14",
-    "task": "T14",
-    "branch": "work/T14-goods-recipes",
-    "head_observed": "babf1f3d04b832cfec9ec3d4b0ee43fc2dd51466",
-    "acquired_at": "2026-09-21T21:01:55Z",
-    "expires_at": "2026-09-21T22:31:55Z"
-  },
+  "lease": null,
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
   "runs": [
@@ -150,6 +143,15 @@
       "commit": "08ad3a868a815395fdc280cfd8646a45462739a9",
       "notes": "GitHub Pages workflow 35649931839 succeeded for the runtime Build 44 commit. T13 acceptance complete; no browser or hardware claim added.",
       "next": "Acquire a fresh lease and implement T14 catalog goods and recipes."
+    },
+    {
+      "at": "2026-09-21T21:12:00Z",
+      "task": "T14",
+      "result": "awaiting_deploy",
+      "branch": "work/T14-goods-recipes",
+      "commit": "6c3728107af9b6b338df612c33402e0da36ae1ed",
+      "notes": "Build 45 introduces the authoritative goods catalog with configurable volume and the physical barley → barley flour → barley bread chain. Local input, local capacity, persistent batches and conservative legacy-batch loading are enforced. Nine new regressions and all prior suites pass; syntax/diff checks pass. No browser or hardware claim.",
+      "next": "Verify Pages workflow 35655701076; if successful mark T14 done and begin T15 local markets."
     }
   ],
   "schema_version": 1,
@@ -459,17 +461,23 @@
         "Testare ogni nuova ricetta con input assente, output pieno, carico interrotto e reload."
       ],
       "blocker": null,
-      "branch": null,
-      "commit": null,
+      "branch": "work/T14-goods-recipes",
+      "commit": "6c3728107af9b6b338df612c33402e0da36ae1ed",
       "depends_on": [
         "T11",
         "T13"
       ],
-      "evidence": [],
+      "evidence": [
+        "9 T14 regressions PASS: catalog coverage plus missing input, full output, interrupted load and reload for both new barley recipes.",
+        "All prior Node VM/DOM suites PASS (45 test files/subtests reported by node:test plus existing custom suites); JavaScript syntax and git diff checks PASS. Browser/hardware not claimed.",
+        "Build 45 Pages workflow 35655701076 queued; deployment not yet counted as successful."
+      ],
       "id": "T14",
-      "last_attempt_at": "2026-09-21T21:01:55Z",
-      "remaining": [],
-      "status": "in_progress",
+      "last_attempt_at": "2026-09-21T21:12:00Z",
+      "remaining": [
+        "Confirm GitHub Pages workflow 35655701076 succeeds, then mark T14 done."
+      ],
+      "status": "awaiting_deploy",
       "title": "Catalogo merci e altre ricette"
     },
     {
@@ -703,5 +711,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-21T21:01:55Z"
+  "updated_at": "2026-09-21T21:12:00Z"
 }
