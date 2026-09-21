@@ -5,7 +5,7 @@
   const clone=value=>JSON.parse(JSON.stringify(value));
   const finite=(v,min=-Infinity,max=Infinity)=>typeof v==='number'&&Number.isFinite(v)&&v>=min&&v<=max;
   const check=(ok,label)=>{if(!ok)throw new Error('Salvataggio non valido: '+label)};
-  const materials=new Set(['food','wood','stone','iron','grain','flour','bread']);
+  const materials=new Set(['food','wood','stone','iron','grain','barley','grapes','olives','flour','bread']);
   const itemsValid=items=>items&&typeof items==='object'&&!Array.isArray(items)&&Object.entries(items).every(([k,v])=>materials.has(k)&&Number.isSafeInteger(v)&&v>=0);
 
   function validate(d) {
@@ -28,6 +28,7 @@
       check(b.requiredMaterials===undefined||b.requiredMaterials===null||itemsValid(b.requiredMaterials),'materiali cantiere');
       check(b.materialsConsumed===undefined||typeof b.materialsConsumed==='boolean','consumo cantiere');
       check(b.repairMaterialDebt===undefined||finite(b.repairMaterialDebt,0,1),'debito riparazione');
+      if(b.type==='farm')check(b.crop===undefined||b.crop==='Grano'||typeof b.crop==='string'&&Object.hasOwn(window.TERRA_CROPS,b.crop),'coltura');
       if(b.batch){const recipe=window.TERRA_RECIPES[b.type];check(recipe&&b.batch.input===recipe.input&&b.batch.output===recipe.output&&b.batch.amount===recipe.amount&&finite(b.batch.remaining,0,recipe.seconds),'ricetta');}
     }
     for(const u of d.units){
@@ -150,7 +151,7 @@
       const world=new World(d.seed),rng=new RNG(d.seed);
       for(const [x,y] of d.roads)world.tile(x,y).road=true;
       world.resources=d.resources.map(o=>Object.assign(new ResourceNode(o.type,o.x,o.y,o.amount),o));
-      const buildings=d.buildings.map(o=>Object.assign(new Building(o.type,Math.floor(o.x),Math.floor(o.y),o.owner,o.progress>=1),o));
+      const buildings=d.buildings.map(o=>{const b=Object.assign(new Building(o.type,Math.floor(o.x),Math.floor(o.y),o.owner,o.progress>=1),o);if(b.type==='farm'&&(b.crop===undefined||b.crop==='Grano'))b.crop='grain';return b;});
       if(d.populationRules!==1)for(const b of buildings)if(b.type==='house')b.birthDays=0;
       const units=d.units.map(({occupation,...o})=>Object.assign(new Unit(o.name,o.x,o.y,rng),o));
       const animals=d.animals.map(o=>Object.assign(new Animal(o.type,o.x,o.y,o.owner),o));
