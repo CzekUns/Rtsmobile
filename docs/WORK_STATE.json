@@ -1,5 +1,5 @@
 {
-  "active_task": "T15",
+  "active_task": "T16",
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
@@ -170,6 +170,15 @@
       "commit": "e18b21fdcbfe74e2763db15d5fac1752d454dddb",
       "notes": "Build 46 adds persistent local markets with market IDs, local stock, liquidity, per-good demand, stock-sensitive prices and carrier-based atomic trades. Six new market regressions and all 51 reported Node tests/subtests pass; JavaScript syntax and diff checks pass. Browser and hardware are not claimed.",
       "next": "Verify Build 46 Pages deployment; if successful mark T15 done and begin T16 touch trade confirmation UI."
+    },
+    {
+      "at": "2026-09-21T22:03:00Z",
+      "task": "T15",
+      "result": "done",
+      "branch": "work/T15-local-markets",
+      "commit": "e18b21fdcbfe74e2763db15d5fac1752d454dddb",
+      "notes": "GitHub Pages workflows 35661144979 and 35661209538 completed successfully for Build 46 and its state commit. T15 acceptance complete; no browser or hardware claim added.",
+      "next": "T16 touch trade view with explicit quantities, balances and confirmation."
     }
   ],
   "schema_version": 1,
@@ -509,12 +518,13 @@
       ],
       "evidence": [
         "6 T15 market regressions PASS: local ID/stock/liquidity, stock-sensitive prices, remote common-house isolation, hard stock/money/capacity constraints, idempotent transaction IDs and save/reload.",
-        "All 51 reported Node tests/subtests PASS; JavaScript syntax and git diff checks PASS. Browser/hardware not claimed."
+        "All 51 reported Node tests/subtests PASS; JavaScript syntax and git diff checks PASS. Browser/hardware not claimed.",
+        "GitHub Pages workflow 35661144979 completed successfully for Build 46 commit e18b21fdcbfe74e2763db15d5fac1752d454dddb."
       ],
       "id": "T15",
       "last_attempt_at": "2026-09-21T22:00:00Z",
       "remaining": [],
-      "status": "awaiting_deploy",
+      "status": "done",
       "title": "Mercati locali e prezzi"
     },
     {
