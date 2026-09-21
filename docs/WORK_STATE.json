@@ -167,7 +167,7 @@
       "task": "T15",
       "result": "awaiting_deploy",
       "branch": "work/T15-local-markets",
-      "commit": "52050646c3713e7d9d58181c643dc99f82108fb9",
+      "commit": "e18b21fdcbfe74e2763db15d5fac1752d454dddb",
       "notes": "Build 46 adds persistent local markets with market IDs, local stock, liquidity, per-good demand, stock-sensitive prices and carrier-based atomic trades. Six new market regressions and all 51 reported Node tests/subtests pass; JavaScript syntax and diff checks pass. Browser and hardware are not claimed.",
       "next": "Verify Build 46 Pages deployment; if successful mark T15 done and begin T16 touch trade confirmation UI."
     }
@@ -503,7 +503,7 @@
       ],
       "blocker": null,
       "branch": "work/T15-local-markets",
-      "commit": "52050646c3713e7d9d58181c643dc99f82108fb9",
+      "commit": "e18b21fdcbfe74e2763db15d5fac1752d454dddb",
       "depends_on": [
         "T14"
       ],
