@@ -3,13 +3,7 @@
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "lease": {
-    "run_id": "automation-20260921T1905Z-t12",
-    "task": "T12",
-    "observed_head": "f4d450a",
-    "acquired_at": "2026-09-21T19:05:56Z",
-    "expires_at": "2026-09-21T20:35:56Z"
-  },
+  "lease": null,
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
   "runs": [
@@ -114,6 +108,15 @@
       "commit": "432938487aaac91bda8b336e5e5e7247b31e83cb",
       "notes": "Build 42 replaces instant construction spending with local site inventories and physical deliveries; builders wait for all materials. Repairs require a named worker and delivered stone. Cancellation, death, destruction and reload preserve or account for goods. Eight new regressions and every prior suite pass.",
       "next": "Verify Build 42 Pages, then mark T11 done and continue with first eligible task T12."
+    },
+    {
+      "at": "2026-09-21T19:24:00Z",
+      "task": "T11/T12",
+      "result": "awaiting_deploy",
+      "branch": "work/T12-crops-seasons",
+      "commit": "d105282c810c1535aad695684756dbf86571c2e7",
+      "notes": "Confirmed the prior Build 42 verification record and implemented Build 43 differentiated crops. Grain, barley, grapes and olives have configurable base days/yields and crop-specific seasons; terrain, water and skill affect growth/yield. Whole harvests remain local or wait for capacity. Seven new regressions and every prior suite pass; syntax/diff checks pass. No hardware claim.",
+      "next": "Verify Build 43 Pages, mark T12 done, then begin T13 persistent livestock."
     }
   ],
   "schema_version": 1,
@@ -369,10 +372,8 @@
       ],
       "id": "T11",
       "last_attempt_at": "2026-09-18T01:28:00Z",
-      "remaining": [
-        "Verify GitHub Pages deployment for Build 42 before marking done."
-      ],
-      "status": "awaiting_deploy",
+      "remaining": [],
+      "status": "done",
       "title": "Materiali ai cantieri e riparazioni"
     },
     {
@@ -381,16 +382,21 @@
         "Il raccolto intero resta locale; terreno, acqua e stagione influiscono senza accrediti globali o eccedenze perdute."
       ],
       "blocker": null,
-      "branch": null,
-      "commit": null,
+      "branch": "work/T12-crops-seasons",
+      "commit": "d105282c810c1535aad695684756dbf86571c2e7",
       "depends_on": [
         "T10"
       ],
-      "evidence": [],
+      "evidence": [
+        "7 crop/season regressions PASS: catalog parameters, four distinct local goods, full-inventory blocking, terrain/water/season effects, crop-change guard, reload and legacy Grano migration.",
+        "All prior Node VM/DOM suites PASS; JavaScript syntax and git diff checks PASS. Browser/hardware not claimed."
+      ],
       "id": "T12",
-      "last_attempt_at": null,
-      "remaining": [],
-      "status": "pending",
+      "last_attempt_at": "2026-09-21T19:24:00Z",
+      "remaining": [
+        "Verify GitHub Pages deployment for Build 43 before marking done."
+      ],
+      "status": "awaiting_deploy",
       "title": "Colture differenziate e stagioni"
     },
     {
@@ -661,5 +667,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-18T01:28:00Z"
+  "updated_at": "2026-09-21T19:24:00Z"
 }
