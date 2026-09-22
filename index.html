@@ -23,7 +23,7 @@
   <main id="app" class="app-shell">
     <header class="hud-top" aria-label="Stato della comunità">
       <div class="identity">
-        <strong>TERRA ITALICA <small style="font-size:8px;opacity:.55;letter-spacing:.08em">BUILD 50</small></strong>
+        <strong>TERRA ITALICA <small style="font-size:8px;opacity:.55;letter-spacing:.08em">BUILD 51</small></strong>
         <span id="sessionState" role="status"></span><span id="dateLabel">1 Marzo · 1000 a.C.</span>
       </div>
       <div class="resources" id="resourceBar">
@@ -47,9 +47,9 @@
       <div id="selectionCard" class="selection-card hidden"></div>
       <div id="gameOver" class="game-over hidden">
         <div>
-          <small>FINE DELLA COMUNITÀ</small>
-          <h1>L'insediamento è caduto</h1>
-          <p>Il mondo resta deterministico: puoi ricominciare dalla stessa geografia o generare un territorio nuovo.</p>
+          <small id="gameResultEyebrow">FINE DELLA COMUNITÀ</small>
+          <h1 id="gameResultTitle">L'insediamento è caduto</h1>
+          <p id="gameResultText">Il mondo resta deterministico: puoi ricominciare dalla stessa geografia o generare un territorio nuovo.</p>
           <button id="restartSame" type="button">Ricomincia</button>
           <button id="restartNew" type="button" class="secondary">Nuovo territorio</button>
         </div>
@@ -190,6 +190,7 @@
   <script src="./persistence.js?v=49"></script>
   <script src="./neutral.js?v=49"></script>
   <script src="./politics.js?v=50"></script>
+  <script src="./war.js?v=51"></script>
   <script src="./community.js?v=39"></script>
   <script src="./population.js?v=39"></script>
   <script src="./equipment.js?v=39"></script>
