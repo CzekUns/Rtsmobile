@@ -3,14 +3,7 @@
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "lease": {
-    "run_id": "run-20260922T020013Z-T19",
-    "task": "T19",
-    "branch": "work/T19-politics",
-    "observed_head": "fd3277eff8eda007c8a6786560af689bd272661b",
-    "acquired_at": "2026-09-22T02:02:00Z",
-    "expires_at": "2026-09-22T03:32:00Z"
-  },
+  "lease": null,
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
   "runs": [
@@ -221,6 +214,15 @@
       "branch": "work/T19-politics",
       "notes": "Confirmed the live GitHub Pages site serves Build 49; completed T18 and acquired the T19 lease.",
       "next": "Implement loyalty, resistance, influence and diplomatic relations with visible effects and persistent ownership-safe transitions."
+    },
+    {
+      "at": "2026-09-22T02:08:00Z",
+      "task": "T19",
+      "result": "awaiting_deploy",
+      "branch": "work/T19-politics",
+      "commit": "ae139166ccad83644958679fc7a4291b5f08eff5",
+      "notes": "Build 50 adds visible loyalty, resistance, influence and exclusive diplomatic states. Idempotent gifts/pressure affect relations; friendly/allied prices improve and hostile markets refuse trade. IDs, ownership and goods remain unchanged through transitions. Seven new tests and all 76 Node tests pass.",
+      "next": "Verify Build 50 Pages deployment; if successful mark T19 done. T20 military objectives is independently eligible from T18 and may proceed after fresh lease."
     }
   ],
   "schema_version": 1,
@@ -644,15 +646,19 @@
       ],
       "blocker": null,
       "branch": "work/T19-politics",
-      "commit": null,
+      "commit": "ae139166ccad83644958679fc7a4291b5f08eff5",
       "depends_on": [
         "T18"
       ],
-      "evidence": [],
+      "evidence": [
+        "7 T19 politics regressions PASS: values/relations, gift cost and influence, idempotency, shortage/hostility, price/access effects, ownership-safe transitions and persistence/legacy defaults.",
+        "All 76 Node tests/subtests PASS; JavaScript syntax and git diff checks PASS. Browser and physical hardware not claimed.",
+        "Build 50 merged to main at commit ae139166ccad83644958679fc7a4291b5f08eff5; GitHub Pages deployment not yet confirmed."
+      ],
       "id": "T19",
-      "last_attempt_at": "2026-09-22T02:02:00Z",
+      "last_attempt_at": "2026-09-22T02:08:00Z",
       "remaining": [],
-      "status": "in_progress",
+      "status": "awaiting_deploy",
       "title": "Lealtà, influenza e diplomazia"
     },
     {
@@ -794,5 +800,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-22T02:02:00Z"
+  "updated_at": "2026-09-22T02:08:00Z"
 }
