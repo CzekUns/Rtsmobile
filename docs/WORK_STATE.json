@@ -3,14 +3,7 @@
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "lease": {
-    "run_id": "run-20260922T020848Z-T20",
-    "task": "T20",
-    "branch": "work/T20-war-endgame",
-    "observed_head": "17ea70dfc9c9a5b27af8fc1fcdfa87488a99c330",
-    "acquired_at": "2026-09-22T02:10:00Z",
-    "expires_at": "2026-09-22T03:40:00Z"
-  },
+  "lease": null,
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
   "runs": [
@@ -247,6 +240,15 @@
       "branch": "work/T20-war-endgame",
       "notes": "Acquired T20 lease on Build 50 main.",
       "next": "Implement persistent hostile camps and ownership-correct victory/defeat with saved terminal state."
+    },
+    {
+      "at": "2026-09-22T02:15:00Z",
+      "task": "T20",
+      "result": "awaiting_deploy",
+      "branch": "work/T20-war-endgame",
+      "commit": "025bd1a878fc8376d672354133aadabe9ae462c5",
+      "notes": "Build 51 adds three persistent hostile camps and camp-origin raids. Victory requires no living camp and no living raider. Defeat counts only living player people in any location and player deposits; neutral entities cannot mask defeat. Terminal outcome pauses and saves.",
+      "next": "Verify Build 51 Pages; if successful mark T20 done, then begin T21 groups, idle selection and minimap."
     }
   ],
   "schema_version": 1,
@@ -693,16 +695,20 @@
       ],
       "blocker": null,
       "branch": "work/T20-war-endgame",
-      "commit": null,
+      "commit": "025bd1a878fc8376d672354133aadabe9ae462c5",
       "depends_on": [
         "T11",
         "T18"
       ],
-      "evidence": [],
+      "evidence": [
+        "7 T20 war/endgame regressions PASS: persistent camps, camp-origin raids, strict victory, resident/mobilized defeat accounting, neutral exclusion, paused saved terminal state and reload.",
+        "All 83 Node tests/subtests PASS; JavaScript syntax and git diff checks PASS. Browser and physical hardware not claimed.",
+        "Build 51 merged to main at commit 025bd1a878fc8376d672354133aadabe9ae462c5; GitHub Pages deployment not yet confirmed."
+      ],
       "id": "T20",
-      "last_attempt_at": "2026-09-22T02:10:00Z",
+      "last_attempt_at": "2026-09-22T02:15:00Z",
       "remaining": [],
-      "status": "in_progress",
+      "status": "awaiting_deploy",
       "title": "Obiettivi militari e fine partita"
     },
     {
@@ -825,5 +831,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-22T02:10:00Z"
+  "updated_at": "2026-09-22T02:15:00Z"
 }
