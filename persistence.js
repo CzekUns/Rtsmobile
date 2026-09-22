@@ -47,13 +47,14 @@
       check(u.skills&&u.xp&&['wood','food','stone','iron','farming','construction','taming','combat'].every(k=>finite(u.skills[k],1)),'skill');
       check(u.personalKnowledge===undefined||Array.isArray(u.personalKnowledge)&&u.personalKnowledge.every(k=>typeof k==='string'),'sapere personale');
       check(Object.values(u.xp).every(v=>finite(v,0)),'XP');check(finite(u.workTimer)&&finite(u.attackCooldown,0),'timer unità');
-      check(['idle','moving','gathering','building','taming','combat','farming','hauling','producing','repairing','livestock'].includes(u.state),'stato');
+      check(['idle','moving','gathering','building','taming','combat','farming','hauling','producing','repairing','livestock','caravan'].includes(u.state),'stato');
       if(u.location.kind==='resident')check(u.task===null&&u.state==='idle'&&u.path.length===0,'stato residente');
       check(Array.isArray(u.path)&&u.path.every(p=>finite(p.x,0,WORLD_SIZE)&&finite(p.y,0,WORLD_SIZE)),'percorso');
-      if(u.task){check(['move','gather','return','build','farm','enter','tame','attack','haul','production','repair','livestock'].includes(u.task.type),'ordine');
+      if(u.task){check(['move','gather','return','build','farm','enter','tame','attack','haul','production','repair','livestock','caravan'].includes(u.task.type),'ordine');
         if(u.task.type==='haul')check(typeof u.task.source==='string'&&typeof u.task.destination==='string'&&materials.has(u.task.good)&&['waiting','source','destination'].includes(u.task.phase)&&Number.isSafeInteger(u.task.amount)&&u.task.amount>=0&&u.task.amount<=u.inventory.cap&&typeof u.task.repeat==='boolean'&&finite(u.task.retry,0),'trasporto');
         if(u.task.type==='production')check(typeof u.task.target==='string'&&['mugnaio','fornaio'].includes(u.task.profession),'mestiere');
         if(u.task.type==='livestock')check(typeof u.task.target==='string'&&u.task.profession==='allevatore','mestiere allevamento');
+        if(u.task.type==='caravan')check(typeof u.task.market==='string'&&materials.has(u.task.good)&&Number.isSafeInteger(u.task.quantity)&&u.task.quantity>0&&['buy','sell'].includes(u.task.side)&&typeof u.task.transactionId==='string'&&['market','return'].includes(u.task.phase)&&u.task.home&&finite(u.task.home.x,0,WORLD_SIZE)&&finite(u.task.home.y,0,WORLD_SIZE)&&typeof u.task.traded==='boolean'&&typeof u.task.threatened==='boolean','carovana');
       }
     }
     check(d.constructionRules===undefined||d.constructionRules===1,'regole sapere edilizio');
@@ -168,6 +169,9 @@
           if(!source||!dest){u.task=null;u.state='idle';u.path=[];}
           else if(t.phase==='destination')check(u.inventory.type===t.good&&u.inventory.amount===t.amount,'carico in viaggio');
           else check(u.inventory.amount===0,'trasporto senza prelievo');
+        }else if(u.task?.type==='caravan'){
+          const market=buildings.find(b=>b.id===u.task.market&&b.health>0&&b.built&&b.type==='market');
+          if(!market&&u.task.phase==='market'){u.task=null;u.state='idle';u.path=[];}
         }else if(u.task?.target&&!existing.has(u.task.target)){u.task=null;u.state='idle';u.path=[];}
       }
       for(const b of buildings){b.assigned=b.assigned.filter(id=>units.some(u=>u.id===id&&u.health>0&&(u.task?.type==='farm'&&u.task.target===b.id||u.task?.after?.type==='farm'&&u.task.after.target===b.id)));b.workers=(b.workers||[]).filter(id=>units.some(u=>u.id===id&&u.health>0&&((u.task?.type==='production'||u.task?.type==='livestock')&&u.task.target===b.id)));if(b.type==='pen')b.animalIds=(b.animalIds||[]).filter(id=>animals.some(a=>a.id===id&&a.health>0&&a.owner===0));}
