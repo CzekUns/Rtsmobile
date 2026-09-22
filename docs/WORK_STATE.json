@@ -3,14 +3,7 @@
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "lease": {
-    "run_id": "run-20260922T010055Z-T18",
-    "task": "T18",
-    "branch": "work/T18-neutral-settlements",
-    "observed_head": "62dcc9dec49ad9aba5ad629fa5ca232813534712",
-    "acquired_at": "2026-09-22T01:00:55Z",
-    "expires_at": "2026-09-22T02:30:55Z"
-  },
+  "lease": null,
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
   "runs": [
@@ -204,6 +197,15 @@
       "commit": "cc5a29c68a9571011ab3949992c6bf7e42838920",
       "notes": "Confirmed Build 47 Pages workflow 35666289455 and Build 48 workflow 35670866742 succeeded. Build 48 adds persistent physical caravan journeys: market arrival before atomic trade, actual return, capacity/path checks, threat pause, safe cancellation, market removal, death cargo drop and save/resume without replay. Seven new caravan regressions and all 62 Node tests/subtests pass; JavaScript syntax and diff checks pass. Browser and hardware are not claimed.",
       "next": "Begin T18 neutral settlements and economy."
+    },
+    {
+      "at": "2026-09-22T01:16:00Z",
+      "task": "T18",
+      "result": "awaiting_deploy",
+      "branch": "work/T18-neutral-settlements",
+      "commit": "6abfe8e94a64597b5b211097addebfed9a804852",
+      "notes": "Build 49 adds two persistent neutral settlements with separate faction ownership, people, local stores and markets. Production, meals and demand use living population. Player and neutral logistics/production ownership boundaries are enforced. Seven dedicated regressions and all 69 Node tests pass; syntax and diff checks pass.",
+      "next": "Verify Build 49 Pages deployment. If successful mark T18 done, then begin T19 loyalty, influence and diplomacy."
     }
   ],
   "schema_version": 1,
@@ -603,16 +605,20 @@
       ],
       "blocker": null,
       "branch": "work/T18-neutral-settlements",
-      "commit": null,
+      "commit": "6abfe8e94a64597b5b211097addebfed9a804852",
       "depends_on": [
         "T05",
         "T15"
       ],
-      "evidence": [],
+      "evidence": [
+        "7 T18 neutral-settlement regressions PASS: separate owners/people/stores, population-driven production, meals and demand, authorization boundaries, persistence, and player isolation.",
+        "All 69 Node tests/subtests PASS; JavaScript syntax and git diff checks PASS. Browser and physical hardware not claimed.",
+        "Build 49 merged to main at commit 6abfe8e94a64597b5b211097addebfed9a804852; GitHub Pages deployment not yet confirmed."
+      ],
       "id": "T18",
-      "last_attempt_at": "2026-09-22T01:00:55Z",
+      "last_attempt_at": "2026-09-22T01:16:00Z",
       "remaining": [],
-      "status": "in_progress",
+      "status": "awaiting_deploy",
       "title": "Insediamenti neutrali ed economia"
     },
     {
@@ -772,5 +778,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-22T01:00:55Z"
+  "updated_at": "2026-09-22T01:16:00Z"
 }
