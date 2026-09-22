@@ -3,7 +3,14 @@
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "lease": null,
+  "lease": {
+    "run_id": "run-20260922T010055Z-T18",
+    "task": "T18",
+    "branch": "work/T18-neutral-settlements",
+    "observed_head": "62dcc9dec49ad9aba5ad629fa5ca232813534712",
+    "acquired_at": "2026-09-22T01:00:55Z",
+    "expires_at": "2026-09-22T02:30:55Z"
+  },
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
   "runs": [
@@ -595,7 +602,7 @@
         "Consumi e domanda dipendono da popolazione reale; impedire accesso a inventari non autorizzati."
       ],
       "blocker": null,
-      "branch": null,
+      "branch": "work/T18-neutral-settlements",
       "commit": null,
       "depends_on": [
         "T05",
@@ -603,9 +610,9 @@
       ],
       "evidence": [],
       "id": "T18",
-      "last_attempt_at": null,
+      "last_attempt_at": "2026-09-22T01:00:55Z",
       "remaining": [],
-      "status": "pending",
+      "status": "in_progress",
       "title": "Insediamenti neutrali ed economia"
     },
     {
@@ -765,5 +772,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-22T00:27:00Z"
+  "updated_at": "2026-09-22T01:00:55Z"
 }
