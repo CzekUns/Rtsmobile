@@ -9,8 +9,9 @@
   const itemsValid=items=>items&&typeof items==='object'&&!Array.isArray(items)&&Object.entries(items).every(([k,v])=>materials.has(k)&&Number.isSafeInteger(v)&&v>=0);
 
   function validate(d) {
-    check(d&&d.version===5,'versione');check(d.populationRules===undefined||d.populationRules===1,'regole popolazione');check(d.neutralRules===undefined||d.neutralRules===1,'regole insediamenti neutrali');check(d.politicsRules===undefined||d.politicsRules===1,'regole politiche');check(Number.isInteger(d.seed),'seed');
+    check(d&&d.version===5,'versione');check(d.populationRules===undefined||d.populationRules===1,'regole popolazione');check(d.neutralRules===undefined||d.neutralRules===1,'regole insediamenti neutrali');check(d.politicsRules===undefined||d.politicsRules===1,'regole politiche');check(d.warRules===undefined||d.warRules===1,'regole guerra');check(Number.isInteger(d.seed),'seed');
     for(const key of ['units','buildings','animals','raiders','resources','roads'])check(Array.isArray(d[key]),key);
+    check(d.warCamps===undefined||Array.isArray(d.warCamps),'campi ostili');check(d.gameResult===undefined||d.gameResult===null||['victory','defeat'].includes(d.gameResult),'esito partita');
     const ids=new Set();
     for(const e of [...d.units,...d.buildings,...d.animals,...d.raiders,...d.resources]){
       check(typeof e.id==='string'&&/^[a-zA-Z0-9_-]{1,100}$/.test(e.id)&&!ids.has(e.id),'ID');ids.add(e.id);
@@ -85,6 +86,7 @@
     check(residentIds.every(id=>d.units.some(u=>u.id===id&&u.location.kind==='resident')),'elenco residenti');
     for(const a of d.animals){check(['sheep','wolf'].includes(a.type)&&finite(a.vx)&&finite(a.vy)&&finite(a.wander)&&finite(a.attackCooldown,0),'animale');check(a.penId===undefined||a.penId===null||typeof a.penId==='string'&&d.buildings.some(b=>b.id===a.penId&&b.type==='pen'&&b.animalIds?.includes(a.id)),'recinto animale');}
     for(const r of d.raiders)check(finite(r.speed,0)&&finite(r.repath)&&finite(r.attackCooldown,0)&&Array.isArray(r.path)&&r.path.every(p=>finite(p.x,0,WORLD_SIZE)&&finite(p.y,0,WORLD_SIZE)),'razziatore');
+    for(const c of d.warCamps||[]){check(typeof c.id==='string'&&!ids.has(c.id),'ID campo ostile');ids.add(c.id);check(c.type==='enemy_camp'&&c.owner===-1&&finite(c.x,0,WORLD_SIZE)&&finite(c.y,0,WORLD_SIZE)&&finite(c.health,0)&&finite(c.maxHealth,1),'campo ostile');}
     for(const r of d.resources)check(materials.has(r.type)&&Number.isSafeInteger(r.amount)&&r.amount>=0&&finite(r.max,r.amount),'risorsa');
     // Validate capacity reservations from jobs before any live-world mutation.
     for(const b of d.buildings){
@@ -178,7 +180,7 @@
       }
       for(const b of buildings){b.assigned=b.assigned.filter(id=>units.some(u=>u.id===id&&u.health>0&&(u.task?.type==='farm'&&u.task.target===b.id||u.task?.after?.type==='farm'&&u.task.after.target===b.id)));b.workers=(b.workers||[]).filter(id=>units.some(u=>u.id===id&&u.health>0&&((u.task?.type==='production'||u.task?.type==='livestock')&&u.task.target===b.id)));if(b.type==='pen')b.animalIds=(b.animalIds||[]).filter(id=>animals.some(a=>a.id===id&&a.health>0&&a.owner===0));}
       const clock=Object.fromEntries(['day','month','year','totalDays','nextRaidDay','raidLevel','dayAccumulator'].map(k=>[k,d.clock[k]]));
-      Object.assign(this,{seed:d.seed,world,rng,buildings,units,animals,raiders,gear:d.gear||[],tribalKnowledge:d.tribalKnowledge,...clock,camera:d.camera});
+      Object.assign(this,{seed:d.seed,world,rng,buildings,units,animals,raiders,warCamps:d.warCamps||[],gameResult:d.gameResult||null,gear:d.gear||[],tribalKnowledge:d.tribalKnowledge,...clock,camera:d.camera});
       this.ensureInventories();this.groupSelection=units.filter(u=>u.health>0&&u.location.kind==='world'&&d.selection.includes(u.id));
       this.selected=entities.find(e=>e.id===d.selectedId)||this.groupSelection[0]||units[0]||null;
       for(const u of units)u.selected=this.groupSelection.includes(u);
