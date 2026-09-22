@@ -9,7 +9,8 @@
   const itemsValid=items=>items&&typeof items==='object'&&!Array.isArray(items)&&Object.entries(items).every(([k,v])=>materials.has(k)&&Number.isSafeInteger(v)&&v>=0);
 
   function validate(d) {
-    check(d&&d.version===5,'versione');check(d.populationRules===undefined||d.populationRules===1,'regole popolazione');check(d.neutralRules===undefined||d.neutralRules===1,'regole insediamenti neutrali');check(d.politicsRules===undefined||d.politicsRules===1,'regole politiche');check(d.warRules===undefined||d.warRules===1,'regole guerra');check(Number.isInteger(d.seed),'seed');
+    check(d&&d.version===5,'versione');check(d.populationRules===undefined||d.populationRules===1,'regole popolazione');check(d.neutralRules===undefined||d.neutralRules===1,'regole insediamenti neutrali');check(d.politicsRules===undefined||d.politicsRules===1,'regole politiche');check(d.warRules===undefined||d.warRules===1,'regole guerra');check(d.groupRules===undefined||d.groupRules===1,'regole gruppi');check(Number.isInteger(d.seed),'seed');
+    if(d.savedGroups!==undefined){check(d.savedGroups&&typeof d.savedGroups==='object'&&!Array.isArray(d.savedGroups)&&Object.keys(d.savedGroups).every(k=>['1','2','3'].includes(k)),'gruppi');for(const ids of Object.values(d.savedGroups))check(Array.isArray(ids)&&ids.every(id=>typeof id==='string'),'membri gruppi');}
     for(const key of ['units','buildings','animals','raiders','resources','roads'])check(Array.isArray(d[key]),key);
     check(d.warCamps===undefined||Array.isArray(d.warCamps),'campi ostili');check(d.gameResult===undefined||d.gameResult===null||['victory','defeat'].includes(d.gameResult),'esito partita');
     const ids=new Set();
@@ -180,7 +181,7 @@
       }
       for(const b of buildings){b.assigned=b.assigned.filter(id=>units.some(u=>u.id===id&&u.health>0&&(u.task?.type==='farm'&&u.task.target===b.id||u.task?.after?.type==='farm'&&u.task.after.target===b.id)));b.workers=(b.workers||[]).filter(id=>units.some(u=>u.id===id&&u.health>0&&((u.task?.type==='production'||u.task?.type==='livestock')&&u.task.target===b.id)));if(b.type==='pen')b.animalIds=(b.animalIds||[]).filter(id=>animals.some(a=>a.id===id&&a.health>0&&a.owner===0));}
       const clock=Object.fromEntries(['day','month','year','totalDays','nextRaidDay','raidLevel','dayAccumulator'].map(k=>[k,d.clock[k]]));
-      Object.assign(this,{seed:d.seed,world,rng,buildings,units,animals,raiders,warCamps:d.warCamps||[],gameResult:d.gameResult||null,gear:d.gear||[],tribalKnowledge:d.tribalKnowledge,...clock,camera:d.camera});
+      Object.assign(this,{seed:d.seed,world,rng,buildings,units,animals,raiders,warCamps:d.warCamps||[],gameResult:d.gameResult||null,gear:d.gear||[],tribalKnowledge:d.tribalKnowledge,savedGroups:d.savedGroups||{},...clock,camera:d.camera});
       this.ensureInventories();this.groupSelection=units.filter(u=>u.health>0&&u.location.kind==='world'&&d.selection.includes(u.id));
       this.selected=entities.find(e=>e.id===d.selectedId)||this.groupSelection[0]||units[0]||null;
       for(const u of units)u.selected=this.groupSelection.includes(u);

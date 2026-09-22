@@ -23,7 +23,7 @@
   <main id="app" class="app-shell">
     <header class="hud-top" aria-label="Stato della comunità">
       <div class="identity">
-        <strong>TERRA ITALICA <small style="font-size:8px;opacity:.55;letter-spacing:.08em">BUILD 51</small></strong>
+        <strong>TERRA ITALICA <small style="font-size:8px;opacity:.55;letter-spacing:.08em">BUILD 52</small></strong>
         <span id="sessionState" role="status"></span><span id="dateLabel">1 Marzo · 1000 a.C.</span>
       </div>
       <div class="resources" id="resourceBar">
@@ -45,6 +45,7 @@
       <button id="touchModifier" class="touch-modifier" type="button" aria-label="Tieni premuto per modalità secondaria" aria-pressed="false"><span>MOD</span></button>
       <div id="message" class="message" role="status"></div>
       <div id="selectionCard" class="selection-card hidden"></div>
+      <canvas id="minimap" class="minimap" width="160" height="112" aria-label="Minimappa navigabile"></canvas>
       <div id="gameOver" class="game-over hidden">
         <div>
           <small id="gameResultEyebrow">FINE DELLA COMUNITÀ</small>
@@ -93,6 +94,11 @@
         <button id="logisticsBtn" type="button"><b>Filiera</b><span>inventari e trasporti</span></button>
         <button id="tradeBtn" type="button"><b>Scambia</b><span>mercato e carico locale</span></button>
         <button id="politicsBtn" type="button"><b>Diplomazia</b><span>lealtà, resistenza e influenza</span></button>
+        <button id="idleNextBtn" type="button"><b>Prossimo libero</b><span>seleziona e centra</span></button>
+        <button id="idleAllBtn" type="button"><b>Tutti liberi</b><span>selezione multipla</span></button>
+        <button id="group1Btn" type="button"><b>Gruppo 1</b><span>tieni premuto per salvare</span></button>
+        <button id="group2Btn" type="button"><b>Gruppo 2</b><span>tieni premuto per salvare</span></button>
+        <button id="group3Btn" type="button"><b>Gruppo 3</b><span>tieni premuto per salvare</span></button>
         <button id="saveBtn" type="button"><b>Salva</b><span>locale sul dispositivo</span></button>
         <button id="loadBtn" type="button"><b>Carica</b><span>ultimo salvataggio</span></button>
         <button id="newWorldBtn" type="button"><b>Nuovo mondo</b><span>genera nuova mappa</span></button>
@@ -191,6 +197,7 @@
   <script src="./neutral.js?v=49"></script>
   <script src="./politics.js?v=50"></script>
   <script src="./war.js?v=51"></script>
+  <script src="./groups-minimap.js?v=52"></script>
   <script src="./community.js?v=39"></script>
   <script src="./population.js?v=39"></script>
   <script src="./equipment.js?v=39"></script>
