@@ -3,14 +3,7 @@
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "lease": {
-    "run_id": "run-20260922T055812Z-T24",
-    "task": "T24",
-    "branch": "work/T24-ui-qa",
-    "observed_head": "a949022a6acbd1f1ddc71c4f11fa510553705e7b",
-    "acquired_at": "2026-09-22T06:01:00Z",
-    "expires_at": "2026-09-22T07:31:00Z"
-  },
+  "lease": null,
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
   "runs": [
@@ -318,6 +311,15 @@
       "commit": "e5a906389bf53d29a386f35267768506e836687a",
       "notes": "Build 54 inventories the approved Drive folders and integrates only the verified native RGBA windmill and selection marker. Oversized overview-scale images were excluded; procedural P16 terrain remains unchanged. Four dedicated tests and all 102 Node tests pass. Live Pages returned Build 54; expired lease recovered and released.",
       "next": "T24 real-browser phone/tablet UI validation across portrait and landscape."
+    },
+    {
+      "at": "2026-09-22T06:23:00Z",
+      "task": "T24",
+      "result": "blocked_external",
+      "branch": "work/T24-ui-qa",
+      "commit": "3d1d4346bff4678d5a270e0c8d5d23b2f109db16",
+      "notes": "BUILD 56 fixed a severe streamed-renderer fallback storm and completed the responsive Diplomacy layout. All 105 Node tests pass; live Pages and real Chrome 1363x936 verify panels, overflow and an error-free app console. Fixed browser viewport and browser security policy prevent the required phone/tablet/short-landscape screenshot matrix; no physical hardware is attached. Lease released.",
+      "next": "Provide an attached phone/tablet or an approved responsive browser/emulator surface to finish T24. T25 remains dependent and then requires physical hardware measurements; no independent task remains."
     }
   ],
   "schema_version": 1,
@@ -859,9 +861,9 @@
         "Verificare orientazioni, safe area, testo, pannelli, tap sovrapposti e flusso intero senza mouse/tastiera.",
         "Registrare screenshot e risultati da browser reale/emulazione distinguendoli dai test su dispositivo fisico."
       ],
-      "blocker": null,
-      "branch": null,
-      "commit": null,
+      "blocker": "The available real Chrome session has a fixed 1363x936 viewport. Its security policy rejected a data-URL responsive wrapper, and no phone/tablet emulator or physical device is attached; required portrait/tablet/short-landscape screenshots and touch-only flow cannot be truthfully recorded.",
+      "branch": "work/T24-ui-qa",
+      "commit": "3d1d4346bff4678d5a270e0c8d5d23b2f109db16",
       "depends_on": [
         "T01",
         "T17",
@@ -869,11 +871,19 @@
         "T21",
         "T23"
       ],
-      "evidence": [],
+      "evidence": [
+        "BUILD 54 live-browser inspection exposed a streamed-rendering fallback storm; BUILD 55 fixed the ambiguous else binding and added a draw-budget regression test.",
+        "BUILD 56 gives Diplomacy the bounded, scrollable, 44px-target responsive dialog layout used by the other management panels.",
+        "Real Chrome on live BUILD 56 at 1363x936: full page responsive, no document overflow, Character/Skill/Logistics/Trade/Diplomacy dialogs remained inside the viewport with no horizontal overflow, and app-origin console errors were empty.",
+        "All 105 Node tests/subtests PASS, including renderer budget, safe-area, viewport-bounded dialogs and phone-column diplomacy checks. Live GitHub Pages returned BUILD 56. This is browser evidence, not physical hardware evidence."
+      ],
       "id": "T24",
-      "last_attempt_at": null,
-      "remaining": [],
-      "status": "pending",
+      "last_attempt_at": "2026-09-22T06:23:00Z",
+      "remaining": [
+        "Capture and inspect the live game at phone portrait, tablet portrait and short landscape viewports.",
+        "Run the complete flow with touch input only and record the required screenshots."
+      ],
+      "status": "blocked_external",
       "title": "Collaudo UI telefono e tablet"
     },
     {
@@ -916,5 +926,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-22T06:01:00Z"
+  "updated_at": "2026-09-22T06:23:00Z"
 }
