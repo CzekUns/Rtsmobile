@@ -3,7 +3,14 @@
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "lease": null,
+  "lease": {
+    "run_id": "run-20260922T020848Z-T20",
+    "task": "T20",
+    "branch": "work/T20-war-endgame",
+    "observed_head": "17ea70dfc9c9a5b27af8fc1fcdfa87488a99c330",
+    "acquired_at": "2026-09-22T02:10:00Z",
+    "expires_at": "2026-09-22T03:40:00Z"
+  },
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
   "runs": [
@@ -232,6 +239,14 @@
       "commit": "ae139166ccad83644958679fc7a4291b5f08eff5",
       "notes": "Live GitHub Pages returned Build 50. T19 acceptance completed; browser gameplay and physical hardware remain unclaimed.",
       "next": "T20 hostile camps, raiders, victory and defeat accounting."
+    },
+    {
+      "at": "2026-09-22T02:10:00Z",
+      "task": "T20",
+      "result": "in_progress",
+      "branch": "work/T20-war-endgame",
+      "notes": "Acquired T20 lease on Build 50 main.",
+      "next": "Implement persistent hostile camps and ownership-correct victory/defeat with saved terminal state."
     }
   ],
   "schema_version": 1,
@@ -677,7 +692,7 @@
         "Sconfitta conteggia persone residenti/mobilitate correttamente e depositi; fine partita arresta simulazione e si salva."
       ],
       "blocker": null,
-      "branch": null,
+      "branch": "work/T20-war-endgame",
       "commit": null,
       "depends_on": [
         "T11",
@@ -685,9 +700,9 @@
       ],
       "evidence": [],
       "id": "T20",
-      "last_attempt_at": null,
+      "last_attempt_at": "2026-09-22T02:10:00Z",
       "remaining": [],
-      "status": "pending",
+      "status": "in_progress",
       "title": "Obiettivi militari e fine partita"
     },
     {
@@ -810,5 +825,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-22T02:09:00Z"
+  "updated_at": "2026-09-22T02:10:00Z"
 }
