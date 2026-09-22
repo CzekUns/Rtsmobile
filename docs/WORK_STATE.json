@@ -3,14 +3,7 @@
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "lease": {
-    "run_id": "run-20260922T021944Z-T21",
-    "task": "T21",
-    "branch": "work/T21-groups-minimap",
-    "observed_head": "9dad7920884a52f7e2706e7b9080d6146bee00da",
-    "acquired_at": "2026-09-22T02:20:00Z",
-    "expires_at": "2026-09-22T03:50:00Z"
-  },
+  "lease": null,
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
   "runs": [
@@ -273,6 +266,15 @@
       "branch": "work/T21-groups-minimap",
       "notes": "Acquired T21 lease on deployed Build 51 main.",
       "next": "Implement persistent ID groups, touch idle selection and navigable minimap with gesture guards."
+    },
+    {
+      "at": "2026-09-22T02:32:00Z",
+      "task": "T21",
+      "result": "awaiting_deploy",
+      "branch": "work/T21-groups-minimap",
+      "commit": "8e2c69a9e0ab588a4cfd04d300eb6534fd45b31a",
+      "notes": "Build 52 adds three persistent ID-based control groups, next/all idle touch selection and a synthetic navigable minimap. Group recall, double-recall camera centering and minimap gestures preserve selection/order boundaries. Eight dedicated regressions and all 91 Node tests pass; syntax and diff checks pass. Lease released.",
+      "next": "Verify Build 52 Pages deployment; if successful mark T21 done and begin T22 streaming and simulation budgets."
     }
   ],
   "schema_version": 1,
@@ -743,15 +745,19 @@
       ],
       "blocker": null,
       "branch": "work/T21-groups-minimap",
-      "commit": null,
+      "commit": "8e2c69a9e0ab588a4cfd04d300eb6534fd45b31a",
       "depends_on": [
         "T04"
       ],
-      "evidence": [],
+      "evidence": [
+        "8 T21 regressions PASS: unique owned group IDs, recall/pruning, double-recall camera, idle selection, persistence, bounded minimap navigation and order isolation.",
+        "All 91 Node tests/subtests PASS; JavaScript syntax and git diff checks PASS. Browser and physical hardware not claimed.",
+        "Build 52 merged to main at commit 8e2c69a9e0ab588a4cfd04d300eb6534fd45b31a; GitHub Pages deployment not yet confirmed."
+      ],
       "id": "T21",
-      "last_attempt_at": "2026-09-22T02:20:00Z",
+      "last_attempt_at": "2026-09-22T02:32:00Z",
       "remaining": [],
-      "status": "in_progress",
+      "status": "awaiting_deploy",
       "title": "Gruppi, inattivi e minimappa"
     },
     {
@@ -856,5 +862,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-22T02:20:00Z"
+  "updated_at": "2026-09-22T02:32:00Z"
 }
