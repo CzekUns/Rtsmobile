@@ -3,7 +3,14 @@
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "lease": null,
+  "lease": {
+    "run_id": "run-20260922T025834Z-T22",
+    "task": "T22",
+    "branch": "work/T22-streaming",
+    "observed_head": "858fd314c891b0e4a6919afe8c8fc230352f9b40",
+    "acquired_at": "2026-09-22T02:59:00Z",
+    "expires_at": "2026-09-22T04:29:00Z"
+  },
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
   "runs": [
@@ -872,5 +879,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-22T02:34:00Z"
+  "updated_at": "2026-09-22T02:59:00Z"
 }
