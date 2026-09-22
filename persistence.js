@@ -9,7 +9,8 @@
   const itemsValid=items=>items&&typeof items==='object'&&!Array.isArray(items)&&Object.entries(items).every(([k,v])=>materials.has(k)&&Number.isSafeInteger(v)&&v>=0);
 
   function validate(d) {
-    check(d&&d.version===5,'versione');check(d.populationRules===undefined||d.populationRules===1,'regole popolazione');check(d.neutralRules===undefined||d.neutralRules===1,'regole insediamenti neutrali');check(d.politicsRules===undefined||d.politicsRules===1,'regole politiche');check(d.warRules===undefined||d.warRules===1,'regole guerra');check(d.groupRules===undefined||d.groupRules===1,'regole gruppi');check(Number.isInteger(d.seed),'seed');
+    check(d&&d.version===5,'versione');check(d.populationRules===undefined||d.populationRules===1,'regole popolazione');check(d.neutralRules===undefined||d.neutralRules===1,'regole insediamenti neutrali');check(d.politicsRules===undefined||d.politicsRules===1,'regole politiche');check(d.warRules===undefined||d.warRules===1,'regole guerra');check(d.groupRules===undefined||d.groupRules===1,'regole gruppi');check(d.streamingRules===undefined||d.streamingRules===1,'regole streaming');check(Number.isInteger(d.seed),'seed');
+    if(d.streaming!==undefined)check(d.streaming&&d.streaming.chunkSize===8&&d.streaming.maxCached===20,'configurazione streaming');
     if(d.savedGroups!==undefined){check(d.savedGroups&&typeof d.savedGroups==='object'&&!Array.isArray(d.savedGroups)&&Object.keys(d.savedGroups).every(k=>['1','2','3'].includes(k)),'gruppi');for(const ids of Object.values(d.savedGroups))check(Array.isArray(ids)&&ids.every(id=>typeof id==='string'),'membri gruppi');}
     for(const key of ['units','buildings','animals','raiders','resources','roads'])check(Array.isArray(d[key]),key);
     check(d.warCamps===undefined||Array.isArray(d.warCamps),'campi ostili');check(d.gameResult===undefined||d.gameResult===null||['victory','defeat'].includes(d.gameResult),'esito partita');
