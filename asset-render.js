@@ -25,7 +25,9 @@
     farm: load('./assets/p16/buildings/building_farm_p16.png?v=24'),
     warehouse: load('./assets/p16/buildings/building_warehouse_p16.png?v=24'),
     tower: load('./assets/p16/buildings/building_tower_p16.png?v=24'),
-    palisade: load('./assets/p16/buildings/building_palisade_p16.png?v=24')
+    palisade: load('./assets/p16/buildings/building_palisade_p16.png?v=24'),
+    mill: load('./assets/p16/buildings/building_mill_p16.png?v=54'),
+    selection: load('./assets/p16/ui/ui_selection_marker_p16.png?v=54')
   };
 
   window.TERRA_P16_SPRITES = SPRITES;
@@ -87,6 +89,12 @@
   const oldDrawHuman = Game.prototype.drawHuman;
   const oldDrawAnimal = Game.prototype.drawAnimal;
   const oldDrawBuilding = Game.prototype.drawBuilding;
+  const oldSelectionRing = Game.prototype.selectionRing;
+
+  Game.prototype.selectionRing = function(x, y, r) {
+    const img = SPRITES.selection;
+    if (!drawCentered(this.ctx, img, x, y, r * 2, r * 2)) oldSelectionRing.call(this, x, y, r);
+  };
 
   Game.prototype.drawResource = function(r) {
     const p = this.worldToScreen(r.x * TILE, r.y * TILE);
@@ -153,6 +161,7 @@
       warehouse: [68, 62],
       tower: [42, 78],
       palisade: [54, 20]
+      ,mill: [64, 76]
     }[b.type];
 
     if (!dims) return oldDrawBuilding.call(this, b);
