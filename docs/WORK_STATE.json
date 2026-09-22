@@ -1,5 +1,5 @@
 {
-  "active_task": "T17",
+  "active_task": "T18",
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
@@ -28,7 +28,7 @@
       "commit": "2f3c15a249c7cccaf69eaae6e9dea679f8696817",
       "next": "Publish Build 34, verify Pages, then mark T03 done and begin T04 community panel.",
       "notes": "Confirmed Build 33 Pages deployment success. Implemented resident entry/exit, capacity, persistent identity/cargo, destroyed-district evacuation and blocked-exit handling with v5 save migration.",
-      "result": "awaiting_deploy",
+      "result": "done",
       "task": "T02/T03",
       "workflow": 35219603988
     },
@@ -195,8 +195,8 @@
       "result": "awaiting_deploy",
       "branch": "work/T17-physical-caravans",
       "commit": "cc5a29c68a9571011ab3949992c6bf7e42838920",
-      "notes": "Confirmed Build 47 Pages workflow 35666289455 success. Build 48 adds persistent physical caravan journeys: market arrival before atomic trade, actual return, capacity/path checks, threat pause, safe cancellation, market removal, death cargo drop and save/resume without replay. Seven new caravan regressions and all 62 Node tests/subtests pass; JavaScript syntax and diff checks pass. Browser and hardware are not claimed.",
-      "next": "Verify Build 48 Pages deployment; if successful mark T17 done and begin T18 neutral settlements and economy."
+      "notes": "Confirmed Build 47 Pages workflow 35666289455 and Build 48 workflow 35670866742 succeeded. Build 48 adds persistent physical caravan journeys: market arrival before atomic trade, actual return, capacity/path checks, threat pause, safe cancellation, market removal, death cargo drop and save/resume without replay. Seven new caravan regressions and all 62 Node tests/subtests pass; JavaScript syntax and diff checks pass. Browser and hardware are not claimed.",
+      "next": "Begin T18 neutral settlements and economy."
     }
   ],
   "schema_version": 1,
@@ -580,14 +580,13 @@
       ],
       "evidence": [
         "7 T17 caravan regressions PASS: physical market/return journey, preflight capacity and route, stop, threat pause/resume, removed market, death cargo recovery, save/resume and idempotent receipt.",
-        "All 62 Node tests/subtests PASS; JavaScript syntax and git diff checks PASS. Browser and physical hardware not claimed."
+        "All 62 Node tests/subtests PASS; JavaScript syntax and git diff checks PASS. Browser and physical hardware not claimed.",
+        "GitHub Pages workflow 35670866742 completed successfully for Build 48 commit cc5a29c68a9571011ab3949992c6bf7e42838920."
       ],
       "id": "T17",
       "last_attempt_at": "2026-09-22T00:03:00Z",
-      "remaining": [
-        "Verify Build 48 GitHub Pages deployment before marking done."
-      ],
-      "status": "awaiting_deploy",
+      "remaining": [],
+      "status": "done",
       "title": "Carovane e rotte fisiche"
     },
     {
@@ -766,5 +765,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-22T00:25:00Z"
+  "updated_at": "2026-09-22T00:27:00Z"
 }
