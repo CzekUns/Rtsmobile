@@ -1,5 +1,5 @@
 {
-  "active_task": "T19",
+  "active_task": "T20",
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
@@ -223,6 +223,15 @@
       "commit": "ae139166ccad83644958679fc7a4291b5f08eff5",
       "notes": "Build 50 adds visible loyalty, resistance, influence and exclusive diplomatic states. Idempotent gifts/pressure affect relations; friendly/allied prices improve and hostile markets refuse trade. IDs, ownership and goods remain unchanged through transitions. Seven new tests and all 76 Node tests pass.",
       "next": "Verify Build 50 Pages deployment; if successful mark T19 done. T20 military objectives is independently eligible from T18 and may proceed after fresh lease."
+    },
+    {
+      "at": "2026-09-22T02:09:00Z",
+      "task": "T19",
+      "result": "done",
+      "branch": "work/T19-politics",
+      "commit": "ae139166ccad83644958679fc7a4291b5f08eff5",
+      "notes": "Live GitHub Pages returned Build 50. T19 acceptance completed; browser gameplay and physical hardware remain unclaimed.",
+      "next": "T20 hostile camps, raiders, victory and defeat accounting."
     }
   ],
   "schema_version": 1,
@@ -653,12 +662,13 @@
       "evidence": [
         "7 T19 politics regressions PASS: values/relations, gift cost and influence, idempotency, shortage/hostility, price/access effects, ownership-safe transitions and persistence/legacy defaults.",
         "All 76 Node tests/subtests PASS; JavaScript syntax and git diff checks PASS. Browser and physical hardware not claimed.",
-        "Build 50 merged to main at commit ae139166ccad83644958679fc7a4291b5f08eff5; GitHub Pages deployment not yet confirmed."
+        "Build 50 merged to main at commit ae139166ccad83644958679fc7a4291b5f08eff5; GitHub Pages deployment not yet confirmed.",
+        "GitHub Pages live site returned BUILD 50 on 2026-09-22T02:09:00Z."
       ],
       "id": "T19",
       "last_attempt_at": "2026-09-22T02:08:00Z",
       "remaining": [],
-      "status": "awaiting_deploy",
+      "status": "done",
       "title": "Lealtà, influenza e diplomazia"
     },
     {
@@ -800,5 +810,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-22T02:08:00Z"
+  "updated_at": "2026-09-22T02:09:00Z"
 }
