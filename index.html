@@ -23,7 +23,7 @@
   <main id="app" class="app-shell">
     <header class="hud-top" aria-label="Stato della comunità">
       <div class="identity">
-        <strong>TERRA ITALICA <small style="font-size:8px;opacity:.55;letter-spacing:.08em">BUILD 49</small></strong>
+        <strong>TERRA ITALICA <small style="font-size:8px;opacity:.55;letter-spacing:.08em">BUILD 50</small></strong>
         <span id="sessionState" role="status"></span><span id="dateLabel">1 Marzo · 1000 a.C.</span>
       </div>
       <div class="resources" id="resourceBar">
@@ -92,6 +92,7 @@
         <button id="knowledgeBtn" type="button"><b>Saperi</b><span>personali e tribali</span></button>
         <button id="logisticsBtn" type="button"><b>Filiera</b><span>inventari e trasporti</span></button>
         <button id="tradeBtn" type="button"><b>Scambia</b><span>mercato e carico locale</span></button>
+        <button id="politicsBtn" type="button"><b>Diplomazia</b><span>lealtà, resistenza e influenza</span></button>
         <button id="saveBtn" type="button"><b>Salva</b><span>locale sul dispositivo</span></button>
         <button id="loadBtn" type="button"><b>Carica</b><span>ultimo salvataggio</span></button>
         <button id="newWorldBtn" type="button"><b>Nuovo mondo</b><span>genera nuova mappa</span></button>
@@ -112,6 +113,11 @@
       <div class="character-actions"><button id="characterEquip" type="button">Equipaggia</button><button id="characterRemove" type="button">Metti in borsa</button></div>
       <label>Rastrelliera locale <select id="characterRacks"></select></label><button id="characterStore" type="button">Deposita oggetto</button>
     </div><p id="characterStatus" role="status"></p>
+  </dialog>
+  <dialog id="politicsDialog" aria-labelledby="politicsTitle">
+    <header><h2 id="politicsTitle">Diplomazia</h2><button id="closePolitics" type="button">Chiudi</button></header>
+    <p>La partita è in pausa. Le relazioni modificano prezzi e accesso ai mercati, senza trasferire automaticamente persone o scorte.</p>
+    <div id="politicsList"></div><p id="politicsRules"></p><p id="politicsStatus" role="status"></p>
   </dialog>
   <dialog id="skillsDialog" aria-labelledby="skillsTitle">
     <header><h2 id="skillsTitle">Skill</h2><button id="closeSkills" type="button">Chiudi</button></header>
@@ -183,6 +189,7 @@
   <script src="./livestock.js?v=45"></script>
   <script src="./persistence.js?v=49"></script>
   <script src="./neutral.js?v=49"></script>
+  <script src="./politics.js?v=50"></script>
   <script src="./community.js?v=39"></script>
   <script src="./population.js?v=39"></script>
   <script src="./equipment.js?v=39"></script>

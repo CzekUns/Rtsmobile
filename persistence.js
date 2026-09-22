@@ -9,7 +9,7 @@
   const itemsValid=items=>items&&typeof items==='object'&&!Array.isArray(items)&&Object.entries(items).every(([k,v])=>materials.has(k)&&Number.isSafeInteger(v)&&v>=0);
 
   function validate(d) {
-    check(d&&d.version===5,'versione');check(d.populationRules===undefined||d.populationRules===1,'regole popolazione');check(d.neutralRules===undefined||d.neutralRules===1,'regole insediamenti neutrali');check(Number.isInteger(d.seed),'seed');
+    check(d&&d.version===5,'versione');check(d.populationRules===undefined||d.populationRules===1,'regole popolazione');check(d.neutralRules===undefined||d.neutralRules===1,'regole insediamenti neutrali');check(d.politicsRules===undefined||d.politicsRules===1,'regole politiche');check(Number.isInteger(d.seed),'seed');
     for(const key of ['units','buildings','animals','raiders','resources','roads'])check(Array.isArray(d[key]),key);
     const ids=new Set();
     for(const e of [...d.units,...d.buildings,...d.animals,...d.raiders,...d.resources]){
@@ -32,6 +32,7 @@
       check(b.repairMaterialDebt===undefined||finite(b.repairMaterialDebt,0,1),'debito riparazione');
       if(b.type==='farm')check(b.crop===undefined||b.crop==='Grano'||typeof b.crop==='string'&&Object.hasOwn(window.TERRA_CROPS,b.crop),'coltura');
       if(b.type==='market'){check(Number.isSafeInteger(b.money)&&b.money>=0,'liquidità mercato');check(b.demand&&Object.keys(window.TERRA_GOODS).every(k=>finite(b.demand[k],.1,10)),'domanda mercato');check(Array.isArray(b.tradeLedger)&&b.tradeLedger.length<=50&&b.tradeLedger.every(x=>x&&typeof x.id==='string'&&x.ok===true&&['buy','sell'].includes(x.side)&&materials.has(x.good)&&Number.isSafeInteger(x.quantity)&&x.quantity>0&&Number.isSafeInteger(x.unitPrice)&&x.unitPrice>0&&x.total===x.quantity*x.unitPrice),'registro mercato');}
+      if(b.owner>0&&b.type==='base'&&d.politicsRules===1){check(finite(b.loyalty,0,100)&&finite(b.resistance,0,100)&&finite(b.playerInfluence,0,100),'valori politici');check(['neutral','friendly','allied','hostile'].includes(b.relationship),'relazione politica');check(Array.isArray(b.diplomacyLedger)&&b.diplomacyLedger.length<=40,'registro politico');}
       if(b.batch){const recipe=window.TERRA_RECIPES[b.type]?.find(r=>r.id===b.batch.recipeId)||window.TERRA_RECIPES[b.type]?.find(r=>b.batch.input===Object.keys(r.inputs)[0]&&b.batch.output===Object.keys(r.outputs)[0]);const inputs=b.batch.inputs||{[b.batch.input]:b.batch.amount},outputs=b.batch.outputs||{[b.batch.output]:b.batch.amount};check(recipe&&Object.entries(recipe.inputs).every(([k,n])=>inputs[k]===n)&&Object.entries(recipe.outputs).every(([k,n])=>outputs[k]===n)&&finite(b.batch.remaining,0,recipe.seconds),'ricetta');}
     }
     for(const u of d.units){
