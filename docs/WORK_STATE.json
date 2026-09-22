@@ -1,5 +1,5 @@
 {
-  "active_task": "T22",
+  "active_task": "T23",
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
@@ -293,6 +293,15 @@
       "commit": "ca4e7574a0fdb1a699eaf1b1c2ea40e2e75a2bf4",
       "notes": "Build 53 adds bounded LRU terrain chunks, view-limited rendering, pinned work-target chunks and a configurable measured pathfinding expansion budget. Offscreen simulation remains authoritative; consumed resource amounts and active tasks persist. Seven dedicated tests and all 98 Node tests pass. Lease released.",
       "next": "Verify Build 53 Pages deployment; if successful mark T22 done. T23 asset integration is independently eligible."
+    },
+    {
+      "at": "2026-09-22T03:10:00Z",
+      "task": "T22",
+      "result": "done",
+      "branch": "work/T22-streaming",
+      "commit": "ca4e7574a0fdb1a699eaf1b1c2ea40e2e75a2bf4",
+      "notes": "Live GitHub Pages returned Build 53. T22 acceptance complete; browser gameplay and physical hardware remain unclaimed.",
+      "next": "T23 inventory and integrate approved P16 assets from the designated Drive folder."
     }
   ],
   "schema_version": 1,
@@ -795,12 +804,13 @@
       "evidence": [
         "7 T22 regressions PASS: deterministic chunks, strict 20-chunk LRU, target pinning, path expansion budget, offscreen work, consumed-resource persistence and task snapshot round trip.",
         "All 98 Node tests/subtests PASS; JavaScript syntax and git diff checks PASS. Browser and physical hardware not claimed.",
-        "Build 53 merged to main at commit ca4e7574a0fdb1a699eaf1b1c2ea40e2e75a2bf4; GitHub Pages deployment not yet confirmed."
+        "Build 53 merged to main at commit ca4e7574a0fdb1a699eaf1b1c2ea40e2e75a2bf4; GitHub Pages deployment not yet confirmed.",
+        "GitHub Pages live site returned BUILD 53 on 2026-09-22T03:10:00Z."
       ],
       "id": "T22",
       "last_attempt_at": "2026-09-22T03:08:00Z",
       "remaining": [],
-      "status": "awaiting_deploy",
+      "status": "done",
       "title": "Streaming del mondo e budget simulazione"
     },
     {
@@ -885,5 +895,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-22T03:08:00Z"
+  "updated_at": "2026-09-22T03:10:00Z"
 }
