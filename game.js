@@ -186,8 +186,15 @@ class Game{
   unitStatus(u){return({idle:'libero',moving:'in cammino',gathering:'raccolta',building:'costruzione',farming:'campo',taming:'domesticazione',combat:'combattimento'})[u.state]||u.state}
   selectionHTML(e){if(e instanceof Unit)return`<h3>${e.name}</h3><p>${e.location.kind==='resident'?'residente':this.unitStatus(e)} · forza ${e.strength} · intelligenza ${e.intelligence}<br>abilità: agricoltura ${e.skills.farming}, costruzione ${e.skills.construction}, combattimento ${e.skills.combat}</p><div class="bar"><i style="width:${e.health/e.maxHealth*100}%"></i></div>`;if(e instanceof ResourceNode)return`<h3>${this.resourceName(e.type)}</h3><p>Risorsa naturale · ${Math.max(0,e.amount)} unità residue.</p>`;if(e instanceof Building)return`<h3>${BUILD_LABEL[e.type]}</h3><p>${e.built?'operativo':`cantiere ${Math.round(e.progress*100)}%`}${e.type==='farm'?` · crescita ${Math.round(e.growth*100)}% · lavoratori ${e.assigned.length}`:e.type==='house'?` · residenti ${e.residents.length}/5`:''}</p>${e.type==='house'&&e.owner===0?e.residents.map(id=>{const u=this.findById(this.units,id);return u?`<button type="button" data-release="${u.id}">Fai uscire ${u.name}</button>`:''}).join(''):''}<div class="bar"><i style="width:${Math.max(0,e.health/e.maxHealth*100)}%"></i></div>`;if(e instanceof Animal)return`<h3>${e.type==='wolf'?'Lupo':'Pecora'}${e.owner===0?' domestica':''}</h3><p>${e.owner===0?'appartiene alla comunità':'fauna selvatica'} · salute ${Math.ceil(e.health)}</p>`;if(e instanceof Raider)return`<h3>Razziatore</h3><p>Minaccia ostile · salute ${Math.ceil(e.health)}</p><div class="bar"><i style="width:${e.health/e.maxHealth*100}%;background:#a94c43"></i></div>`;return''}
   draw(){const ctx=this.ctx,w=this.viewW,h=this.viewH,zoom=this.camera.zoom,ts=TILE*zoom;ctx.save();ctx.setTransform(this.dpr,0,0,this.dpr,0,0);ctx.fillStyle='#30392b';ctx.fillRect(0,0,w,h);const min=this.screenToWorld(0,0),max=this.screenToWorld(w,h),x0=clamp(Math.floor(min.x/TILE)-1,0,this.world.size-1),x1=clamp(Math.ceil(max.x/TILE)+1,0,this.world.size-1),y0=clamp(Math.floor(min.y/TILE)-1,0,this.world.size-1),y1=clamp(Math.ceil(max.y/TILE)+1,0,this.world.size-1);
-    if(this.world.chunkCache)for(const chunk of this.world.chunkCache.values())for(const tile of chunk.tiles)if(tile.x>=x0&&tile.x<=x1&&tile.y>=y0&&tile.y<=y1)this.drawTile(tile.x,tile.y,ts);
-    else for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)this.drawTile(x,y,ts);
+    if(this.world.chunkCache){
+      for(const chunk of this.world.chunkCache.values()){
+        for(const tile of chunk.tiles){
+          if(tile.x>=x0&&tile.x<=x1&&tile.y>=y0&&tile.y<=y1)this.drawTile(tile.x,tile.y,ts);
+        }
+      }
+    }else{
+      for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)this.drawTile(x,y,ts);
+    }
     for(const r of this.world.resources)if(r.amount>0&&r.x>=x0-1&&r.x<=x1+1&&r.y>=y0-1&&r.y<=y1+1)this.drawResource(r);
     const visible=e=>e.x>=x0-2&&e.x<=x1+2&&e.y>=y0-2&&e.y<=y1+2;
     for(const b of this.buildings)if(b.alive&&visible(b))this.drawBuilding(b);

@@ -12,6 +12,18 @@ test('camera traversal retains a strict bounded LRU cache',()=>{
   assert(g.world.chunkCache.size<=20);assert.equal(g.world.chunkCache.has('0,0'),false);assert.equal(g.world.chunkCache.has('10,10'),true);
 });
 
+test('renderer draws visible cached tiles once without an offscreen fallback storm',()=>{
+  const {g}=make();
+  for(let y=0;y<4;y++)for(let x=0;x<5;x++)g.world.loadChunk(x+6,y+6);
+  g.world.loadChunk(Math.floor(g.camera.x/30/8),Math.floor(g.camera.y/30/8));
+  let draws=0;g.drawTile=()=>{draws++};g.drawResource=()=>{};g.drawBuilding=()=>{};g.drawAnimal=()=>{};g.drawHuman=()=>{};
+  g.draw();
+  const min=g.screenToWorld(0,0),max=g.screenToWorld(g.viewW,g.viewH);
+  const visibleArea=(Math.ceil(max.x/30)-Math.floor(min.x/30)+3)*(Math.ceil(max.y/30)-Math.floor(min.y/30)+3);
+  assert(draws>0,'at least one visible cached tile should render');
+  assert(draws<=visibleArea,`visible render budget exceeded: ${draws} > ${visibleArea}`);
+});
+
 test('active work target chunk is retained while ordinary old chunks leave',()=>{
   const {g}=make(),u=g.units[0],r=g.world.resources.at(-1);u.task={type:'gather',target:r.id};g.world.chunkCache.clear();g.refreshStreaming();
   assert(g.world.chunkCache.has(`${Math.floor(r.x/8)},${Math.floor(r.y/8)}`));assert(g.world.chunkCache.size<=20);
