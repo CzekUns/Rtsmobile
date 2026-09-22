@@ -1,5 +1,5 @@
 {
-  "active_task": "T20",
+  "active_task": "T21",
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
@@ -249,6 +249,15 @@
       "commit": "025bd1a878fc8376d672354133aadabe9ae462c5",
       "notes": "Build 51 adds three persistent hostile camps and camp-origin raids. Victory requires no living camp and no living raider. Defeat counts only living player people in any location and player deposits; neutral entities cannot mask defeat. Terminal outcome pauses and saves.",
       "next": "Verify Build 51 Pages; if successful mark T20 done, then begin T21 groups, idle selection and minimap."
+    },
+    {
+      "at": "2026-09-22T02:16:00Z",
+      "task": "T20",
+      "result": "done",
+      "branch": "work/T20-war-endgame",
+      "commit": "025bd1a878fc8376d672354133aadabe9ae462c5",
+      "notes": "Live GitHub Pages returned Build 51. T20 acceptance complete; browser gameplay and physical hardware remain unclaimed.",
+      "next": "T21 persistent groups, idle selection and navigable minimap."
     }
   ],
   "schema_version": 1,
@@ -703,12 +712,13 @@
       "evidence": [
         "7 T20 war/endgame regressions PASS: persistent camps, camp-origin raids, strict victory, resident/mobilized defeat accounting, neutral exclusion, paused saved terminal state and reload.",
         "All 83 Node tests/subtests PASS; JavaScript syntax and git diff checks PASS. Browser and physical hardware not claimed.",
-        "Build 51 merged to main at commit 025bd1a878fc8376d672354133aadabe9ae462c5; GitHub Pages deployment not yet confirmed."
+        "Build 51 merged to main at commit 025bd1a878fc8376d672354133aadabe9ae462c5; GitHub Pages deployment not yet confirmed.",
+        "GitHub Pages live site returned BUILD 51 on 2026-09-22T02:16:00Z."
       ],
       "id": "T20",
       "last_attempt_at": "2026-09-22T02:15:00Z",
       "remaining": [],
-      "status": "awaiting_deploy",
+      "status": "done",
       "title": "Obiettivi militari e fine partita"
     },
     {
@@ -831,5 +841,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-22T02:15:00Z"
+  "updated_at": "2026-09-22T02:16:00Z"
 }
