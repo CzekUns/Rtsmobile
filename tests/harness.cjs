@@ -2,7 +2,7 @@ const {readFileSync}=require('node:fs');
 const vm=require('node:vm');
 const assert=require('node:assert/strict');
 const path=require('node:path');
-module.exports=function createGame(initialStorage=[]){
+module.exports=function createGame(initialStorage=[],options={}){
 const root=path.join(__dirname,'..');
 const html=readFileSync(path.join(root,'index.html'),'utf8');
 const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
@@ -15,7 +15,7 @@ const orders=[...html.matchAll(/data-order="([^"]+)"/g)].map(m=>node({order:m[1]
 const builds=[...html.matchAll(/data-build="([^"]+)"/g)].map(m=>node({build:m[1]}));
 const lists={'.dock-tab':tabs,'.dock-panel':tabs.map(t=>byId[t.dataset.panel]),'[data-order]':orders,'[data-build]':builds,'[data-order],[data-build]':[...orders,...builds]};
 const storage=new Map(initialStorage);
-const sandbox={console,performance,Math,Date,setTimeout:()=>0,clearTimeout(){},devicePixelRatio:1,crypto:require('node:crypto').webcrypto,requestAnimationFrame(){},addEventListener(){},navigator:{},confirm:()=>true,localStorage:{removeItem:k=>storage.delete(k),setItem:(k,v)=>storage.set(k,v),getItem:k=>storage.get(k)},document:{querySelector:s=>byId[s.slice(1)],querySelectorAll:s=>lists[s]||[],getElementById:id=>byId[id],addEventListener(){}},Image:class{constructor(){this.complete=true;this.naturalWidth=16}}};
+const sandbox={console,performance,Math,Date,__ENABLE_NEUTRALS__:options.neutrals===true,setTimeout:()=>0,clearTimeout(){},devicePixelRatio:1,crypto:require('node:crypto').webcrypto,requestAnimationFrame(){},addEventListener(){},navigator:{},confirm:()=>true,localStorage:{removeItem:k=>storage.delete(k),setItem:(k,v)=>storage.set(k,v),getItem:k=>storage.get(k)},document:{querySelector:s=>byId[s.slice(1)],querySelectorAll:s=>lists[s]||[],getElementById:id=>byId[id],addEventListener(){}},Image:class{constructor(){this.complete=true;this.naturalWidth=16}}};
 sandbox.window=sandbox;vm.createContext(sandbox);
 for(const m of html.matchAll(/<script src="\.\/([^?]+)\?[^\"]+"><\/script>/g)){let code=readFileSync(path.join(root,m[1]),'utf8');if(m[1]==='boot.js')code=code.replace('const game = new Game();','globalThis.game=new Game();');vm.runInContext(code,sandbox,{filename:m[1]});}
 

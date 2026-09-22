@@ -58,7 +58,7 @@
   };
 
   const selectUnits = (game, units) => {
-    const alive = units.filter(u => u.health > 0);
+    const alive = units.filter(u => u.health > 0 && u.owner === 0);
     clearUnitSelection(game);
     game.groupSelection = alive;
     for (const u of alive) u.selected = true;
@@ -68,9 +68,9 @@
   };
 
   const selectedUnits = game => {
-    const group = game.selected instanceof Unit ? (game.groupSelection || []).filter(u => u.health > 0 && u.location.kind === 'world' && game.units.includes(u)) : [];
+    const group = game.selected instanceof Unit ? (game.groupSelection || []).filter(u => u.owner === 0 && u.health > 0 && u.location.kind === 'world' && game.units.includes(u)) : [];
     if (group.length) return group;
-    return game.selected instanceof Unit && game.selected.health > 0 ? [game.selected] : [];
+    return game.selected instanceof Unit && game.selected.owner === 0 && game.selected.health > 0 ? [game.selected] : [];
   };
 
   Game.prototype.rtsSelectedUnits = function() { return selectedUnits(this); };
@@ -104,7 +104,7 @@
 
     if (entity) {
       this.selected = entity;
-      if (entity instanceof Unit) {
+      if (entity instanceof Unit && entity.owner === 0) {
         entity.selected = true;
         this.groupSelection = [entity];
         this.lastSelectedUnit = entity;
@@ -350,4 +350,3 @@
     ctx.restore();
   };
 })();
-

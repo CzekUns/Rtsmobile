@@ -9,7 +9,7 @@
   const itemsValid=items=>items&&typeof items==='object'&&!Array.isArray(items)&&Object.entries(items).every(([k,v])=>materials.has(k)&&Number.isSafeInteger(v)&&v>=0);
 
   function validate(d) {
-    check(d&&d.version===5,'versione');check(d.populationRules===undefined||d.populationRules===1,'regole popolazione');check(Number.isInteger(d.seed),'seed');
+    check(d&&d.version===5,'versione');check(d.populationRules===undefined||d.populationRules===1,'regole popolazione');check(d.neutralRules===undefined||d.neutralRules===1,'regole insediamenti neutrali');check(Number.isInteger(d.seed),'seed');
     for(const key of ['units','buildings','animals','raiders','resources','roads'])check(Array.isArray(d[key]),key);
     const ids=new Set();
     for(const e of [...d.units,...d.buildings,...d.animals,...d.raiders,...d.resources]){
@@ -35,11 +35,12 @@
       if(b.batch){const recipe=window.TERRA_RECIPES[b.type]?.find(r=>r.id===b.batch.recipeId)||window.TERRA_RECIPES[b.type]?.find(r=>b.batch.input===Object.keys(r.inputs)[0]&&b.batch.output===Object.keys(r.outputs)[0]);const inputs=b.batch.inputs||{[b.batch.input]:b.batch.amount},outputs=b.batch.outputs||{[b.batch.output]:b.batch.amount};check(recipe&&Object.entries(recipe.inputs).every(([k,n])=>inputs[k]===n)&&Object.entries(recipe.outputs).every(([k,n])=>outputs[k]===n)&&finite(b.batch.remaining,0,recipe.seconds),'ricetta');}
     }
     for(const u of d.units){
-      check(u.owner===0,'proprietario abitante');
+      check(Number.isSafeInteger(u.owner)&&u.owner>=0&&u.owner<=2,'proprietario abitante');
+      if(u.owner>0)check(d.neutralRules===1&&typeof u.neutralSettlementId==='string'&&d.buildings.some(b=>b.owner===u.owner&&b.type==='base'&&b.settlementId===u.neutralSettlementId),'appartenenza neutrale');
       check(u.money===undefined||Number.isSafeInteger(u.money)&&u.money>=0,'denaro abitante');
       check(u.mobilized===undefined||typeof u.mobilized==='boolean','mobilitazione');
       check(!u.mobilized||u.location?.kind==='world','mobilitato sulla mappa');
-      check(u.location&&(u.location.kind==='world'&&u.location.settlementId===null||u.location.kind==='resident'&&typeof u.location.settlementId==='string'),'collocazione abitante');
+      check(u.location&&(u.location.kind==='world'&&(u.location.settlementId===null||typeof u.location.settlementId==='string')||u.location.kind==='resident'&&typeof u.location.settlementId==='string'),'collocazione abitante');
       check(u.occupation===(u.task?.type||'idle'),'occupazione abitante');
       check(typeof u.name==='string'&&u.name.length<=80&&!/[<>]/.test(u.name),'nome');
       check(u.inventory&&finite(u.inventory.cap,1)&&Number.isSafeInteger(u.inventory.amount)&&u.inventory.amount>=0&&u.inventory.amount<=u.inventory.cap,'carico');
@@ -79,7 +80,7 @@
     }
     const residentIds=d.buildings.flatMap(b=>b.residents);
     check(new Set(residentIds).size===residentIds.length,'residente duplicato');
-    for(const u of d.units)if(u.location.kind==='resident')check(residentIds.includes(u.id)&&d.buildings.some(b=>b.id===u.location.settlementId&&b.type==='house'&&b.residents.includes(u.id)),'legame residente');
+    for(const u of d.units)if(u.location.kind==='resident')check(residentIds.includes(u.id)&&d.buildings.some(b=>b.id===u.location.settlementId&&b.owner===u.owner&&b.type==='house'&&b.residents.includes(u.id)),'legame residente');
     check(residentIds.every(id=>d.units.some(u=>u.id===id&&u.location.kind==='resident')),'elenco residenti');
     for(const a of d.animals){check(['sheep','wolf'].includes(a.type)&&finite(a.vx)&&finite(a.vy)&&finite(a.wander)&&finite(a.attackCooldown,0),'animale');check(a.penId===undefined||a.penId===null||typeof a.penId==='string'&&d.buildings.some(b=>b.id===a.penId&&b.type==='pen'&&b.animalIds?.includes(a.id)),'recinto animale');}
     for(const r of d.raiders)check(finite(r.speed,0)&&finite(r.repath)&&finite(r.attackCooldown,0)&&Array.isArray(r.path)&&r.path.every(p=>finite(p.x,0,WORLD_SIZE)&&finite(p.y,0,WORLD_SIZE)),'razziatore');
@@ -130,7 +131,7 @@
 
   Game.prototype.snapshot=function(){
     this.ensureInventories();this.ensureMarkets?.();
-    return {version:5,populationRules:1,equipmentRules:1,gear:this.gear||[],seed:this.seed,rngState:this.rng.s,paused:this.paused,gameEnded:this.gameEnded,
+    return {version:5,populationRules:1,neutralRules:1,equipmentRules:1,gear:this.gear||[],seed:this.seed,rngState:this.rng.s,paused:this.paused,gameEnded:this.gameEnded,
       clock:{day:this.day,month:this.month,year:this.year,totalDays:this.totalDays,nextRaidDay:this.nextRaidDay,raidLevel:this.raidLevel,dayAccumulator:this.dayAccumulator},
       roads:this.world.tiles.filter(t=>t.road).map(t=>[t.x,t.y]),resources:this.world.resources,buildings:this.buildings,units:this.units,animals:this.animals,raiders:this.raiders,camera:this.camera,
       selection:(this.rtsSelectedUnits?.()||[]).map(u=>u.id),selectedId:this.selected?.id||null};
