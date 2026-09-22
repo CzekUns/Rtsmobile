@@ -1,9 +1,15 @@
 {
-  "active_task": "T16",
+  "active_task": "T17",
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "lease": null,
+  "lease": {
+    "run_id": "automation-20260922T000105Z-T17",
+    "task": "T17",
+    "head_observed": "ff9313f40aa89d88540b944fe717366381d741b9",
+    "acquired_at": "2026-09-22T00:03:00Z",
+    "expires_at": "2026-09-22T01:33:00Z"
+  },
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
   "runs": [
@@ -554,10 +560,8 @@
       ],
       "id": "T16",
       "last_attempt_at": "2026-09-21T23:15:00Z",
-      "remaining": [
-        "Verify Build 47 GitHub Pages deployment before marking done."
-      ],
-      "status": "awaiting_deploy",
+      "remaining": [],
+      "status": "done",
       "title": "Scambio touch e carico commerciale"
     },
     {
@@ -566,16 +570,16 @@
         "Stop, minaccia, morte, mercato rimosso e ripresa app gestiti senza doppia spesa."
       ],
       "blocker": null,
-      "branch": null,
+      "branch": "work/T17-physical-caravans",
       "commit": null,
       "depends_on": [
         "T16"
       ],
       "evidence": [],
       "id": "T17",
-      "last_attempt_at": null,
+      "last_attempt_at": "2026-09-22T00:03:00Z",
       "remaining": [],
-      "status": "pending",
+      "status": "in_progress",
       "title": "Carovane e rotte fisiche"
     },
     {
