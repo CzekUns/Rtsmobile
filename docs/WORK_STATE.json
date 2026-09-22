@@ -1,16 +1,9 @@
 {
-  "active_task": "T23",
+  "active_task": "T24",
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "lease": {
-    "run_id": "run-20260922T040155Z-T23",
-    "task": "T23",
-    "branch": "work/T23-approved-assets",
-    "observed_head": "1d9b182dd1ca4a0f9bddb65c89b11d2224027a37",
-    "acquired_at": "2026-09-22T04:03:00Z",
-    "expires_at": "2026-09-22T05:33:00Z"
-  },
+  "lease": null,
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
   "runs": [
@@ -309,6 +302,15 @@
       "commit": "ca4e7574a0fdb1a699eaf1b1c2ea40e2e75a2bf4",
       "notes": "Live GitHub Pages returned Build 53. T22 acceptance complete; browser gameplay and physical hardware remain unclaimed.",
       "next": "T23 inventory and integrate approved P16 assets from the designated Drive folder."
+    },
+    {
+      "at": "2026-09-22T05:59:00Z",
+      "task": "T23",
+      "result": "done",
+      "branch": "work/T23-approved-assets",
+      "commit": "e5a906389bf53d29a386f35267768506e836687a",
+      "notes": "Build 54 inventories the approved Drive folders and integrates only the verified native RGBA windmill and selection marker. Oversized overview-scale images were excluded; procedural P16 terrain remains unchanged. Four dedicated tests and all 102 Node tests pass. Live Pages returned Build 54; expired lease recovered and released.",
+      "next": "T24 real-browser phone/tablet UI validation across portrait and landscape."
     }
   ],
   "schema_version": 1,
@@ -826,18 +828,23 @@
         "Verificare trasparenza, scala nativa, P16 e ancoraggi; niente tavole riepilogative usate come sprite o nuovo terreno PNG."
       ],
       "blocker": null,
-      "branch": null,
-      "commit": null,
+      "branch": "work/T23-approved-assets",
+      "commit": "e5a906389bf53d29a386f35267768506e836687a",
       "depends_on": [
         "T07",
         "T14",
         "T20"
       ],
-      "evidence": [],
+      "evidence": [
+        "Drive inventory verified P16 specification, native dimensions and RGBA transparency; oversized v02/overview assets excluded.",
+        "Approved windmill 32x38 and selection marker 16x16 integrated with nearest-neighbor scaling and procedural fallbacks; procedural terrain preserved.",
+        "4 T23 regressions and all 102 Node tests/subtests PASS; JavaScript syntax and git diff checks PASS.",
+        "GitHub Pages live site returned BUILD 54 on 2026-09-22T05:59:00Z. Browser gameplay and physical hardware not claimed."
+      ],
       "id": "T23",
-      "last_attempt_at": null,
+      "last_attempt_at": "2026-09-22T05:59:00Z",
       "remaining": [],
-      "status": "pending",
+      "status": "done",
       "title": "Integrazione degli asset approvati"
     },
     {
@@ -902,5 +909,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-22T04:03:00Z"
+  "updated_at": "2026-09-22T05:59:00Z"
 }
