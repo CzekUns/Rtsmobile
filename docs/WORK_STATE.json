@@ -3,13 +3,7 @@
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "lease": {
-    "run_id": "automation-20260922T000105Z-T17",
-    "task": "T17",
-    "head_observed": "ff9313f40aa89d88540b944fe717366381d741b9",
-    "acquired_at": "2026-09-22T00:03:00Z",
-    "expires_at": "2026-09-22T01:33:00Z"
-  },
+  "lease": null,
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
   "runs": [
@@ -194,6 +188,15 @@
       "commit": "9d2b097acc974d76ecd986c8dcba204da7cef727",
       "notes": "Build 47 adds a touch-sized trade dialog with explicit trader/market/good/quantity selection, pre-confirmation price and balance preview, atomic receipt reuse for double taps, and cargo-only sales that do not touch equipment or reservations. Four new regressions and all 55 Node tests/subtests pass; JavaScript syntax passes. Browser and hardware are not claimed.",
       "next": "Verify Build 47 Pages deployment; if successful mark T16 done and begin T17 physical caravans."
+    },
+    {
+      "at": "2026-09-22T00:25:00Z",
+      "task": "T16/T17",
+      "result": "awaiting_deploy",
+      "branch": "work/T17-physical-caravans",
+      "commit": "cc5a29c68a9571011ab3949992c6bf7e42838920",
+      "notes": "Confirmed Build 47 Pages workflow 35666289455 success. Build 48 adds persistent physical caravan journeys: market arrival before atomic trade, actual return, capacity/path checks, threat pause, safe cancellation, market removal, death cargo drop and save/resume without replay. Seven new caravan regressions and all 62 Node tests/subtests pass; JavaScript syntax and diff checks pass. Browser and hardware are not claimed.",
+      "next": "Verify Build 48 Pages deployment; if successful mark T17 done and begin T18 neutral settlements and economy."
     }
   ],
   "schema_version": 1,
@@ -571,15 +574,20 @@
       ],
       "blocker": null,
       "branch": "work/T17-physical-caravans",
-      "commit": null,
+      "commit": "cc5a29c68a9571011ab3949992c6bf7e42838920",
       "depends_on": [
         "T16"
       ],
-      "evidence": [],
+      "evidence": [
+        "7 T17 caravan regressions PASS: physical market/return journey, preflight capacity and route, stop, threat pause/resume, removed market, death cargo recovery, save/resume and idempotent receipt.",
+        "All 62 Node tests/subtests PASS; JavaScript syntax and git diff checks PASS. Browser and physical hardware not claimed."
+      ],
       "id": "T17",
       "last_attempt_at": "2026-09-22T00:03:00Z",
-      "remaining": [],
-      "status": "in_progress",
+      "remaining": [
+        "Verify Build 48 GitHub Pages deployment before marking done."
+      ],
+      "status": "awaiting_deploy",
       "title": "Carovane e rotte fisiche"
     },
     {
@@ -758,5 +766,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-21T21:13:00Z"
+  "updated_at": "2026-09-22T00:25:00Z"
 }
