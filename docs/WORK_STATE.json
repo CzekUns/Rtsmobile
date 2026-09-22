@@ -1,9 +1,16 @@
 {
-  "active_task": "T18",
+  "active_task": "T19",
   "automation_id": "6aab7d16987881918a9b34ee4eaa83e7",
   "baseline_build": 32,
   "baseline_commit": "0b94e2eb4323e4195e1595da1a715052c8bd4822",
-  "lease": null,
+  "lease": {
+    "run_id": "run-20260922T020013Z-T19",
+    "task": "T19",
+    "branch": "work/T19-politics",
+    "observed_head": "fd3277eff8eda007c8a6786560af689bd272661b",
+    "acquired_at": "2026-09-22T02:02:00Z",
+    "expires_at": "2026-09-22T03:32:00Z"
+  },
   "project": "Terra Italica / Ver Sacrum mobile",
   "repository": "CzekUns/Rtsmobile",
   "runs": [
@@ -206,6 +213,14 @@
       "commit": "6abfe8e94a64597b5b211097addebfed9a804852",
       "notes": "Build 49 adds two persistent neutral settlements with separate faction ownership, people, local stores and markets. Production, meals and demand use living population. Player and neutral logistics/production ownership boundaries are enforced. Seven dedicated regressions and all 69 Node tests pass; syntax and diff checks pass.",
       "next": "Verify Build 49 Pages deployment. If successful mark T18 done, then begin T19 loyalty, influence and diplomacy."
+    },
+    {
+      "at": "2026-09-22T02:02:00Z",
+      "task": "T18/T19",
+      "result": "in_progress",
+      "branch": "work/T19-politics",
+      "notes": "Confirmed the live GitHub Pages site serves Build 49; completed T18 and acquired the T19 lease.",
+      "next": "Implement loyalty, resistance, influence and diplomatic relations with visible effects and persistent ownership-safe transitions."
     }
   ],
   "schema_version": 1,
@@ -613,12 +628,13 @@
       "evidence": [
         "7 T18 neutral-settlement regressions PASS: separate owners/people/stores, population-driven production, meals and demand, authorization boundaries, persistence, and player isolation.",
         "All 69 Node tests/subtests PASS; JavaScript syntax and git diff checks PASS. Browser and physical hardware not claimed.",
-        "Build 49 merged to main at commit 6abfe8e94a64597b5b211097addebfed9a804852; GitHub Pages deployment not yet confirmed."
+        "Build 49 merged to main at commit 6abfe8e94a64597b5b211097addebfed9a804852; GitHub Pages deployment not yet confirmed.",
+        "GitHub Pages live site returned BUILD 49 on 2026-09-22T02:02:00Z."
       ],
       "id": "T18",
       "last_attempt_at": "2026-09-22T01:16:00Z",
       "remaining": [],
-      "status": "awaiting_deploy",
+      "status": "done",
       "title": "Insediamenti neutrali ed economia"
     },
     {
@@ -627,16 +643,16 @@
         "Transizioni politiche preservano ID, merci e appartenenze; testare persistenza e stati incompatibili."
       ],
       "blocker": null,
-      "branch": null,
+      "branch": "work/T19-politics",
       "commit": null,
       "depends_on": [
         "T18"
       ],
       "evidence": [],
       "id": "T19",
-      "last_attempt_at": null,
+      "last_attempt_at": "2026-09-22T02:02:00Z",
       "remaining": [],
-      "status": "pending",
+      "status": "in_progress",
       "title": "Lealtà, influenza e diplomazia"
     },
     {
@@ -778,5 +794,5 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-22T01:16:00Z"
+  "updated_at": "2026-09-22T02:02:00Z"
 }
