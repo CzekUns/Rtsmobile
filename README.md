@@ -6,9 +6,9 @@ RTS sandbox mobile-first ambientato nell'Italia preromana. La direzione funziona
 Non richiede build, Node o installazioni. GitHub Pages pubblica direttamente la branch `main` tramite GitHub Actions.
 
 ## Controlli touch
-- Tocca un abitante per selezionarlo; trascina un dito per selezionare un gruppo con il riquadro.
-- Tieni premuto **MOD** e tocca un bersaglio per impartire un ordine contestuale a tutta la selezione.
-- Tieni premuto **MOD** e trascina per muovere la mappa.
+- Tieni premuto **MOD**: tocca un abitante per selezionarlo oppure trascina per selezionare un gruppo con il riquadro.
+- Senza MOD, tocca un bersaglio per impartire un ordine contestuale a tutta la selezione.
+- Senza MOD, trascina per muovere la mappa.
 - Usa due dita senza MOD oppure `+ / −` per lo zoom.
 - In **Comunità**, tocca una scheda per selezionare soltanto quell'abitante.
 - In **Ordini**, scegli un'azione e tocca il bersaglio: vale per tutto il gruppo selezionato. **Libera** annulla i compiti del gruppo.
@@ -43,3 +43,6 @@ Dopo il caricamento e il ritorno dal background compare un avviso sulla mappa co
 
 ## Build 32 — selezione oltre lo schermo
 Durante il trascinamento del riquadro, tieni il dito sul bordo sinistro, destro o superiore: la mappa scorre e la selezione resta ancorata al terreno. Lo scorrimento funziona anche in pausa e si ferma al rilascio, con il pinch o ai confini della mappa.
+
+### BUILD 58 — incursioni sospese
+Le incursioni sono temporaneamente disattivate. Al caricamento vengono rimossi i razziatori già presenti e annullati gli ordini rivolti a loro. Campi ostili e sistema bellico restano disponibili; il flag `Game.prototype.raidsEnabled` permette la riattivazione.

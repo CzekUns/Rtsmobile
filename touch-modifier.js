@@ -1,5 +1,5 @@
 // RTS mobile input grammar
-// Free finger = left mouse button. Hold MOD = right mouse button / secondary layer.
+// Free finger = orders / camera. Hold MOD = selection.
 (() => {
   'use strict';
 
@@ -118,6 +118,7 @@
   };
 
   Game.prototype.rtsContextTap = function(sx, sy) {
+    if (this.buildMode || this.orderMode) { this.rtsLeftTap(sx, sy); return; }
     const group = selectedUnits(this);
     if (!group.length) {
       this.message('Seleziona prima uno o più abitanti.');
@@ -170,8 +171,8 @@
   };
 
   // Full replacement of the canvas pointer grammar:
-  // free tap = select; free drag = box-select; MOD tap = context command;
-  // MOD drag = camera pan; two free fingers = pinch zoom.
+  // free tap = context command; free drag = camera pan; MOD tap = select;
+  // MOD drag = box-select; two free fingers = pinch zoom.
   Game.prototype.pointerDown = function(e) {
     this.canvas.setPointerCapture(e.pointerId);
     this.rtsPointers ||= new Map();
@@ -203,7 +204,7 @@
     }
 
     this.rtsGesture = {
-      type: modifierHeld ? 'modCandidate' : 'leftCandidate',
+      type: modifierHeld ? 'leftCandidate' : 'modCandidate',
       pointerId:e.pointerId
     };
     this.rtsSelectionBox = null;
@@ -280,7 +281,8 @@
       } else if (g.type === 'leftCandidate') {
         this.rtsLeftTap(lp.x,lp.y);
       } else if (g.type === 'modCandidate') {
-        this.rtsContextTap(lp.x,lp.y);
+        if (this.buildMode || this.orderMode) this.rtsLeftTap(lp.x,lp.y);
+        else this.rtsContextTap(lp.x,lp.y);
       }
     }
 
@@ -300,7 +302,7 @@
 
   Game.prototype.rtsScrollSelection = function(dt) {
     const box=this.rtsSelectionBox,gesture=this.rtsGesture;
-    if (!box?.active || gesture?.type!=='leftBox' || this.rtsPointers?.size!==1 || modifierHeld || this.suspended || this.gameEnded) return;
+    if (!box?.active || gesture?.type!=='leftBox' || this.rtsPointers?.size!==1 || !modifierHeld || this.suspended || this.gameEnded) return;
     const pointer=this.rtsPointers.get(gesture.pointerId);
     if (!pointer) return;
     // A small edge zone also works on phones where a finger cannot leave the screen.
