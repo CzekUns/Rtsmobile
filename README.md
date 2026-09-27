@@ -46,3 +46,6 @@ Durante il trascinamento del riquadro, tieni il dito sul bordo sinistro, destro 
 
 ### BUILD 58 — incursioni sospese
 Le incursioni sono temporaneamente disattivate. Al caricamento vengono rimossi i razziatori già presenti e annullati gli ordini rivolti a loro. Campi ostili e sistema bellico restano disponibili; il flag `Game.prototype.raidsEnabled` permette la riattivazione.
+
+### BUILD 59 — risorse e raccolta continua
+Risorse naturali ×10, comprese le quantità residue dei vecchi salvataggi (una sola volta; spot esauriti restano vuoti). Carichi e merci cadute non sono moltiplicati. Esaurito uno spot, il raccoglitore cerca lo spot raggiungibile più vicino dello stesso tipo entro 10 tile dallo spot esaurito; a carico pieno consegna prima al deposito. Senza alternative consegna il residuo e si ferma.

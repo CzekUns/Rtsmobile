@@ -133,18 +133,29 @@
     if(amount){b.inventory.items[u.inventory.type]=(b.inventory.items[u.inventory.type]||0)+amount;u.inventory.amount-=amount;}
     if(u.inventory.amount){this.cancelTask(u);this.message('Deposito pieno: il residuo resta nel carico.');return;}
     u.inventory.type=null;
-    if(after?.type==='gather'){const r=this.findById(this.world.resources,after.target);if(r?.amount>0)return this.assignGather(u,r);}
+    if(after?.type==='gather'){const r=this.findById(this.world.resources,after.target);if(r?.amount>0)return this.assignGather(u,r);return this.continueGather(u,r);}
     if(after?.type==='farm'){const f=this.findById(this.buildings,after.target);if(f?.alive)return this.assignFarm(u,f);}
     this.cancelTask(u);
+  };
+  // Search around the depleted spot, never around the deposit.
+  Game.prototype.continueGather=function(u,origin){
+    const candidates=origin?this.world.resources.filter(r=>r.id!==origin.id&&r.type===origin.type&&r.amount>0&&dist(origin,r)<=10).sort((a,b)=>dist(origin,a)-dist(origin,b)):[];
+    for(const r of candidates){
+      const path=dist(u,r)<=1?[]:this.findPath(u.x,u.y,Math.floor(r.x),Math.floor(r.y),1);
+      if(dist(u,r)>1&&!path.length)continue;
+      if(u.inventory.amount&&(u.inventory.type!==r.type||u.inventory.amount>=u.inventory.cap))return this.returnToStorage(u,{type:'gather',target:origin.id});
+      this.cancelTask(u);u.task={type:'gather',target:r.id,phase:'toResource'};u.path=path;u.state=path.length?'moving':'gathering';return;
+    }
+    if(u.inventory.amount)this.returnToStorage(u,null);else this.cancelTask(u);
   };
   const assignGather=Game.prototype.assignGather;
   Game.prototype.assignGather=function(u,r){if(u.inventory.amount&&(u.inventory.type!==r.type||u.inventory.amount>=u.inventory.cap)){this.cancelTask(u);return this.returnToStorage(u,{type:'gather',target:r.id});}assignGather.call(this,u,r);};
   Game.prototype.gatherTick=function(u,dt){
     const r=this.findById(this.world.resources,u.task?.target);
-    if(!r||r.amount<=0){if(u.inventory.amount)this.returnToStorage(u,null);else this.cancelTask(u);return;}
+    if(!r||r.amount<=0){this.continueGather(u,r);return;}
     if(u.inventory.amount&&(u.inventory.type!==r.type||u.inventory.amount>=u.inventory.cap)){this.returnToStorage(u,{type:'gather',target:r.id});return;}
     if(dist(u,r)>1){u.path=this.findPath(u.x,u.y,Math.floor(r.x),Math.floor(r.y),1);if(!u.path.length){this.cancelTask(u);return;}u.state='moving';return;}
-    u.workTimer-=dt;if(u.workTimer<=0){const skill=Object.hasOwn(u.skills,r.type)?r.type:'food';u.workTimer=Math.max(.45,1.15-u.skills[skill]*.06);r.amount--;u.inventory.type=r.type;u.inventory.amount++;u.gain(skill,1);if(u.inventory.amount>=u.inventory.cap||r.amount<=0)this.returnToStorage(u,r.amount>0?{type:'gather',target:r.id}:null);}
+    u.workTimer-=dt;if(u.workTimer<=0){const skill=Object.hasOwn(u.skills,r.type)?r.type:'food';u.workTimer=Math.max(.45,1.15-u.skills[skill]*.06);r.amount--;u.inventory.type=r.type;u.inventory.amount++;u.gain(skill,1);if(r.amount<=0)this.continueGather(u,r);else if(u.inventory.amount>=u.inventory.cap)this.returnToStorage(u,{type:'gather',target:r.id});}
   };
   Game.prototype.buildingDay=function(b){
     if(!b.built||!b.alive)return;this.ensureInventories();

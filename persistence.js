@@ -162,7 +162,13 @@
       // Construct and resolve everything before replacing the running world.
       const world=new World(d.seed),rng=new RNG(d.seed);
       for(const [x,y] of d.roads)world.tile(x,y).road=true;
-      world.resources=d.resources.map(o=>Object.assign(new ResourceNode(o.type,o.x,o.y,o.amount),o));
+      const natural=new Map(world.resources.map(r=>[`${r.type}:${r.x}:${r.y}`,r]));
+      world.resources=d.resources.map(o=>{
+        const r=Object.assign(new ResourceNode(o.type,o.x,o.y,o.amount),o);
+        const original=natural.get(`${r.type}:${r.x}:${r.y}`);
+        if(!r.naturalScale&&original&&r.max===original.max/10){r.amount*=10;r.max*=10;r.naturalScale=10;}
+        return r;
+      });
       const buildings=d.buildings.map(o=>{const b=Object.assign(new Building(o.type,Math.floor(o.x),Math.floor(o.y),o.owner,o.progress>=1),o);if(b.type==='farm'&&(b.crop===undefined||b.crop==='Grano'))b.crop='grain';return b;});
       if(d.populationRules!==1)for(const b of buildings)if(b.type==='house')b.birthDays=0;
       const units=d.units.map(({occupation,...o})=>Object.assign(new Unit(o.name,o.x,o.y,rng),o));
