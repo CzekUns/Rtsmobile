@@ -13,7 +13,7 @@
   };
 
   const SPRITES = {
-    human: load('./assets/p16/units/unit_human_p16.png?v=27'),
+    human: load('./assets/p16/units/unit_human_token.svg?v=60'),
     raider: load('./assets/p16/units/unit_raider_p16.png?v=24'),
     sheep: load('./assets/p16/animals/animal_sheep_p16.png?v=24'),
     wolf: load('./assets/p16/animals/animal_wolf_p16.png?v=24'),
@@ -114,25 +114,25 @@
     const z = this.camera.zoom;
     const ctx = this.ctx;
     const img = hostile ? SPRITES.raider : SPRITES.human;
-    const dims = hostile ? [28, 32] : [24, 30];
+    const dims = hostile ? [28, 32] : [38, 41];
 
     if (!ready(img)) return oldDrawHuman.call(this, u, hostile);
 
     ctx.save();
     ctx.fillStyle = '#00000045';
     ctx.beginPath();
-    ctx.ellipse(p.x, p.y + 7 * z, 6 * z, 2.4 * z, 0, 0, Math.PI * 2);
+    ctx.ellipse(p.x, p.y + (hostile ? 7 : 16) * z, (hostile ? 6 : 9) * z, (hostile ? 2.4 : 3) * z, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
 
-    drawCentered(ctx, img, p.x, p.y, dims[0] * z, dims[1] * z, directionAngle(u));
+    drawCentered(ctx, img, p.x, p.y, dims[0] * z, dims[1] * z, hostile ? directionAngle(u) : 0);
 
-    if (!hostile && this.selected?.id === u.id) this.selectionRing(p.x, p.y, 12 * z);
+    if (!hostile && this.selected?.id === u.id) this.selectionRing(p.x, p.y, 21 * z);
     if ((u.health / u.maxHealth) < .65) {
       ctx.fillStyle = '#171717';
-      ctx.fillRect(p.x - 8 * z, p.y - 18 * z, 16 * z, 2 * z);
+      ctx.fillRect(p.x - 12 * z, p.y - 26 * z, 24 * z, 2 * z);
       ctx.fillStyle = hostile ? '#a94c43' : '#70835d';
-      ctx.fillRect(p.x - 8 * z, p.y - 18 * z, 16 * z * (u.health / u.maxHealth), 2 * z);
+      ctx.fillRect(p.x - 12 * z, p.y - 26 * z, 24 * z * (u.health / u.maxHealth), 2 * z);
     }
   };
 
