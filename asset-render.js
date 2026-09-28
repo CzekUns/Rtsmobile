@@ -13,7 +13,7 @@
   window.TERRA_P16_SPRITES=SPRITES;
   const TOKEN_NAMES=['libero','taglialegna','minatore','contadino','costruttore','trasportatore','mugnaio','fornaio','allevatore','mobilitato'];
   const tokenTemplates=new Map(),tokenImages=new Map(),tokenFetches=new Map();
-  const tokenUrl=name=>'./assets/tokens/professions/'+name+'.svg?v=61';
+  const tokenUrl=name=>'./assets/tokens/professions/'+name+'.svg?v=62';
   function preloadToken(name){if(tokenTemplates.has(name)||tokenFetches.has(name))return;const p=fetch(tokenUrl(name),{cache:'force-cache'}).then(r=>{if(!r.ok)throw new Error(name);return r.text();}).then(t=>tokenTemplates.set(name,t)).catch(()=>null).finally(()=>tokenFetches.delete(name));tokenFetches.set(name,p);}
   TOKEN_NAMES.forEach(preloadToken);
   const factionStyle=owner=>window.terraFactionStyle?window.terraFactionStyle(owner):{color:'#B4442B'};
