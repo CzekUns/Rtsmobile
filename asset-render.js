@@ -20,7 +20,7 @@
   const ANIMAL_TOKENS=Object.fromEntries(ANIMAL_TOKEN_NAMES.map(name=>[name,load('./assets/tokens/animals/'+name+'.svg?v=65')]));
   window.TERRA_ANIMAL_TOKENS=ANIMAL_TOKENS;
   const RESOURCE_TILE_NAMES=['forest_full_hex','forest_medium_hex','forest_low_hex','forest_empty_hex','berries_full_hex','berries_medium_hex','berries_low_hex','berries_empty_hex','stone_up_full_tri','stone_up_low_tri','stone_down_full_tri','stone_down_low_tri','ore_up_full_tri','ore_up_low_tri','ore_down_full_tri','ore_down_low_tri'];
-  const RESOURCE_TILES=Object.fromEntries(RESOURCE_TILE_NAMES.map(name=>[name,load('./assets/terrain/resources/'+name+'.svg?v=66')]));
+  const RESOURCE_TILES=Object.fromEntries(RESOURCE_TILE_NAMES.map(name=>[name,load('./assets/terrain/resources/'+name+'.svg?v=67')]));
   window.TERRA_RESOURCE_TILES=RESOURCE_TILES;
   const factionStyle=owner=>window.terraFactionStyle?window.terraFactionStyle(owner):{color:'#B4442B'};
   function tokenImage(name,owner){const key=name+':'+owner;if(tokenImages.has(key))return tokenImages.get(key);const source=tokenTemplates.get(name);if(!source){preloadToken(name);return null;}const themed=source.split('#B4442B').join(factionStyle(owner).color),img=new Image();img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(themed);tokenImages.set(key,img);return img;}
@@ -35,43 +35,27 @@
   const oldDrawResource=Game.prototype.drawResource,oldDrawHuman=Game.prototype.drawHuman,oldDrawAnimal=Game.prototype.drawAnimal,oldDrawBuilding=Game.prototype.drawBuilding,oldSelectionRing=Game.prototype.selectionRing;
   Game.prototype.selectionRing=function(x,y,r){const img=SPRITES.selection;if(!drawCentered(this.ctx,img,x,y,r*2,r*2))oldSelectionRing.call(this,x,y,r);};
   Game.prototype.drawResource=function(r){
-    const z=this.camera.zoom,gx=Math.floor(r.x),gy=Math.floor(r.y),ratio=r.max>0?r.amount/r.max:0,ctx=this.ctx;
+    const z=this.camera.zoom,ratio=r.max>0?r.amount/r.max:0,ctx=this.ctx;
 
+    // One node = one marker. Renewable nodes are hexes with their own depletion state.
     if(r.type==='wood'||r.type==='food'){
       const state=ratio<=0?'empty':ratio>.66?'full':ratio>.33?'medium':'low';
       const key=(r.type==='wood'?'forest_':'berries_')+state+'_hex';
-      const img=RESOURCE_TILES[key];
-      // Hex spots sit on a staggered visual lattice so adjacent spots lock together like a honeycomb.
-      const stagger=(gy&1)?TILE*.23:0;
-      const p=this.worldToScreen(r.x*TILE+stagger,r.y*TILE);
-      const size=TILE*1.02*z;
-      if(!drawCentered(ctx,img,p.x,p.y,size,size*.88,0,true))return oldDrawResource.call(this,r);
+      const img=RESOURCE_TILES[key],p=this.worldToScreen(r.x*TILE,r.y*TILE);
+      const size=TILE*1.03*z;
+      if(!drawCentered(ctx,img,p.x,p.y,size,size,0,true))return oldDrawResource.call(this,r);
       return;
     }
 
+    // Stone and ore are not multi-piece icons: every triangle is a real resource node.
     if(r.type==='stone'||r.type==='iron'){
       if(r.amount<=0)return;
-      const state=ratio>.48?'full':'low';
-      // One gather node is rendered as a compact interlocking relief, not as a single icon.
-      // Up/down triangles share edges and overlap slightly; ore appears as veins among stone.
-      const layout=[
-        {dx:-.34,dy: .16,o:'up'},
-        {dx: .00,dy: .16,o:'down'},
-        {dx: .34,dy: .16,o:'up'},
-        {dx:-.17,dy:-.18,o:'down'},
-        {dx: .17,dy:-.18,o:'up'}
-      ];
-      const count=ratio>.55?5:3;
-      const oreSlots=r.type==='iron'?new Set(count===5?[1,4]:[1]):new Set();
-      const baseX=r.x*TILE,baseY=r.y*TILE;
-      for(let i=0;i<count;i++){
-        const q=layout[i],kind=oreSlots.has(i)?'ore':'stone';
-        const key=kind+'_'+q.o+'_'+state+'_tri';
-        const img=RESOURCE_TILES[key];
-        const p=this.worldToScreen(baseX+q.dx*TILE,baseY+q.dy*TILE);
-        const size=TILE*.72*z;
-        if(!drawCentered(ctx,img,p.x,p.y,size,size,0,true))return oldDrawResource.call(this,r);
-      }
+      const state=ratio>.42?'full':'low';
+      const orientation=r.orientation||(((Math.round(r.x*100)+Math.round(r.y*100))&1)?'down':'up');
+      const key=(r.type==='iron'?'ore_':'stone_')+orientation+'_'+state+'_tri';
+      const img=RESOURCE_TILES[key],p=this.worldToScreen(r.x*TILE,r.y*TILE);
+      const size=TILE*.86*z;
+      if(!drawCentered(ctx,img,p.x,p.y,size,size,0,true))return oldDrawResource.call(this,r);
       return;
     }
 
