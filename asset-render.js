@@ -17,10 +17,10 @@
   function preloadToken(name){if(tokenTemplates.has(name)||tokenFetches.has(name))return;const p=fetch(tokenUrl(name),{cache:'force-cache'}).then(r=>{if(!r.ok)throw new Error(name);return r.text();}).then(t=>tokenTemplates.set(name,t)).catch(()=>null).finally(()=>tokenFetches.delete(name));tokenFetches.set(name,p);}
   TOKEN_NAMES.forEach(preloadToken);
   const ANIMAL_TOKEN_NAMES=['sheep_alive','sheep_dead','sheep_skeleton','goat_alive','goat_dead','goat_skeleton','cow_alive','cow_dead','cow_skeleton','wolf_alive','wolf_dead','wolf_skeleton'];
-  const ANIMAL_TOKENS=Object.fromEntries(ANIMAL_TOKEN_NAMES.map(name=>[name,load('./assets/tokens/animals/'+name+'.svg?v=63')]));
+  const ANIMAL_TOKENS=Object.fromEntries(ANIMAL_TOKEN_NAMES.map(name=>[name,load('./assets/tokens/animals/'+name+'.svg?v=65')]));
   window.TERRA_ANIMAL_TOKENS=ANIMAL_TOKENS;
   const RESOURCE_TILE_NAMES=['forest_full_hex','forest_medium_hex','forest_low_hex','forest_empty_hex','berries_full_hex','berries_medium_hex','berries_low_hex','berries_empty_hex','stone_up_full_tri','stone_up_low_tri','stone_down_full_tri','stone_down_low_tri','ore_up_full_tri','ore_up_low_tri','ore_down_full_tri','ore_down_low_tri'];
-  const RESOURCE_TILES=Object.fromEntries(RESOURCE_TILE_NAMES.map(name=>[name,load('./assets/terrain/resources/'+name+'.svg?v=64')]));
+  const RESOURCE_TILES=Object.fromEntries(RESOURCE_TILE_NAMES.map(name=>[name,load('./assets/terrain/resources/'+name+'.svg?v=65')]));
   window.TERRA_RESOURCE_TILES=RESOURCE_TILES;
   const factionStyle=owner=>window.terraFactionStyle?window.terraFactionStyle(owner):{color:'#B4442B'};
   function tokenImage(name,owner){const key=name+':'+owner;if(tokenImages.has(key))return tokenImages.get(key);const source=tokenTemplates.get(name);if(!source){preloadToken(name);return null;}const themed=source.split('#B4442B').join(factionStyle(owner).color),img=new Image();img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(themed);tokenImages.set(key,img);return img;}
@@ -35,26 +35,56 @@
   const oldDrawResource=Game.prototype.drawResource,oldDrawHuman=Game.prototype.drawHuman,oldDrawAnimal=Game.prototype.drawAnimal,oldDrawBuilding=Game.prototype.drawBuilding,oldSelectionRing=Game.prototype.selectionRing;
   Game.prototype.selectionRing=function(x,y,r){const img=SPRITES.selection;if(!drawCentered(this.ctx,img,x,y,r*2,r*2))oldSelectionRing.call(this,x,y,r);};
   Game.prototype.drawResource=function(r){
-    const z=this.camera.zoom,gx=Math.floor(r.x),gy=Math.floor(r.y),ratio=r.max>0?r.amount/r.max:0;
-    let key=null,w=TILE*z,h=TILE*z,px=r.x*TILE,py=r.y*TILE;
+    const z=this.camera.zoom,gx=Math.floor(r.x),gy=Math.floor(r.y),ratio=r.max>0?r.amount/r.max:0,ctx=this.ctx;
+
     if(r.type==='wood'||r.type==='food'){
       const state=ratio<=0?'empty':ratio>.66?'full':ratio>.33?'medium':'low';
-      key=(r.type==='wood'?'forest_':'berries_')+state+'_hex';
-      // Slight overlap makes neighboring resource spots read as one irregular hex puzzle.
-      w=TILE*1.18*z;h=TILE*1.08*z;
-    }else if(r.type==='stone'||r.type==='iron'){
-      if(r.amount<=0)return;
-      const orientation=((gx+gy)&1)?'down':'up',state=ratio>.48?'full':'low';
-      key=(r.type==='iron'?'ore_':'stone_')+orientation+'_'+state+'_tri';
-      // Alternating up/down triangles overlap like an interlocking relief instead of isolated icons.
-      const shift=((gx+gy)&1)?1:-1;
-      px+=shift*TILE*.16;py-=shift*TILE*.07;
-      w=TILE*1.52*z;h=TILE*1.10*z;
+      const key=(r.type==='wood'?'forest_':'berries_')+state+'_hex';
+      const img=RESOURCE_TILES[key];
+      // Hex spots sit on a staggered visual lattice so adjacent spots lock together like a honeycomb.
+      const stagger=(gy&1)?TILE*.23:0;
+      const p=this.worldToScreen(r.x*TILE+stagger,r.y*TILE);
+      const size=TILE*1.02*z;
+      if(!drawCentered(ctx,img,p.x,p.y,size,size*.88,0,true))return oldDrawResource.call(this,r);
+      return;
     }
-    const img=RESOURCE_TILES[key],p=this.worldToScreen(px,py);
-    if(!drawCentered(this.ctx,img,p.x,p.y,w,h,0,true))return oldDrawResource.call(this,r);
+
+    if(r.type==='stone'||r.type==='iron'){
+      if(r.amount<=0)return;
+      const state=ratio>.48?'full':'low';
+      // One gather node is rendered as a compact interlocking relief, not as a single icon.
+      // Up/down triangles share edges and overlap slightly; ore appears as veins among stone.
+      const layout=[
+        {dx:-.34,dy: .00,o:'up'},
+        {dx: .00,dy: .00,o:'down'},
+        {dx: .34,dy: .00,o:'up'},
+        {dx:-.17,dy:-.20,o:'down'},
+        {dx: .17,dy:-.20,o:'up'},
+        {dx:-.17,dy: .20,o:'down'},
+        {dx: .17,dy: .20,o:'up'}
+      ];
+      const count=ratio>.66?7:ratio>.33?5:3;
+      const oreSlots=r.type==='iron'?new Set([1,4,6]):new Set();
+      const baseX=r.x*TILE,baseY=r.y*TILE;
+      for(let i=0;i<count;i++){
+        const q=layout[i],kind=oreSlots.has(i)?'ore':'stone';
+        const key=kind+'_'+q.o+'_'+state+'_tri';
+        const img=RESOURCE_TILES[key];
+        const p=this.worldToScreen(baseX+q.dx*TILE,baseY+q.dy*TILE);
+        const w=TILE*.78*z,h=TILE*.53*z;
+        if(!drawCentered(ctx,img,p.x,p.y,w,h,0,true))return oldDrawResource.call(this,r);
+      }
+      return;
+    }
+
+    oldDrawResource.call(this,r);
   };
   Game.prototype.drawHuman=function(u,hostile){const p=this.worldToScreen(u.x*TILE,u.y*TILE),z=this.camera.zoom,ctx=this.ctx,profession=hostile?null:professionForUnit(this,u),img=hostile?SPRITES.raider:tokenImage(profession,u.owner),dims=hostile?[28,32]:[42,42];if(!ready(img))return oldDrawHuman.call(this,u,hostile);ctx.save();ctx.fillStyle='#00000045';ctx.beginPath();ctx.ellipse(p.x,p.y+(hostile?7:16)*z,(hostile?6:9)*z,(hostile?2.4:3)*z,0,0,Math.PI*2);ctx.fill();ctx.restore();drawCentered(ctx,img,p.x,p.y,dims[0]*z,dims[1]*z,hostile?directionAngle(u):0,!hostile,hostile?1:horizontalFacing(u));if(!hostile&&this.selected?.id===u.id)this.selectionRing(p.x,p.y,23*z);if((u.health/u.maxHealth)<.65){ctx.fillStyle='#171717';ctx.fillRect(p.x-12*z,p.y-27*z,24*z,2*z);ctx.fillStyle=hostile?'#a94c43':factionStyle(u.owner).color;ctx.fillRect(p.x-12*z,p.y-27*z,24*z*(u.health/u.maxHealth),2*z);}};
-  Game.prototype.drawAnimal=function(a){const p=this.worldToScreen(a.x*TILE,a.y*TILE),z=this.camera.zoom,state=a.visualState||a.carcassState||(a.health<=0?'dead':'alive'),key=a.type+'_'+state,img=ANIMAL_TOKENS[key]||(a.type==='wolf'?SPRITES.wolf:SPRITES.sheep),token=!!ANIMAL_TOKENS[key],size=token?36:(a.type==='wolf'?32:30);if(!drawCentered(this.ctx,img,p.x,p.y,size*z,(token?36:(a.type==='wolf'?24:22))*z,0,token,horizontalFacing(a)))return oldDrawAnimal.call(this,a);if(this.selected?.id===a.id)this.selectionRing(p.x,p.y,(token?19:12)*z);};
+  Game.prototype.drawAnimal=function(a){
+    const p=this.worldToScreen(a.x*TILE,a.y*TILE),z=this.camera.zoom,state=a.visualState||a.carcassState||(a.health<=0?'dead':'alive'),key=a.type+'_'+state,img=ANIMAL_TOKENS[key]||(a.type==='wolf'?SPRITES.wolf:SPRITES.sheep),token=!!ANIMAL_TOKENS[key];
+    const size=token?(a.type==='cow'?30:27):(a.type==='wolf'?27:25);
+    if(!drawCentered(this.ctx,img,p.x,p.y,size*z,(token?size:(a.type==='wolf'?20:19))*z,0,token,horizontalFacing(a)))return oldDrawAnimal.call(this,a);
+    if(this.selected?.id===a.id)this.selectionRing(p.x,p.y,(token?15:11)*z);
+  };
   Game.prototype.drawBuilding=function(b){const img=SPRITES[b.type];if(!b.built||!ready(img))return oldDrawBuilding.call(this,b);const p=this.worldToScreen(b.x*TILE,b.y*TILE),z=this.camera.zoom,dims={house:[64,66],farm:[64,68],warehouse:[68,62],tower:[42,78],palisade:[54,20],mill:[64,76]}[b.type];if(!dims)return oldDrawBuilding.call(this,b);const ctx=this.ctx;ctx.save();ctx.fillStyle='#0000003f';ctx.beginPath();ctx.ellipse(p.x,p.y+(b.type==='tower'?14:10)*z,Math.max(8,dims[0]*.28)*z,Math.max(3,dims[1]*.07)*z,0,0,Math.PI*2);ctx.fill();ctx.restore();drawCentered(ctx,img,p.x,p.y,dims[0]*z,dims[1]*z);if(this.selected?.id===b.id)this.selectionRing(p.x,p.y,Math.max(15,dims[0]*.28)*z);if(b.health<b.maxHealth){const ratio=Math.max(0,b.health/b.maxHealth),barW=Math.min(32,dims[0]*.55)*z,barY=p.y-(dims[1]*.5+5)*z;ctx.fillStyle='#171717';ctx.fillRect(p.x-barW/2,barY,barW,3*z);ctx.fillStyle='#70835d';ctx.fillRect(p.x-barW/2,barY,barW*ratio,3*z);}};
 })();
