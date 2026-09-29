@@ -20,7 +20,7 @@
   const ANIMAL_TOKENS=Object.fromEntries(ANIMAL_TOKEN_NAMES.map(name=>[name,load('./assets/tokens/animals/'+name+'.svg?v=65')]));
   window.TERRA_ANIMAL_TOKENS=ANIMAL_TOKENS;
   const RESOURCE_TILE_NAMES=['forest_full_hex','forest_medium_hex','forest_low_hex','forest_empty_hex','berries_full_hex','berries_medium_hex','berries_low_hex','berries_empty_hex','stone_up_full_tri','stone_up_low_tri','stone_down_full_tri','stone_down_low_tri','ore_up_full_tri','ore_up_low_tri','ore_down_full_tri','ore_down_low_tri'];
-  const RESOURCE_TILES=Object.fromEntries(RESOURCE_TILE_NAMES.map(name=>[name,load('./assets/terrain/resources/'+name+'.svg?v=65')]));
+  const RESOURCE_TILES=Object.fromEntries(RESOURCE_TILE_NAMES.map(name=>[name,load('./assets/terrain/resources/'+name+'.svg?v=66')]));
   window.TERRA_RESOURCE_TILES=RESOURCE_TILES;
   const factionStyle=owner=>window.terraFactionStyle?window.terraFactionStyle(owner):{color:'#B4442B'};
   function tokenImage(name,owner){const key=name+':'+owner;if(tokenImages.has(key))return tokenImages.get(key);const source=tokenTemplates.get(name);if(!source){preloadToken(name);return null;}const themed=source.split('#B4442B').join(factionStyle(owner).color),img=new Image();img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(themed);tokenImages.set(key,img);return img;}
@@ -55,24 +55,22 @@
       // One gather node is rendered as a compact interlocking relief, not as a single icon.
       // Up/down triangles share edges and overlap slightly; ore appears as veins among stone.
       const layout=[
-        {dx:-.34,dy: .00,o:'up'},
-        {dx: .00,dy: .00,o:'down'},
-        {dx: .34,dy: .00,o:'up'},
-        {dx:-.17,dy:-.20,o:'down'},
-        {dx: .17,dy:-.20,o:'up'},
-        {dx:-.17,dy: .20,o:'down'},
-        {dx: .17,dy: .20,o:'up'}
+        {dx:-.34,dy: .16,o:'up'},
+        {dx: .00,dy: .16,o:'down'},
+        {dx: .34,dy: .16,o:'up'},
+        {dx:-.17,dy:-.18,o:'down'},
+        {dx: .17,dy:-.18,o:'up'}
       ];
-      const count=ratio>.66?7:ratio>.33?5:3;
-      const oreSlots=r.type==='iron'?new Set([1,4,6]):new Set();
+      const count=ratio>.55?5:3;
+      const oreSlots=r.type==='iron'?new Set(count===5?[1,4]:[1]):new Set();
       const baseX=r.x*TILE,baseY=r.y*TILE;
       for(let i=0;i<count;i++){
         const q=layout[i],kind=oreSlots.has(i)?'ore':'stone';
         const key=kind+'_'+q.o+'_'+state+'_tri';
         const img=RESOURCE_TILES[key];
         const p=this.worldToScreen(baseX+q.dx*TILE,baseY+q.dy*TILE);
-        const w=TILE*.78*z,h=TILE*.53*z;
-        if(!drawCentered(ctx,img,p.x,p.y,w,h,0,true))return oldDrawResource.call(this,r);
+        const size=TILE*.72*z;
+        if(!drawCentered(ctx,img,p.x,p.y,size,size,0,true))return oldDrawResource.call(this,r);
       }
       return;
     }
