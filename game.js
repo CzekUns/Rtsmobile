@@ -196,7 +196,7 @@ class Game{
     }else{
       for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)this.drawTile(x,y,ts);
     }
-    for(const r of this.world.resources)if(r.amount>0&&r.x>=x0-1&&r.x<=x1+1&&r.y>=y0-1&&r.y<=y1+1)this.drawResource(r);
+    for(const r of this.world.resources)if((r.amount>0||r.type==='wood'||r.type==='food')&&r.x>=x0-1&&r.x<=x1+1&&r.y>=y0-1&&r.y<=y1+1)this.drawResource(r);
     const visible=e=>e.x>=x0-2&&e.x<=x1+2&&e.y>=y0-2&&e.y<=y1+2;
     for(const b of this.buildings)if(b.alive&&visible(b))this.drawBuilding(b);
     for(const a of this.animals)if(a.health>0&&visible(a))this.drawAnimal(a);
