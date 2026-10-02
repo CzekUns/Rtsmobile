@@ -37,7 +37,7 @@
     const canvas=$('#minimap');if(!canvas||!this.world)return;const ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height,sx=w/WORLD_SIZE,sy=h/WORLD_SIZE;
     for(let y=0;y<WORLD_SIZE;y+=2)for(let x=0;x<WORLD_SIZE;x+=2){ctx.fillStyle=BIOME[this.world.tile(x,y).biome].color;ctx.fillRect(x*sx,y*sy,2*sx+.5,2*sy+.5)}
     const dot=(e,color,size=2)=>{ctx.fillStyle=color;ctx.fillRect(e.x*sx-size/2,e.y*sy-size/2,size,size)};
-    for(const b of this.buildings)if(b.health>0)dot(b,b.owner===0?'#f3d78b':'#c49a73',b.type==='base'?4:2);
+    for(const b of this.buildings)if(b.health>0){const color=b.owner===0?'#f3d78b':'#c49a73';if(b.type==='house'&&window.VER_SACRUM_VILLAGE){const r=VER_SACRUM_VILLAGE.bounds(b);ctx.fillStyle=color;ctx.fillRect(r.left*sx,r.top*sy,(r.right-r.left)*sx,(r.bottom-r.top)*sy);}else dot(b,color,b.type==='base'?4:2);}
     for(const u of this.units)if(u.health>0&&u.location?.kind==='world')dot(u,u.owner===0?'#fff2bd':'#d8a077',2);
     for(const r of this.raiders||[])if(r.health>0)dot(r,'#d7584e',2);for(const c of this.warCamps||[])if(c.health>0)dot(c,'#a92828',4);
     const viewW=(this.viewW||390)/this.camera.zoom/TILE*sx,viewH=(this.viewH||600)/this.camera.zoom/TILE*sy,cx=this.camera.x/TILE*sx,cy=this.camera.y/TILE*sy;
@@ -53,3 +53,4 @@
   const snapshot=Game.prototype.snapshot;Game.prototype.snapshot=function(){const d=snapshot.call(this);this.ensureGroups();d.groupRules=1;d.savedGroups=this.savedGroups;return d};
   const load=Game.prototype.load;Game.prototype.load=function(){const ok=load.call(this);if(ok)this.ensureGroups();return ok};
 })();
+

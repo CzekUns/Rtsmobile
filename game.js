@@ -198,7 +198,7 @@ class Game{
     }
     for(const r of this.world.resources)if((r.amount>0||r.type==='wood'||r.type==='food')&&r.x>=x0-1&&r.x<=x1+1&&r.y>=y0-1&&r.y<=y1+1)this.drawResource(r);
     const visible=e=>e.x>=x0-2&&e.x<=x1+2&&e.y>=y0-2&&e.y<=y1+2;
-    for(const b of this.buildings)if(b.alive&&visible(b))this.drawBuilding(b);
+    for(const b of this.buildings)if(b.alive&&(visible(b)||b.type==='house'&&b.x+2>=x0&&b.x-2<=x1&&b.y+2>=y0&&b.y-2<=y1))this.drawBuilding(b);
     for(const a of this.animals)if(a.health>0&&visible(a))this.drawAnimal(a);
     for(const u of this.units)if(u.health>0&&u.location.kind==='world'&&visible(u))this.drawHuman(u,false);
     for(const r of this.raiders)if(r.health>0&&visible(r))this.drawHuman(r,true);

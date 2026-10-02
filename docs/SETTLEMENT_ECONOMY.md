@@ -35,3 +35,9 @@ La carovana preleva al mercato di origine, viaggia, rivaluta lo scambio all’ar
 Conservati token, esagoni e triangoli della build 68. Aggiunta azione Radi al suolo con abitante entro 2 tile: permanente, nessuna ricrescita. Anche uno spot vuoto è selezionabile. Merci cadute non diventano risorse rigenerabili.
 
 Le prove automatiche coprono inventari, razioni, produzione, migrazione, quote, carovane e salvataggi. Le vecchie prove di denaro e crescita dalla Casa comune sono state aggiornate alle nuove regole. Verifica visiva su dispositivo reale ancora da svolgere: il download di Chromium nel workspace non è riuscito.
+
+## Build 70 — villaggi di 4 × 4 tile
+
+Ogni villaggio riserva 16 tile, disegnati e selezionabili su tutta la superficie, anche nella minimappa. Il territorio del villaggio rimane attraversabile. Nuovi cantieri non possono sovrapporsi; i 16 tile devono essere edificabili e dentro la mappa. Ingressi e uscite sono sul perimetro; collegamenti misurati dal bordo. Popolazione e costi invariati.
+
+I vecchi villaggi che si sovrappongono a strutture vicine sono ricollocati nella più vicina area libera edificabile, mantenendo ID, abitanti e scorte; la migrazione avviene una sola volta.

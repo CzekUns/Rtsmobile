@@ -1,4 +1,6 @@
-# Ver Sacrum — build 69
+# Ver Sacrum — build 70
+
+Villaggi aggiornati a **4 × 4 tile**, con ingombro, selezione, accessi e minimappa coerenti.
 
 Economia comunitaria senza denaro: totem, magazzini collegati, mercati distributivi, artigiani alimentati e carovane di baratto. Apri **Mondo → Insediamento** per collegamenti, soglie e quote di produzione. **Scambi** imposta il baratto fra mercati. La falegnameria produce tavole; i villaggi crescono solo con cibo e alloggi.
 

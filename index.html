@@ -23,7 +23,7 @@
   <main id="app" class="app-shell">
     <header class="hud-top" aria-label="Stato della comunità">
       <div class="identity">
-        <strong>VER SACRUM <small style="font-size:8px;opacity:.55;letter-spacing:.08em">BUILD 69</small></strong>
+        <strong>VER SACRUM <small style="font-size:8px;opacity:.55;letter-spacing:.08em">BUILD 70</small></strong>
         <span id="sessionState" role="status"></span><span id="dateLabel">1 Marzo · 1000 a.C.</span>
       </div>
       <div class="resources" id="resourceBar">
@@ -78,7 +78,7 @@
       <div id="build" class="dock-panel">
         <button data-build="road" type="button"><b>Sentiero</b><span>1 legno</span></button>
         <button data-build="warehouse" type="button"><b>Magazzino</b><span>18L · 8P</span></button>
-        <button data-build="house" type="button"><b>Villaggio</b><span>24L · 10P</span></button>
+        <button data-build="house" type="button"><b>Villaggio · 4 × 4</b><span>24L · 10P</span></button>
         <button data-build="sawmill" type="button"><b>Falegnameria</b><span>18L · 8P</span></button>
         <button data-build="mill" type="button"><b>Mulino</b><span>20L · 12P</span></button>
         <button data-build="bakery" type="button"><b>Forno</b><span>16L · 16P</span></button>
@@ -195,7 +195,7 @@
     <label><input id="linkExport" type="checkbox" checked>Invia eccedenze al mercato</label><label>Scorta da trattenere<input id="linkKeep" type="number" min="0" value="30"></label><button type="submit">Salva collegamento</button></form>
     <form id="factoryPolicy"><label>Artigiani desiderati<input id="factoryWorkers" type="number" min="0" max="8" value="1"></label><label>Quota prodotti al magazzino (%)<input id="factoryReturn" type="number" min="0" max="100" value="75"></label><button type="submit">Imposta produzione</button></form><p id="linkStatus" role="status"></p>
   </dialog>
-  <script src="./game.js?v=69"></script>
+  <script src="./game.js?v=70"></script>
   <script src="./resources.js?v=69"></script>
   <script src="./p16-render.js?v=24"></script>
   <script src="./factions.js?v=61"></script>
@@ -209,7 +209,7 @@
   <script src="./neutral.js?v=69"></script>
   <script src="./politics.js?v=69"></script>
   <script src="./war.js?v=58"></script>
-  <script src="./groups-minimap.js?v=52"></script>
+  <script src="./groups-minimap.js?v=70"></script>
   <script src="./streaming.js?v=53"></script>
   <script src="./community.js?v=39"></script>
   <script src="./population.js?v=69"></script>
@@ -218,6 +218,7 @@
   <script src="./skills.js?v=40"></script>
   <script src="./construction-knowledge.js?v=46"></script>
   <script src="./settlement.js?v=69"></script>
+  <script src="./village-footprint.js?v=70"></script>
   <script src="./boot.js?v=42"></script>
 </body>
 </html>
