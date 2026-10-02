@@ -5,7 +5,7 @@
   const oldGenerate=World.prototype.generate;
 
   function setupResource(r){
-    if(r.type==='wood'||r.type==='food'){
+    if((r.type==='wood'||r.type==='food')&&(r.naturalScale===10||r.resourceShape==='hex'||r.renewable===true)){
       r.renewable=true;
       if(!Number.isSafeInteger(r.regrowDelay))r.regrowDelay=r.type==='wood'?900:600;
       if(r.depletedAt===undefined)r.depletedAt=null;
@@ -26,7 +26,7 @@
       if(x<1||y<1||x>=s-1||y>=s-1)return null;
       const r=setupResource(new ResourceNode(type,x,y,amount));
       Object.assign(r,extra);
-      r.naturalScale=10;
+      r.naturalScale=10;setupResource(r);
       next.push(r);
       return r;
     };
@@ -123,4 +123,7 @@
     oldAdvanceDay.call(this);
     this.resourceRegenerationDay();
   };
+  Game.prototype.clearResource=function(r){if(!r||!r.renewable||r.cleared)return false;const u=this.rtsSelectedUnits().find(u=>u.owner===0&&u.health>0&&dist(u,r)<=2)||this.units.find(u=>u.owner===0&&u.health>0&&u.location.kind==='world'&&dist(u,r)<=2);if(!u){this.message('Porta un abitante entro 2 tile dallo spot da radere.');return false;}r.amount=0;r.cleared=true;r.regrowing=false;for(const person of this.units)if(person.task?.type==='gather'&&person.task.target===r.id)this.continueGather(person,r);this.save(true);this.updateUI();return true;};
+  const selectionHTML=Game.prototype.selectionHTML;Game.prototype.selectionHTML=function(e){let html=selectionHTML.call(this,e);if(e instanceof ResourceNode&&e.renewable&&!e.cleared)html+='<button id="clearResource" type="button">Radi al suolo (nessuna ricrescita)</button>';return html;};
+  const updateUI=Game.prototype.updateUI;Game.prototype.updateUI=function(){updateUI.call(this);const button=$('#clearResource');if(button)button.onclick=()=>this.clearResource(this.selected);};
 })();

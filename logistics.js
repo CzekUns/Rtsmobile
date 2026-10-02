@@ -1,15 +1,16 @@
 // Local inventories and persistent carrier jobs; reservations are derived from jobs.
 (() => {
   'use strict';
-  const CAPACITY={base:800,warehouse:400,farm:240,mill:80,bakery:80,pen:120,market:240,house:40,tower:20,palisade:10};
+  const CAPACITY={sawmill:120,base:800,warehouse:400,farm:240,mill:80,bakery:80,pen:120,market:240,house:40,tower:20,palisade:10};
   const REPAIR_COST_PER_HP=.04;
   const GOODS={
-    food:{label:'cibo',volume:1},wood:{label:'legno',volume:1},stone:{label:'pietra',volume:1},iron:{label:'ferro',volume:1},
+    planks:{label:'tavole',volume:1},food:{label:'cibo',volume:1},wood:{label:'legno',volume:1},stone:{label:'pietra',volume:1},iron:{label:'ferro',volume:1},
     grain:{label:'grano',volume:1},barley:{label:'orzo',volume:1},grapes:{label:'uva',volume:1},olives:{label:'olive',volume:1},
     flour:{label:'farina',volume:1},barleyFlour:{label:'farina d’orzo',volume:1},bread:{label:'pane',volume:1},barleyBread:{label:'pane d’orzo',volume:1},
     forage:{label:'foraggio',volume:1},milk:{label:'latte',volume:1}
   };
   const RECIPES={
+    sawmill:[{id:'wood-planks',inputs:{wood:10},outputs:{planks:8},seconds:10}],
     mill:[{id:'grain-flour',inputs:{grain:2},outputs:{flour:2},seconds:6},{id:'barley-flour',inputs:{barley:2},outputs:{barleyFlour:3},seconds:6}],
     bakery:[{id:'wheat-bread',inputs:{flour:2},outputs:{bread:2},seconds:8},{id:'barley-bread',inputs:{barleyFlour:2},outputs:{barleyBread:3},seconds:8}]
   };
@@ -21,7 +22,7 @@
   };
   window.TERRA_CAPACITY=CAPACITY;window.TERRA_GOODS=GOODS;window.TERRA_RECIPES=RECIPES;window.TERRA_CROPS=CROPS;
   const total=items=>Object.entries(items).reduce((sum,[good,n])=>sum+n*(GOODS[good]?.volume||1),0);
-  const storage=b=>b&&b.alive&&b.built&&(b.type==='base'||b.type==='warehouse');
+  const storage=b=>b&&b.alive&&b.built&&b.type==='warehouse';
   Game.prototype.ensureInventories=function(){
     for(const b of this.buildings){if(!b.inventory)b.inventory={items:b.type==='base'?{...this.stock}:{},capacity:CAPACITY[b.type]||80};if(b.type==='farm'){b.crop=Object.hasOwn(CROPS,b.crop)?b.crop:'grain';if(b.inventory.capacity===80)b.inventory.capacity=CAPACITY.farm;}if(b.requiredMaterials===undefined)b.requiredMaterials=b.built?null:{...(BUILD_COSTS[b.type]||{})};if(!b.built&&b.requiredMaterials)b.inventory.capacity=Math.max(b.inventory.capacity,Object.values(b.requiredMaterials).reduce((n,v)=>n+v,0));if(b.batch===undefined)b.batch=null;if(b.batch&&!b.batch.outputs){b.batch.inputs={[b.batch.input]:b.batch.amount};b.batch.outputs={[b.batch.output]:b.batch.amount};b.batch.outputVolume=total(b.batch.outputs);b.batch.recipeId=`legacy-${b.type}`;}if(!Array.isArray(b.workers))b.workers=[];}
     const base=this.buildings.find(b=>b.type==='base');if(base)this.stock=base.inventory.items;
@@ -36,7 +37,7 @@
     if(!u||u.health<=0||u.location?.kind!=='world'||!b?.alive||!b.built||!recipes)return 'Scegli un abitante libero e una fabbrica operativa.';
     if(u.inventory.amount)return 'Deposita prima il carico dell’abitante.';
     const path=this.pathToBuilding(u,b);if(path===null)return 'Fabbrica non raggiungibile.';
-    this.cancelTask(u);u.task={type:'production',target:b.id,profession:b.type==='mill'?'mugnaio':'fornaio'};u.state='producing';u.path=path;
+    this.cancelTask(u);u.task={type:'production',target:b.id,profession:b.type==='mill'?'mugnaio':b.type==='sawmill'?'falegname':'fornaio'};u.state='producing';u.path=path;
     if(!b.workers.includes(u.id))b.workers.push(u.id);this.message(`${u.name} ora lavora come ${u.task.profession}.`);return null;
   };
   Game.prototype.updateProduction=function(u,dt){
@@ -227,3 +228,4 @@
     document.addEventListener('visibilitychange',()=>{if(document.hidden&&dialog.open)this.backgroundDuringLogistics=true;});
   };
 })();
+

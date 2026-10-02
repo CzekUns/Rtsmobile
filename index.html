@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./app.css?v=62">
+  <link rel="stylesheet" href="./app.css?v=69">
   <style>
     .selection-card{
       left:auto!important;
@@ -17,13 +17,13 @@
       max-width:none!important;
     }
   </style>
-  <title>Terra Italica — RTS Mobile</title>
+  <title>Ver Sacrum — RTS Mobile</title>
 </head>
 <body>
   <main id="app" class="app-shell">
     <header class="hud-top" aria-label="Stato della comunità">
       <div class="identity">
-        <strong>TERRA ITALICA <small style="font-size:8px;opacity:.55;letter-spacing:.08em">BUILD 68</small></strong>
+        <strong>VER SACRUM <small style="font-size:8px;opacity:.55;letter-spacing:.08em">BUILD 69</small></strong>
         <span id="sessionState" role="status"></span><span id="dateLabel">1 Marzo · 1000 a.C.</span>
       </div>
       <div class="resources" id="resourceBar">
@@ -78,7 +78,8 @@
       <div id="build" class="dock-panel">
         <button data-build="road" type="button"><b>Sentiero</b><span>1 legno</span></button>
         <button data-build="warehouse" type="button"><b>Magazzino</b><span>18L · 8P</span></button>
-        <button data-build="house" type="button"><b>Distretto</b><span>24L · 10P</span></button>
+        <button data-build="house" type="button"><b>Villaggio</b><span>24L · 10P</span></button>
+        <button data-build="sawmill" type="button"><b>Falegnameria</b><span>18L · 8P</span></button>
         <button data-build="mill" type="button"><b>Mulino</b><span>20L · 12P</span></button>
         <button data-build="bakery" type="button"><b>Forno</b><span>16L · 16P</span></button>
         <button data-build="farm" type="button"><b>Campo</b><span>6 legno</span></button>
@@ -91,6 +92,7 @@
         <button id="characterBtn" type="button"><b>Personaggio</b><span>abitante selezionato</span></button>
         <button id="skillsBtn" type="button"><b>Skill</b><span>livelli e progresso</span></button>
         <button id="knowledgeBtn" type="button"><b>Saperi</b><span>personali e tribali</span></button>
+        <button id="settlementBtn" type="button"><b>Insediamento</b><span>collegamenti e produzione</span></button>
         <button id="logisticsBtn" type="button"><b>Filiera</b><span>inventari e trasporti</span></button>
         <button id="tradeBtn" type="button"><b>Scambia</b><span>mercato e carico locale</span></button>
         <button id="politicsBtn" type="button"><b>Diplomazia</b><span>lealtà, resistenza e influenza</span></button>
@@ -168,44 +170,55 @@
       <button type="submit">Assegna mestiere</button>
     </form>
     <p id="productionStatus" role="status"></p>
-    <p>I materiali da costruzione e riparazione devono essere consegnati fisicamente al cantiere o edificio. Merci nei magazzini, nelle fabbriche o in viaggio restano locali. Porta il pane alla Casa comune per le razioni e l’accoglienza.</p>
+    <p>I magazzini collegati al totem assegnano i materiali ai cantieri. I mercati riforniscono villaggi e artigiani. Ogni abitante consuma una razione ogni 30 giorni; le riparazioni richiedono pietra nell’edificio.</p>
   </dialog>
   <dialog id="tradeDialog" aria-labelledby="tradeTitle">
-    <header><h2 id="tradeTitle">Scambio al mercato</h2><button id="closeTrade" type="button">Chiudi</button></header>
-    <p>Partita in pausa · vengono scambiati soltanto il carico del mercante e le scorte del mercato scelto.</p>
+    <header><h2 id="tradeTitle">Baratto fra comunità</h2><button id="closeTrade" type="button">Chiudi</button></header>
+    <p>Scegli un’offerta: la carovana carica al tuo mercato, viaggia verso l’altra comunità e torna con le merci ricevute.</p>
     <label>Mercante<select id="tradePerson"></select></label>
-    <label>Mercato<select id="tradeMarket"></select></label>
+    <label>Mercato di destinazione<select id="tradeMarket"></select></label>
     <div id="tradeBalances"></div>
     <form id="tradeForm">
-      <label>Operazione<select id="tradeSide"><option value="buy">Compra</option><option value="sell">Vendi</option></select></label>
-      <label>Merce<select id="tradeGood"></select></label>
+      <label>Mercato di partenza<select id="tradeSource"></select></label><label>Merce offerta<select id="tradeOffer"></select></label><label>Quantità offerta<input id="tradeOfferQuantity" type="number" min="1" value="10" required></label><input id="tradeSide" type="hidden" value="barter">
+      <label>Merce richiesta<select id="tradeGood"></select></label>
       <label>Quantità<input id="tradeQuantity" type="number" min="1" step="1" inputmode="numeric" value="1" required></label>
       <section id="tradePreview" aria-live="polite"></section>
-      <button id="confirmTrade" type="submit">Scambia ora (se già presente)</button>
+      <button id="confirmTrade" type="submit">Verifica accordo</button>
       <button id="sendCaravan" type="button">Invia carovana</button>
     </form><p id="tradeStatus" role="status"></p>
   </dialog>
-  <script src="./game.js?v=67"></script>\n  <script src="./resources.js?v=67"></script>
+  <dialog id="linksDialog"><h2>Collegamenti dell’insediamento</h2><button id="closeLinks" type="button">Chiudi</button>
+    <p>Collegamenti automatici entro 12 tile. Le scorte si spostano fra inventari; i magazzini collegati al totem finanziano le costruzioni.</p>
+    <form id="cityForm"><label>Nome dell’insediamento<input id="cityName" maxlength="60"></label><button type="submit">Rinomina</button></form><label>Struttura<select id="linkBuilding"></select></label><div id="linksList"></div>
+    <form id="linkForm"><label>Collegamento<select id="linkPair"></select></label><label>Risorsa<select id="linkGood"></select></label>
+    <label><input id="linkEnabled" type="checkbox" checked>Collegamento aperto</label><label><input id="linkImport" type="checkbox" checked>Riprendi dal mercato sotto il minimo</label><label>Minimo magazzino<input id="linkMin" type="number" min="0" value="0"></label>
+    <label><input id="linkExport" type="checkbox" checked>Invia eccedenze al mercato</label><label>Scorta da trattenere<input id="linkKeep" type="number" min="0" value="30"></label><button type="submit">Salva collegamento</button></form>
+    <form id="factoryPolicy"><label>Artigiani desiderati<input id="factoryWorkers" type="number" min="0" max="8" value="1"></label><label>Quota prodotti al magazzino (%)<input id="factoryReturn" type="number" min="0" max="100" value="75"></label><button type="submit">Imposta produzione</button></form><p id="linkStatus" role="status"></p>
+  </dialog>
+  <script src="./game.js?v=69"></script>
+  <script src="./resources.js?v=69"></script>
   <script src="./p16-render.js?v=24"></script>
   <script src="./factions.js?v=61"></script>
-  <script src="./asset-render.js?v=68"></script>
+  <script src="./asset-render.js?v=69"></script>
   <script src="./touch-modifier.js?v=58"></script>
-  <script src="./logistics.js?v=59"></script>
-  <script src="./market.js?v=47"></script>
-  <script src="./caravan.js?v=48"></script>
+  <script src="./logistics.js?v=69"></script>
+  <script src="./market.js?v=69"></script>
+  <script src="./caravan.js?v=69"></script>
   <script src="./livestock.js?v=45"></script>
-  <script src="./persistence.js?v=59"></script>
-  <script src="./neutral.js?v=61"></script>
-  <script src="./politics.js?v=61"></script>
+  <script src="./persistence.js?v=69"></script>
+  <script src="./neutral.js?v=69"></script>
+  <script src="./politics.js?v=69"></script>
   <script src="./war.js?v=58"></script>
   <script src="./groups-minimap.js?v=52"></script>
   <script src="./streaming.js?v=53"></script>
   <script src="./community.js?v=39"></script>
-  <script src="./population.js?v=39"></script>
+  <script src="./population.js?v=69"></script>
   <script src="./equipment.js?v=39"></script>
   <script src="./character.js?v=39"></script>
   <script src="./skills.js?v=40"></script>
   <script src="./construction-knowledge.js?v=46"></script>
+  <script src="./settlement.js?v=69"></script>
   <script src="./boot.js?v=42"></script>
 </body>
 </html>
+

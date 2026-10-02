@@ -926,5 +926,12 @@
     }
   ],
   "timezone": "Europe/Rome",
-  "updated_at": "2026-09-22T06:23:00Z"
+  "updated_at": "2026-09-22T06:23:00Z",
+  "latest_manual_update": {
+    "build": 69,
+    "date": "2026-10-02",
+    "scope": "Totem, magazzini collegati, distribuzione interna, artigiani alimentati, quote di trasformazione e carovane di baratto",
+    "validation": "29 suite passate; 352 giorni simulati con tutte le fazioni; controllo visivo browser non eseguito per download Chromium non riuscito",
+    "specification": "docs/SETTLEMENT_ECONOMY.md"
+  }
 }

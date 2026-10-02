@@ -1,6 +1,6 @@
 {
-  "name": "Terra Italica — RTS Mobile",
-  "short_name": "Terra Italica",
+  "name": "Ver Sacrum — RTS Mobile",
+  "short_name": "Ver Sacrum",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#121511",
@@ -8,3 +8,4 @@
   "orientation": "any",
   "description": "RTS sandbox mobile ambientato nell'Italia preromana."
 }
+

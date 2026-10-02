@@ -9,7 +9,7 @@
   const itemsValid=items=>items&&typeof items==='object'&&!Array.isArray(items)&&Object.entries(items).every(([k,v])=>materials.has(k)&&Number.isSafeInteger(v)&&v>=0);
 
   function validate(d) {
-    check(d&&d.version===5,'versione');check(d.populationRules===undefined||d.populationRules===1,'regole popolazione');check(d.neutralRules===undefined||d.neutralRules===1,'regole insediamenti neutrali');check(d.politicsRules===undefined||d.politicsRules===1,'regole politiche');check(d.warRules===undefined||d.warRules===1,'regole guerra');check(d.groupRules===undefined||d.groupRules===1,'regole gruppi');check(d.streamingRules===undefined||d.streamingRules===1,'regole streaming');check(Number.isInteger(d.seed),'seed');
+    check(d&&d.version===5,'versione');check(d.populationRules===undefined||d.populationRules===1,'regole popolazione');check(d.neutralRules===undefined||d.neutralRules===1,'regole insediamenti neutrali');check(d.politicsRules===undefined||[1,2].includes(d.politicsRules),'regole politiche');check(d.warRules===undefined||d.warRules===1,'regole guerra');check(d.groupRules===undefined||d.groupRules===1,'regole gruppi');check(d.streamingRules===undefined||d.streamingRules===1,'regole streaming');check(Number.isInteger(d.seed),'seed');
     if(d.streaming!==undefined)check(d.streaming&&d.streaming.chunkSize===8&&d.streaming.maxCached===20,'configurazione streaming');
     if(d.savedGroups!==undefined){check(d.savedGroups&&typeof d.savedGroups==='object'&&!Array.isArray(d.savedGroups)&&Object.keys(d.savedGroups).every(k=>['1','2','3'].includes(k)),'gruppi');for(const ids of Object.values(d.savedGroups))check(Array.isArray(ids)&&ids.every(id=>typeof id==='string'),'membri gruppi');}
     for(const key of ['units','buildings','animals','raiders','resources','roads'])check(Array.isArray(d[key]),key);
@@ -22,6 +22,8 @@
     }
     check(d.buildings.some(b=>b.type==='base'),'casa comune');
     for(const b of d.buildings){
+      if(b.linkSettings!==undefined){check(b.linkSettings&&typeof b.linkSettings==='object'&&!Array.isArray(b.linkSettings),'collegamenti');for(const p of Object.values(b.linkSettings)){check(p&&typeof p.enabled==='boolean'&&p.goods&&typeof p.goods==='object','collegamento');for(const[k,v]of Object.entries(p.goods))check(materials.has(k)&&v&&typeof v.import==='boolean'&&typeof v.export==='boolean'&&Number.isSafeInteger(v.min)&&v.min>=0&&Number.isSafeInteger(v.keep)&&v.keep>=v.min,'soglie collegamento');}}
+      check(b.desiredWorkers===undefined||Number.isSafeInteger(b.desiredWorkers)&&b.desiredWorkers>=0&&b.desiredWorkers<=8,'artigiani desiderati');check(b.returnPercent===undefined||Number.isSafeInteger(b.returnPercent)&&b.returnPercent>=0&&b.returnPercent<=100,'quota comunitaria');check(b.returnDue===undefined||itemsValid(b.returnDue),'prodotti riservati');check(b.returnRemainder===undefined||itemsValid(b.returnRemainder)&&Object.values(b.returnRemainder).every(n=>n<100),'resti quota');check(b.cityName===undefined||typeof b.cityName==='string'&&b.cityName.length<=60&&!/[<>]/.test(b.cityName),'nome insediamento');
       check(Object.hasOwn(BUILD_LABEL,b.type),'edificio');check(finite(b.progress,0,1)&&finite(b.growth,0)&&finite(b.birthDays,0)&&finite(b.cooldown,0),'progresso edificio');
       check(Array.isArray(b.assigned)&&b.assigned.every(id=>typeof id==='string'),'lavoratori');
       check(b.workers===undefined||Array.isArray(b.workers)&&b.workers.every(id=>typeof id==='string'),'mestieri fabbrica');
@@ -34,13 +36,14 @@
       check(b.materialsConsumed===undefined||typeof b.materialsConsumed==='boolean','consumo cantiere');
       check(b.repairMaterialDebt===undefined||finite(b.repairMaterialDebt,0,1),'debito riparazione');
       if(b.type==='farm')check(b.crop===undefined||b.crop==='Grano'||typeof b.crop==='string'&&Object.hasOwn(window.TERRA_CROPS,b.crop),'coltura');
-      if(b.type==='market'){check(Number.isSafeInteger(b.money)&&b.money>=0,'liquidità mercato');check(b.demand&&Object.keys(window.TERRA_GOODS).every(k=>finite(b.demand[k],.1,10)),'domanda mercato');check(Array.isArray(b.tradeLedger)&&b.tradeLedger.length<=50&&b.tradeLedger.every(x=>x&&typeof x.id==='string'&&x.ok===true&&['buy','sell'].includes(x.side)&&materials.has(x.good)&&Number.isSafeInteger(x.quantity)&&x.quantity>0&&Number.isSafeInteger(x.unitPrice)&&x.unitPrice>0&&x.total===x.quantity*x.unitPrice),'registro mercato');}
-      if(b.owner>0&&b.type==='base'&&d.politicsRules===1){check(finite(b.loyalty,0,100)&&finite(b.resistance,0,100)&&finite(b.playerInfluence,0,100),'valori politici');check(['neutral','friendly','allied','hostile'].includes(b.relationship),'relazione politica');check(Array.isArray(b.diplomacyLedger)&&b.diplomacyLedger.length<=40,'registro politico');}
+      if(b.type==='market'){if(b.demand&&b.demand.planks===undefined)b.demand.planks=1;check(Number.isSafeInteger(b.money)&&b.money>=0,'liquidità mercato');check(b.demand&&Object.keys(window.TERRA_GOODS).every(k=>finite(b.demand[k],.1,10)),'domanda mercato');check(Array.isArray(b.tradeLedger)&&b.tradeLedger.length<=50&&b.tradeLedger.every(x=>x&&typeof x.id==='string'&&x.ok===true&&['buy','sell'].includes(x.side)&&materials.has(x.good)&&Number.isSafeInteger(x.quantity)&&x.quantity>0&&Number.isSafeInteger(x.unitPrice)&&x.unitPrice>0&&x.total===x.quantity*x.unitPrice),'registro mercato');}
+      if(b.owner>0&&b.type==='base'&&[1,2].includes(d.politicsRules)){check(finite(b.loyalty,0,100)&&finite(b.resistance,0,100)&&finite(b.playerInfluence,0,100),'valori politici');check(['neutral','friendly','allied','hostile'].includes(b.relationship),'relazione politica');check(Array.isArray(b.diplomacyLedger)&&b.diplomacyLedger.length<=40,'registro politico');}
       if(b.batch){const recipe=window.TERRA_RECIPES[b.type]?.find(r=>r.id===b.batch.recipeId)||window.TERRA_RECIPES[b.type]?.find(r=>b.batch.input===Object.keys(r.inputs)[0]&&b.batch.output===Object.keys(r.outputs)[0]);const inputs=b.batch.inputs||{[b.batch.input]:b.batch.amount},outputs=b.batch.outputs||{[b.batch.output]:b.batch.amount};check(recipe&&Object.entries(recipe.inputs).every(([k,n])=>inputs[k]===n)&&Object.entries(recipe.outputs).every(([k,n])=>outputs[k]===n)&&finite(b.batch.remaining,0,recipe.seconds),'ricetta');}
     }
     for(const u of d.units){
-      check(Number.isSafeInteger(u.owner)&&u.owner>=0&&u.owner<=2,'proprietario abitante');
+      check(Number.isSafeInteger(u.owner)&&u.owner>=0&&u.owner<=3,'proprietario abitante');
       if(u.owner>0)check(d.neutralRules===1&&typeof u.neutralSettlementId==='string'&&d.buildings.some(b=>b.owner===u.owner&&b.type==='base'&&b.settlementId===u.neutralSettlementId),'appartenenza neutrale');
+      check(u.fedUntil===undefined||finite(u.fedUntil,0),'copertura alimentare');check(u.homeVillageId===undefined||typeof u.homeVillageId==='string','domicilio');
       check(u.money===undefined||Number.isSafeInteger(u.money)&&u.money>=0,'denaro abitante');
       check(u.mobilized===undefined||typeof u.mobilized==='boolean','mobilitazione');
       check(!u.mobilized||u.location?.kind==='world','mobilitato sulla mappa');
@@ -57,9 +60,10 @@
       check(Array.isArray(u.path)&&u.path.every(p=>finite(p.x,0,WORLD_SIZE)&&finite(p.y,0,WORLD_SIZE)),'percorso');
       if(u.task){check(['move','gather','return','build','farm','enter','tame','attack','haul','production','repair','livestock','caravan'].includes(u.task.type),'ordine');
         if(u.task.type==='haul')check(typeof u.task.source==='string'&&typeof u.task.destination==='string'&&materials.has(u.task.good)&&['waiting','source','destination'].includes(u.task.phase)&&Number.isSafeInteger(u.task.amount)&&u.task.amount>=0&&u.task.amount<=u.inventory.cap&&typeof u.task.repeat==='boolean'&&finite(u.task.retry,0),'trasporto');
-        if(u.task.type==='production')check(typeof u.task.target==='string'&&['mugnaio','fornaio'].includes(u.task.profession),'mestiere');
+        if(u.task.type==='production')check(typeof u.task.target==='string'&&['mugnaio','fornaio','falegname'].includes(u.task.profession),'mestiere');
         if(u.task.type==='livestock')check(typeof u.task.target==='string'&&u.task.profession==='allevatore','mestiere allevamento');
-        if(u.task.type==='caravan')check(typeof u.task.market==='string'&&materials.has(u.task.good)&&Number.isSafeInteger(u.task.quantity)&&u.task.quantity>0&&['buy','sell'].includes(u.task.side)&&typeof u.task.transactionId==='string'&&['market','return'].includes(u.task.phase)&&u.task.home&&finite(u.task.home.x,0,WORLD_SIZE)&&finite(u.task.home.y,0,WORLD_SIZE)&&typeof u.task.traded==='boolean'&&typeof u.task.threatened==='boolean','carovana');
+        if(u.task.type==='caravan'&&u.task.barter)check(typeof u.task.source==='string'&&typeof u.task.market==='string'&&materials.has(u.task.offerGood)&&materials.has(u.task.good)&&Number.isSafeInteger(u.task.offerQuantity)&&u.task.offerQuantity>0&&Number.isSafeInteger(u.task.quantity)&&u.task.quantity>0&&['source','market','return'].includes(u.task.phase)&&typeof u.task.traded==='boolean','carovana baratto');
+        if(u.task.type==='caravan'&&!u.task.barter)check(typeof u.task.market==='string'&&materials.has(u.task.good)&&Number.isSafeInteger(u.task.quantity)&&u.task.quantity>0&&['buy','sell'].includes(u.task.side)&&typeof u.task.transactionId==='string'&&['market','return'].includes(u.task.phase)&&u.task.home&&finite(u.task.home.x,0,WORLD_SIZE)&&finite(u.task.home.y,0,WORLD_SIZE)&&typeof u.task.traded==='boolean'&&typeof u.task.threatened==='boolean','carovana');
       }
     }
     check(d.constructionRules===undefined||d.constructionRules===1,'regole sapere edilizio');
@@ -148,7 +152,7 @@
       const previous=localStorage.getItem(SLOT);
       if(previous){try{validate(JSON.parse(previous));localStorage.setItem(BACKUP,previous)}catch(e){if(e.name==='QuotaExceededError')throw e;}}
       localStorage.setItem(SLOT,raw);localStorage.removeItem(TEMP);this.saveFailed=false;return true;
-    }catch(e){this.saveFailed=true;if(show)this.message('Salvataggio non riuscito: spazio locale insufficiente o dati non validi.');return false;}
+    }catch(e){this.lastSaveError=e.message;this.saveFailed=true;if(show)this.message('Salvataggio non riuscito: spazio locale insufficiente o dati non validi.');return false;}
   };
   Game.prototype.load=function(){
     try{
@@ -212,3 +216,4 @@
   const newGame=Game.prototype.newGame;
   Game.prototype.newGame=function(seed){newGame.call(this,seed);this.autosave=0;this.suspended=!!document.hidden;this.setPaused(false);};
 })();
+

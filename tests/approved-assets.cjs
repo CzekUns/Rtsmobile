@@ -17,9 +17,10 @@ test('mill uses approved image only when loaded and keeps procedural fallback',(
 });
 
 test('PWA cache includes both approved masters and has a fresh version',()=>{
-  const sw=readFileSync(path.join(root,'sw.js'),'utf8');assert.match(sw,/terra-italica-v59/);assert.match(sw,/building_mill_p16\.png/);assert.match(sw,/ui_selection_marker_p16\.png/);
+  const sw=readFileSync(path.join(root,'sw.js'),'utf8');assert.match(sw,/terra-italica-v69/);assert.match(sw,/building_mill_p16\.png/);assert.match(sw,/ui_selection_marker_p16\.png/);
 });
 
 test('inventory records Drive IDs, dimensions and rejected overview-scale files',()=>{
   const doc=readFileSync(path.join(root,'docs/ASSET_INVENTORY.md'),'utf8');assert.match(doc,/1e2JOCQV4zu3Rz7CWZxI34eT5sgYBKW7K/);assert.match(doc,/32×38 RGBA/);assert.match(doc,/142mP8IUG7WhDKbROAP-_fNgX9jWOy5su/);assert.match(doc,/495×495/);assert.match(doc,/terreno procedurale/);
 });
+

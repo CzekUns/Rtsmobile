@@ -9,10 +9,10 @@ const WORLD_SIZE=88;
 const SAVE_KEY='terra-italica-save-v2';
 const NAMES=['Aulo','Neria','Tito','Velia','Maro','Tana','Silio','Ovia','Vibio','Larth','Atria','Festo','Tita','Numa','Ruma','Caio'];
 const BUILD_COSTS={
-  mill:{wood:20,stone:12}, bakery:{wood:16,stone:16}, warehouse:{wood:18,stone:8}, house:{wood:24,stone:10}, farm:{wood:6},
+  sawmill:{wood:18,stone:8},mill:{wood:20,stone:12}, bakery:{wood:16,stone:16}, warehouse:{wood:18,stone:8}, house:{wood:24,stone:10}, farm:{wood:6},
   pen:{wood:12,stone:4}, market:{wood:22,stone:10}, palisade:{wood:4}, tower:{wood:14,stone:8}
 };
-const BUILD_LABEL={mill:'Mulino',bakery:'Forno',base:'Casa comune',warehouse:'Magazzino',house:'Distretto',farm:'Campo',pen:'Recinto',market:'Mercato',palisade:'Palizzata',tower:'Torre'};
+const BUILD_LABEL={sawmill:'Falegnameria',mill:'Mulino',bakery:'Forno',base:'Totem',warehouse:'Magazzino',house:'Villaggio',farm:'Campo',pen:'Recinto',market:'Mercato',palisade:'Palizzata',tower:'Torre'};
 const BIOME={
   sea:{name:'Mare',color:'#34484b',walk:false,fertility:0}, river:{name:'Fiume',color:'#48615f',walk:false,fertility:.2},
   beach:{name:'Spiaggia',color:'#9a8d69',walk:true,fertility:.35}, grass:{name:'Prateria',color:'#687454',walk:true,fertility:1},
@@ -87,13 +87,13 @@ class Game{
   constructor(){
     this.canvas=$('#world');this.ctx=this.canvas.getContext('2d',{alpha:false});this.wrap=$('#worldWrap');this.dpr=1;
     this.seed=(Date.now()&0x7fffffff);this.rng=new RNG(this.seed);this.world=null;this.units=[];this.buildings=[];this.animals=[];this.raiders=[];
-    this.stock={food:70,wood:55,stone:24,iron:0};this.day=1;this.month=2;this.year=1000;this.totalDays=0;this.dayAccumulator=0;this.secondsPerDay=.85;this.paused=false;this.gameEnded=false;
+    this.stock={food:70,wood:55,stone:24,iron:0};this.day=1;this.month=2;this.year=800;this.totalDays=0;this.dayAccumulator=0;this.secondsPerDay=.85;this.paused=false;this.gameEnded=false;
     this.camera={x:0,y:0,zoom:1.05};this.selected=null;this.orderMode=null;this.buildMode=null;this.pointer=new Map();this.dragging=false;this.lastFrame=performance.now();this.uiTick=0;this.autosave=0;this.raidLevel=0;this.nextRaidDay=65;
     this.initUI();this.newGame(this.seed);this.loop=this.loop.bind(this);requestAnimationFrame(this.loop);
     if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
   }
   newGame(seed){
-    this.seed=seed;this.rng=new RNG(seed);this.world=new World(seed);this.groupSelection=[];this.orderMode=null;this.buildMode=null;this.pointerCancel();this.syncModeButtons();this.units=[];this.buildings=[];this.animals=[];this.raiders=[];this.stock={food:70,wood:55,stone:24,iron:0};this.day=1;this.month=2;this.year=1000;this.totalDays=0;this.dayAccumulator=0;this.raidLevel=0;this.nextRaidDay=65;this.gameEnded=false;$('#gameOver').classList.add('hidden');
+    this.seed=seed;this.rng=new RNG(seed);this.world=new World(seed);this.groupSelection=[];this.orderMode=null;this.buildMode=null;this.pointerCancel();this.syncModeButtons();this.units=[];this.buildings=[];this.animals=[];this.raiders=[];this.stock={food:70,wood:55,stone:24,iron:0};this.day=1;this.month=2;this.year=800;this.totalDays=0;this.dayAccumulator=0;this.raidLevel=0;this.nextRaidDay=65;this.gameEnded=false;$('#gameOver').classList.add('hidden');
     const spawn=this.findSpawn();this.buildings.push(new Building('base',spawn.x,spawn.y,0,true));
     for(let i=0;i<5;i++)this.units.push(new Unit(NAMES[i],spawn.x+.2+(i%3)*.48,spawn.y+1.2+Math.floor(i/3)*.5,this.rng));
     this.spawnAnimals(24);this.camera.x=(spawn.x+.5)*TILE;this.camera.y=(spawn.y+.5)*TILE;this.selected=this.units[0];this.lastSelectedUnit=this.units[0];this.resize();this.updateUI();this.message('La comunità è pronta. Seleziona un abitante e assegna un lavoro.');
@@ -127,7 +127,7 @@ class Game{
     if(entity){this.selected=entity;if(entity instanceof ResourceNode&&this.lastSelectedUnit){this.selected=this.lastSelectedUnit;this.assignGather(this.selected,entity)}else if(entity instanceof Unit)this.lastSelectedUnit=entity;this.updateUI();return}
     if(this.selected instanceof Unit){this.assignMove(this.selected,tx,ty);this.message(`${this.selected.name} si sposta.`)}else{this.selected=null;this.updateUI()}
   }
-  pickEntity(p){let best=null,bd=.58;const groups=[this.units.filter(u=>u.location.kind==='world'),this.raiders,this.animals,this.buildings,this.world.resources];for(const arr of groups)for(const e of arr){if(e.health!==undefined&&e.health<=0)continue;if(e.amount!==undefined&&e.amount<=0)continue;const d=Math.hypot(e.x-p.x,e.y-p.y);if(d<bd){best=e;bd=d}}return best}
+  pickEntity(p){let best=null,bd=.58;const groups=[this.units.filter(u=>u.location.kind==='world'),this.raiders,this.animals,this.buildings,this.world.resources];for(const arr of groups)for(const e of arr){if(e.health!==undefined&&e.health<=0)continue;if(e.cleared||e.amount!==undefined&&e.amount<=0&&!e.renewable)continue;const d=Math.hypot(e.x-p.x,e.y-p.y);if(d<bd){best=e;bd=d}}return best}
   orderHelp(o){return({move:'Tocca il punto di destinazione.',gather:'Tocca un albero, una roccia, bacche o ferro.',farm:'Tocca un campo costruito.',enter:'Tocca un Distretto operativo.',tame:'Tocca una pecora selvatica.',attack:'Tocca un lupo o un razziatore.'})[o]||''}
   applyOrder(o,pos,tx,ty,u=this.selected){if(o==='move')this.assignMove(u,tx,ty);else if(o==='gather'){const r=this.nearestAt(this.world.resources,pos,.8);if(r)this.assignGather(u,r);else return this.message('Qui non c’è una risorsa raccoglibile.')}else if(o==='farm'){const b=this.nearestAt(this.buildings,pos,.9,x=>x.type==='farm'&&x.built);if(b)this.assignFarm(u,b);else return this.message('Tocca un campo completato.')}else if(o==='enter'){const b=this.nearestAt(this.buildings,pos,.9,x=>x.type==='house'&&x.built&&x.alive);if(b)this.assignEnter(u,b);else return this.message('Tocca un Distretto operativo.')}else if(o==='tame'){const a=this.nearestAt(this.animals,pos,.9,x=>x.type==='sheep'&&x.owner===-1);if(a)this.assignTame(u,a);else return this.message('Serve una pecora selvatica.')}else if(o==='attack'){const target=this.nearestAt([...this.raiders,...this.animals.filter(a=>a.type==='wolf')],pos,.9);if(target)this.assignAttack(u,target);else return this.message('Nessuna minaccia selezionata.')}this.orderMode=null;this.syncModeButtons();this.updateUI()}
   nearestAt(arr,p,r,filter=()=>true){let best=null,bd=r;for(const e of arr)if(filter(e)){const d=Math.hypot(e.x-p.x,e.y-p.y);if(d<bd){best=e;bd=d}}return best}
@@ -213,3 +213,4 @@ class Game{
 }
 
 // Boot runs after simulation extensions are installed.
+

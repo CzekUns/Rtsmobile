@@ -35,6 +35,7 @@
   const oldDrawResource=Game.prototype.drawResource,oldDrawHuman=Game.prototype.drawHuman,oldDrawAnimal=Game.prototype.drawAnimal,oldDrawBuilding=Game.prototype.drawBuilding,oldSelectionRing=Game.prototype.selectionRing;
   Game.prototype.selectionRing=function(x,y,r){const img=SPRITES.selection;if(!drawCentered(this.ctx,img,x,y,r*2,r*2))oldSelectionRing.call(this,x,y,r);};
   Game.prototype.drawResource=function(r){
+    if(r.cleared)return;
     const z=this.camera.zoom,ratio=r.max>0?r.amount/r.max:0,ctx=this.ctx;
 
     // One node = one marker. Renewable nodes are hexes with their own depletion state.

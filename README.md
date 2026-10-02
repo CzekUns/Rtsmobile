@@ -1,3 +1,9 @@
+# Ver Sacrum — build 69
+
+Economia comunitaria senza denaro: totem, magazzini collegati, mercati distributivi, artigiani alimentati e carovane di baratto. Apri **Mondo → Insediamento** per collegamenti, soglie e quote di produzione. **Scambi** imposta il baratto fra mercati. La falegnameria produce tavole; i villaggi crescono solo con cibo e alloggi.
+
+Regole e migrazione: [docs/SETTLEMENT_ECONOMY.md](docs/SETTLEMENT_ECONOMY.md). I valori economici sotto, se riferiti a build precedenti, sono storici e sostituiti da questa specifica.
+
 # Terra Italica — RTS Mobile
 
 RTS sandbox mobile-first ambientato nell'Italia preromana. La direzione funzionale è descritta nel handoff Ver Sacrum desktop Godot; questa PWA ha visuale top-down e controlli dedicati agli smartphone, e non ha ancora parità di funzioni con il desktop.
@@ -49,3 +55,4 @@ Le incursioni sono temporaneamente disattivate. Al caricamento vengono rimossi i
 
 ### BUILD 59 — risorse e raccolta continua
 Risorse naturali ×10, comprese le quantità residue dei vecchi salvataggi (una sola volta; spot esauriti restano vuoti). Carichi e merci cadute non sono moltiplicati. Esaurito uno spot, il raccoglitore cerca lo spot raggiungibile più vicino dello stesso tipo entro 10 tile dallo spot esaurito; a carico pieno consegna prima al deposito. Senza alternative consegna il residuo e si ferma.
+
