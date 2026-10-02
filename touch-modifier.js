@@ -194,6 +194,7 @@
         prevDist:Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y)
       };
       this.rtsSelectionBox = null;
+      this.buildPreview = null;
       e.preventDefault();
       return;
     }
@@ -204,10 +205,13 @@
     }
 
     this.rtsGesture = {
-      type: modifierHeld ? 'leftCandidate' : 'modCandidate',
+      type: this.buildMode ? (modifierHeld ? 'buildCancel' : 'buildDrag') : (modifierHeld ? 'leftCandidate' : 'modCandidate'),
+      buildType:this.buildMode,
       pointerId:e.pointerId
     };
     this.rtsSelectionBox = null;
+    if(this.rtsGesture.type==='buildCancel')this.cancelBuildPlacement();
+    else if(this.rtsGesture.type==='buildDrag')this.updateBuildPreview(p.x,p.y);
     e.preventDefault();
   };
 
@@ -221,6 +225,7 @@
       const pts=[...this.rtsPointers.values()];
       const d=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
       if (this.rtsGesture?.type !== 'pinch') this.rtsGesture={type:'pinch',prevDist:d};
+      this.buildPreview=null;
       const prev=this.rtsGesture.prevDist || d;
       if (Math.abs(d-prev)>1) this.camera.zoom=clamp(this.camera.zoom*(d/prev),.48,2.3);
       this.rtsGesture.prevDist=d;
@@ -231,6 +236,11 @@
 
     const g=this.rtsGesture;
     if (!g || g.pointerId !== e.pointerId) return;
+    if(g.type==='buildDrag'||g.type==='buildCancel'){
+      if(modifierHeld){g.type='buildCancel';this.cancelBuildPlacement();}
+      else if(g.type==='buildDrag'&&this.buildMode===g.buildType)this.updateBuildPreview(lp.x,lp.y);
+      e.preventDefault();return;
+    }
     const moved=Math.hypot(e.clientX-p.startX, e.clientY-p.startY);
 
     if (g.type === 'leftCandidate' && moved > 7) {
@@ -273,7 +283,11 @@
     }
 
     if (g?.pointerId === e.pointerId) {
-      if (g.type === 'leftBox' && this.rtsSelectionBox) {
+      if(g.type==='buildDrag'||g.type==='buildCancel'){
+        if(g.type==='buildCancel'||modifierHeld)this.cancelBuildPlacement();
+        else if(this.buildMode===g.buildType){const preview=this.updateBuildPreview(lp.x,lp.y);if(preview?.valid)this.placeBuild(preview.type,preview.x,preview.y);else if(preview?.error)this.message(preview.error);}
+        this.buildPreview=null;
+      } else if (g.type === 'leftBox' && this.rtsSelectionBox) {
         this.rtsSelectionBox.x=lp.x;
         this.rtsSelectionBox.y=lp.y;
         this.rtsSyncSelectionBox();
@@ -289,6 +303,32 @@
     this.rtsSelectionBox=null;
     this.rtsGesture=null;
     e.preventDefault();
+  };
+
+
+  Game.prototype.cancelBuildPlacement=function(){this.buildMode=null;this.buildPreview=null;this.syncModeButtons();};
+  Game.prototype.updateBuildPreview=function(sx,sy){
+    if(!this.buildMode){this.buildPreview=null;return null;}
+    const type=this.buildMode,w=this.screenToWorld(sx,sy),x=Math.floor(w.x/TILE),y=Math.floor(w.y/TILE);
+    let error=sx<0||sy<0||sx>this.viewW||sy>this.viewH?'Rilascia dentro la mappa.':null;
+    if(!error)error=this.villagePlacementError(type,x,y);
+    const cost=type==='road'?{wood:1}:BUILD_COSTS[type];
+    if(!error&&(!cost||!this.canPay(cost)))error='Risorse disponibili insufficienti.';
+    if(!error&&type==='road'&&this.world.tile(x,y)?.road)error='Qui c’è già un sentiero.';
+    const builder=this.selected instanceof Unit&&this.selected.location.kind==='world'?this.selected:this.units.find(u=>u.health>0&&u.location.kind==='world'&&!u.mobilized&&u.state==='idle');
+    if(!error&&!this.constructionCheck(type,builder).ok)error=builder?this.constructionRequirementText(type,builder):'Serve un costruttore disponibile.';
+    const ghost=this.buildPreview?.type===type?this.buildPreview.ghost:new Building(type,x,y,0,true);ghost.x=x+.5;ghost.y=y+.5;ghost.preview=true;
+    this.buildPreview={type,x,y,valid:!error,error,ghost};return this.buildPreview;
+  };
+  const cancelPointer=Game.prototype.pointerCancel;
+  Game.prototype.pointerCancel=function(){this.buildPreview=null;return cancelPointer.call(this);};
+  Game.prototype.drawBuildPreview=function(){
+    const b=this.buildPreview;if(!b||this.buildMode!==b.type)return;
+    const c=this.ctx,z=this.camera.zoom,r=window.VER_SACRUM_VILLAGE.bounds(b.ghost),p=this.worldToScreen(r.left*TILE,r.top*TILE),width=(r.right-r.left)*TILE*z,height=(r.bottom-r.top)*TILE*z;
+    c.save();c.setTransform(this.dpr,0,0,this.dpr,0,0);c.globalAlpha=.45;
+    if(b.type!=='road')this.drawBuilding(b.ghost);
+    c.globalAlpha=1;c.fillStyle=b.valid?'#6bbb633d':'#db514c55';c.strokeStyle=b.valid?'#a0ed83':'#ff766d';c.lineWidth=2;c.fillRect(p.x,p.y,width,height);c.strokeRect(p.x,p.y,width,height);
+    c.fillStyle=b.valid?'#ddffd1':'#ffe0dd';c.font='bold 12px sans-serif';c.fillText(BUILD_LABEL[b.type]||'Sentiero',p.x,p.y-7);c.restore();
   };
 
   // Keep the selection anchored to the terrain while the camera moves.
@@ -337,6 +377,7 @@
 
   Game.prototype.draw = function() {
     originalDraw.call(this);
+    this.drawBuildPreview();
     const box=this.rtsSelectionBox;
     if (!box?.active) return;
     const ctx=this.ctx;
@@ -352,3 +393,4 @@
     ctx.restore();
   };
 })();
+

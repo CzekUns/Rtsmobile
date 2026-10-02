@@ -1,4 +1,6 @@
-# Ver Sacrum — build 70
+# Ver Sacrum — build 71
+
+Costruzioni: tieni premuto e trascina il fantasma, rilascia per piazzare. **MOD + tap annulla la modalità costruzione.** Verde = posizione valida; rosso = posizione non valida.
 
 Villaggi aggiornati a **4 × 4 tile**, con ingombro, selezione, accessi e minimappa coerenti.
 

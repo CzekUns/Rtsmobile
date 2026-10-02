@@ -9,10 +9,10 @@ test('free tap orders, free drag pans; MOD tap selects and MOD drag boxes',()=>{
   g.pointerDown(ev(3,180,250));g.pointerUp(ev(3,180,250));assert.equal(select,1);assert.equal(order,1);
   const camera=g.camera.x;g.pointerDown(ev(4,180,250));g.pointerMove(ev(4,220,300));assert(g.rtsSelectionBox.active);assert.equal(g.camera.x,camera);g.pointerUp(ev(4,220,300));assert.equal(order,1);
 });
-test('free tap respects explicit orders and building tools before contextual delivery',()=>{
+test('free tap respects explicit orders before contextual delivery',()=>{
   const {g}=make();let tool=0,context=0;g.rtsLeftTap=()=>tool++;g.rtsContextTap=()=>context++;
-  for(const mode of ['orderMode','buildMode']){g[mode]='test';g.pointerDown(ev(1,180,250));g.pointerUp(ev(1,180,250));g[mode]=null;}
-  assert.equal(tool,2);assert.equal(context,0);
+  for(const mode of ['orderMode']){g[mode]='test';g.pointerDown(ev(1,180,250));g.pointerUp(ev(1,180,250));g[mode]=null;}
+  assert.equal(tool,1);assert.equal(context,0);
 });
 test('incursions disabled by default, including scheduled spawning',()=>{
   const {g}=make();assert.equal(g.raidsEnabled,false);g.spawnRaid();assert.equal(g.raiders.length,0);
@@ -23,3 +23,4 @@ test('saved raiders are removed and their attack orders cleared without changing
   g.raidsEnabled=false;assert(g.load());assert.equal(g.raiders.length,0);assert.equal(g.units[0].task,null);assert.equal(g.units[0].inventory.amount,3);assert.deepEqual(g.warCamps.map(c=>c.id),camps);
   g.spawnRaid();assert.equal(g.raiders.length,0);
 });
+
