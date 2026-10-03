@@ -53,6 +53,7 @@ Game.prototype.spawnPositionFree=function(p,ignore=null,occupied=actors(this)){
  if(this.buildings.some(b=>b.alive&&overlaps(r,bounds(b))))return false;
  if((this.warCamps||[]).some(b=>b.health>0&&overlaps(r,bounds(b))))return false;
  if(this.world.resources.some(n=>resourceAlive(n)&&overlaps(r,resourceBounds(n))))return false;
+ if(ignore instanceof Animal&&!this.animalHasExit(p))return false;
  return !occupied.some(e=>e!==ignore&&dist(e,p)<.95);
 };
 Game.prototype.nearestSpawnPosition=function(p,ignore=null,occupied=actors(this)){
@@ -152,9 +153,39 @@ Game.prototype.followPath=function(e,dt,speed){
  if(e.path?.length&&!this.movementClear(e,e.path[0])){e.path=[];return;}
  return follow.call(this,e,dt,speed);
 };
-for(const method of ['updateAnimal','updateRaider']){
+for(const method of ['updateRaider']){
  const update=Game.prototype[method];Game.prototype[method]=function(e,dt){const before={x:e.x,y:e.y};update.call(this,e,dt);if(!this.movementClear(before,e)){e.x=before.x;e.y=before.y;if(e.path)e.path=[];}};
 }
+// Animals avoid the full resource footprint throughout movement, not just spawn.
+Game.prototype.animalTerrainClear=function(p){return this.spawnPositionFree(p,null,[]);};
+Game.prototype.animalSegmentClear=function(from,to){
+ const steps=Math.max(1,Math.ceil(dist(from,to)/.15));
+ for(let i=0;i<=steps;i++)if(!this.animalTerrainClear({x:from.x+(to.x-from.x)*i/steps,y:from.y+(to.y-from.y)*i/steps}))return false;
+ return true;
+};
+Game.prototype.animalHasExit=function(p){
+ return [[.5,0],[-.5,0],[0,.5],[0,-.5]].some(([x,y])=>this.animalSegmentClear(p,{x:p.x+x,y:p.y+y}));
+};
+const animalUpdate=Game.prototype.updateAnimal;
+Game.prototype.updateAnimal=function(a,dt){
+ if(a.health<=0)return;
+ // Also repair old or newly obstructed positions without replacing the animal.
+ if(!this.animalTerrainClear(a)){
+  const free=this.nearestSpawnPosition(a,a);if(!free)return;
+  a.x=free.x;a.y=free.y;a.vx=0;a.vy=0;a.wander=0;
+ }
+ const before={x:a.x,y:a.y};animalUpdate.call(this,a,dt);
+ if(this.animalSegmentClear(before,a))return;
+ const angle=Math.atan2(a.y-before.y,a.x-before.x),step=Math.max(dist(before,a),.28*dt);
+ a.x=before.x;a.y=before.y;
+ // Turn along the obstacle rather than retrying the same blocked direction.
+ for(const turn of [Math.PI/2,-Math.PI/2,Math.PI/4,-Math.PI/4,Math.PI]){
+  const heading=angle+turn,next={x:before.x+Math.cos(heading)*step,y:before.y+Math.sin(heading)*step};
+  if(!this.animalSegmentClear(before,next))continue;
+  a.x=next.x;a.y=next.y;a.vx=Math.cos(heading)*.28;a.vy=Math.sin(heading)*.28;a.wander=1;return;
+ }
+ a.vx=0;a.vy=0;a.wander=0;
+};
 const pen=Game.prototype.assignAnimalToPen;
 Game.prototype.assignAnimalToPen=function(a,b){
  if(!a||!b)return pen.call(this,a,b);
