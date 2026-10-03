@@ -372,7 +372,7 @@
     if (this.selected?.id === u.id) return;
     if (!this.groupSelection.some(x => x.id === u.id)) return;
     const p=this.worldToScreen(u.x*TILE,u.y*TILE);
-    this.selectionRing(p.x,p.y,11*this.camera.zoom);
+    this.selectionRing(p.x,p.y,11*.8*this.camera.zoom);
   };
 
   Game.prototype.draw = function() {
