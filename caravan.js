@@ -9,7 +9,7 @@ Game.prototype.updateCaravan=function(u,dt){
  if(!source?.alive||source.owner!==u.owner){this.cancelTask(u);this.message('Mercato di origine perduto: il carico resta alla carovana.');return;}
  if(t.phase==='market'&&(!market?.alive||!market.built)){t.phase='return';u.path=[];}
  const target=t.phase==='market'?market:source;t.threatened=this.caravanThreat(u);if(t.threatened){u.path=[];return;}
- if(dist(u,target)>1.15){if(!u.path.length){const p=this.pathToBuilding(u,target);if(p===null){t.blocked=true;return;}u.path=p;}t.blocked=false;this.followPath(u,dt,1.45);return;}
+ if(this.buildingDistance(u,target)>1.15){if(!u.path.length){const p=this.pathToBuilding(u,target);if(p===null){t.blocked=true;return;}u.path=p;}t.blocked=false;this.followPath(u,dt,1.45);return;}
  if(t.phase==='source'){const d={...t,trader:u,source,market};const error=this.barterQuote(d);if(error){this.cancelTask(u);this.message(error);return;}source.inventory.items[t.offerGood]-=t.offerQuantity;u.inventory.type=t.offerGood;u.inventory.amount=t.offerQuantity;t.phase='market';u.path=[];return;}
  if(t.phase==='market'){const result=this.tradeAtMarket({...t,trader:u,source,market});t.traded=result.ok;t.phase='return';u.path=[];if(!result.ok)this.message(result.error+' La carovana riporta l’offerta.');return;}
  const n=Math.min(u.inventory.amount,this.freeSpace(source));if(n){source.inventory.items[u.inventory.type]=(source.inventory.items[u.inventory.type]||0)+n;u.inventory.amount-=n;}if(u.inventory.amount)return;u.inventory.type=null;this.cancelTask(u);this.message('Carovana rientrata: merci depositate nel mercato.');

@@ -37,7 +37,7 @@
   Game.prototype.updateUnit=function(u,dt){
     if(u.state!=='livestock')return updateUnit.call(this,u,dt);
     const pen=this.findById(this.buildings,u.task?.target);if(!pen?.alive||!pen.built||pen.type!=='pen'){this.cancelTask(u);return;}
-    if(dist(u,pen)>1.15){if(!u.path.length){const path=this.pathToBuilding(u,pen);if(path===null){this.cancelTask(u);return;}u.path=path;}this.followPath(u,dt,1.55);}
+    if(this.buildingDistance(u,pen)>1.15){if(!u.path.length){const path=this.pathToBuilding(u,pen);if(path===null){this.cancelTask(u);return;}u.path=path;}this.followPath(u,dt,1.55);}
   };
   const cancelTask=Game.prototype.cancelTask;
   Game.prototype.cancelTask=function(u){if(u?.task?.type==='livestock'){const b=this.findById(this.buildings,u.task.target);if(b)b.workers=(b.workers||[]).filter(id=>id!==u.id);}return cancelTask.call(this,u);};
@@ -45,7 +45,7 @@
   Game.prototype.buildingDay=function(b){
     buildingDay.call(this,b);if(b.type!=='pen'||!b.built||!b.alive)return;this.ensureLivestock();
     const animals=b.animalIds.map(id=>this.findById(this.animals,id)).filter(a=>a?.health>0&&a.owner===0&&a.type==='sheep');
-    const workers=b.workers.map(id=>this.findById(this.units,id)).filter(u=>u?.health>0&&u.task?.type==='livestock'&&u.task.target===b.id&&dist(u,b)<=1.2);
+    const workers=b.workers.map(id=>this.findById(this.units,id)).filter(u=>u?.health>0&&u.task?.type==='livestock'&&u.task.target===b.id&&this.buildingDistance(u,b)<=1.15);
     if(!animals.length||!workers.length)return;
     const forage=animals.length*RULES.foragePerAnimal;if((b.inventory.items.forage||0)<forage)return;
     const milk=animals.length*RULES.milkPerSheep;if(this.freeSpace(b)<milk)return;

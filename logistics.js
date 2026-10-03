@@ -42,7 +42,7 @@
   };
   Game.prototype.updateProduction=function(u,dt){
     const b=this.findById(this.buildings,u.task?.target);if(!b?.alive||!b.built||!RECIPES[b.type]){this.cancelTask(u);return;}
-    if(dist(u,b)>1.15){if(!u.path.length){const path=this.pathToBuilding(u,b);if(path===null){this.cancelTask(u);return;}u.path=path;}this.followPath(u,dt,1.55);}
+    if(this.buildingDistance(u,b)>1.15){if(!u.path.length){const path=this.pathToBuilding(u,b);if(path===null){this.cancelTask(u);return;}u.path=path;}this.followPath(u,dt,1.55);}
   };
   const newGame=Game.prototype.newGame;
   Game.prototype.newGame=function(seed){newGame.call(this,seed);this.ensureInventories();};
@@ -58,7 +58,7 @@
   Game.prototype.pay=function(cost){if(!this.canPay(cost))return false;for(const [k,v]of Object.entries(cost))this.stock[k]-=v;return true;};
   Game.prototype.pathToBuilding=function(u,b){
     if(!b?.alive)return null;
-    if(dist(u,b)<=1.15)return [];
+    if(this.buildingDistance(u,b)<=1.15)return [];
     const x=Math.floor(b.x),y=Math.floor(b.y);
     const targets=[[x+1,y],[x-1,y],[x,y+1],[x,y-1]].filter(([x,y])=>this.world.walkable(x,y,1,null,this.buildings)).sort((a,c)=>Math.hypot(u.x-a[0],u.y-a[1])-Math.hypot(u.x-c[0],u.y-c[1]));
     for(const [tx,ty]of targets){const path=this.findPath(u.x,u.y,tx,ty,1);if(path.length)return path;}
@@ -88,7 +88,7 @@
     if(t.retry>0){t.retry=Math.max(0,t.retry-dt);return;}
     if(t.phase==='waiting'){this.prepareHaul(u);return;}
     const target=t.phase==='source'?source:destination;
-    if(dist(u,target)>1.15){
+    if(this.buildingDistance(u,target)>1.15){
       if(!u.path.length){const path=this.pathToBuilding(u,target);if(path===null){t.retry=2;return;}u.path=path;}
       this.followPath(u,dt,1.6);return;
     }
@@ -114,7 +114,7 @@
     if(u.inventory.amount)return 'Deposita prima il carico dell’abitante.';const path=this.pathToBuilding(u,b);if(path===null)return 'Edificio non raggiungibile.';
     this.cancelTask(u);u.task={type:'repair',target:b.id};u.state='repairing';u.path=path;return null;
   };
-  Game.prototype.updateRepair=function(u,dt){const b=this.findById(this.buildings,u.task?.target);if(!b?.alive||!b.built||b.health>=b.maxHealth){this.cancelTask(u);return;}if(dist(u,b)>1.15){if(!u.path.length){const p=this.pathToBuilding(u,b);if(p===null){this.cancelTask(u);return;}u.path=p;}this.followPath(u,dt,1.55);return;}const stone=b.inventory.items.stone||0;if(stone<=0)return;const hp=Math.min(b.maxHealth-b.health,dt*(5+u.skills.construction),stone/REPAIR_COST_PER_HP);if(hp<=0)return;b.health+=hp;b.repairMaterialDebt=(b.repairMaterialDebt||0)+hp*REPAIR_COST_PER_HP;const spend=Math.floor(b.repairMaterialDebt+1e-9);if(spend){b.inventory.items.stone-=spend;b.repairMaterialDebt-=spend;}u.gain('construction',dt*.2);if(b.health>=b.maxHealth-.001){b.health=b.maxHealth;const finalSpend=Math.min(b.inventory.items.stone||0,Math.ceil(b.repairMaterialDebt-1e-9));b.inventory.items.stone=(b.inventory.items.stone||0)-finalSpend;b.repairMaterialDebt=0;this.cancelTask(u);this.message(`${BUILD_LABEL[b.type]} riparato.`);}};
+  Game.prototype.updateRepair=function(u,dt){const b=this.findById(this.buildings,u.task?.target);if(!b?.alive||!b.built||b.health>=b.maxHealth){this.cancelTask(u);return;}if(this.buildingDistance(u,b)>1.15){if(!u.path.length){const p=this.pathToBuilding(u,b);if(p===null){this.cancelTask(u);return;}u.path=p;}this.followPath(u,dt,1.55);return;}const stone=b.inventory.items.stone||0;if(stone<=0)return;const hp=Math.min(b.maxHealth-b.health,dt*(5+u.skills.construction),stone/REPAIR_COST_PER_HP);if(hp<=0)return;b.health+=hp;b.repairMaterialDebt=(b.repairMaterialDebt||0)+hp*REPAIR_COST_PER_HP;const spend=Math.floor(b.repairMaterialDebt+1e-9);if(spend){b.inventory.items.stone-=spend;b.repairMaterialDebt-=spend;}u.gain('construction',dt*.2);if(b.health>=b.maxHealth-.001){b.health=b.maxHealth;const finalSpend=Math.min(b.inventory.items.stone||0,Math.ceil(b.repairMaterialDebt-1e-9));b.inventory.items.stone=(b.inventory.items.stone||0)-finalSpend;b.repairMaterialDebt=0;this.cancelTask(u);this.message(`${BUILD_LABEL[b.type]} riparato.`);}};
   const updateUnit=Game.prototype.updateUnit;
   Game.prototype.updateUnit=function(u,dt){if(u.health<=0)return;if(u.state==='hauling'){this.updateHaul(u,dt);return;}if(u.state==='producing'){this.updateProduction(u,dt);return;}if(u.state==='repairing'){this.updateRepair(u,dt);return;}updateUnit.call(this,u,dt);};
   Game.prototype.nearestStorage=function(u){this.ensureInventories();return this.buildings.filter(b=>storage(b)&&this.freeSpace(b)>0).sort((a,b)=>dist(u,a)-dist(u,b)).find(b=>this.pathToBuilding(u,b)!==null)||null;};
@@ -129,7 +129,7 @@
   Game.prototype.deposit=function(u,after){
     const b=this.findById(this.buildings,u.task?.target);
     if(!storage(b)){this.cancelTask(u);this.message('Deposito non disponibile. Carico conservato.');return;}
-    if(dist(u,b)>1.15){const path=this.pathToBuilding(u,b);if(path===null){this.cancelTask(u);this.message('Percorso bloccato. Carico conservato.');return;}u.path=path;return;}
+    if(this.buildingDistance(u,b)>1.15){const path=this.pathToBuilding(u,b);if(path===null){this.cancelTask(u);this.message('Percorso bloccato. Carico conservato.');return;}u.path=path;return;}
     const amount=Math.min(u.inventory.amount,this.freeSpace(b));
     if(amount){b.inventory.items[u.inventory.type]=(b.inventory.items[u.inventory.type]||0)+amount;u.inventory.amount-=amount;}
     if(u.inventory.amount){this.cancelTask(u);this.message('Deposito pieno: il residuo resta nel carico.');return;}
@@ -161,7 +161,7 @@
   Game.prototype.buildingDay=function(b){
     if(!b.built||!b.alive)return;this.ensureInventories();
     if(b.type==='farm'){
-      const workers=this.units.filter(u=>u.health>0&&u.state==='farming'&&u.task?.target===b.id&&dist(u,b)<=1.2);
+      const workers=this.units.filter(u=>u.health>0&&u.state==='farming'&&u.task?.target===b.id&&this.buildingDistance(u,b)<=1.15);
       if(!workers.length)return;
       const crop=CROPS[b.crop]||CROPS.grain,tile=this.world.tile(Math.floor(b.x),Math.floor(b.y)),season=this.season(),seasonMod=crop.seasons[season],water=tile.nearWater?1.3:1;
       const skill=workers.reduce((s,u)=>s+u.skills.farming,0)/workers.length;
@@ -174,7 +174,7 @@
   const updateBuilding=Game.prototype.updateBuilding;
   Game.prototype.updateBuilding=function(b,dt){
     updateBuilding.call(this,b,dt);const recipes=RECIPES[b.type];if(!recipes||!b.built||!b.alive)return;
-    const workers=this.factoryWorkers(b).filter(u=>dist(u,b)<=1.15);if(!workers.length)return;
+    const workers=this.factoryWorkers(b).filter(u=>this.buildingDistance(u,b)<=1.15);if(!workers.length)return;
     if(b.batch){b.batch.remaining=Math.max(0,b.batch.remaining-dt);if(b.batch.remaining===0){for(const[good,amount]of Object.entries(b.batch.outputs))b.inventory.items[good]=(b.inventory.items[good]||0)+amount;b.batch=null;}return;}
     const incoming=this.reserved(b.id,null,'in');
     const recipe=recipes.find(r=>Object.entries(r.inputs).every(([good,amount])=>this.available(b,good)>=amount)&&total(b.inventory.items)-total(r.inputs)+total(r.outputs)+incoming<=b.inventory.capacity);
@@ -192,7 +192,7 @@
   const resourceName=Game.prototype.resourceName;
   Game.prototype.resourceName=function(type){return GOODS[type]?.label||resourceName.call(this,type);};
   const unitStatus=Game.prototype.unitStatus;
-  Game.prototype.unitStatus=function(u){if(u.task?.type==='haul'){const t=u.task;return t.phase==='waiting'?'attende merci o spazio':t.phase==='source'?'va al prelievo':`trasporta ${this.resourceName(t.good)}`;}if(u.task?.type==='production'){const b=this.findById(this.buildings,u.task.target);return `${u.task.profession} · ${b&&dist(u,b)<=1.15?'al lavoro':'in cammino'}`;}if(u.task?.type==='repair')return 'ripara edificio';return unitStatus.call(this,u);};
+  Game.prototype.unitStatus=function(u){if(u.task?.type==='haul'){const t=u.task;return t.phase==='waiting'?'attende merci o spazio':t.phase==='source'?'va al prelievo':`trasporta ${this.resourceName(t.good)}`;}if(u.task?.type==='production'){const b=this.findById(this.buildings,u.task.target);return `${u.task.profession} · ${b&&this.buildingDistance(u,b)<=1.15?'al lavoro':'in cammino'}`;}if(u.task?.type==='repair')return 'ripara edificio';return unitStatus.call(this,u);};
   const applyOrder=Game.prototype.applyOrder;
   Game.prototype.applyOrder=function(o,pos,tx,ty,u=this.selected){if(o==='deliver'){const b=this.nearestAt(this.buildings,pos,1,storage);if(!b||!u.inventory.amount){this.message('Serve un carico e un deposito completato.');return;}this.cancelTask(u);if(this.returnToStorage(u,null,b)){this.orderMode=null;this.syncModeButtons();}return;}return applyOrder.call(this,o,pos,tx,ty,u);};
   const orderHelp=Game.prototype.orderHelp;

@@ -1,4 +1,4 @@
-// A village is an 4×4 traversable settlement district, not a single-tile building.
+// A village occupies a 4×4 footprint; collision rules keep movement outside.
 (() => {
 'use strict';
 const SIZE=4;
@@ -40,7 +40,7 @@ const compatible=Game.prototype.linkCompatible;Game.prototype.linkCompatible=fun
 const selection=Game.prototype.selectionHTML;Game.prototype.selectionHTML=function(e){return selection.call(this,e)+(e instanceof Building&&e.type==='house'?'<p>Superficie del villaggio: <b>4 × 4 tile · 16 tile</b>.</p>':'');};
 const draw=Game.prototype.drawBuilding;Game.prototype.drawBuilding=function(b){if(b.type!=='house')return draw.call(this,b);const r=bounds(b),p=this.worldToScreen(r.left*TILE,r.top*TILE),s=TILE*this.camera.zoom,c=this.ctx;c.save();c.globalAlpha*=b.built?1:.55;c.fillStyle='#d8c69c';c.fillRect(p.x,p.y,SIZE*s,SIZE*s);c.strokeStyle=window.terraFactionStyle?.(b.owner)?.color||'#934c36';c.lineWidth=3*this.camera.zoom;c.strokeRect(p.x,p.y,SIZE*s,SIZE*s);
  c.strokeStyle='#b5a17b';c.lineWidth=1;for(let i=1;i<SIZE;i++){c.beginPath();c.moveTo(p.x+i*s,p.y);c.lineTo(p.x+i*s,p.y+SIZE*s);c.moveTo(p.x,p.y+i*s);c.lineTo(p.x+SIZE*s,p.y+i*s);c.stroke();}
- // The central lanes remain walkable; eight houses visualize population, not tile count.
+ // Decorative central lanes; eight houses visualize population, not tile count.
  const unit=s*SIZE/8;c.fillStyle='#c0aa7e';c.fillRect(p.x+3*unit,p.y,2*unit,8*unit);c.fillRect(p.x,p.y+3*unit,8*unit,2*unit);
  const n=Math.min(8,Math.ceil(this.villagePeople(b).length*8/5)),lots=[[1,1],[5,1],[1,5],[5,5],[3.5,1],[1,3.5],[5,3.5],[3.5,5]];
  for(let i=0;i<n;i++){const [x,y]=lots[i];c.fillStyle='#916a49';c.fillRect(p.x+x*unit,p.y+(y+.4)*unit,1.4*unit,1.3*unit);c.fillStyle='#663a2b';c.beginPath();c.moveTo(p.x+(x-.15)*unit,p.y+(y+.5)*unit);c.lineTo(p.x+(x+.7)*unit,p.y+(y-.15)*unit);c.lineTo(p.x+(x+1.55)*unit,p.y+(y+.5)*unit);c.closePath();c.fill();}
