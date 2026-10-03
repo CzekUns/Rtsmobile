@@ -16,6 +16,6 @@ Game.prototype.updateCaravan=function(u,dt){
 };
 const update=Game.prototype.updateUnit;Game.prototype.updateUnit=function(u,dt){if(u.state==='caravan')return this.updateCaravan(u,dt);return update.call(this,u,dt);};
 const status=Game.prototype.unitStatus;Game.prototype.unitStatus=function(u){return u.task?.type==='caravan'?(u.task.threatened?'carovana: minaccia':u.task.blocked?'carovana: percorso bloccato':u.task.phase==='source'?'carovana: carico al mercato':u.task.phase==='market'?'carovana: viaggio di baratto':'carovana: ritorno e scarico'):status.call(this,u);};
-Game.prototype.startTradeCaravan=function(){const error=this.assignCaravan(this.tradeDraft());$('#tradeStatus').textContent=error||'Carovana assegnata.';if(error)return false;this.save(true);$('#tradeDialog').close();return true;};
+Game.prototype.startTradeCaravan=function(){const error=this.assignCaravan(this.tradeDraft());$('#tradeStatus').textContent=error||'Carovana assegnata.';if(error)return false;this.save(true);this.closeManagement();return true;};
 const init=Game.prototype.initUI;Game.prototype.initUI=function(){init.call(this);$('#sendCaravan').onclick=()=>this.startTradeCaravan();};
 })();

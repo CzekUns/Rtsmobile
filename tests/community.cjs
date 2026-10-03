@@ -27,13 +27,14 @@ test('old v5 saves without duty fields load conservatively',()=>{
 test('invalid mobilization cannot replace live state',()=>{
  const e=setup(),u=e.g.units[0];e.g.enterResident(u,e.b);const d=JSON.parse(JSON.stringify(e.g.snapshot()));d.units[0].mobilized=true;e.storage.set('terra-italica-save-v5',JSON.stringify(d));assert(!e.g.load());assert.equal(e.g.units[0],u);
 });
-test('dialog event flow pauses, mobilizes by ID and preserves background pause',()=>{
+test('inline event flow mobilizes by ID and preserves background pause',()=>{
  const e=setup(),g=e.g,u=g.units[0];g.enterResident(u,e.b);g.setPaused(false);assert.match(e.byId.people.innerHTML,/data-open-community/);
- e.byId.people.listeners.click[0]({target:{closest:()=>({})}});assert(e.byId.communityDialog.open);assert(g.paused);assert.match(e.byId.communityRoster.innerHTML,new RegExp(u.id));
+ e.byId.people.listeners.click[0]({target:{closest:()=>({})}});assert(e.byId.communityDialog.open);assert.equal(g.paused,false);assert.match(e.byId.communityRoster.innerHTML,new RegExp(u.id));
  e.byId.communityRoster.listeners.click[0]({target:{closest:()=>({dataset:{community:'mobilize',id:u.id}})}});assert(u.mobilized);assert.match(e.byId.communitySummary.textContent,/1 mobilitati/);
- g.suspend();g.resumeFromBackground();e.byId.communityDialog.close();assert(g.paused);
+ g.suspend();g.resumeFromBackground();g.closeManagement();assert(g.paused);
 });
 test('selecting a resident clears world selection and building never assigns hidden workers',()=>{
  const e=setup(),g=e.g,u=g.units[0];g.enterResident(u,e.b);assert(g.selectCommunityPerson(u.id));assert.equal(g.selected,u);assert.equal(g.groupSelection.length,0);assert.equal(g.lastSelectedUnit,null);g.placeBuild('farm',52,52);assert.equal(u.task,null);assert(g.save());
 });
 console.log(`${count} community regressions passed.`);
+

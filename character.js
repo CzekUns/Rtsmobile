@@ -5,8 +5,8 @@
     if(!this.units.some(u=>u.id===id&&u.owner===0&&u.health>0)){this.message('Seleziona un abitante dalla Comunità.');return false;}
     const dialog=$('#characterDialog');
     if(!dialog.open){this.pauseBeforeCharacter=this.paused;this.backgroundDuringCharacter=false;}
-    this.characterPersonId=id;this.setPaused(true);this.pointerCancel();this.orderMode=null;this.buildMode=null;this.syncModeButtons();
-    this.renderCharacter();$('#characterStatus').textContent='';if(!dialog.open)dialog.showModal();return true;
+    this.characterPersonId=id;this.pointerCancel();this.orderMode=null;this.buildMode=null;this.syncModeButtons();
+    this.renderCharacter();$('#characterStatus').textContent='';if(!dialog.open)this.showManagement('characterDialog');return true;
   };
   Game.prototype.renderCharacter=function(){
     const u=this.units.find(u=>u.id===this.characterPersonId&&u.health>0&&u.owner===0);
@@ -44,7 +44,7 @@
     initUI.call(this);const dialog=$('#characterDialog');
     $('#characterBtn').onclick=()=>this.openCharacter(this.selected?.id);
     $('#characterPeople').onchange=()=>{this.characterPersonId=$('#characterPeople').value;this.renderCharacter();$('#characterStatus').textContent='';};
-    $('#closeCharacter').onclick=()=>dialog.close();
+    $('#closeCharacter').onclick=()=>this.closeManagement();
     $('#characterEquip').onclick=()=>this.characterTransfer('equipped');
     $('#characterRemove').onclick=()=>this.characterTransfer('bag');
     $('#characterStore').onclick=()=>this.characterTransfer('storage');
@@ -53,3 +53,4 @@
   const suspend=Game.prototype.suspend;
   Game.prototype.suspend=function(){if($('#characterDialog').open)this.backgroundDuringCharacter=true;suspend.call(this);};
 })();
+

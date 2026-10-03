@@ -57,9 +57,10 @@
   const update=Game.prototype.update;
   Game.prototype.update=function(dt){this.ensureLivestock();return update.call(this,dt);};
   const renderLogistics=Game.prototype.renderLogistics;
-  Game.prototype.renderLogistics=function(){renderLogistics.call(this);const select=$('#factorySelect'),pens=this.buildings.filter(b=>b.type==='pen'&&b.alive&&b.built);for(const b of pens){const o=document.createElement?.('option');if(o){o.value=b.id;o.textContent=`Recinto (${Math.floor(b.x)}, ${Math.floor(b.y)})`;select.appendChild(o);}}};
+  Game.prototype.renderLogistics=function(){renderLogistics.call(this);const select=$('#factorySelect'),pens=this.buildings.filter(b=>b.owner===0&&b.type==='pen'&&b.alive&&b.built);for(const b of pens){const o=document.createElement?.('option');if(o){o.value=b.id;o.textContent=`Recinto (${Math.floor(b.x)}, ${Math.floor(b.y)})`;select.appendChild(o);}}};
   const selectionHTML=Game.prototype.selectionHTML;
   Game.prototype.selectionHTML=function(e){let html=selectionHTML.call(this,e);if(e instanceof Building&&e.type==='pen'){this.ensureLivestock();const names=e.animalIds.map(id=>this.findById(this.animals,id)?.id.slice(0,8)).filter(Boolean).join(', ')||'nessuno';const workers=e.workers.map(id=>this.findById(this.units,id)?.name).filter(Boolean).join(', ')||'nessuno';html+=`<p>Animali ${e.animalIds.length}/${RULES.penCapacity}: ${names}</p><p>Allevatori: ${workers}. Foraggio ${(e.inventory.items.forage||0)} · latte ${(e.inventory.items.milk||0)}.</p>`;}return html;};
   const unitStatus=Game.prototype.unitStatus;
   Game.prototype.unitStatus=function(u){return u.task?.type==='livestock'?'allevatore':unitStatus.call(this,u);};
 })();
+

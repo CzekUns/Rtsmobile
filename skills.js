@@ -5,8 +5,8 @@
     if(!this.units.some(u=>u.id===id&&u.owner===0&&u.health>0)){this.message('Seleziona un abitante dalla Comunità.');return false;}
     const dialog=$('#skillsDialog');
     if(!dialog.open){this.pauseBeforeSkills=this.paused;this.backgroundDuringSkills=false;}
-    this.skillsPersonId=id;this.setPaused(true);this.pointerCancel();this.orderMode=null;this.buildMode=null;this.syncModeButtons();
-    this.renderSkills();$('#skillsStatus').textContent='';if(!dialog.open)dialog.showModal();return true;
+    this.skillsPersonId=id;this.pointerCancel();this.orderMode=null;this.buildMode=null;this.syncModeButtons();
+    this.renderSkills();$('#skillsStatus').textContent='';if(!dialog.open)this.showManagement('skillsDialog');return true;
   };
   Game.prototype.renderSkills=function(){
     const u=this.units.find(p=>p.id===this.skillsPersonId&&p.owner===0&&p.health>0);
@@ -27,9 +27,10 @@
     initUI.call(this);const dialog=$('#skillsDialog');
     $('#skillsBtn').onclick=()=>this.openSkills(this.selected?.id);
     $('#skillsPeople').onchange=()=>{this.skillsPersonId=$('#skillsPeople').value;this.renderSkills();$('#skillsStatus').textContent='';};
-    $('#closeSkills').onclick=()=>dialog.close();
+    $('#closeSkills').onclick=()=>this.closeManagement();
     dialog.addEventListener('close',()=>{this.skillsPersonId=null;if(!this.suspended&&!this.backgroundDuringSkills)this.setPaused(this.pauseBeforeSkills);this.backgroundDuringSkills=false;});
   };
   const suspend=Game.prototype.suspend;
   Game.prototype.suspend=function(){if($('#skillsDialog').open)this.backgroundDuringSkills=true;suspend.call(this);};
 })();
+

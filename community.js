@@ -2,8 +2,7 @@
 (() => {
   'use strict';
   const escape = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  Game.prototype.communityCounts = function () {
-    const people = this.units.filter(u => u.owner === 0 && u.health > 0);
+  Game.prototype.communityCounts = function (people=this.units.filter(u => u.owner === 0 && u.health > 0)) {
     return {total:people.length, residents:people.filter(u => u.location.kind === 'resident').length,
       occupied:people.filter(u => !u.mobilized && u.task !== null).length,
       available:people.filter(u => !u.mobilized && u.task === null).length,
@@ -45,9 +44,9 @@
     this.updateUI(); return true;
   };
   Game.prototype.renderCommunity = function () {
-    const c = this.communityCounts();
+    const c = this.communityCounts(this.contextPeople());
     $('#communitySummary').textContent = `${c.total} persone · ${c.residents} residenti nei Distretti · ${c.occupied} occupati · ${c.available} disponibili · ${c.mobilized} mobilitati`;
-    $('#communityRoster').innerHTML = this.units.filter(u => u.owner === 0 && u.health > 0).map(u => {
+    $('#communityRoster').innerHTML = this.contextPeople().map(u => {
       const home = this.buildings.find(b => b.id === u.location.settlementId);
       const place = home ? `Distretto (${Math.floor(home.x)}, ${Math.floor(home.y)})` : 'Sulla mappa';
       const duty = u.mobilized ? 'Mobilitato' : u.task ? 'Occupato' : 'Disponibile';
@@ -61,10 +60,10 @@
     $('#people').addEventListener('click', e => {
       if (!e.target.closest?.('[data-open-community]')) return;
       this.pauseBeforeCommunity = this.paused; this.backgroundDuringCommunity = false;
-      this.setPaused(true); this.pointerCancel(); this.orderMode=null; this.buildMode=null; this.syncModeButtons();
-      this.renderCommunity(); $('#communityStatus').textContent=''; dialog.showModal();
+       this.pointerCancel(); this.orderMode=null; this.buildMode=null; this.syncModeButtons();
+      this.renderCommunity(); $('#communityStatus').textContent=''; this.showManagement('communityDialog');
     });
-    $('#closeCommunity').onclick = () => dialog.close();
+    $('#closeCommunity').onclick = () => this.closeManagement();
     dialog.addEventListener('close', () => {
       if (!this.suspended && !this.backgroundDuringCommunity) this.setPaused(this.pauseBeforeCommunity);
       this.backgroundDuringCommunity=false;
@@ -73,7 +72,7 @@
       const button=e.target.closest?.('[data-community]');
       if (!button || button.disabled) return;
       const {community:action,id}=button.dataset;
-      if (action === 'select') {if(this.selectCommunityPerson(id)) dialog.close(); return;}
+      if (action === 'select') {if(this.selectCommunityPerson(id)) this.closeManagement(); return;}
       const changed=action==='mobilize'?this.mobilizePerson(id):action==='demobilize'?this.demobilizePerson(id):false;
       $('#communityStatus').textContent=changed?$('#message').textContent:'Operazione non riuscita: verifica disponibilità e uscita dal Distretto.';
       if(changed&&!this.save(true)) $('#communityStatus').textContent+=' Salvataggio non riuscito: riprova da Mondo → Salva.';
@@ -89,3 +88,4 @@
     $('#people').insertAdjacentHTML?.('afterbegin',`<button type="button" data-open-community class="community-open"><b>Gestisci comunità · ${c.total}</b><span>${c.residents} residenti · ${c.mobilized} mobilitati</span></button>`);
   };
 })();
+
