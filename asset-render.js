@@ -55,7 +55,7 @@
       const orientation=r.orientation||(((Math.round(r.x*100)+Math.round(r.y*100))&1)?'down':'up');
       const key=(r.type==='iron'?'ore_':'stone_')+orientation+'_'+state+'_tri';
       const img=RESOURCE_TILES[key],p=this.worldToScreen(r.x*TILE,r.y*TILE);
-      const size=TILE*.86*z;
+      const size=TILE*.76*z;
       if(!drawCentered(ctx,img,p.x,p.y,size,size,0,true))return oldDrawResource.call(this,r);
       return;
     }
