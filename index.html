@@ -14,7 +14,7 @@
   <main id="app" class="app-shell">
     <header class="hud-top" aria-label="Stato della comunità">
       <div class="identity">
-        <strong>VER SACRUM <small style="font-size:8px;opacity:.55;letter-spacing:.08em">BUILD 84</small></strong>
+        <strong>VER SACRUM <small style="font-size:8px;opacity:.55;letter-spacing:.08em">BUILD 85</small></strong>
         <span id="sessionState" role="status"></span><span id="dateLabel">1 Marzo · 1000 a.C.</span>
       </div>
       <div class="resources" id="resourceBar">
@@ -185,11 +185,11 @@
     </form><p id="tradeStatus" role="status"></p>
   </section>
   <section class="management-panel dock-panel" hidden id="linksDialog"><h2>Collegamenti dell’insediamento</h2><button id="closeLinks" type="button">Dettagli</button>
-    <p>Collegamenti automatici entro 12 tile. Le scorte si spostano fra inventari; i magazzini collegati al totem finanziano le costruzioni.</p>
+    <p>Collegamenti automatici entro 12 tile. Campo ↔ Magazzino trasferisce automaticamente il raccolto finché c’è spazio; i magazzini collegati al totem finanziano le costruzioni.</p>
     <form id="cityForm"><label>Nome dell’insediamento<input id="cityName" maxlength="60"></label><button type="submit">Rinomina</button></form><label>Struttura<select id="linkBuilding"></select></label><div id="linksList"></div>
     <form id="linkForm"><label>Collegamento<select id="linkPair"></select></label><label>Risorsa<select id="linkGood"></select></label>
-    <label><input id="linkEnabled" type="checkbox" checked>Collegamento aperto</label><label><input id="linkImport" type="checkbox" checked>Riprendi dal mercato sotto il minimo</label><label>Minimo magazzino<input id="linkMin" type="number" min="0" value="0"></label>
-    <label><input id="linkExport" type="checkbox" checked>Invia eccedenze al mercato</label><label>Scorta da trattenere<input id="linkKeep" type="number" min="0" value="30"></label><button type="submit">Salva collegamento</button></form>
+    <label><input id="linkEnabled" type="checkbox" checked>Collegamento aperto</label><label><input id="linkImport" type="checkbox" checked>Importa sotto il minimo</label><label>Scorta minima destinazione<input id="linkMin" type="number" min="0" value="0"></label>
+    <label><input id="linkExport" type="checkbox" checked>Esporta eccedenze</label><label>Scorta da trattenere alla fonte<input id="linkKeep" type="number" min="0" value="0"></label><button type="submit">Salva collegamento</button></form>
     <form id="factoryPolicy"><label>Artigiani desiderati<input id="factoryWorkers" type="number" min="0" max="8" value="1"></label><label>Quota prodotti al magazzino (%)<input id="factoryReturn" type="number" min="0" max="100" value="75"></label><button type="submit">Imposta produzione</button></form><p id="linkStatus" role="status"></p>
   </section>
       </div>
@@ -211,7 +211,7 @@
   <script src="./factions.js?v=61"></script>
   <script src="./asset-render.js?v=74"></script>
   <script src="./touch-modifier.js?v=74"></script>
-  <script src="./logistics.js?v=84"></script>
+  <script src="./logistics.js?v=85"></script>
   <script src="./market.js?v=72"></script>
   <script src="./caravan.js?v=76"></script>
   <script src="./livestock.js?v=76"></script>
@@ -227,11 +227,11 @@
   <script src="./character.js?v=72"></script>
   <script src="./skills.js?v=72"></script>
   <script src="./construction-knowledge.js?v=72"></script>
-  <script src="./settlement.js?v=84"></script>
+  <script src="./settlement.js?v=85"></script>
   <script src="./village-footprint.js?v=84"></script>
   <script src="./contextual-ui.js?v=72"></script>
   <script src="./collisions.js?v=79"></script>
-  <script src="./agriculture.js?v=84"></script>
+  <script src="./agriculture.js?v=85"></script>
   <script src="./actor-collisions.js?v=83"></script>
   <script src="./boot.js?v=42"></script>
 </body>
