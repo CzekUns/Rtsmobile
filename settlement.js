@@ -38,7 +38,7 @@ Game.prototype.initializeSettlement=function(){
 const newGame=Game.prototype.newGame;Game.prototype.newGame=function(seed){newGame.call(this,seed);this.initializeSettlement();this.year=800;this.economyTimer=0;this.updateUI();};
 const load=Game.prototype.load;Game.prototype.load=function(){const ok=load.call(this);if(ok){this.initializeSettlement();this.economyTimer=0;this.updateUI();}return ok;};
 // Opening a site transfers its full material requirement once from linked warehouses.
-const place=Game.prototype.placeBuild;Game.prototype.placeBuild=function(type,x,y){const before=new Set(this.buildings.map(b=>b.id));place.call(this,type,x,y);const site=this.buildings.find(b=>!before.has(b.id));if(site&&this.pay(site.requiredMaterials)){site.inventory.items={...site.requiredMaterials};this.message('Materiali assegnati al cantiere dai magazzini collegati al totem.');}};
+const place=Game.prototype.placeBuild;Game.prototype.placeBuild=function(type,x,y,crop=null){const before=new Set(this.buildings.map(b=>b.id));place.call(this,type,x,y,crop);const site=this.buildings.find(b=>!before.has(b.id));if(site&&this.pay(site.requiredMaterials)){site.inventory.items={...site.requiredMaterials};this.message('Materiali assegnati al cantiere dai magazzini collegati al totem.');}};
 const nearest=Game.prototype.nearestStorage;Game.prototype.nearestStorage=function(u){this.ensureInventories();return this.buildings.filter(b=>b.owner===u.owner&&b.type==='warehouse'&&operational(b)&&this.freeSpace(b)>0).sort((a,b)=>dist(u,a)-dist(u,b)).find(b=>this.pathToBuilding(u,b)!==null)||null;};
 // Food is consumed once per person per 30 days, including artisans.
 Game.prototype.foodStoresFor=function(u){
