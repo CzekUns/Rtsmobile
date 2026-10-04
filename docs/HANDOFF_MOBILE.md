@@ -1,13 +1,14 @@
 # Ver Sacrum - Handoff Funzionale e Tecnico Mobile
 
-## Aggiornamento mobile vincolante — 4 ottobre 2026, build 79
+## Aggiornamento mobile vincolante — 4 ottobre 2026, build 80
 
 Il documento storico sotto descrive il desktop del 16 settembre. Per agricoltura e attraversabilità nella versione mobile prevalgono queste regole:
 
 - **Solo il campo è attraversabile.** Il recinto e tutte le altre strutture bloccano il movimento anche da incomplete.
-- Grano e orzo: **1 × 1 tile, massimo 2 contadini, 10 giorni base, resa base 20**.
+- Grano: **2 × 2 tile, massimo 2 contadini, 10 giorni base, resa base 20**.
+- Orzo: **1 × 1 tile, massimo 2 contadini, 10 giorni base, resa base 20**.
 - Vite: **2 × 2 tile, massimo 8 contadini, 30 giorni base, resa base 80 uva**.
-- Olivo: **2 × 2 tile, massimo 8 contadini, 40 giorni base, resa base 100 olive**.
+- Olivo: **3 × 3 tile, massimo 8 contadini, 40 giorni base, resa base 100 olive**.
 - Ogni nuovo campo costa **10 legno**. Selezionarlo per cambiare coltura nella UI inferiore; il cambio è consentito tra i cicli e controlla spazio libero e lavoratori.
 - Raccolti e merci restano locali; un inventario pieno trattiene il raccolto maturo senza perdite. Non copiare il vecchio accredito globale di `food` descritto nella sezione desktop.
 

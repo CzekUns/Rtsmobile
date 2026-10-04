@@ -7,7 +7,7 @@ Game.prototype.villageHouseSlots=function(b){
  const r=bounds(b),n=Math.min(16,Math.ceil(this.villagePeople(b).length*16/5));
  return Array.from({length:n},(_,i)=>({x:r.left+i%SIZE+.5,y:r.top+Math.floor(i/SIZE)+.5}));
 };
-function bounds(b){const x=Math.floor(b.x),y=Math.floor(b.y);return b.type==='house'?{left:x-SIZE/2,top:y-SIZE/2,right:x+SIZE/2,bottom:y+SIZE/2}:{left:x,top:y,right:x+(b.type==='farm'?(TERRA_CROPS[b.crop]?.side||1):1),bottom:y+(b.type==='farm'?(TERRA_CROPS[b.crop]?.side||1):1)};}
+function bounds(b){const x=Math.floor(b.x),y=Math.floor(b.y);return b.type==='house'?{left:x-SIZE/2,top:y-SIZE/2,right:x+SIZE/2,bottom:y+SIZE/2}:{left:x,top:y,right:x+(b.type==='farm'?(TERRA_CROPS[b.crop]?.side||TERRA_CROPS.grain.side):1),bottom:y+(b.type==='farm'?(TERRA_CROPS[b.crop]?.side||TERRA_CROPS.grain.side):1)};}
 const overlap=(a,b)=>a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top;
 const contains=(r,p)=>p.x>=r.left&&p.x<r.right&&p.y>=r.top&&p.y<r.bottom;
 const distance=(a,b)=>Math.hypot(Math.max(0,a.left-b.right,b.left-a.right),Math.max(0,a.top-b.bottom,b.top-a.bottom));

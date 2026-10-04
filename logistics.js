@@ -15,10 +15,10 @@
     bakery:[{id:'wheat-bread',inputs:{flour:2},outputs:{bread:2},seconds:8},{id:'barley-bread',inputs:{barleyFlour:2},outputs:{barleyBread:3},seconds:8}]
   };
   const CROPS={
-    grain:{label:'Grano',side:1,maxWorkers:2,days:10,yield:20,seasons:{Inverno:.35,Primavera:1.15,Estate:.85,Autunno:1}},
+    grain:{label:'Grano',side:2,maxWorkers:2,days:10,yield:20,seasons:{Inverno:.35,Primavera:1.15,Estate:.85,Autunno:1}},
     barley:{label:'Orzo',side:1,maxWorkers:2,days:10,yield:20,seasons:{Inverno:.45,Primavera:1.1,Estate:.95,Autunno:1}},
     grapes:{label:'Vite',side:2,maxWorkers:8,days:30,yield:80,seasons:{Inverno:.15,Primavera:.85,Estate:1.2,Autunno:1.05}},
-    olives:{label:'Olivo',side:2,maxWorkers:8,days:40,yield:100,seasons:{Inverno:.4,Primavera:.8,Estate:1.05,Autunno:1.2}}
+    olives:{label:'Olivo',side:3,maxWorkers:8,days:40,yield:100,seasons:{Inverno:.4,Primavera:.8,Estate:1.05,Autunno:1.2}}
   };
   window.TERRA_CAPACITY=CAPACITY;window.TERRA_GOODS=GOODS;window.TERRA_RECIPES=RECIPES;window.TERRA_CROPS=CROPS;
   const total=items=>Object.entries(items).reduce((sum,[good,n])=>sum+n*(GOODS[good]?.volume||1),0);
