@@ -1,5 +1,8 @@
 # Ver Sacrum - Handoff Funzionale e Tecnico Mobile
 
+**Stato verificato del mobile:** [Audit build 80, lacune e priorità](AUDIT_HANDOFF_BUILD80.md). Consultarlo per distinguere il comportamento attuale dal desktop storico descritto sotto.
+
+
 ## Aggiornamento mobile vincolante — 4 ottobre 2026, build 80
 
 Il documento storico sotto descrive il desktop del 16 settembre. Per agricoltura e attraversabilità nella versione mobile prevalgono queste regole:
