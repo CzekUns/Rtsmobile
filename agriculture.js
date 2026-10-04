@@ -58,13 +58,13 @@ Game.prototype.initUI=function(){
   this.message('Scegli prima la coltura da piantare.');
   this.syncModeButtons();this.updateUI();
  };
- $('[data-crop-build]').forEach(button=>button.onclick=()=>{
+ document.querySelectorAll('[data-crop-build]').forEach(button=>button.onclick=()=>{
   const crop=button.dataset.cropBuild,c=TERRA_CROPS[crop];if(!c)return;
   this.pendingBuildCrop=crop;this.buildMode='farm';this.orderMode=null;closeChooser();
   this.message(`${c.label} · ${c.side} × ${c.side} tile. Tocca il terreno per piazzare il campo.`);
   this.syncModeButtons();this.updateUI();
  });
- $('[data-build]').filter(button=>button.dataset.build!=='farm').forEach(button=>button.addEventListener('click',()=>{this.pendingBuildCrop=null;closeChooser();}));
+ [...document.querySelectorAll('[data-build]')].filter(button=>button.dataset.build!=='farm').forEach(button=>button.addEventListener('click',()=>{this.pendingBuildCrop=null;closeChooser();}));
 };
 const placeBuild=Game.prototype.placeBuild;
 Game.prototype.placeBuild=function(type,x,y,crop=null){
