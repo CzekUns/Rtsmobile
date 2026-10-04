@@ -64,7 +64,7 @@ class World{
 }
 class ResourceNode{constructor(type,x,y,amount){this.id=crypto.randomUUID?.()||Math.random().toString(36).slice(2);this.type=type;this.x=x;this.y=y;this.amount=amount;this.max=amount}}
 class Building{
-  constructor(type,x,y,owner=0,complete=false){this.id=crypto.randomUUID?.()||Math.random().toString(36).slice(2);this.type=type;this.x=x+.5;this.y=y+.5;this.owner=owner;this.progress=complete?1:.08;this.maxHealth=type==='palisade'?180:type==='tower'?260:type==='base'?700:420;this.health=this.maxHealth;this.cooldown=0;this.assigned=[];this.residents=[];this.growth=0;this.crop='Grano';this.birthDays=0}
+  constructor(type,x,y,owner=0,complete=false){this.id=crypto.randomUUID?.()||Math.random().toString(36).slice(2);this.type=type;this.x=x+.5;this.y=y+.5;this.owner=owner;this.progress=complete?1:.08;this.maxHealth=type==='palisade'?180:type==='tower'?260:type==='base'?700:420;this.health=this.maxHealth;this.cooldown=0;this.assigned=[];this.residents=[];this.growth=0;this.crop='grain';this.birthDays=0}
   get alive(){return this.health>0}
   get built(){return this.progress>=1}
 }
@@ -121,7 +121,7 @@ class Game{
   screenToWorld(sx,sy){return{x:(sx-this.viewW/2)/this.camera.zoom+this.camera.x,y:(sy-this.viewH/2)/this.camera.zoom+this.camera.y}}
   worldToScreen(x,y){return{x:(x-this.camera.x)*this.camera.zoom+this.viewW/2,y:(y-this.camera.y)*this.camera.zoom+this.viewH/2}}
   handleTap(sx,sy){const w=this.screenToWorld(sx,sy),tx=Math.floor(w.x/TILE),ty=Math.floor(w.y/TILE),pos={x:w.x/TILE,y:w.y/TILE};if(tx<0||ty<0||tx>=this.world.size||ty>=this.world.size)return;
-    if(this.buildMode){this.placeBuild(this.buildMode,tx,ty);return}
+    if(this.buildMode){this.placeBuild(this.buildMode,tx,ty,this.buildMode==='farm'?this.pendingBuildCrop:null);return}
     if(this.orderMode&&this.selected instanceof Unit){this.applyOrder(this.orderMode,pos,tx,ty);return}
     const entity=this.pickEntity(pos);
     if(entity){this.selected=entity;if(entity instanceof ResourceNode&&this.lastSelectedUnit){this.selected=this.lastSelectedUnit;this.assignGather(this.selected,entity)}else if(entity instanceof Unit)this.lastSelectedUnit=entity;this.updateUI();return}
@@ -134,8 +134,8 @@ class Game{
   syncModeButtons(){$$('[data-order],[data-build]').forEach(b=>b.classList.toggle('active',b.dataset.order===this.orderMode||b.dataset.build===this.buildMode))}
   canPay(cost){return Object.entries(cost).every(([k,v])=>(this.stock[k]||0)>=v)}
   pay(cost){for(const[k,v]of Object.entries(cost))this.stock[k]-=v}
-  placeBuild(type,tx,ty){const t=this.world.tile(tx,ty);if(!t||!BIOME[t.biome].walk)return this.message('Terreno non edificabile.');if(type==='road'){if(t.road)return; if(!this.pay({wood:1}))return this.message('Legno disponibile insufficiente: una parte può essere prenotata.');t.road=true;this.updateUI();return}
-    if(this.buildings.some(b=>b.alive&&Math.floor(b.x)===tx&&Math.floor(b.y)===ty))return this.message('Spazio occupato.');const cost=BUILD_COSTS[type];if(!this.canPay(cost))return this.message('Risorse insufficienti da prenotare per il cantiere.');const b=new Building(type,tx,ty);b.requiredMaterials={...cost};this.buildings.push(b);this.ensureInventories?.();let builder=this.selected instanceof Unit&&this.selected.location.kind==='world'?this.selected:this.units.find(u=>u.health>0&&u.location.kind==='world'&&!u.mobilized&&u.state==='idle');if(builder)this.assignBuild(builder,b);this.groupSelection=[];for(const u of this.units)u.selected=false;this.selected=b;this.updateUI();this.message(builder?`${builder.name} attende i materiali consegnati al cantiere.`:'Cantiere aperto: consegna i materiali e assegna un abitante.');}
+  placeBuild(type,tx,ty,crop=null){const t=this.world.tile(tx,ty);if(!t||!BIOME[t.biome].walk)return this.message('Terreno non edificabile.');if(type==='road'){if(t.road)return; if(!this.pay({wood:1}))return this.message('Legno disponibile insufficiente: una parte può essere prenotata.');t.road=true;this.updateUI();return}
+    if(this.buildings.some(b=>b.alive&&Math.floor(b.x)===tx&&Math.floor(b.y)===ty))return this.message('Spazio occupato.');const cost=BUILD_COSTS[type];if(!this.canPay(cost))return this.message('Risorse insufficienti da prenotare per il cantiere.');const b=new Building(type,tx,ty);if(type==='farm'&&window.TERRA_CROPS?.[crop])b.crop=crop;b.requiredMaterials={...cost};this.buildings.push(b);this.ensureInventories?.();let builder=this.selected instanceof Unit&&this.selected.location.kind==='world'?this.selected:this.units.find(u=>u.health>0&&u.location.kind==='world'&&!u.mobilized&&u.state==='idle');if(builder)this.assignBuild(builder,b);this.groupSelection=[];for(const u of this.units)u.selected=false;this.selected=b;this.updateUI();this.message(builder?`${builder.name} attende i materiali consegnati al cantiere.`:'Cantiere aperto: consegna i materiali e assegna un abitante.');}
   cancelTask(u){if(u.task?.type==='farm'){const f=this.findById(this.buildings,u.task.target);if(f)f.assigned=f.assigned.filter(id=>id!==u.id)}if(u.task?.type==='production'){const b=this.findById(this.buildings,u.task.target);if(b)b.workers=(b.workers||[]).filter(id=>id!==u.id)}u.task=null;u.state='idle';u.path=[];u.inventory.type=u.inventory.amount?u.inventory.type:null}
   assignMove(u,tx,ty){this.cancelTask(u);u.task={type:'move',x:tx,y:ty};u.path=this.findPath(u.x,u.y,tx,ty,1);u.state='moving'}
   assignGather(u,r){this.cancelTask(u);u.task={type:'gather',target:r.id,phase:'toResource'};u.path=this.findPath(u.x,u.y,Math.floor(r.x),Math.floor(r.y),1);u.state='moving';this.message(`${u.name}: raccolta ${this.resourceName(r.type)}.`)}
