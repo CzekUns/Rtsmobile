@@ -77,6 +77,10 @@
         if(!t||!BIOME[t.biome].walk||['sea','river','marsh'].includes(t.biome))continue;
 
         const orientation=((row+col)&1)?'down':'up';
+        // Keep the vein visually interlocked, but never stack two triangle nodes on top of each other.
+        // The minimum centre distance removes the current overdraw while preserving the staggered lattice.
+        const tooClose=next.some(n=>n.resourceShape==='triangle'&&Math.hypot(n.x-px,n.y-py)<.54);
+        if(tooClose)continue;
         const ironChance=metalRich?.28:.07;
         const type=rng.next()<ironChance?'iron':'stone';
         const amount=(type==='iron'?rng.int(75,115):rng.int(95,150))*10;
