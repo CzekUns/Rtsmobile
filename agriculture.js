@@ -41,7 +41,9 @@ const selection=Game.prototype.selectionHTML;
 Game.prototype.selectionHTML=function(e){
  let html=selection.call(this,e);if(!(e instanceof Building)||e.type!=='farm')return html;
  const c=TERRA_CROPS[e.crop]||TERRA_CROPS.grain;
+ const linkedWarehouses=this.linkedBuildings?.(e,'warehouse')||[];
  html+=`<p><b>Campo attraversabile · ${c.side} × ${c.side} tile</b><br>Lavoratori assegnati: ${this.cropWorkers(e).length}/${c.maxWorkers}. Impianto: 10 legno. Nessuna crescita senza lavoratori presenti.</p>`;
+ html+=linkedWarehouses.length?`<p><b>Logistica:</b> collegato a ${linkedWarehouses.length} magazzin${linkedWarehouses.length===1?'o':'i'}. Il raccolto viene trasferito automaticamente finché c’è spazio.</p>`:'<p><b>Logistica:</b> nessun magazzino collegato. Apri Collegamenti e collega un magazzino entro 12 tile per trasferire automaticamente il raccolto.</p>';
  html+='<p><b>Guida alle quattro colture</b></p>';
  for(const [id,crop] of Object.entries(TERRA_CROPS))html+=`<p><b>${crop.label}</b> · ${crop.side} × ${crop.side} tile · massimo ${crop.maxWorkers} lavoratori · ${crop.days} giorni base · ${crop.yield} ${this.resourceName(id)} di resa base.</p>`;
  return html+'<p>Grano e orzo alimentano mulino e forno. Vite produce uva; olivo produce olive. Vino e olio richiedono filiere ancora da implementare.</p><p>Fertilità, acqua e stagione modificano crescita e resa; la competenza agricola accelera la crescita. Il raccolto resta nell’inventario del campo: va trasportato. Se manca spazio, il raccolto maturo attende senza andare perso.</p><p>La coltura si sceglie prima del piazzamento del campo. Puoi sostituirla tra due cicli; il cambio richiede lo spazio previsto dalla nuova coltura. Gli altri edifici, incluso il recinto, non sono attraversabili.</p>';
