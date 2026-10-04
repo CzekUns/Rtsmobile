@@ -15,12 +15,15 @@ Game.prototype.followPath=function(e,dt,speed){
 };
 Game.prototype.settleUnitPosition=function(u){
  if(!(u instanceof Unit)||u.health<=0||u.location?.kind!=='world'||clear(this,u,u))return true;
- const occupied=living(this),origin={x:u.x,y:u.y};
- for(let ring=1;ring<=8;ring++){
-  const radius=ring*.45;
+ const origin={x:u.x,y:u.y};
+ // No teleporting: only a short local bounce, kept close enough to shared work targets.
+ for(const radius of [.35,.6,.85]){
   for(let i=0;i<16;i++){
    const a=i/16*Math.PI*2,p={x:origin.x+Math.cos(a)*radius,y:origin.y+Math.sin(a)*radius};
-   if(this.spawnPositionFree?.(p,u,occupied,true)){u.x=p.x;u.y=p.y;u.tx=p.x;u.ty=p.y;return true;}
+   if(!this.movementClear?.(origin,p))continue;
+   if(!clear(this,p,u))continue;
+   u.x=p.x;u.y=p.y;u.tx=p.x;u.ty=p.y;
+   return true;
   }
  }
  return false;
@@ -44,8 +47,6 @@ Game.prototype.updateUnit=function(u,dt){
  }
  update.call(this,u,dt);
  if(u.state==='farming'&&u.farmWanderTimer===undefined)u.farmWanderTimer=2;
- // Separation is enforced only once the villager is no longer travelling.
- if(u.state!=='moving'&&!u.path?.length)this.settleUnitPosition(u);
 };
 const arrive=Game.prototype.onUnitArrive;
 Game.prototype.onUnitArrive=function(u){
