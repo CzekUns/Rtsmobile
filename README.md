@@ -1,0 +1,62 @@
+# Ver Sacrum — build 71
+
+Costruzioni: tieni premuto e trascina il fantasma, rilascia per piazzare. **MOD + tap annulla la modalità costruzione.** Verde = posizione valida; rosso = posizione non valida.
+
+Villaggi aggiornati a **4 × 4 tile**, con ingombro, selezione, accessi e minimappa coerenti.
+
+Economia comunitaria senza denaro: totem, magazzini collegati, mercati distributivi, artigiani alimentati e carovane di baratto. Apri **Mondo → Insediamento** per collegamenti, soglie e quote di produzione. **Scambi** imposta il baratto fra mercati. La falegnameria produce tavole; i villaggi crescono solo con cibo e alloggi.
+
+Regole e migrazione: [docs/SETTLEMENT_ECONOMY.md](docs/SETTLEMENT_ECONOMY.md). I valori economici sotto, se riferiti a build precedenti, sono storici e sostituiti da questa specifica.
+
+# Terra Italica — RTS Mobile
+
+RTS sandbox mobile-first ambientato nell'Italia preromana. La direzione funzionale è descritta nel handoff Ver Sacrum desktop Godot; questa PWA ha visuale top-down e controlli dedicati agli smartphone, e non ha ancora parità di funzioni con il desktop.
+
+## Avvio
+Non richiede build, Node o installazioni. GitHub Pages pubblica direttamente la branch `main` tramite GitHub Actions.
+
+## Controlli touch
+- Tieni premuto **MOD**: tocca un abitante per selezionarlo oppure trascina per selezionare un gruppo con il riquadro.
+- Senza MOD, tocca un bersaglio per impartire un ordine contestuale a tutta la selezione.
+- Senza MOD, trascina per muovere la mappa.
+- Usa due dita senza MOD oppure `+ / −` per lo zoom.
+- In **Comunità**, tocca una scheda per selezionare soltanto quell'abitante.
+- In **Ordini**, scegli un'azione e tocca il bersaglio: vale per tutto il gruppo selezionato. **Libera** annulla i compiti del gruppo.
+- In **Costruisci**, scegli una struttura e tocca il terreno.
+- In **Mondo**, salva/carica la partita locale, genera un territorio o torna al villaggio.
+
+## Stato attuale — Build 32
+Mondo procedurale, cinque abitanti, raccolta, costruzioni, fauna, combattimento e prima filiera fisica **campo → mulino → forno → Casa comune**. Gli edifici hanno scorte locali, gli abitanti trasportano le merci e il salvataggio conserva i viaggi in corso.
+
+Apri **Mondo → Filiera** per inventari e rotte. Il pannello mette in pausa la simulazione. Dopo sospensione o caricamento premi ▶ per riprendere. I salvataggi precedenti vengono importati conservando l'originale.
+
+Leggi [guida, stato e limiti della build](docs/BUILD_29.md) e [handoff funzionale](docs/HANDOFF_MOBILE.md). Villaggi evoluti, paperdoll, skill separate, mercati e carovane restano lavori successivi.
+
+## Verifiche
+Con Node.js:
+
+```sh
+node tests/controls.cjs
+node tests/simulation.cjs
+node tests/debug.cjs
+```
+
+I test usano DOM/canvas simulati; non sostituiscono una prova touch e prestazionale su dispositivo.
+
+## Correzioni Build 30
+- I sentieri non possono spendere legna prenotata dai trasporti.
+- I percorsi controllano nuovi ostacoli prima di ogni passo: una nuova palizzata ferma il passaggio; i trasporti ricalcolano il percorso.
+- Piazzare un edificio elimina la precedente selezione di gruppo e i relativi indicatori.
+
+## Build 31 — ripresa visibile
+Dopo il caricamento e il ritorno dal background compare un avviso sulla mappa con **Riprendi partita**. Gli ordini impartiti durante la pausa rimangono in attesa e partono alla ripresa.
+
+## Build 32 — selezione oltre lo schermo
+Durante il trascinamento del riquadro, tieni il dito sul bordo sinistro, destro o superiore: la mappa scorre e la selezione resta ancorata al terreno. Lo scorrimento funziona anche in pausa e si ferma al rilascio, con il pinch o ai confini della mappa.
+
+### BUILD 58 — incursioni sospese
+Le incursioni sono temporaneamente disattivate. Al caricamento vengono rimossi i razziatori già presenti e annullati gli ordini rivolti a loro. Campi ostili e sistema bellico restano disponibili; il flag `Game.prototype.raidsEnabled` permette la riattivazione.
+
+### BUILD 59 — risorse e raccolta continua
+Risorse naturali ×10, comprese le quantità residue dei vecchi salvataggi (una sola volta; spot esauriti restano vuoti). Carichi e merci cadute non sono moltiplicati. Esaurito uno spot, il raccoglitore cerca lo spot raggiungibile più vicino dello stesso tipo entro 10 tile dallo spot esaurito; a carico pieno consegna prima al deposito. Senza alternative consegna il residuo e si ferma.
+
