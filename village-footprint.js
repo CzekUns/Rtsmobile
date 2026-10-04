@@ -12,14 +12,14 @@ const overlap=(a,b)=>a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.
 const contains=(r,p)=>p.x>=r.left&&p.x<r.right&&p.y>=r.top&&p.y<r.bottom;
 const distance=(a,b)=>Math.hypot(Math.max(0,a.left-b.right,b.left-a.right),Math.max(0,a.top-b.bottom,b.top-a.bottom));
 window.VER_SACRUM_VILLAGE={size:SIZE,bounds};
-Game.prototype.villagePlacementError=function(type,x,y,ignore=null){
- const r=bounds({type,x:x+.5,y:y+.5});
+Game.prototype.villagePlacementError=function(type,x,y,ignore=null,crop=null){
+ const r=bounds({type,x:x+.5,y:y+.5,crop:type==='farm'?(crop||this.pendingBuildCrop||'grain'):undefined});
  if(r.left<0||r.top<0||r.right>this.world.size||r.bottom>this.world.size)return 'Il villaggio deve rientrare interamente nella mappa (4 × 4 tile).';
  for(let ty=r.top;ty<r.bottom;ty++)for(let tx=r.left;tx<r.right;tx++){const t=this.world.tile(tx,ty);if(!t||!BIOME[t.biome].walk)return 'Servono 4 × 4 tile di terreno edificabile.';}
  if(this.buildings.some(b=>b!==ignore&&b.alive&&overlap(r,bounds(b))))return 'Area occupata: il villaggio riserva 4 × 4 tile.';
  return null;
 };
-const place=Game.prototype.placeBuild;Game.prototype.placeBuild=function(type,x,y){const error=this.villagePlacementError(type,x,y);if(error)return this.message(error);const result=place.call(this,type,x,y);for(const b of this.buildings)if(b.type==='house'&&Math.floor(b.x)===x&&Math.floor(b.y)===y)b.villageFootprintVersion=1;return result;};
+const place=Game.prototype.placeBuild;Game.prototype.placeBuild=function(type,x,y,crop=null){const error=this.villagePlacementError(type,x,y,null,crop);if(error)return this.message(error);const result=place.call(this,type,x,y,crop);for(const b of this.buildings)if(b.type==='house'&&Math.floor(b.x)===x&&Math.floor(b.y)===y)b.villageFootprintVersion=1;return result;};
 Game.prototype.initializeVillageFootprints=function(){
  for(const b of this.buildings.filter(b=>b.type==='house'&&b.alive)){
   if(b.villageFootprintVersion===1)continue;
