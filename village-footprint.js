@@ -2,6 +2,11 @@
 (() => {
 'use strict';
 const SIZE=4;
+const houseArt=new Image();houseArt.src='./assets/tokens/buildings/village_house.svg?v=78';
+Game.prototype.villageHouseSlots=function(b){
+ const r=bounds(b),n=Math.min(16,Math.ceil(this.villagePeople(b).length*16/5));
+ return Array.from({length:n},(_,i)=>({x:r.left+i%SIZE+.5,y:r.top+Math.floor(i/SIZE)+.5}));
+};
 function bounds(b){const x=Math.floor(b.x),y=Math.floor(b.y);return b.type==='house'?{left:x-SIZE/2,top:y-SIZE/2,right:x+SIZE/2,bottom:y+SIZE/2}:{left:x,top:y,right:x+1,bottom:y+1};}
 const overlap=(a,b)=>a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top;
 const contains=(r,p)=>p.x>=r.left&&p.x<r.right&&p.y>=r.top&&p.y<r.bottom;
@@ -37,13 +42,15 @@ const exit=Game.prototype.findResidentExit;Game.prototype.findResidentExit=funct
 const enter=Game.prototype.assignEnter;Game.prototype.assignEnter=function(u,b){if(b?.type!=='house')return enter.call(this,u,b);if(!b.alive||!b.built||b.owner!==u.owner||this.villagePeople(b).filter(p=>p!==u).length>=5)return this.message('Villaggio non disponibile o pieno.');const doors=this.villageDoors(b).sort((a,c)=>dist(u,a)-dist(u,c));for(const door of doors){const path=dist(u,door)<=.8?[]:this.findPath(u.x,u.y,Math.floor(door.x),Math.floor(door.y),1);if(!path.length&&dist(u,door)>.8)continue;this.cancelTask(u);u.task={type:'enter',target:b.id};u.path=path;u.state='moving';if(!path.length)this.onUnitArrive(u);return;}this.message('Nessun ingresso del villaggio raggiungibile.');};
 // Link distance is measured from the village edge, keeping the same 12-tile rule.
 const compatible=Game.prototype.linkCompatible;Game.prototype.linkCompatible=function(a,b){if(a.type!=='house'&&b.type!=='house')return compatible.call(this,a,b);if(a===b||a.owner!==b.owner||!a.alive||!a.built||!b.alive||!b.built||distance(bounds(a),bounds(b))>VER_SACRUM.linkRange)return false;const other=a.type==='house'?b:a;return other.type==='market'||!!TERRA_RECIPES[other.type];};
-const selection=Game.prototype.selectionHTML;Game.prototype.selectionHTML=function(e){return selection.call(this,e)+(e instanceof Building&&e.type==='house'?'<p>Superficie del villaggio: <b>4 × 4 tile · 16 tile</b>.</p>':'');};
+const selection=Game.prototype.selectionHTML;Game.prototype.selectionHTML=function(e){return selection.call(this,e)+(e instanceof Building&&e.type==='house'?'<p>Superficie del villaggio: <b>4 × 4 tile · 16 tile</b> · fino a 16 case.</p>':'');};
 const draw=Game.prototype.drawBuilding;Game.prototype.drawBuilding=function(b){if(b.type!=='house')return draw.call(this,b);const r=bounds(b),p=this.worldToScreen(r.left*TILE,r.top*TILE),s=TILE*this.camera.zoom,c=this.ctx;c.save();c.globalAlpha*=b.built?1:.55;c.fillStyle='#d8c69c';c.fillRect(p.x,p.y,SIZE*s,SIZE*s);c.strokeStyle=window.terraFactionStyle?.(b.owner)?.color||'#934c36';c.lineWidth=3*this.camera.zoom;c.strokeRect(p.x,p.y,SIZE*s,SIZE*s);
  c.strokeStyle='#b5a17b';c.lineWidth=1;for(let i=1;i<SIZE;i++){c.beginPath();c.moveTo(p.x+i*s,p.y);c.lineTo(p.x+i*s,p.y+SIZE*s);c.moveTo(p.x,p.y+i*s);c.lineTo(p.x+SIZE*s,p.y+i*s);c.stroke();}
- // Decorative central lanes; eight houses visualize population, not tile count.
- const unit=s*SIZE/8;c.fillStyle='#c0aa7e';c.fillRect(p.x+3*unit,p.y,2*unit,8*unit);c.fillRect(p.x,p.y+3*unit,8*unit,2*unit);
- const n=Math.min(8,Math.ceil(this.villagePeople(b).length*8/5)),lots=[[1,1],[5,1],[1,5],[5,5],[3.5,1],[1,3.5],[5,3.5],[3.5,5]];
- for(let i=0;i<n;i++){const [x,y]=lots[i];c.fillStyle='#916a49';c.fillRect(p.x+x*unit,p.y+(y+.4)*unit,1.4*unit,1.3*unit);c.fillStyle='#663a2b';c.beginPath();c.moveTo(p.x+(x-.15)*unit,p.y+(y+.5)*unit);c.lineTo(p.x+(x+.7)*unit,p.y+(y-.15)*unit);c.lineTo(p.x+(x+1.55)*unit,p.y+(y+.5)*unit);c.closePath();c.fill();}
+ // One house per tile: no central cross and no fractional lot coordinates.
+ for(const slot of this.villageHouseSlots(b)){
+  const center=this.worldToScreen(slot.x*TILE,slot.y*TILE),size=s*.92;
+  if(houseArt.complete&&houseArt.naturalWidth>0){c.imageSmoothingEnabled=true;c.drawImage(houseArt,center.x-size/2,center.y-size/2,size,size);}
+  else{c.fillStyle='#d8bd87';c.fillRect(center.x-s*.34,center.y-s*.34,s*.68,s*.68);c.fillStyle='#a55a39';c.fillRect(center.x-s*.38,center.y-s*.38,s*.76,s*.62);c.fillStyle='#663c2b';c.fillRect(center.x-s*.035,center.y-s*.38,s*.07,s*.62);}
+ }
  if(!b.built){c.fillStyle='#382f23';c.fillRect(p.x,p.y+SIZE*s-6,SIZE*s,6);c.fillStyle='#d4af62';c.fillRect(p.x,p.y+SIZE*s-6,SIZE*s*b.progress,6);}
  if(this.selected?.id===b.id){c.strokeStyle='#fff0ad';c.lineWidth=3;c.strokeRect(p.x-3,p.y-3,SIZE*s+6,SIZE*s+6);const center=this.worldToScreen((r.left+SIZE/2)*TILE,(r.top+SIZE/2)*TILE);for(const other of this.buildings.filter(other=>this.linkCompatible(other,b))){const q=this.worldToScreen(other.x*TILE,other.y*TILE);c.strokeStyle=this.linkOpen(other,b)?'#e0c27a':'#8c4940';c.beginPath();c.moveTo(center.x,center.y);c.lineTo(q.x,q.y);c.stroke();}}
  c.restore();};
