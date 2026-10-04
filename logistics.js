@@ -15,10 +15,10 @@
     bakery:[{id:'wheat-bread',inputs:{flour:2},outputs:{bread:2},seconds:8},{id:'barley-bread',inputs:{barleyFlour:2},outputs:{barleyBread:3},seconds:8}]
   };
   const CROPS={
-    grain:{label:'Grano',days:10,yield:20,seasons:{Inverno:.35,Primavera:1.15,Estate:.85,Autunno:1}},
-    barley:{label:'Orzo',days:10,yield:20,seasons:{Inverno:.45,Primavera:1.1,Estate:.95,Autunno:1}},
-    grapes:{label:'Vite',days:30,yield:80,seasons:{Inverno:.15,Primavera:.85,Estate:1.2,Autunno:1.05}},
-    olives:{label:'Olivo',days:40,yield:100,seasons:{Inverno:.4,Primavera:.8,Estate:1.05,Autunno:1.2}}
+    grain:{label:'Grano',side:1,maxWorkers:2,days:10,yield:20,seasons:{Inverno:.35,Primavera:1.15,Estate:.85,Autunno:1}},
+    barley:{label:'Orzo',side:1,maxWorkers:2,days:10,yield:20,seasons:{Inverno:.45,Primavera:1.1,Estate:.95,Autunno:1}},
+    grapes:{label:'Vite',side:2,maxWorkers:8,days:30,yield:80,seasons:{Inverno:.15,Primavera:.85,Estate:1.2,Autunno:1.05}},
+    olives:{label:'Olivo',side:2,maxWorkers:8,days:40,yield:100,seasons:{Inverno:.4,Primavera:.8,Estate:1.05,Autunno:1.2}}
   };
   window.TERRA_CAPACITY=CAPACITY;window.TERRA_GOODS=GOODS;window.TERRA_RECIPES=RECIPES;window.TERRA_CROPS=CROPS;
   const total=items=>Object.entries(items).reduce((sum,[good,n])=>sum+n*(GOODS[good]?.volume||1),0);
@@ -161,7 +161,7 @@
   Game.prototype.buildingDay=function(b){
     if(!b.built||!b.alive)return;this.ensureInventories();
     if(b.type==='farm'){
-      const workers=this.units.filter(u=>u.health>0&&u.state==='farming'&&u.task?.target===b.id&&this.buildingDistance(u,b)<=1.15);
+      const workers=this.units.filter(u=>u.health>0&&u.state==='farming'&&u.task?.target===b.id&&this.buildingDistance(u,b)<=1.15).slice(0,(CROPS[b.crop]||CROPS.grain).maxWorkers);
       if(!workers.length)return;
       const crop=CROPS[b.crop]||CROPS.grain,tile=this.world.tile(Math.floor(b.x),Math.floor(b.y)),season=this.season(),seasonMod=crop.seasons[season],water=tile.nearWater?1.3:1;
       const skill=workers.reduce((s,u)=>s+u.skills.farming,0)/workers.length;
@@ -174,7 +174,7 @@
   const updateBuilding=Game.prototype.updateBuilding;
   Game.prototype.updateBuilding=function(b,dt){
     updateBuilding.call(this,b,dt);const recipes=RECIPES[b.type];if(!recipes||!b.built||!b.alive)return;
-    const workers=this.factoryWorkers(b).filter(u=>this.buildingDistance(u,b)<=1.15);if(!workers.length)return;
+    const workers=this.factoryWorkers(b).filter(u=>this.buildingDistance(u,b)<=1.15).slice(0,(CROPS[b.crop]||CROPS.grain).maxWorkers);if(!workers.length)return;
     if(b.batch){b.batch.remaining=Math.max(0,b.batch.remaining-dt);if(b.batch.remaining===0){for(const[good,amount]of Object.entries(b.batch.outputs))b.inventory.items[good]=(b.inventory.items[good]||0)+amount;b.batch=null;}return;}
     const incoming=this.reserved(b.id,null,'in');
     const recipe=recipes.find(r=>Object.entries(r.inputs).every(([good,amount])=>this.available(b,good)>=amount)&&total(b.inventory.items)-total(r.inputs)+total(r.outputs)+incoming<=b.inventory.capacity);

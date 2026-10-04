@@ -9,7 +9,7 @@ const WORLD_SIZE=88;
 const SAVE_KEY='terra-italica-save-v2';
 const NAMES=['Aulo','Neria','Tito','Velia','Maro','Tana','Silio','Ovia','Vibio','Larth','Atria','Festo','Tita','Numa','Ruma','Caio'];
 const BUILD_COSTS={
-  sawmill:{wood:18,stone:8},mill:{wood:20,stone:12}, bakery:{wood:16,stone:16}, warehouse:{wood:18,stone:8}, house:{wood:24,stone:10}, farm:{wood:6},
+  sawmill:{wood:18,stone:8},mill:{wood:20,stone:12}, bakery:{wood:16,stone:16}, warehouse:{wood:18,stone:8}, house:{wood:24,stone:10}, farm:{wood:10},
   pen:{wood:12,stone:4}, market:{wood:22,stone:10}, palisade:{wood:4}, tower:{wood:14,stone:8}
 };
 const BUILD_LABEL={sawmill:'Falegnameria',mill:'Mulino',bakery:'Forno',base:'Totem',warehouse:'Magazzino',house:'Villaggio',farm:'Campo',pen:'Recinto',market:'Mercato',palisade:'Palizzata',tower:'Torre'};

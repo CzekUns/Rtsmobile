@@ -1,5 +1,21 @@
 # Ver Sacrum - Handoff Funzionale e Tecnico Mobile
 
+## Aggiornamento mobile vincolante — 4 ottobre 2026, build 79
+
+Il documento storico sotto descrive il desktop del 16 settembre. Per agricoltura e attraversabilità nella versione mobile prevalgono queste regole:
+
+- **Solo il campo è attraversabile.** Il recinto e tutte le altre strutture bloccano il movimento anche da incomplete.
+- Grano e orzo: **1 × 1 tile, massimo 2 contadini, 10 giorni base, resa base 20**.
+- Vite: **2 × 2 tile, massimo 8 contadini, 30 giorni base, resa base 80 uva**.
+- Olivo: **2 × 2 tile, massimo 8 contadini, 40 giorni base, resa base 100 olive**.
+- Ogni nuovo campo costa **10 legno**. Selezionarlo per cambiare coltura nella UI inferiore; il cambio è consentito tra i cicli e controlla spazio libero e lavoratori.
+- Raccolti e merci restano locali; un inventario pieno trattiene il raccolto maturo senza perdite. Non copiare il vecchio accredito globale di `food` descritto nella sezione desktop.
+
+Guida completa, filiere disponibili, salvataggi e limiti: [Colture e stagioni mobile](CROPS_AND_SEASONS.md). Codice mobile: `agriculture.js`, `logistics.js`, `collisions.js` e `village-footprint.js`. La guida è anche nella scheda del campo in gioco.
+
+---
+
+
 Data: 16 settembre 2026. Destinatario: sviluppatore o agente della versione mobile.
 Base esaminata: progetto desktop locale Godot, non il codice della versione mobile.
 Questo documento descrive tutte le principali funzioni di gioco e i loro collegamenti;
@@ -163,7 +179,7 @@ Costi correnti in legno/cibo/pietra; valori di prototipo, non bilanciamento fina
 
 Piazzamento con anteprima, controllo terreno/occupazione/costo e lavoro di
 costruzione. Gli edifici bloccano normalmente il percorso anche da incompleti;
-il recinto e attraversabile. Riparazione e salute degli edifici sono presenti.
+nel mobile solo il campo è attraversabile, mentre il recinto è un ostacolo. Riparazione e salute degli edifici sono presenti.
 Non rinominare `hearth` o `farm` nei salvataggi senza una migrazione esplicita.
 
 ## 8. Agricoltura, allevamento e tempo
@@ -428,3 +444,4 @@ richiedono verifica dei diritti prima di una distribuzione pubblica.
 > a timer come modello finale. Conserva ID e salvataggi, progetta comandi touch
 > senza ambiguita, testa sospensione/ripresa e misura su hardware mobile reale.
 > Prima rendi completa una filiera e una partita da touch, poi amplia i contenuti.
+

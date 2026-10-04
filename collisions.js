@@ -10,10 +10,10 @@ const actors=g=>[...g.units.filter(u=>u.health>0&&u.location?.kind==='world'),..
 const walk=World.prototype.walkable;
 World.prototype.walkable=function(x,y,climb=1,from=null,buildings=[]){
  if(!walk.call(this,x,y,climb,from,buildings))return false;
- return ![...buildings,...(this.collisionCamps||[])].some(b=>b.health>0&&inside(bounds(b),{x:x+.5,y:y+.5}));
+ return ![...buildings,...(this.collisionCamps||[])].some(b=>b.health>0&&b.type!=='farm'&&inside(bounds(b),{x:x+.5,y:y+.5}));
 };
 Game.prototype.buildingDistance=function(p,b){
- const r=bounds(b);if(inside(r,p))return Infinity;
+ const r=bounds(b);if(inside(r,p))return b.type==='farm'?0:Infinity;
  return .5+Math.hypot(Math.max(r.left-p.x,0,p.x-r.right),Math.max(r.top-p.y,0,p.y-r.bottom));
 };
 Game.prototype.buildingDoors=function(b){
@@ -47,16 +47,16 @@ Game.prototype.villagePlacementError=function(type,x,y,ignore=null){
  if(actors(this).some(e=>overlaps(r,{left:e.x-.45,right:e.x+.45,top:e.y-.45,bottom:e.y+.45})))return 'Area occupata da abitanti o animali.';
  return null;
 };
-Game.prototype.spawnPositionFree=function(p,ignore=null,occupied=actors(this)){
+Game.prototype.spawnPositionFree=function(p,ignore=null,occupied=actors(this),allowFields=false){
  if(!this.world.walkable(Math.floor(p.x),Math.floor(p.y),1,null,this.buildings))return false;
  const r={left:p.x-.45,right:p.x+.45,top:p.y-.45,bottom:p.y+.45};
- if(this.buildings.some(b=>b.alive&&overlaps(r,bounds(b))))return false;
+ if(this.buildings.some(b=>b.alive&&(!allowFields||b.type!=='farm')&&overlaps(r,bounds(b))))return false;
  if((this.warCamps||[]).some(b=>b.health>0&&overlaps(r,bounds(b))))return false;
  if(this.world.resources.some(n=>resourceAlive(n)&&overlaps(r,resourceBounds(n))))return false;
  if(ignore instanceof Animal&&!this.animalHasExit(p))return false;
  return !occupied.some(e=>e!==ignore&&dist(e,p)<.95);
 };
-Game.prototype.nearestSpawnPosition=function(p,ignore=null,occupied=actors(this)){
+Game.prototype.nearestSpawnPosition=function(p,ignore=null,occupied=actors(this),allowFields=false){
  const x=Math.floor(p.x),y=Math.floor(p.y);
  for(let radius=0;radius<this.world.size;radius++)for(let dy=-radius;dy<=radius;dy++)for(let dx=-radius;dx<=radius;dx++){
   if(Math.max(Math.abs(dx),Math.abs(dy))!==radius)continue;
@@ -95,7 +95,7 @@ Game.prototype.normalizeWorldSpawns=function(){
  const placed=[];
  for(const b of [...this.buildings.filter(b=>b.alive),...(this.warCamps||[]).filter(c=>c.health>0)]){
   const free=(x,y)=>{
-   const r=bounds({type:b.type,x:x+.5,y:y+.5});
+   const r=bounds({...b,x:x+.5,y:y+.5});
    if(r.left<0||r.top<0||r.right>this.world.size||r.bottom>this.world.size)return false;
    for(let yy=r.top;yy<r.bottom;yy++)for(let xx=r.left;xx<r.right;xx++){const t=this.world.tile(xx,yy);if(!t||!BIOME[t.biome].walk)return false;}
    return !placed.some(a=>overlaps(r,bounds(a)))&&!this.world.resources.some(n=>resourceAlive(n)&&overlaps(r,resourceBounds(n)));
@@ -157,7 +157,7 @@ for(const method of ['updateRaider']){
  const update=Game.prototype[method];Game.prototype[method]=function(e,dt){const before={x:e.x,y:e.y};update.call(this,e,dt);if(!this.movementClear(before,e)){e.x=before.x;e.y=before.y;if(e.path)e.path=[];}};
 }
 // Animals avoid the full resource footprint throughout movement, not just spawn.
-Game.prototype.animalTerrainClear=function(p){return this.spawnPositionFree(p,null,[]);};
+Game.prototype.animalTerrainClear=function(p){return this.spawnPositionFree(p,null,[],true);};
 Game.prototype.animalSegmentClear=function(from,to){
  const steps=Math.max(1,Math.ceil(dist(from,to)/.15));
  for(let i=0;i<=steps;i++)if(!this.animalTerrainClear({x:from.x+(to.x-from.x)*i/steps,y:from.y+(to.y-from.y)*i/steps}))return false;

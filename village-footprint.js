@@ -7,7 +7,7 @@ Game.prototype.villageHouseSlots=function(b){
  const r=bounds(b),n=Math.min(16,Math.ceil(this.villagePeople(b).length*16/5));
  return Array.from({length:n},(_,i)=>({x:r.left+i%SIZE+.5,y:r.top+Math.floor(i/SIZE)+.5}));
 };
-function bounds(b){const x=Math.floor(b.x),y=Math.floor(b.y);return b.type==='house'?{left:x-SIZE/2,top:y-SIZE/2,right:x+SIZE/2,bottom:y+SIZE/2}:{left:x,top:y,right:x+1,bottom:y+1};}
+function bounds(b){const x=Math.floor(b.x),y=Math.floor(b.y);return b.type==='house'?{left:x-SIZE/2,top:y-SIZE/2,right:x+SIZE/2,bottom:y+SIZE/2}:{left:x,top:y,right:x+(b.type==='farm'?(TERRA_CROPS[b.crop]?.side||1):1),bottom:y+(b.type==='farm'?(TERRA_CROPS[b.crop]?.side||1):1)};}
 const overlap=(a,b)=>a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top;
 const contains=(r,p)=>p.x>=r.left&&p.x<r.right&&p.y>=r.top&&p.y<r.bottom;
 const distance=(a,b)=>Math.hypot(Math.max(0,a.left-b.right,b.left-a.right),Math.max(0,a.top-b.bottom,b.top-a.bottom));
@@ -35,8 +35,8 @@ Game.prototype.initializeVillageFootprints=function(){
 };
 const newGame=Game.prototype.newGame;Game.prototype.newGame=function(seed){newGame.call(this,seed);this.initializeVillageFootprints();};
 const load=Game.prototype.load;Game.prototype.load=function(){const ok=load.call(this);if(ok)this.initializeVillageFootprints();return ok;};
-const pick=Game.prototype.pickEntity;Game.prototype.pickEntity=function(p){const e=pick.call(this,p);if(e instanceof Unit||e instanceof Animal||e instanceof Raider)return e;const village=this.buildings.find(b=>b.type==='house'&&b.alive&&contains(bounds(b),p));return village||e;};
-const nearest=Game.prototype.nearestAt;Game.prototype.nearestAt=function(list,p,radius,filter=()=>true){const village=list.find(b=>b instanceof Building&&b.type==='house'&&b.alive&&filter(b)&&contains(bounds(b),p));return village||nearest.call(this,list,p,radius,filter);};
+const pick=Game.prototype.pickEntity;Game.prototype.pickEntity=function(p){const e=pick.call(this,p);if(e instanceof Unit||e instanceof Animal||e instanceof Raider)return e;const village=this.buildings.find(b=>['house','farm'].includes(b.type)&&b.alive&&contains(bounds(b),p));return village||e;};
+const nearest=Game.prototype.nearestAt;Game.prototype.nearestAt=function(list,p,radius,filter=()=>true){const village=list.find(b=>b instanceof Building&&['house','farm'].includes(b.type)&&b.alive&&filter(b)&&contains(bounds(b),p));return village||nearest.call(this,list,p,radius,filter);};
 Game.prototype.villageDoors=function(b){const r=bounds(b),out=[];for(let i=0;i<SIZE;i++)out.push({x:r.left+i+.5,y:r.top-.5},{x:r.left+i+.5,y:r.bottom+.5},{x:r.left-.5,y:r.top+i+.5},{x:r.right+.5,y:r.top+i+.5});return out.filter(p=>this.world.walkable(Math.floor(p.x),Math.floor(p.y),1,null,this.buildings)&&!this.buildings.some(other=>other!==b&&other.alive&&contains(bounds(other),p)));};
 const exit=Game.prototype.findResidentExit;Game.prototype.findResidentExit=function(b){if(b.type!=='house')return exit.call(this,b);return this.villageDoors(b).find(p=>!this.units.some(u=>u.health>0&&u.location.kind==='world'&&Math.floor(u.x)===Math.floor(p.x)&&Math.floor(u.y)===Math.floor(p.y)))||null;};
 const enter=Game.prototype.assignEnter;Game.prototype.assignEnter=function(u,b){if(b?.type!=='house')return enter.call(this,u,b);if(!b.alive||!b.built||b.owner!==u.owner||this.villagePeople(b).filter(p=>p!==u).length>=5)return this.message('Villaggio non disponibile o pieno.');const doors=this.villageDoors(b).sort((a,c)=>dist(u,a)-dist(u,c));for(const door of doors){const path=dist(u,door)<=.8?[]:this.findPath(u.x,u.y,Math.floor(door.x),Math.floor(door.y),1);if(!path.length&&dist(u,door)>.8)continue;this.cancelTask(u);u.task={type:'enter',target:b.id};u.path=path;u.state='moving';if(!path.length)this.onUnitArrive(u);return;}this.message('Nessun ingresso del villaggio raggiungibile.');};
