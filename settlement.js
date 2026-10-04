@@ -12,7 +12,7 @@ Game.prototype.ensureSettlement=function(){
  this.ensureInventories();
  for(const b of this.buildings){b.linkSettings??={};b.returnDue??={};if(TERRA_RECIPES[b.type]){b.desiredWorkers??=1;b.returnPercent??=75;}}
 };
-Game.prototype.linkCompatible=function(a,b){if(a===b||a.owner!==b.owner||!operational(a)||!operational(b)||dist(a,b)>RANGE)return false;const types=[a.type,b.type];return types.includes('base')&&types.includes('warehouse')||types.includes('market')&&(types.includes('warehouse')||types.includes('house')||types.some(t=>TERRA_RECIPES[t]))||types.includes('house')&&types.some(t=>TERRA_RECIPES[t]);};
+Game.prototype.linkCompatible=function(a,b){if(a===b||a.owner!==b.owner||!operational(a)||!operational(b)||dist(a,b)>RANGE)return false;const types=[a.type,b.type];return types.includes('base')&&types.includes('warehouse')||types.includes('farm')&&types.includes('warehouse')||types.includes('market')&&(types.includes('warehouse')||types.includes('house')||types.some(t=>TERRA_RECIPES[t]))||types.includes('house')&&types.some(t=>TERRA_RECIPES[t]);};
 Game.prototype.linkPolicy=function(a,b){const holder=a.id<b.id?a:b;holder.linkSettings??={};return holder.linkSettings[pair(a,b)]??={enabled:true,goods:{}};};
 Game.prototype.linkOpen=function(a,b){return this.linkCompatible(a,b)&&this.linkPolicy(a,b).enabled!==false;};
 Game.prototype.linkedBuildings=function(b,type){return this.buildings.filter(a=>(!type||a.type===type)&&this.linkOpen(a,b));};
@@ -53,6 +53,17 @@ Game.prototype.takeFood=function(stores,amount){if(stores.reduce((s,b)=>s+EDIBLE
 Game.prototype.feedPeople=function(){for(const u of this.units.filter(u=>u.health>0)){if((u.fedUntil??-1)>this.totalDays)continue;u.hungry=!this.takeFood(this.foodStoresFor(u),1);if(!u.hungry)u.fedUntil=this.totalDays+30;}};
 Game.prototype.settlementTick=function(){
  this.ensureSettlement();const markets=this.buildings.filter(b=>b.type==='market'&&operational(b));
+ // Fields may feed a nearby linked warehouse directly. Goods remain local if the link is closed or the warehouse is full.
+ for(const farm of this.buildings.filter(b=>b.type==='farm'&&operational(b))){
+  const good=farm.crop;
+  if(!TERRA_CROPS[good])continue;
+  for(const warehouse of this.linkedBuildings(farm,'warehouse')){
+   const p=this.linkGoodPolicy(farm,warehouse,good);
+   if(!p.export)continue;
+   const available=Math.max(0,this.available(farm,good)-Math.max(0,p.keep||0));
+   if(available>0)this.moveLinkedGoods(farm,warehouse,good,available);
+  }
+ }
  for(const m of markets)for(const w of this.linkedBuildings(m,'warehouse')){
   for(const good of Object.keys(TERRA_GOODS)){const p=this.linkGoodPolicy(w,m,good);let n=this.available(w,good);if(p.import&&n<p.min){this.moveLinkedGoods(m,w,good,p.min-n);continue;}if(p.export&&n>p.keep){const due=EDIBLE.includes(good)?this.units.filter(u=>u.owner===w.owner&&u.health>0).length:0;this.moveLinkedGoods(w,m,good,Math.min(12,Math.max(0,n-Math.max(p.keep,due))));}}
  }
