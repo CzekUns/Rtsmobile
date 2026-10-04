@@ -44,8 +44,39 @@ Game.prototype.selectionHTML=function(e){
  html+=`<p><b>Campo attraversabile · ${c.side} × ${c.side} tile</b><br>Lavoratori assegnati: ${this.cropWorkers(e).length}/${c.maxWorkers}. Impianto: 10 legno. Nessuna crescita senza lavoratori presenti.</p>`;
  html+='<p><b>Guida alle quattro colture</b></p>';
  for(const [id,crop] of Object.entries(TERRA_CROPS))html+=`<p><b>${crop.label}</b> · ${crop.side} × ${crop.side} tile · massimo ${crop.maxWorkers} lavoratori · ${crop.days} giorni base · ${crop.yield} ${this.resourceName(id)} di resa base.</p>`;
- return html+'<p>Grano e orzo alimentano mulino e forno. Vite produce uva; olivo produce olive. Vino e olio richiedono filiere ancora da implementare.</p><p>Fertilità, acqua e stagione modificano crescita e resa; la competenza agricola accelera la crescita. Il raccolto resta nell’inventario del campo: va trasportato. Se manca spazio, il raccolto maturo attende senza andare perso.</p><p>Il campo nasce a grano. Cambia coltura tra due cicli; le colture più grandi richiedono spazio libero verso destra e in basso. Gli altri edifici, incluso il recinto, non sono attraversabili.</p>';
+ return html+'<p>Grano e orzo alimentano mulino e forno. Vite produce uva; olivo produce olive. Vino e olio richiedono filiere ancora da implementare.</p><p>Fertilità, acqua e stagione modificano crescita e resa; la competenza agricola accelera la crescita. Il raccolto resta nell’inventario del campo: va trasportato. Se manca spazio, il raccolto maturo attende senza andare perso.</p><p>La coltura si sceglie prima del piazzamento del campo. Puoi sostituirla tra due cicli; il cambio richiede lo spazio previsto dalla nuova coltura. Gli altri edifici, incluso il recinto, non sono attraversabili.</p>';
 };
+// Build flow: choose the crop first, then place a farm already configured with it.
+const initUI=Game.prototype.initUI;
+Game.prototype.initUI=function(){
+ initUI.call(this);
+ const chooser=$('#cropBuildChooser'),farmButton=$('[data-build="farm"]');
+ const closeChooser=()=>{if(chooser)chooser.hidden=true;};
+ if(farmButton)farmButton.onclick=()=>{
+  this.orderMode=null;this.buildMode=null;this.pendingBuildCrop=null;closeChooser();
+  if(chooser)chooser.hidden=false;
+  this.message('Scegli prima la coltura da piantare.');
+  this.syncModeButtons();this.updateUI();
+ };
+ $('[data-crop-build]').forEach(button=>button.onclick=()=>{
+  const crop=button.dataset.cropBuild,c=TERRA_CROPS[crop];if(!c)return;
+  this.pendingBuildCrop=crop;this.buildMode='farm';this.orderMode=null;closeChooser();
+  this.message(`${c.label} · ${c.side} × ${c.side} tile. Tocca il terreno per piazzare il campo.`);
+  this.syncModeButtons();this.updateUI();
+ });
+ $('[data-build]').filter(button=>button.dataset.build!=='farm').forEach(button=>button.addEventListener('click',()=>{this.pendingBuildCrop=null;closeChooser();}));
+};
+const placeBuild=Game.prototype.placeBuild;
+Game.prototype.placeBuild=function(type,x,y,crop=null){
+ const chosen=type==='farm'?(crop||this.pendingBuildCrop):null;
+ if(type==='farm'&&!TERRA_CROPS[chosen]){this.buildMode=null;this.message('Scegli prima la coltura.');this.syncModeButtons();return;}
+ const before=new Set(this.buildings.map(b=>b.id));
+ const result=placeBuild.call(this,type,x,y,chosen);
+ const farm=type==='farm'?this.buildings.find(b=>!before.has(b.id)&&b.type==='farm'):null;
+ if(farm&&TERRA_CROPS[chosen]){farm.crop=chosen;this.pendingBuildCrop=null;this.buildMode=null;this.syncModeButtons();this.updateUI();}
+ return result;
+};
+
 const draw=Game.prototype.drawBuilding;
 Game.prototype.drawBuilding=function(b){
  if(b.type!=='farm')return draw.call(this,b);
