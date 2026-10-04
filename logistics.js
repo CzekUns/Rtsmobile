@@ -167,7 +167,7 @@
       const skill=workers.reduce((s,u)=>s+u.skills.farming,0)/workers.length;
       b.growth=Math.min(1,b.growth+1/crop.days*BIOME[tile.biome].fertility*seasonMod*water*(1+(skill-1)*.08));
       const amount=Math.max(1,Math.round(crop.yield*BIOME[tile.biome].fertility*water*seasonMod));
-      if(b.growth>=1&&this.freeSpace(b)>=amount){b.inventory.items[b.crop]=(b.inventory.items[b.crop]||0)+amount;b.growth=0;for(const u of workers)u.gain('farming',5);this.message(`Raccolto: ${amount} ${this.resourceName(b.crop)} nel campo. Il raccolto resta locale finché non viene trasportato.`);}
+      if(b.growth>=1&&this.freeSpace(b)>=amount){b.inventory.items[b.crop]=(b.inventory.items[b.crop]||0)+amount;b.growth=0;for(const u of workers)u.gain('farming',5);const linked=this.linkedBuildings?.(b,'warehouse')?.some(w=>this.linkOpen?.(b,w));this.message(linked?`Raccolto: ${amount} ${this.resourceName(b.crop)} nel campo. Trasferimento automatico verso il magazzino collegato.`:`Raccolto: ${amount} ${this.resourceName(b.crop)} nel campo. Collega un magazzino entro 12 tile oppure assegna un trasporto.`);}
     }
 
   };
