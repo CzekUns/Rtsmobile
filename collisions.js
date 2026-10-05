@@ -10,7 +10,7 @@ const actors=g=>[...g.units.filter(u=>u.health>0&&u.location?.kind==='world'),..
 const walk=World.prototype.walkable;
 World.prototype.walkable=function(x,y,climb=1,from=null,buildings=[]){
  if(!walk.call(this,x,y,climb,from,buildings))return false;
- return ![...buildings,...(this.collisionCamps||[])].some(b=>b.health>0&&b.type!=='farm'&&inside(bounds(b),{x:x+.5,y:y+.5}));
+ return ![...buildings,...(this.collisionCamps||[])].some(b=>b.health>0&&b.type!=='farm'&&!(b.type==='palisade'&&!b.built)&&inside(bounds(b),{x:x+.5,y:y+.5}));
 };
 Game.prototype.buildingDistance=function(p,b){
  const r=bounds(b);if(inside(r,p))return b.type==='farm'?0:Infinity;
