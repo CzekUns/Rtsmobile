@@ -13,11 +13,11 @@
   window.TERRA_P16_SPRITES=SPRITES;
   const TOKEN_NAMES=['libero','taglialegna','minatore','contadino','costruttore','trasportatore','mugnaio','fornaio','allevatore','mobilitato'];
   const tokenTemplates=new Map(),tokenImages=new Map(),tokenFetches=new Map();
-  const tokenUrl=name=>'./assets/tokens/professions/'+name+'.svg?v=62';
+  const tokenUrl=name=>'./assets/tokens/professions/'+name+'.svg?v=105';
   function preloadToken(name){if(tokenTemplates.has(name)||tokenFetches.has(name))return;const p=fetch(tokenUrl(name),{cache:'force-cache'}).then(r=>{if(!r.ok)throw new Error(name);return r.text();}).then(t=>tokenTemplates.set(name,t)).catch(()=>null).finally(()=>tokenFetches.delete(name));tokenFetches.set(name,p);}
   TOKEN_NAMES.forEach(preloadToken);
   const ANIMAL_TOKEN_NAMES=['sheep_alive','sheep_dead','sheep_skeleton','goat_alive','goat_dead','goat_skeleton','cow_alive','cow_dead','cow_skeleton','wolf_alive','wolf_dead','wolf_skeleton'];
-  const ANIMAL_TOKENS=Object.fromEntries(ANIMAL_TOKEN_NAMES.map(name=>[name,load('./assets/tokens/animals/'+name+'.svg?v=99')]));
+  const ANIMAL_TOKENS=Object.fromEntries(ANIMAL_TOKEN_NAMES.map(name=>[name,load('./assets/tokens/animals/'+name+'.svg?v=105')]));
   window.TERRA_ANIMAL_TOKENS=ANIMAL_TOKENS;
   const RESOURCE_TILE_NAMES=['forest_full_hex','forest_medium_hex','forest_low_hex','forest_empty_hex','berries_full_hex','berries_medium_hex','berries_low_hex','berries_empty_hex','stone_up_full_tri','stone_up_low_tri','stone_down_full_tri','stone_down_low_tri','ore_up_full_tri','ore_up_low_tri','ore_down_full_tri','ore_down_low_tri'];
   const RESOURCE_TILES=Object.fromEntries(RESOURCE_TILE_NAMES.map(name=>[name,load('./assets/terrain/resources/'+name+'.svg?v=104')]));
