@@ -10,6 +10,7 @@
   const oldCancelBuildPlacement=Game.prototype.cancelBuildPlacement;
   const oldDraw=Game.prototype.draw;
   const oldDrawBuilding=Game.prototype.drawBuilding;
+  const oldBuildTick=Game.prototype.buildTick;
   const oldRefreshContextDock=Game.prototype.refreshContextDock;
   const oldInitUI=Game.prototype.initUI;
   const oldNewGame=Game.prototype.newGame;
@@ -17,11 +18,20 @@
   const localPoint=(g,e)=>{const r=g.canvas.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top};};
   const tileAt=(g,sx,sy)=>{const w=g.screenToWorld(sx,sy);return{x:Math.floor(w.x/TILE),y:Math.floor(w.y/TILE)};};
   const addCost=(a,b,m=1)=>{for(const[k,v]of Object.entries(b||{}))a[k]=(a[k]||0)+v*m;return a;};
-  const planCost=items=>items.reduce((sum,item)=>addCost(sum,item.type==='road'?{wood:1}:BUILD_COSTS[item.type]),{});
+  const planCost=items=>items.filter(item=>!item.reuseId).reduce((sum,item)=>addCost(sum,item.type==='road'?{wood:1}:BUILD_COSTS[item.type]),{});
   const availableBuilder=g=>g.selected instanceof Unit&&g.selected.location?.kind==='world'&&g.selected.health>0?g.selected:g.units.find(u=>u.health>0&&u.location?.kind==='world'&&!u.mobilized&&u.state==='idle');
+
+  Game.prototype.palisadeAt=function(x,y){
+    return this.buildings.find(b=>b.alive&&b.type==='palisade'&&Math.floor(b.x)===x&&Math.floor(b.y)===y)||null;
+  };
 
   Game.prototype.pendingPlacementError=function(item){
     if(item.x<0||item.y<0||item.x>=this.world.size||item.y>=this.world.size)return 'La costruzione deve rientrare nella mappa.';
+    if(item._forcedError)return item._forcedError;
+    if(item.type==='palisade'&&item.reuseId){
+      const joint=this.palisadeAt(item.x,item.y);
+      return joint&&joint.id===item.reuseId?null:'Il punto di raccordo della palizzata non è più disponibile.';
+    }
     if(item.type==='road'){
       const t=this.world.tile(item.x,item.y);
       if(!t||!BIOME[t.biome].walk)return 'Terreno non percorribile.';
@@ -71,7 +81,13 @@
       const x=orientation==='horizontal'?start.x+i*step:start.x;
       const y=orientation==='vertical'?start.y+i*step:start.y;
       const cap=count===1?'both':orientation==='horizontal'?(i===0?(step>0?'left':'right'):i===count-1?(step>0?'right':'left'):'middle'):(i===0?(step>0?'top':'bottom'):i===count-1?(step>0?'bottom':'top'):'middle');
-      items.push({type:'palisade',x,y,orientation,cap,single:count===1});
+      const item={type:'palisade',x,y,orientation,cap,single:count===1};
+      const existing=this.palisadeAt(x,y);
+      if(existing){
+        if(count>1&&(i===0||i===count-1))item.reuseId=existing.id;
+        else item._forcedError='Una linea può raccordarsi a una palizzata esistente solo dal primo o dall’ultimo tile.';
+      }
+      items.push(item);
     }
     const builder=availableBuilder(this);
     const plan={kind:'palisade',items,builderId:builder?.id||null,orientation};
@@ -130,24 +146,71 @@
   Game.prototype.commitPalisadePlan=function(plan,builder){
     const cost=planCost(plan.items);
     if(!this.pay(cost)){this.message('Legno insufficiente per confermare la palizzata.');return false;}
-    const lineId=crypto.randomUUID?.()||Math.random().toString(36).slice(2),created=[];
-    for(const item of plan.items){
+    const lineId=crypto.randomUUID?.()||Math.random().toString(36).slice(2),created=[],reused=[];
+    for(const [index,item] of plan.items.entries()){
+      if(item.reuseId){
+        const joint=this.palisadeAt(item.x,item.y);
+        if(joint){
+          joint.palisadeLineIds=[...new Set([...(joint.palisadeLineIds||[joint.palisadeLineId]).filter(Boolean),lineId])];
+          reused.push(joint);
+        }
+        continue;
+      }
       const b=new Building('palisade',item.x,item.y,0,false);
       b.requiredMaterials={...BUILD_COSTS.palisade};
       b.palisadeOrientation=item.orientation;
       b.palisadeCap=item.cap;
       b.palisadeSingle=!!item.single;
       b.palisadeLineId=lineId;
+      b.palisadeLineIndex=index;
+      b.palisadeLineLength=plan.items.length;
       this.buildings.push(b);created.push(b);
     }
     this.ensureInventories?.();
     for(const b of created)b.inventory.items={...b.requiredMaterials};
-    if(builder&&created[0])this.assignBuild(builder,created[0]);
+    if(builder&&created.length){
+      const queue=created.map(b=>b.id);
+      if(this.assignBuild(builder,created[0])&&builder.task){
+        builder.task.palisadeQueue=queue;
+        builder.task.palisadeLineId=lineId;
+        builder.task.palisadeQueueIndex=0;
+      }
+    }
     this.groupSelection=[];for(const u of this.units)u.selected=false;
-    this.selected=created[0]||builder||null;
+    this.selected=created[0]||reused[0]||builder||null;
     this.updateUI();
-    this.message(`${created.length} ${created.length===1?'sezione':'sezioni'} di palizzata confermate${builder?`. ${builder.name} inizia dal primo tratto.`:'.'}`);
+    const junctionText=reused.length?` · ${reused.length} raccordo${reused.length===1?'':'i'} riutilizzato${reused.length===1?'':'i'}`:'';
+    this.message(`${created.length} ${created.length===1?'nuova sezione':'nuove sezioni'} di palizzata confermate${junctionText}${builder&&created.length?`. ${builder.name} costruirà l’intera linea in sequenza.`:'.'}`);
     return true;
+  };
+
+  Game.prototype.buildTick=function(u,dt){
+    const before=u.task?.type==='build'&&Array.isArray(u.task.palisadeQueue)?{
+      queue:[...u.task.palisadeQueue],
+      lineId:u.task.palisadeLineId,
+      index:Number.isInteger(u.task.palisadeQueueIndex)?u.task.palisadeQueueIndex:Math.max(0,u.task.palisadeQueue.indexOf(u.task.target)),
+      target:u.task.target
+    }:null;
+    oldBuildTick.call(this,u,dt);
+    if(!before)return;
+    const current=this.buildings.find(b=>b.id===before.target);
+    if(current?.alive&&!current.built)return;
+    for(let i=before.index+1;i<before.queue.length;i++){
+      const next=this.buildings.find(b=>b.id===before.queue[i]&&b.alive&&!b.built);
+      if(!next)continue;
+      if(this.assignBuild(u,next)&&u.task){
+        u.task.palisadeQueue=before.queue;
+        u.task.palisadeLineId=before.lineId;
+        u.task.palisadeQueueIndex=i;
+        this.message(`${u.name} passa alla sezione ${i+1}/${before.queue.length} della palizzata.`);
+        return;
+      }
+    }
+    const remaining=before.queue.some(id=>this.buildings.some(b=>b.id===id&&b.alive&&!b.built));
+    if(!remaining){
+      this.cancelTask(u);
+      this.message(`${u.name} ha terminato tutta la palizzata (${before.queue.length} sezioni).`);
+    }
   };
 
   Game.prototype.confirmPendingBuildPlan=function(){
@@ -168,22 +231,45 @@
     this.syncModeButtons();this.updateUI();return true;
   };
 
-  Game.prototype.drawPalisadePlaceholder=function(item,alpha=1,ghost=false){
-    const tx=item.x??Math.floor(item.x),ty=item.y??Math.floor(item.y),orientation=item.orientation||item.palisadeOrientation||'horizontal';
-    const cap=item.cap||item.palisadeCap||'middle',single=item.single??item.palisadeSingle;
+  Game.prototype.palisadeConnections=function(item,networkItems=[]){
+    const tx=item.x??Math.floor(item.x),ty=item.y??Math.floor(item.y);
+    const planned=new Set((networkItems||[]).map(p=>`${p.x},${p.y}`));
+    const has=(x,y)=>planned.has(`${x},${y}`)||!!this.palisadeAt(x,y);
+    return{left:has(tx-1,ty),right:has(tx+1,ty),up:has(tx,ty-1),down:has(tx,ty+1)};
+  };
+
+  Game.prototype.drawPalisadePlaceholder=function(item,alpha=1,ghost=false,networkItems=[]){
+    const tx=item.x??Math.floor(item.x),ty=item.y??Math.floor(item.y);
     const p=this.worldToScreen(tx*TILE,ty*TILE),s=TILE*this.camera.zoom,c=this.ctx;
     const fill=ghost?'#d9c58f':'#6c5136',stroke=ghost?'#fff0bd':'#3c2e20';
+    const n=this.palisadeConnections(item,networkItems);
+    const horizontal=n.left||n.right,vertical=n.up||n.down;
+    const degree=[n.left,n.right,n.up,n.down].filter(Boolean).length;
+    const corner=horizontal&&vertical;
     c.save();c.globalAlpha*=alpha;c.fillStyle=fill;c.strokeStyle=stroke;c.lineWidth=Math.max(1,1.2*this.camera.zoom);
     const rect=(x,y,w,h)=>{c.fillRect(x,y,w,h);c.strokeRect(x,y,w,h);};
-    if(single){rect(p.x+s*.25,p.y+s*.25,s*.5,s*.5);}
-    else if(orientation==='vertical'){
-      rect(p.x+s*.25,p.y,s*.5,s);
-      if(cap==='top')rect(p.x,p.y,s,s*.5);
-      else if(cap==='bottom')rect(p.x,p.y+s*.5,s,s*.5);
-    }else{
-      rect(p.x,p.y+s*.25,s,s*.5);
-      if(cap==='left')rect(p.x,p.y,s*.5,s);
-      else if(cap==='right')rect(p.x+s*.5,p.y,s*.5,s);
+
+    // Arms occupy the two central quarters of the tile: 50% thickness.
+    if(n.left)rect(p.x,p.y+s*.25,s*.5,s*.5);
+    if(n.right)rect(p.x+s*.5,p.y+s*.25,s*.5,s*.5);
+    if(n.up)rect(p.x+s*.25,p.y,s*.5,s*.5);
+    if(n.down)rect(p.x+s*.25,p.y+s*.5,s*.5,s*.5);
+
+    // A corner/junction becomes a robust central square, our temporary "tower".
+    if(corner||degree===0||degree>=3)rect(p.x+s*.25,p.y+s*.25,s*.5,s*.5);
+
+    // Straight middle pieces fill the central strip.
+    if(degree===2&&!corner){
+      if(horizontal)rect(p.x,p.y+s*.25,s,s*.5);
+      else rect(p.x+s*.25,p.y,s*.5,s);
+    }
+
+    // End pieces have the outer half of the tile solid.
+    if(degree===1){
+      if(n.left)rect(p.x+s*.5,p.y,s*.5,s);
+      else if(n.right)rect(p.x,p.y,s*.5,s);
+      else if(n.up)rect(p.x,p.y+s*.5,s,s*.5);
+      else if(n.down)rect(p.x,p.y,s,s*.5);
     }
     c.restore();
   };
@@ -202,7 +288,7 @@
     const c=this.ctx,z=this.camera.zoom;
     for(const item of plan.items){
       const error=this.pendingPlacementError(item),valid=!error;
-      if(item.type==='palisade')this.drawPalisadePlaceholder(item,alpha,true);
+      if(item.type==='palisade')this.drawPalisadePlaceholder(item,alpha,true,plan.items);
       else if(item.type==='road'){
         const p=this.worldToScreen(item.x*TILE,item.y*TILE),s=TILE*z;c.save();c.globalAlpha*=alpha;c.fillStyle='#c9b27d';c.fillRect(p.x,p.y+s*.36,s,s*.28);c.restore();
       }else{
