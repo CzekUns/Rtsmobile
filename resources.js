@@ -65,26 +65,34 @@
     centers.forEach((c,ci)=>{
       const metalRich=hash(Math.floor(c.x),Math.floor(c.y),seed+3401)>.68;
       const clusterId='terrain-'+ci;
+      const cx=Math.floor(c.x),cy=Math.floor(c.y);
 
+      // Mineral lattice anchored to the world tile grid.
+      // ▲ lives inside one tile: centre x+.5, base on the tile bottom edge.
+      // ▼ is shifted half a tile horizontally: centre on x+1, so it bridges two adjacent tiles,
+      //    with its base on the tile top edge. The two orientations interlock without overlap.
       for(let row=-4;row<=4;row++)for(let col=-5;col<=5;col++){
         const edge=(col/5)*(col/5)+(row/4)*(row/4);
         const irregular=(hash(col+ci*17,row-ci*11,seed+4401)-.5)*.22;
         if(edge>1+irregular)continue;
 
-        const px=c.x+col*.44+((row&1)?0.22:0);
-        const py=c.y+row*.39;
-        const t=this.tile(Math.floor(px),Math.floor(py));
+        const tileX=cx+col,tileY=cy+row;
+        const orientation=((row+col)&1)?'down':'up';
+        const px=orientation==='up'?tileX+.5:tileX+1;
+        const py=orientation==='up'?tileY+.675:tileY+.325;
+        const t=this.tile(tileX,tileY);
         if(!t||!BIOME[t.biome].walk||['sea','river','marsh'].includes(t.biome))continue;
 
-        const orientation=((row+col)&1)?'down':'up';
-        // Keep the vein visually interlocked, but never stack two triangle nodes on top of each other.
-        // The minimum centre distance removes the current overdraw while preserving the staggered lattice.
-        const tooClose=next.some(n=>n.resourceShape==='triangle'&&Math.hypot(n.x-px,n.y-py)<.54);
-        if(tooClose)continue;
+        // Down triangles sit on a tile boundary, so both tiles they bridge must be valid terrain.
+        if(orientation==='down'){
+          const right=this.tile(tileX+1,tileY);
+          if(!right||!BIOME[right.biome].walk||['sea','river','marsh'].includes(right.biome))continue;
+        }
+
         const ironChance=metalRich?.28:.07;
         const type=rng.next()<ironChance?'iron':'stone';
         const amount=(type==='iron'?rng.int(75,115):rng.int(95,150))*10;
-        const r=add(type,px,py,amount,{orientation,clusterId,resourceShape:'triangle'});
+        const r=add(type,px,py,amount,{orientation,clusterId,resourceShape:'triangle',tileX,tileY});
         if(r)r.renewable=false;
       }
     });
