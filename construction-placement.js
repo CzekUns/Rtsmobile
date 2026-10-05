@@ -14,19 +14,12 @@
   const oldRefreshContextDock=Game.prototype.refreshContextDock;
   const oldInitUI=Game.prototype.initUI;
   const oldNewGame=Game.prototype.newGame;
-  const oldWorldWalkable=World.prototype.walkable;
 
   const localPoint=(g,e)=>{const r=g.canvas.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top};};
   const tileAt=(g,sx,sy)=>{const w=g.screenToWorld(sx,sy);return{x:Math.floor(w.x/TILE),y:Math.floor(w.y/TILE)};};
   const addCost=(a,b,m=1)=>{for(const[k,v]of Object.entries(b||{}))a[k]=(a[k]||0)+v*m;return a;};
   const planCost=items=>items.filter(item=>!item.reuseId).reduce((sum,item)=>addCost(sum,item.type==='road'?{wood:1}:BUILD_COSTS[item.type]),{});
   const availableBuilder=g=>g.selected instanceof Unit&&g.selected.location?.kind==='world'&&g.selected.health>0?g.selected:g.units.find(u=>u.health>0&&u.location?.kind==='world'&&!u.mobilized&&u.state==='idle');
-
-  // Confirmed palisade sites stay traversable until the segment is actually complete.
-  World.prototype.walkable=function(x,y,climb=1,from=null,buildings=[]){
-    const filtered=(buildings||[]).filter(b=>!(b?.type==='palisade'&&!b.built));
-    return oldWorldWalkable.call(this,x,y,climb,from,filtered);
-  };
 
   Game.prototype.palisadeAt=function(x,y){
     return this.buildings.find(b=>b.alive&&b.type==='palisade'&&Math.floor(b.x)===x&&Math.floor(b.y)===y)||null;
@@ -37,7 +30,7 @@
     if(item._forcedError)return item._forcedError;
     if(item.type==='palisade'&&item.reuseId){
       const joint=this.palisadeAt(item.x,item.y);
-      return joint&&joint.id===item.reuseId?null:'Il punto di raccordo della palizzata non è più disponibile.';
+      return joint?.id===item.reuseId?null:'Il raccordo della palizzata non è più disponibile.';
     }
     if(item.type==='road'){
       const t=this.world.tile(item.x,item.y);
@@ -79,48 +72,31 @@
     return this.stagePendingBuild(type,x,y,crop);
   };
 
-  Game.prototype.normalizePalisadeTrace=function(cells){
-    const out=[];
-    for(const raw of cells||[]){
-      const cell={x:raw.x,y:raw.y};
-      const last=out.at(-1);if(last&&last.x===cell.x&&last.y===cell.y)continue;
-      const prev=out.at(-2);
-      if(prev&&prev.x===cell.x&&prev.y===cell.y){out.pop();continue;} // finger backtrack = undo last tile
-      if(!last){out.push(cell);continue;}
-      let x=last.x,y=last.y;
-      while(x!==cell.x||y!==cell.y){
-        const dx=cell.x-x,dy=cell.y-y;
-        // Follow the actual pointer direction; only cardinal tile steps are emitted.
-        if(Math.abs(dx)>=Math.abs(dy)&&dx!==0)x+=Math.sign(dx);
-        else if(dy!==0)y+=Math.sign(dy);
-        if(!out.some(p=>p.x===x&&p.y===y))out.push({x,y});
-        else if(out.length>1&&out.at(-2).x===x&&out.at(-2).y===y)out.pop();
-      }
-    }
-    return out;
-  };
-
-  Game.prototype.makePalisadePlanFromCells=function(cells){
-    const trace=this.normalizePalisadeTrace(cells),items=[];
-    for(let i=0;i<trace.length;i++){
-      const {x,y}=trace[i],item={type:'palisade',x,y};
+  Game.prototype.makePalisadePlan=function(start,end){
+    const dx=end.x-start.x,dy=end.y-start.y;
+    const orientation=Math.abs(dy)>Math.abs(dx)?'vertical':'horizontal';
+    const delta=orientation==='vertical'?dy:dx;
+    const step=delta<0?-1:1,count=Math.abs(delta)+1,items=[];
+    for(let i=0;i<count;i++){
+      const x=orientation==='horizontal'?start.x+i*step:start.x;
+      const y=orientation==='vertical'?start.y+i*step:start.y;
+      const cap=count===1?'both':orientation==='horizontal'?(i===0?(step>0?'left':'right'):i===count-1?(step>0?'right':'left'):'middle'):(i===0?(step>0?'top':'bottom'):i===count-1?(step>0?'bottom':'top'):'middle');
+      const item={type:'palisade',x,y,orientation,cap,single:count===1};
       const existing=this.palisadeAt(x,y);
-      if(existing)item.reuseId=existing.id;
+      if(existing){
+        if(count>1&&(i===0||i===count-1))item.reuseId=existing.id;
+        else item._forcedError='Puoi raccordarti a una palizzata esistente solo con il primo o l’ultimo tile.';
+      }
       items.push(item);
     }
-    // Reusing an existing wall is allowed at a junction or endpoint, but never makes a duplicate building.
     const builder=availableBuilder(this);
-    const plan={kind:'palisade',items,builderId:builder?.id||null,trace};
+    const plan={kind:'palisade',items,builderId:builder?.id||null,orientation};
     const tileError=items.map(item=>this.pendingPlacementError(item)).find(Boolean);
     const check=this.constructionCheck('palisade',builder);
     plan.error=tileError||(!check.ok?(builder?this.constructionRequirementText('palisade',builder):'Serve un costruttore disponibile.'):null)||(!this.canPay(planCost(items))?'Legno insufficiente per tutta la palizzata.':null);
-    plan.valid=!plan.error&&items.length>0;
+    if(!plan.error&&!items.some(item=>!item.reuseId))plan.error='Trascina almeno un nuovo segmento di palizzata.';
+    plan.valid=!plan.error;
     return plan;
-  };
-
-  // Compatibility entry point for a simple straight line.
-  Game.prototype.makePalisadePlan=function(start,end){
-    return this.makePalisadePlanFromCells([start,end]);
   };
 
   Game.prototype.pointerDown=function(e){
@@ -129,35 +105,28 @@
     if(this._palisadeDrag){e.preventDefault();return;}
     this.canvas.setPointerCapture(e.pointerId);
     const p=localPoint(this,e),start=tileAt(this,p.x,p.y);
-    this._palisadeDrag={pointerId:e.pointerId,cells:[start],lastTile:start};
-    this.palisadeDraft=this.makePalisadePlanFromCells(this._palisadeDrag.cells);
+    this._palisadeDrag={pointerId:e.pointerId,start};
+    this.palisadeDraft=this.makePalisadePlan(start,start);
     e.preventDefault();
   };
 
   Game.prototype.pointerMove=function(e){
     const d=this._palisadeDrag;
     if(!d||d.pointerId!==e.pointerId)return oldPointerMove.call(this,e);
-    const p=localPoint(this,e),tile=tileAt(this,p.x,p.y);
-    if(tile.x!==d.lastTile.x||tile.y!==d.lastTile.y){
-      d.cells.push(tile);d.lastTile=tile;
-      d.cells=this.normalizePalisadeTrace(d.cells);
-      this.palisadeDraft=this.makePalisadePlanFromCells(d.cells);
-    }
+    const p=localPoint(this,e),end=tileAt(this,p.x,p.y);
+    this.palisadeDraft=this.makePalisadePlan(d.start,end);
     e.preventDefault();
   };
 
   Game.prototype.pointerUp=function(e){
     const d=this._palisadeDrag;
     if(!d||d.pointerId!==e.pointerId)return oldPointerUp.call(this,e);
-    const p=localPoint(this,e),tile=tileAt(this,p.x,p.y);
-    if(tile.x!==d.lastTile.x||tile.y!==d.lastTile.y)d.cells.push(tile);
-    const plan=this.makePalisadePlanFromCells(d.cells);
+    const p=localPoint(this,e),end=tileAt(this,p.x,p.y),plan=this.makePalisadePlan(d.start,end);
     this._palisadeDrag=null;this.palisadeDraft=null;
     if(plan.valid){
       this.pendingBuildPlan=plan;this.buildMode=null;this.buildPreview=null;
       this.syncModeButtons();this.updateUI();
-      const turns=this.palisadeTurnCount(plan.items);
-      this.message(`Palizzata fantasma: ${plan.items.length} tile${turns?` · ${turns} ${turns===1?'angolo':'angoli'}`:''} · ✓ conferma · ✕ annulla.`);
+      this.message(`Palizzata fantasma: ${plan.items.length} ${plan.items.length===1?'sezione':'sezioni'} · ✓ conferma · ✕ annulla.`);
     }else if(plan.error)this.message(plan.error);
     e.preventDefault();
   };
@@ -182,10 +151,7 @@
     for(const [index,item] of plan.items.entries()){
       if(item.reuseId){
         const joint=this.palisadeAt(item.x,item.y);
-        if(joint){
-          joint.palisadeLineIds=[...new Set([...(joint.palisadeLineIds||[joint.palisadeLineId]).filter(Boolean),lineId])];
-          reused.push(joint);
-        }
+        if(joint){joint.palisadeJunction=true;reused.push(joint);}
         continue;
       }
       const b=new Building('palisade',item.x,item.y,0,false);
@@ -195,66 +161,38 @@
       b.palisadeSingle=!!item.single;
       b.palisadeLineId=lineId;
       b.palisadeLineIndex=index;
-      b.palisadeLineLength=plan.items.length;
       this.buildings.push(b);created.push(b);
     }
     this.ensureInventories?.();
     for(const b of created)b.inventory.items={...b.requiredMaterials};
-    if(builder&&created.length){
-      const queue=created.map(b=>b.id);
-      if(this.assignBuild(builder,created[0])&&builder.task){
-        builder.task.palisadeQueue=queue;
-        builder.task.palisadeLineId=lineId;
-        builder.task.palisadeQueueIndex=0;
-      }
+    for(let i=0;i<created.length;i++){
+      created[i].palisadeNextId=created[i+1]?.id||null;
+      created[i].palisadePrevId=created[i-1]?.id||null;
+      created[i].palisadeLineLength=created.length;
     }
+    if(builder&&created[0])this.assignBuild(builder,created[0]);
     this.groupSelection=[];for(const u of this.units)u.selected=false;
     this.selected=created[0]||reused[0]||builder||null;
     this.updateUI();
-    const junctionText=reused.length?` · ${reused.length} raccordo${reused.length===1?'':'i'} riutilizzato${reused.length===1?'':'i'}`:'';
-    this.message(`${created.length} ${created.length===1?'nuova sezione':'nuove sezioni'} di palizzata confermate${junctionText}${builder&&created.length?`. ${builder.name} costruirà l’intera linea in sequenza.`:'.'}`);
+    const join=reused.length?' · raccordo creato':'';
+    this.message(created.length+' '+(created.length===1?'sezione':'sezioni')+' di palizzata confermate'+join+(builder&&created.length?'. '+builder.name+' costruirà tutta la linea.':'.'));
     return true;
   };
 
   Game.prototype.buildTick=function(u,dt){
-    if(u.task?.type==='build'&&Array.isArray(u.task.palisadeQueue)){
-      const target=this.buildings.find(b=>b.id===u.task.target);
-      if(target?.alive&&!target.built&&this.buildingDistance(u,target)>1.15&&!u.path?.length){
-        const path=this.pathToBuilding(u,target,true);
-        if(path!==null){u.path=path;u.state=path.length?'moving':'building';}
-        return;
-      }
-    }
-    const before=u.task?.type==='build'&&Array.isArray(u.task.palisadeQueue)?{
-      queue:[...u.task.palisadeQueue],
-      lineId:u.task.palisadeLineId,
-      index:Number.isInteger(u.task.palisadeQueueIndex)?u.task.palisadeQueueIndex:Math.max(0,u.task.palisadeQueue.indexOf(u.task.target)),
-      target:u.task.target
-    }:null;
+    const current=u.task?.type==='build'?this.buildings.find(b=>b.id===u.task.target):null;
+    const nextId=current?.type==='palisade'?current.palisadeNextId:null;
+    const wasBuilt=current?.built;
     oldBuildTick.call(this,u,dt);
-    if(!before)return;
-    const current=this.buildings.find(b=>b.id===before.target);
-    if(current?.alive&&!current.built)return;
-    for(let i=before.index+1;i<before.queue.length;i++){
-      const next=this.buildings.find(b=>b.id===before.queue[i]&&b.alive&&!b.built);
-      if(!next)continue;
-      if(this.assignBuild(u,next)&&u.task){
-        u.task.palisadeQueue=before.queue;
-        u.task.palisadeLineId=before.lineId;
-        u.task.palisadeQueueIndex=i;
-        this.message(`${u.name} passa alla sezione ${i+1}/${before.queue.length} della palizzata.`);
+    if(!current||current.type!=='palisade'||wasBuilt||!current.built)return;
+    if(nextId){
+      const next=this.buildings.find(b=>b.id===nextId&&b.alive&&!b.built);
+      if(next&&this.assignBuild(u,next)){
+        this.message(u.name+' passa alla sezione successiva della palizzata.');
         return;
       }
-      // Do not declare the wall finished just because a route was momentarily unavailable.
-      u.task={type:'build',target:next.id,palisadeQueue:before.queue,palisadeLineId:before.lineId,palisadeQueueIndex:i,workSpot:null};
-      u.path=[];u.state='building';
-      return;
     }
-    const remaining=before.queue.some(id=>this.buildings.some(b=>b.id===id&&b.alive&&!b.built));
-    if(!remaining){
-      this.cancelTask(u);
-      this.message(`${u.name} ha terminato tutta la palizzata (${before.queue.length} sezioni).`);
-    }
+    this.message(u.name+' ha terminato tutta la palizzata.');
   };
 
   Game.prototype.confirmPendingBuildPlan=function(){
@@ -275,20 +213,10 @@
     this.syncModeButtons();this.updateUI();return true;
   };
 
-  Game.prototype.palisadeTurnCount=function(items){
-    let turns=0;
-    for(let i=1;i<(items?.length||0)-1;i++){
-      const a=items[i-1],b=items[i],d=items[i+1];
-      const ax=b.x-a.x,ay=b.y-a.y,bx=d.x-b.x,by=d.y-b.y;
-      if((ax===0)!==(bx===0))turns++;
-    }
-    return turns;
-  };
-
   Game.prototype.palisadeConnections=function(item,networkItems=[]){
     const tx=item.x??Math.floor(item.x),ty=item.y??Math.floor(item.y);
-    const planned=new Set((networkItems||[]).map(p=>`${p.x},${p.y}`));
-    const has=(x,y)=>planned.has(`${x},${y}`)||!!this.palisadeAt(x,y);
+    const planned=new Set((networkItems||[]).map(p=>p.x+','+p.y));
+    const has=(x,y)=>planned.has(x+','+y)||!!this.palisadeAt(x,y);
     return{left:has(tx-1,ty),right:has(tx+1,ty),up:has(tx,ty-1),down:has(tx,ty+1)};
   };
 
@@ -302,23 +230,15 @@
     const corner=horizontal&&vertical;
     c.save();c.globalAlpha*=alpha;c.fillStyle=fill;c.strokeStyle=stroke;c.lineWidth=Math.max(1,1.2*this.camera.zoom);
     const rect=(x,y,w,h)=>{c.fillRect(x,y,w,h);c.strokeRect(x,y,w,h);};
-
-    // Arms occupy the two central quarters of the tile: 50% thickness.
     if(n.left)rect(p.x,p.y+s*.25,s*.5,s*.5);
     if(n.right)rect(p.x+s*.5,p.y+s*.25,s*.5,s*.5);
     if(n.up)rect(p.x+s*.25,p.y,s*.5,s*.5);
     if(n.down)rect(p.x+s*.25,p.y+s*.5,s*.5,s*.5);
-
-    // A corner/junction becomes a robust central square, our temporary "tower".
-    if(corner||degree===0||degree>=3)rect(p.x+s*.25,p.y+s*.25,s*.5,s*.5);
-
-    // Straight middle pieces fill the central strip.
+    if(corner||degree>=3||degree===0)rect(p.x+s*.25,p.y+s*.25,s*.5,s*.5);
     if(degree===2&&!corner){
       if(horizontal)rect(p.x,p.y+s*.25,s,s*.5);
       else rect(p.x+s*.25,p.y,s*.5,s);
     }
-
-    // End pieces have the outer half of the tile solid.
     if(degree===1){
       if(n.left)rect(p.x+s*.5,p.y,s*.5,s);
       else if(n.right)rect(p.x,p.y,s*.5,s);
