@@ -13,7 +13,7 @@
   window.TERRA_P16_SPRITES=SPRITES;
   const TOKEN_NAMES=['libero','taglialegna','minatore','contadino','costruttore','trasportatore','mugnaio','fornaio','allevatore','mobilitato'];
   const tokenTemplates=new Map(),tokenImages=new Map(),tokenFetches=new Map();
-  const tokenUrl=name=>'./assets/tokens/professions/'+name+'.svg?v=106';
+  const tokenUrl=name=>'./assets/tokens/professions/'+name+'.svg?v=107';
   function preloadToken(name){if(tokenTemplates.has(name)||tokenFetches.has(name))return;const p=fetch(tokenUrl(name),{cache:'force-cache'}).then(r=>{if(!r.ok)throw new Error(name);return r.text();}).then(t=>tokenTemplates.set(name,t)).catch(()=>null).finally(()=>tokenFetches.delete(name));tokenFetches.set(name,p);}
   TOKEN_NAMES.forEach(preloadToken);
   const ANIMAL_TOKEN_NAMES=['sheep_alive','sheep_dead','sheep_skeleton','goat_alive','goat_dead','goat_skeleton','cow_alive','cow_dead','cow_skeleton','wolf_alive','wolf_dead','wolf_skeleton'];
@@ -23,7 +23,8 @@
   const RESOURCE_TILES=Object.fromEntries(RESOURCE_TILE_NAMES.map(name=>[name,load('./assets/terrain/resources/'+name+'.svg?v=104')]));
   window.TERRA_RESOURCE_TILES=RESOURCE_TILES;
   const factionStyle=owner=>window.terraFactionStyle?window.terraFactionStyle(owner):{color:'#B4442B'};
-  function tokenImage(name,owner){const key=name+':'+owner;if(tokenImages.has(key))return tokenImages.get(key);const source=tokenTemplates.get(name);if(!source){preloadToken(name);return null;}const themed=source.split('#B4442B').join(factionStyle(owner).color),img=new Image();img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(themed);tokenImages.set(key,img);return img;}
+  const darkenFaction=color=>{const h=String(color||'#B4442B').replace('#','');if(!/^[0-9a-f]{6}$/i.test(h))return'#7A2F25';const n=parseInt(h,16),f=.68,r=Math.round(((n>>16)&255)*f),g=Math.round(((n>>8)&255)*f),b=Math.round((n&255)*f);return'#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('').toUpperCase();};
+  function tokenImage(name,owner){const key=name+':'+owner;if(tokenImages.has(key))return tokenImages.get(key);const source=tokenTemplates.get(name);if(!source){preloadToken(name);return null;}const style=factionStyle(owner),themed=source.split('#B4442B').join(style.color).split('#7A2F25').join(darkenFaction(style.color)),img=new Image();img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(themed);tokenImages.set(key,img);return img;}
   function gatherProfession(game,u,task){let type=u.inventory?.type||null;if(task?.target){const node=game.findById(game.world.resources,task.target);if(node?.type)type=node.type;}if(type==='wood')return'taglialegna';if(type==='stone'||type==='iron')return'minatore';if(['food','grain','barley','grapes','olives'].includes(type))return'contadino';return'libero';}
   function professionForUnit(game,u){if(u.mobilized||u.task?.type==='attack'||u.state==='combat')return'mobilitato';const t=u.task;if(!t)return'libero';switch(t.type){case'gather':return gatherProfession(game,u,t);case'return':return t.after?.type==='gather'?gatherProfession(game,u,t.after):(u.inventory?.amount?'trasportatore':'libero');case'farm':return'contadino';case'build':case'repair':return'costruttore';case'haul':case'caravan':return'trasportatore';case'production':{if(t.profession==='mugnaio'||t.profession==='fornaio')return t.profession;const b=game.findById(game.buildings,t.target);return b?.type==='mill'?'mugnaio':b?.type==='bakery'?'fornaio':'libero';}case'livestock':case'tame':return'allevatore';default:return'libero';}}
   window.TERRA_UNIT_TOKENS=Object.freeze({names:TOKEN_NAMES,professionForUnit});
