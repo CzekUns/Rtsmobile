@@ -155,7 +155,9 @@
         continue;
       }
       const b=new Building('palisade',item.x,item.y,0,false);
-      b.requiredMaterials={...BUILD_COSTS.palisade};
+      b.progress=.08;
+      b.requiredMaterials=null;
+      b.materialsConsumed=true;
       b.palisadeOrientation=item.orientation;
       b.palisadeCap=item.cap;
       b.palisadeSingle=!!item.single;
@@ -164,35 +166,47 @@
       this.buildings.push(b);created.push(b);
     }
     this.ensureInventories?.();
-    for(const b of created)b.inventory.items={...b.requiredMaterials};
-    for(let i=0;i<created.length;i++){
-      created[i].palisadeNextId=created[i+1]?.id||null;
-      created[i].palisadePrevId=created[i-1]?.id||null;
-      created[i].palisadeLineLength=created.length;
+    for(const b of created){if(b.inventory)b.inventory.items={};b.palisadeLineLength=created.length;}
+    if(created.length){
+      const master=created[0];
+      master.palisadeLineMaster=true;
+      master.palisadeLineIds=created.map(b=>b.id);
+      master.palisadeLineWork=.08;
+      if(builder)this.assignBuild(builder,master);
     }
-    if(builder&&created[0])this.assignBuild(builder,created[0]);
-    this.groupSelection=[];for(const u of this.units)u.selected=false;
-    this.selected=created[0]||reused[0]||builder||null;
+    // Keep the player's current selection: construction must not visually 'refresh' the board.
     this.updateUI();
     const join=reused.length?' · raccordo creato':'';
-    this.message(created.length+' '+(created.length===1?'sezione':'sezioni')+' di palizzata confermate'+join+(builder&&created.length?'. '+builder.name+' costruirà tutta la linea.':'.'));
+    this.message(created.length+' '+(created.length===1?'sezione':'sezioni')+' di palizzata confermate'+join+(builder&&created.length?'. '+builder.name+' lavora sull’intera linea.':'.'));
     return true;
   };
 
   Game.prototype.buildTick=function(u,dt){
-    const current=u.task?.type==='build'?this.buildings.find(b=>b.id===u.task.target):null;
-    const nextId=current?.type==='palisade'?current.palisadeNextId:null;
-    const wasBuilt=current?.built;
-    oldBuildTick.call(this,u,dt);
-    if(!current||current.type!=='palisade'||wasBuilt||!current.built)return;
-    if(nextId){
-      const next=this.buildings.find(b=>b.id===nextId&&b.alive&&!b.built);
-      if(next&&this.assignBuild(u,next)){
-        this.message(u.name+' passa alla sezione successiva della palizzata.');
-        return;
-      }
+    const master=u.task?.type==='build'?this.buildings.find(b=>b.id===u.task.target):null;
+    if(!master||master.type!=='palisade'||!master.palisadeLineMaster)return oldBuildTick.call(this,u,dt);
+    if(!master.alive){this.cancelTask(u);return;}
+    if(this.buildingDistance(u,master)>1.15){
+      const path=this.pathToBuilding(u,master,true);
+      if(path===null){this.cancelTask(u);this.message('Palizzata non raggiungibile.');return;}
+      u.path=path;u.state=path.length?'moving':'building';return;
     }
-    this.message(u.name+' ha terminato tutta la palizzata.');
+    const ids=master.palisadeLineIds||[master.id];
+    const parts=ids.map(id=>this.buildings.find(b=>b.id===id)).filter(b=>b?.alive);
+    if(!parts.length){this.cancelTask(u);return;}
+    const speed=.06+u.skills.construction*.012;
+    master.palisadeLineWork=Math.min(parts.length,(master.palisadeLineWork||.08)+dt*speed);
+    const work=master.palisadeLineWork;
+    for(let i=0;i<parts.length;i++){
+      const p=parts[i];
+      p.progress=Math.max(p.progress||.08,Math.min(1,Math.max(.08,work-i)));
+      p.materialsConsumed=true;p.requiredMaterials=null;
+    }
+    u.gain('construction',dt*.4);
+    if(work>=parts.length){
+      for(const p of parts)p.progress=1;
+      this.cancelTask(u);
+      this.message(u.name+' ha terminato tutta la palizzata ('+parts.length+' sezioni).');
+    }
   };
 
   Game.prototype.confirmPendingBuildPlan=function(){
@@ -213,37 +227,52 @@
     this.syncModeButtons();this.updateUI();return true;
   };
 
-  Game.prototype.palisadeConnections=function(item,networkItems=[]){
-    const tx=item.x??Math.floor(item.x),ty=item.y??Math.floor(item.y);
-    const planned=new Set((networkItems||[]).map(p=>p.x+','+p.y));
-    const has=(x,y)=>planned.has(x+','+y)||!!this.palisadeAt(x,y);
-    return{left:has(tx-1,ty),right:has(tx+1,ty),up:has(tx,ty-1),down:has(tx,ty+1)};
+  Game.prototype.palisadeNeighbor=function(x,y,networkItems=[]){
+    const planned=(networkItems||[]).find(p=>p.x===x&&p.y===y);
+    if(planned)return planned;
+    return this.palisadeAt(x,y);
+  };
+
+  Game.prototype.palisadeOrientationOf=function(p){
+    return p?.orientation||p?.palisadeOrientation||null;
   };
 
   Game.prototype.drawPalisadePlaceholder=function(item,alpha=1,ghost=false,networkItems=[]){
     const tx=item.x??Math.floor(item.x),ty=item.y??Math.floor(item.y);
-    const p=this.worldToScreen(tx*TILE,ty*TILE),s=TILE*this.camera.zoom,c=this.ctx;
-    const fill=ghost?'#d9c58f':'#6c5136',stroke=ghost?'#fff0bd':'#3c2e20';
-    const n=this.palisadeConnections(item,networkItems);
-    const horizontal=n.left||n.right,vertical=n.up||n.down;
-    const degree=[n.left,n.right,n.up,n.down].filter(Boolean).length;
-    const corner=horizontal&&vertical;
-    c.save();c.globalAlpha*=alpha;c.fillStyle=fill;c.strokeStyle=stroke;c.lineWidth=Math.max(1,1.2*this.camera.zoom);
-    const rect=(x,y,w,h)=>{c.fillRect(x,y,w,h);c.strokeRect(x,y,w,h);};
-    if(n.left)rect(p.x,p.y+s*.25,s*.5,s*.5);
-    if(n.right)rect(p.x+s*.5,p.y+s*.25,s*.5,s*.5);
-    if(n.up)rect(p.x+s*.25,p.y,s*.5,s*.5);
-    if(n.down)rect(p.x+s*.25,p.y+s*.5,s*.5,s*.5);
-    if(corner||degree>=3||degree===0)rect(p.x+s*.25,p.y+s*.25,s*.5,s*.5);
-    if(degree===2&&!corner){
-      if(horizontal)rect(p.x,p.y+s*.25,s,s*.5);
-      else rect(p.x+s*.25,p.y,s*.5,s);
+    const orientation=this.palisadeOrientationOf(item)||'horizontal';
+    const p=this.worldToScreen(tx*TILE,ty*TILE),s=TILE*this.camera.zoom,q=s/5,c=this.ctx;
+    const fill=ghost?'#dbc58f':'#765737',stroke=ghost?'#fff0bd':'#3c2e20';
+    const left=this.palisadeNeighbor(tx-1,ty,networkItems),right=this.palisadeNeighbor(tx+1,ty,networkItems);
+    const up=this.palisadeNeighbor(tx,ty-1,networkItems),down=this.palisadeNeighbor(tx,ty+1,networkItems);
+    const lo=this.palisadeOrientationOf(left),ro=this.palisadeOrientationOf(right),uo=this.palisadeOrientationOf(up),do_=this.palisadeOrientationOf(down);
+    const occupied=new Set();
+    const add=(cx,cy)=>{if(cx>=0&&cx<5&&cy>=0&&cy<5)occupied.add(cx+','+cy);};
+    const block3=(cx,cy)=>{for(let yy=cy-1;yy<=cy+1;yy++)for(let xx=cx-1;xx<=cx+1;xx++)add(xx,yy);};
+
+    // Base strip: one log is exactly one 1/25 cell of the tile.
+    if(orientation==='horizontal')for(let x=0;x<5;x++)add(x,2);
+    else for(let y=0;y<5;y++)add(2,y);
+
+    // Adjacent perpendicular walls bend into one another inside this tile.
+    if(left&&lo&&lo!==orientation){add(0,2);add(1,2);add(2,2);}
+    if(right&&ro&&ro!==orientation){add(2,2);add(3,2);add(4,2);}
+    if(up&&uo&&uo!==orientation){add(2,0);add(2,1);add(2,2);}
+    if(down&&do_&&do_!==orientation){add(2,2);add(2,3);add(2,4);}
+
+    // External ends are 3x3 agglomerates of 1/25-tile logs.
+    if(orientation==='horizontal'){
+      if(!left)block3(1,2);
+      if(!right)block3(3,2);
+    }else{
+      if(!up)block3(2,1);
+      if(!down)block3(2,3);
     }
-    if(degree===1){
-      if(n.left)rect(p.x+s*.5,p.y,s*.5,s);
-      else if(n.right)rect(p.x,p.y,s*.5,s);
-      else if(n.up)rect(p.x,p.y+s*.5,s,s*.5);
-      else if(n.down)rect(p.x,p.y,s,s*.5);
+
+    c.save();c.globalAlpha*=alpha;c.fillStyle=fill;c.strokeStyle=stroke;c.lineWidth=Math.max(.7,.7*this.camera.zoom);
+    for(const key of occupied){
+      const [cx,cy]=key.split(',').map(Number),x=p.x+cx*q,y=p.y+cy*q;
+      c.fillRect(x+.06*q,y+.06*q,q*.88,q*.88);
+      c.strokeRect(x+.06*q,y+.06*q,q*.88,q*.88);
     }
     c.restore();
   };
