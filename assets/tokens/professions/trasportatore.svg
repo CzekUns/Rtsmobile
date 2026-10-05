@@ -224,4 +224,4 @@
   <path d="M32 541h1l-1 15 3-1 1 4-2 2h-2l-2 9h-1c-.54-21.92-.54-21.92 3-29" fill="#e0a452"/>
   <path d="M763 126h2c4.6 9.27 11.59 23.63 9 34a3235 3235 0 0 0-4.79-14.33c-.61-1.83-1.22-3.66-1.83-5.48-.32-.93-.63-1.86-.95-2.81-1.26-3.78-2.46-7.52-3.43-11.38" fill="#412114"/>
  </g>
-<g id="faction-mark"><circle cx="36" cy="35" r="30.5" fill="none" stroke="#B4442B" stroke-width="3.4"/><circle cx="36" cy="62" r="5.6" fill="none" stroke="#B4442B" stroke-width="1.8"/></g></svg>
+<g id="faction-mark"><ellipse cx="197" cy="196" rx="185" ry="184" fill="none" stroke="#B4442B" stroke-width="18"/></g></svg>
