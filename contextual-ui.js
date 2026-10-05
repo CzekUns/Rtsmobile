@@ -73,7 +73,7 @@
     $('#placementStatus').hidden=!this.buildMode;
     $('#placementLabel').textContent=this.buildMode?`${BUILD_LABEL[this.buildMode]||'Sentiero'} · tieni premuto, poi rilascia`:'';
     const layout=`${!!e}:${this.contextPanel}:${!!this.buildMode}`;
-    if(this.contextLayout!==layout){this.contextLayout=layout;this.resize();}
+    if(this.contextLayout!==layout)this.contextLayout=layout;
   };
   // Programmatic entry points follow the same selected identity as the map.
   for(const [method,collection] of [['openCharacter','units'],['openSkills','units'],['openKnowledge','units'],['openLinks','buildings']]){
