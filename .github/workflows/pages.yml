@@ -12,7 +12,7 @@ permissions:
 
 concurrency:
   group: "pages"
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -23,12 +23,43 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check latest main
+        id: latest
+        shell: bash
+        run: |
+          git fetch origin main
+          if [ "$(git rev-parse origin/main)" = "$GITHUB_SHA" ]; then
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Setup Pages
+        if: steps.latest.outputs.deploy == 'true'
         uses: actions/configure-pages@v5
+
       - name: Upload artifact
+        if: steps.latest.outputs.deploy == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: '.'
+
+      - name: Recheck latest main
+        if: steps.latest.outputs.deploy == 'true'
+        id: latest_before_deploy
+        shell: bash
+        run: |
+          git fetch origin main
+          if [ "$(git rev-parse origin/main)" = "$GITHUB_SHA" ]; then
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Deploy to GitHub Pages
+        if: steps.latest_before_deploy.outputs.deploy == 'true'
         id: deployment
         uses: actions/deploy-pages@v4
