@@ -58,7 +58,7 @@
   };
 
   Game.prototype.placeBuild=function(type,x,y,crop=null){
-    if(this._committingPendingBuild)return oldPlaceBuild.call(this,type,x,y,crop);
+    if(this._committingPendingBuild||this.buildMode!==type)return oldPlaceBuild.call(this,type,x,y,crop);
     return this.stagePendingBuild(type,x,y,crop);
   };
 
