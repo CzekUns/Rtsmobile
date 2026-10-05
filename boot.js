@@ -12,9 +12,23 @@ try {
 
 
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js?v=114', {updateViaCache:'none'})
-      .then(registration => registration.update())
-      .catch(() => {});
+  window.addEventListener('load', async () => {
+    try {
+      let reloading=false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if(reloading)return;
+        reloading=true;
+        location.reload();
+      });
+      const registration=await navigator.serviceWorker.register('./sw.js?v=115', {updateViaCache:'none'});
+      await registration.update();
+      if(registration.waiting)registration.waiting.postMessage({type:'SKIP_WAITING'});
+      registration.addEventListener('updatefound', () => {
+        const worker=registration.installing;
+        worker?.addEventListener('statechange', () => {
+          if(worker.state==='installed'&&navigator.serviceWorker.controller)worker.postMessage({type:'SKIP_WAITING'});
+        });
+      });
+    } catch (_) {}
   });
 }
