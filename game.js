@@ -108,7 +108,25 @@ class Game{
     $('#zoomIn').onclick=()=>this.camera.zoom=clamp(this.camera.zoom*1.18,.48,2.3);$('#zoomOut').onclick=()=>this.camera.zoom=clamp(this.camera.zoom/1.18,.48,2.3);$('#pauseBtn').onclick=()=>{this.setPaused(!this.paused)};
     $('#saveBtn').onclick=()=>{if(this.save(true))this.message('Partita salvata sul dispositivo.')};$('#loadBtn').onclick=()=>this.load();
     $('#newWorldBtn').onclick=()=>{if(confirm('Generare un nuovo territorio? Il salvataggio attuale resta disponibile.'))this.newGame((Math.random()*2147483647)|0)};
-    $('#centerBtn').onclick=()=>this.centerOnBase();$('#restartSame').onclick=()=>this.newGame(this.seed);$('#restartNew').onclick=()=>this.newGame((Math.random()*2147483647)|0);
+    $('#centerBtn').onclick=()=>this.centerOnBase();
+    $('#forceBuildBtn').onclick=async()=>{
+      try{this.save(false)}catch(_){ }
+      this.message('Forzo il caricamento dell’ultima BUILD…');
+      try{
+        if('caches'in window){
+          const keys=await caches.keys();
+          await Promise.all(keys.filter(k=>k.startsWith('terra-italica-')).map(k=>caches.delete(k)));
+        }
+        if('serviceWorker'in navigator){
+          const regs=await navigator.serviceWorker.getRegistrations();
+          await Promise.all(regs.map(r=>r.unregister()));
+        }
+      }catch(_){ }
+      const url=new URL(location.href);
+      url.searchParams.set('force',Date.now().toString());
+      location.replace(url.toString());
+    };
+    $('#restartSame').onclick=()=>this.newGame(this.seed);$('#restartNew').onclick=()=>this.newGame((Math.random()*2147483647)|0);
     this.canvas.addEventListener('pointerdown',e=>this.pointerDown(e));this.canvas.addEventListener('pointermove',e=>this.pointerMove(e));this.canvas.addEventListener('pointerup',e=>this.pointerUp(e));this.canvas.addEventListener('pointercancel',()=>this.pointerCancel());this.canvas.addEventListener('lostpointercapture',()=>this.pointerCancel());
     this.installLifecycle();
   }
