@@ -20,7 +20,7 @@
   const ANIMAL_TOKENS=Object.fromEntries(ANIMAL_TOKEN_NAMES.map(name=>[name,load('./assets/tokens/animals/'+name+'.svg?v=99')]));
   window.TERRA_ANIMAL_TOKENS=ANIMAL_TOKENS;
   const RESOURCE_TILE_NAMES=['forest_full_hex','forest_medium_hex','forest_low_hex','forest_empty_hex','berries_full_hex','berries_medium_hex','berries_low_hex','berries_empty_hex','stone_up_full_tri','stone_up_low_tri','stone_down_full_tri','stone_down_low_tri','ore_up_full_tri','ore_up_low_tri','ore_down_full_tri','ore_down_low_tri'];
-  const RESOURCE_TILES=Object.fromEntries(RESOURCE_TILE_NAMES.map(name=>[name,load('./assets/terrain/resources/'+name+'.svg?v=101')]));
+  const RESOURCE_TILES=Object.fromEntries(RESOURCE_TILE_NAMES.map(name=>[name,load('./assets/terrain/resources/'+name+'.svg?v=102')]));
   window.TERRA_RESOURCE_TILES=RESOURCE_TILES;
   const factionStyle=owner=>window.terraFactionStyle?window.terraFactionStyle(owner):{color:'#B4442B'};
   function tokenImage(name,owner){const key=name+':'+owner;if(tokenImages.has(key))return tokenImages.get(key);const source=tokenTemplates.get(name);if(!source){preloadToken(name);return null;}const themed=source.split('#B4442B').join(factionStyle(owner).color),img=new Image();img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(themed);tokenImages.set(key,img);return img;}
@@ -45,27 +45,6 @@
       const img=RESOURCE_TILES[key],p=this.worldToScreen(r.x*TILE,r.y*TILE);
       const size=TILE*1.03*z;
       if(!drawCentered(ctx,img,p.x,p.y,size,size,0,true))return oldDrawResource.call(this,r);
-      // The source forest SVG has a baked rust-colored frame. Paint only that visible frame
-      // at render time so the internal tree artwork remains untouched.
-      const hw=size/2,hh=size/2;
-      const pts=[
-        [p.x,p.y-hh*.994],
-        [p.x+hw*.993,p.y-hh*.5],
-        [p.x+hw*.993,p.y+hh*.5],
-        [p.x,p.y+hh*.994],
-        [p.x-hw*.993,p.y+hh*.5],
-        [p.x-hw*.993,p.y-hh*.5]
-      ];
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(pts[0][0],pts[0][1]);
-      for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);
-      ctx.closePath();
-      ctx.strokeStyle='#705c33';
-      ctx.lineWidth=Math.max(2.6*z,2);
-      ctx.lineJoin='round';
-      ctx.stroke();
-      ctx.restore();
       return;
     }
 
