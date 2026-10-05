@@ -67,33 +67,45 @@
       const clusterId='terrain-'+ci;
       const cx=Math.floor(c.x),cy=Math.floor(c.y);
 
-      // Mineral lattice anchored to the world tile grid.
-      // ▲ lives inside one tile: centre x+.5, base on the tile bottom edge.
-      // ▼ is shifted half a tile horizontally: centre on x+1, so it bridges two adjacent tiles,
-      //    with its base on the tile top edge. The two orientations interlock without overlap.
-      for(let row=-4;row<=4;row++)for(let col=-5;col<=5;col++){
-        const edge=(col/5)*(col/5)+(row/4)*(row/4);
-        const irregular=(hash(col+ci*17,row-ci*11,seed+4401)-.5)*.22;
-        if(edge>1+irregular)continue;
+      // Mineral lattice anchored to the tile grid.
+      // Every occupied tile contributes an ▲ at its centre and, when the vein continues,
+      // a ▼ on its right edge. This yields a continuous chain:
+      // x+.5 (▲) -> x+1 (▼) -> x+1.5 (▲) -> x+2 (▼) ...
+      for(let row=-4;row<=4;row++){
+        const rowWidth=Math.max(1,Math.floor(5*Math.sqrt(Math.max(0,1-(row/4)*(row/4)))));
+        const leftJitter=Math.floor(hash(ci*31,row*17,seed+4401)*2);
+        const rightJitter=Math.floor(hash(ci*37,row*19,seed+4402)*2);
+        const minCol=-rowWidth+leftJitter;
+        const maxCol=rowWidth-rightJitter;
 
-        const tileX=cx+col,tileY=cy+row;
-        const orientation=((row+col)&1)?'down':'up';
-        const px=orientation==='up'?tileX+.5:tileX+1;
-        const py=tileY+.5;
-        const t=this.tile(tileX,tileY);
-        if(!t||!BIOME[t.biome].walk||['sea','river','marsh'].includes(t.biome))continue;
+        for(let col=minCol;col<=maxCol;col++){
+          const tileX=cx+col,tileY=cy+row;
+          const t=this.tile(tileX,tileY);
+          if(!t||!BIOME[t.biome].walk||['sea','river','marsh'].includes(t.biome))continue;
 
-        // Down triangles sit on a tile boundary, so both tiles they bridge must be valid terrain.
-        if(orientation==='down'){
-          const right=this.tile(tileX+1,tileY);
-          if(!right||!BIOME[right.biome].walk||['sea','river','marsh'].includes(right.biome))continue;
+          const ironChance=metalRich?.28:.07;
+          const type=rng.next()<ironChance?'iron':'stone';
+          const amount=(type==='iron'?rng.int(75,115):rng.int(95,150))*10;
+
+          // ▲ fully inside the tile.
+          const up=add(type,tileX+.5,tileY+.5,amount,{
+            orientation:'up',clusterId,resourceShape:'triangle',tileX,tileY
+          });
+          if(up)up.renewable=false;
+
+          // ▼ bridges this tile and the next one only when the chain can continue.
+          if(col<maxCol){
+            const right=this.tile(tileX+1,tileY);
+            if(right&&BIOME[right.biome].walk&&!['sea','river','marsh'].includes(right.biome)){
+              const downType=rng.next()<ironChance?'iron':'stone';
+              const downAmount=(downType==='iron'?rng.int(75,115):rng.int(95,150))*10;
+              const down=add(downType,tileX+1,tileY+.5,downAmount,{
+                orientation:'down',clusterId,resourceShape:'triangle',tileX,tileY
+              });
+              if(down)down.renewable=false;
+            }
+          }
         }
-
-        const ironChance=metalRich?.28:.07;
-        const type=rng.next()<ironChance?'iron':'stone';
-        const amount=(type==='iron'?rng.int(75,115):rng.int(95,150))*10;
-        const r=add(type,px,py,amount,{orientation,clusterId,resourceShape:'triangle',tileX,tileY});
-        if(r)r.renewable=false;
       }
     });
 
