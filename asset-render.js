@@ -20,7 +20,7 @@
   const ANIMAL_TOKENS=Object.fromEntries(ANIMAL_TOKEN_NAMES.map(name=>[name,load('./assets/tokens/animals/'+name+'.svg?v=99')]));
   window.TERRA_ANIMAL_TOKENS=ANIMAL_TOKENS;
   const RESOURCE_TILE_NAMES=['forest_full_hex','forest_medium_hex','forest_low_hex','forest_empty_hex','berries_full_hex','berries_medium_hex','berries_low_hex','berries_empty_hex','stone_up_full_tri','stone_up_low_tri','stone_down_full_tri','stone_down_low_tri','ore_up_full_tri','ore_up_low_tri','ore_down_full_tri','ore_down_low_tri'];
-  const RESOURCE_TILES=Object.fromEntries(RESOURCE_TILE_NAMES.map(name=>[name,load('./assets/terrain/resources/'+name+'.svg?v=102')]));
+  const RESOURCE_TILES=Object.fromEntries(RESOURCE_TILE_NAMES.map(name=>[name,load('./assets/terrain/resources/'+name+'.svg?v=103')]));
   window.TERRA_RESOURCE_TILES=RESOURCE_TILES;
   const factionStyle=owner=>window.terraFactionStyle?window.terraFactionStyle(owner):{color:'#B4442B'};
   function tokenImage(name,owner){const key=name+':'+owner;if(tokenImages.has(key))return tokenImages.get(key);const source=tokenTemplates.get(name);if(!source){preloadToken(name);return null;}const themed=source.split('#B4442B').join(factionStyle(owner).color),img=new Image();img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(themed);tokenImages.set(key,img);return img;}
@@ -38,10 +38,19 @@
     if(r.cleared)return;
     const z=this.camera.zoom,ratio=r.max>0?r.amount/r.max:0,ctx=this.ctx;
 
-    // One node = one marker. Renewable nodes are hexes with their own depletion state.
-    if(r.type==='wood'||r.type==='food'){
+    // Keep forests and berry bushes on separate render paths.
+    // Tree-only SVG edits must never affect berries.
+    if(r.type==='wood'){
       const state=ratio<=0?'empty':ratio>.66?'full':ratio>.33?'medium':'low';
-      const key=(r.type==='wood'?'forest_':'berries_')+state+'_hex';
+      const key='forest_'+state+'_hex';
+      const img=RESOURCE_TILES[key],p=this.worldToScreen(r.x*TILE,r.y*TILE);
+      const size=TILE*1.03*z;
+      if(!drawCentered(ctx,img,p.x,p.y,size,size,0,true))return oldDrawResource.call(this,r);
+      return;
+    }
+    if(r.type==='food'){
+      const state=ratio<=0?'empty':ratio>.66?'full':ratio>.33?'medium':'low';
+      const key='berries_'+state+'_hex';
       const img=RESOURCE_TILES[key],p=this.worldToScreen(r.x*TILE,r.y*TILE);
       const size=TILE*1.03*z;
       if(!drawCentered(ctx,img,p.x,p.y,size,size,0,true))return oldDrawResource.call(this,r);
