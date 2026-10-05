@@ -174,8 +174,7 @@
       master.palisadeLineWork=.08;
       if(builder)this.assignBuild(builder,master);
     }
-    // Keep the player's current selection: construction must not visually 'refresh' the board.
-    this.updateUI();
+    // Keep the player's current selection; the outer confirmation refreshes UI once.
     const join=reused.length?' · raccordo creato':'';
     this.message(created.length+' '+(created.length===1?'sezione':'sezioni')+' di palizzata confermate'+join+(builder&&created.length?'. '+builder.name+' lavora sull’intera linea.':'.'));
     return true;
