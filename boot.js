@@ -9,3 +9,12 @@ try {
   game.setPaused(true);
   game.message('Archivio locale non disponibile. Puoi giocare, ma il salvataggio potrebbe non riuscire.');
 }
+
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js?v=103', {updateViaCache:'none'})
+      .then(registration => registration.update())
+      .catch(() => {});
+  });
+}
