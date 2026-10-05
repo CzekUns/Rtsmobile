@@ -90,7 +90,7 @@ class Game{
     this.stock={food:70,wood:55,stone:24,iron:0};this.day=1;this.month=2;this.year=800;this.totalDays=0;this.dayAccumulator=0;this.secondsPerDay=.85;this.paused=false;this.gameEnded=false;
     this.camera={x:0,y:0,zoom:1.05};this.selected=null;this.orderMode=null;this.buildMode=null;this.pointer=new Map();this.dragging=false;this.lastFrame=performance.now();this.uiTick=0;this.autosave=0;this.raidLevel=0;this.nextRaidDay=65;
     this.initUI();this.newGame(this.seed);this.loop=this.loop.bind(this);requestAnimationFrame(this.loop);
-    if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+
   }
   newGame(seed){
     this.seed=seed;this.rng=new RNG(seed);this.world=new World(seed);this.groupSelection=[];this.orderMode=null;this.buildMode=null;this.pointerCancel();this.syncModeButtons();this.units=[];this.buildings=[];this.animals=[];this.raiders=[];this.stock={food:70,wood:55,stone:24,iron:0};this.day=1;this.month=2;this.year=800;this.totalDays=0;this.dayAccumulator=0;this.raidLevel=0;this.nextRaidDay=65;this.gameEnded=false;$('#gameOver').classList.add('hidden');
