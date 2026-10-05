@@ -14,12 +14,19 @@
   const oldRefreshContextDock=Game.prototype.refreshContextDock;
   const oldInitUI=Game.prototype.initUI;
   const oldNewGame=Game.prototype.newGame;
+  const oldWorldWalkable=World.prototype.walkable;
 
   const localPoint=(g,e)=>{const r=g.canvas.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top};};
   const tileAt=(g,sx,sy)=>{const w=g.screenToWorld(sx,sy);return{x:Math.floor(w.x/TILE),y:Math.floor(w.y/TILE)};};
   const addCost=(a,b,m=1)=>{for(const[k,v]of Object.entries(b||{}))a[k]=(a[k]||0)+v*m;return a;};
   const planCost=items=>items.filter(item=>!item.reuseId).reduce((sum,item)=>addCost(sum,item.type==='road'?{wood:1}:BUILD_COSTS[item.type]),{});
   const availableBuilder=g=>g.selected instanceof Unit&&g.selected.location?.kind==='world'&&g.selected.health>0?g.selected:g.units.find(u=>u.health>0&&u.location?.kind==='world'&&!u.mobilized&&u.state==='idle');
+
+  // Confirmed palisade sites stay traversable until the segment is actually complete.
+  World.prototype.walkable=function(x,y,climb=1,from=null,buildings=[]){
+    const filtered=(buildings||[]).filter(b=>!(b?.type==='palisade'&&!b.built));
+    return oldWorldWalkable.call(this,x,y,climb,from,filtered);
+  };
 
   Game.prototype.palisadeAt=function(x,y){
     return this.buildings.find(b=>b.alive&&b.type==='palisade'&&Math.floor(b.x)===x&&Math.floor(b.y)===y)||null;
@@ -72,30 +79,48 @@
     return this.stagePendingBuild(type,x,y,crop);
   };
 
-  Game.prototype.makePalisadePlan=function(start,end){
-    const dx=end.x-start.x,dy=end.y-start.y;
-    const orientation=Math.abs(dy)>Math.abs(dx)?'vertical':'horizontal';
-    const delta=orientation==='vertical'?dy:dx;
-    const step=delta<0?-1:1,count=Math.abs(delta)+1,items=[];
-    for(let i=0;i<count;i++){
-      const x=orientation==='horizontal'?start.x+i*step:start.x;
-      const y=orientation==='vertical'?start.y+i*step:start.y;
-      const cap=count===1?'both':orientation==='horizontal'?(i===0?(step>0?'left':'right'):i===count-1?(step>0?'right':'left'):'middle'):(i===0?(step>0?'top':'bottom'):i===count-1?(step>0?'bottom':'top'):'middle');
-      const item={type:'palisade',x,y,orientation,cap,single:count===1};
-      const existing=this.palisadeAt(x,y);
-      if(existing){
-        if(count>1&&(i===0||i===count-1))item.reuseId=existing.id;
-        else item._forcedError='Una linea può raccordarsi a una palizzata esistente solo dal primo o dall’ultimo tile.';
+  Game.prototype.normalizePalisadeTrace=function(cells){
+    const out=[];
+    for(const raw of cells||[]){
+      const cell={x:raw.x,y:raw.y};
+      const last=out.at(-1);if(last&&last.x===cell.x&&last.y===cell.y)continue;
+      const prev=out.at(-2);
+      if(prev&&prev.x===cell.x&&prev.y===cell.y){out.pop();continue;} // finger backtrack = undo last tile
+      if(!last){out.push(cell);continue;}
+      let x=last.x,y=last.y;
+      while(x!==cell.x||y!==cell.y){
+        const dx=cell.x-x,dy=cell.y-y;
+        // Follow the actual pointer direction; only cardinal tile steps are emitted.
+        if(Math.abs(dx)>=Math.abs(dy)&&dx!==0)x+=Math.sign(dx);
+        else if(dy!==0)y+=Math.sign(dy);
+        if(!out.some(p=>p.x===x&&p.y===y))out.push({x,y});
+        else if(out.length>1&&out.at(-2).x===x&&out.at(-2).y===y)out.pop();
       }
+    }
+    return out;
+  };
+
+  Game.prototype.makePalisadePlanFromCells=function(cells){
+    const trace=this.normalizePalisadeTrace(cells),items=[];
+    for(let i=0;i<trace.length;i++){
+      const {x,y}=trace[i],item={type:'palisade',x,y};
+      const existing=this.palisadeAt(x,y);
+      if(existing)item.reuseId=existing.id;
       items.push(item);
     }
+    // Reusing an existing wall is allowed at a junction or endpoint, but never makes a duplicate building.
     const builder=availableBuilder(this);
-    const plan={kind:'palisade',items,builderId:builder?.id||null,orientation};
+    const plan={kind:'palisade',items,builderId:builder?.id||null,trace};
     const tileError=items.map(item=>this.pendingPlacementError(item)).find(Boolean);
     const check=this.constructionCheck('palisade',builder);
     plan.error=tileError||(!check.ok?(builder?this.constructionRequirementText('palisade',builder):'Serve un costruttore disponibile.'):null)||(!this.canPay(planCost(items))?'Legno insufficiente per tutta la palizzata.':null);
-    plan.valid=!plan.error;
+    plan.valid=!plan.error&&items.length>0;
     return plan;
+  };
+
+  // Compatibility entry point for a simple straight line.
+  Game.prototype.makePalisadePlan=function(start,end){
+    return this.makePalisadePlanFromCells([start,end]);
   };
 
   Game.prototype.pointerDown=function(e){
@@ -104,28 +129,35 @@
     if(this._palisadeDrag){e.preventDefault();return;}
     this.canvas.setPointerCapture(e.pointerId);
     const p=localPoint(this,e),start=tileAt(this,p.x,p.y);
-    this._palisadeDrag={pointerId:e.pointerId,start};
-    this.palisadeDraft=this.makePalisadePlan(start,start);
+    this._palisadeDrag={pointerId:e.pointerId,cells:[start],lastTile:start};
+    this.palisadeDraft=this.makePalisadePlanFromCells(this._palisadeDrag.cells);
     e.preventDefault();
   };
 
   Game.prototype.pointerMove=function(e){
     const d=this._palisadeDrag;
     if(!d||d.pointerId!==e.pointerId)return oldPointerMove.call(this,e);
-    const p=localPoint(this,e),end=tileAt(this,p.x,p.y);
-    this.palisadeDraft=this.makePalisadePlan(d.start,end);
+    const p=localPoint(this,e),tile=tileAt(this,p.x,p.y);
+    if(tile.x!==d.lastTile.x||tile.y!==d.lastTile.y){
+      d.cells.push(tile);d.lastTile=tile;
+      d.cells=this.normalizePalisadeTrace(d.cells);
+      this.palisadeDraft=this.makePalisadePlanFromCells(d.cells);
+    }
     e.preventDefault();
   };
 
   Game.prototype.pointerUp=function(e){
     const d=this._palisadeDrag;
     if(!d||d.pointerId!==e.pointerId)return oldPointerUp.call(this,e);
-    const p=localPoint(this,e),end=tileAt(this,p.x,p.y),plan=this.makePalisadePlan(d.start,end);
+    const p=localPoint(this,e),tile=tileAt(this,p.x,p.y);
+    if(tile.x!==d.lastTile.x||tile.y!==d.lastTile.y)d.cells.push(tile);
+    const plan=this.makePalisadePlanFromCells(d.cells);
     this._palisadeDrag=null;this.palisadeDraft=null;
     if(plan.valid){
       this.pendingBuildPlan=plan;this.buildMode=null;this.buildPreview=null;
       this.syncModeButtons();this.updateUI();
-      this.message(`Palizzata fantasma: ${plan.items.length} ${plan.items.length===1?'sezione':'sezioni'} · ✓ conferma · ✕ annulla.`);
+      const turns=this.palisadeTurnCount(plan.items);
+      this.message(`Palizzata fantasma: ${plan.items.length} tile${turns?` · ${turns} ${turns===1?'angolo':'angoli'}`:''} · ✓ conferma · ✕ annulla.`);
     }else if(plan.error)this.message(plan.error);
     e.preventDefault();
   };
@@ -185,6 +217,14 @@
   };
 
   Game.prototype.buildTick=function(u,dt){
+    if(u.task?.type==='build'&&Array.isArray(u.task.palisadeQueue)){
+      const target=this.buildings.find(b=>b.id===u.task.target);
+      if(target?.alive&&!target.built&&this.buildingDistance(u,target)>1.15&&!u.path?.length){
+        const path=this.pathToBuilding(u,target,true);
+        if(path!==null){u.path=path;u.state=path.length?'moving':'building';}
+        return;
+      }
+    }
     const before=u.task?.type==='build'&&Array.isArray(u.task.palisadeQueue)?{
       queue:[...u.task.palisadeQueue],
       lineId:u.task.palisadeLineId,
@@ -205,6 +245,10 @@
         this.message(`${u.name} passa alla sezione ${i+1}/${before.queue.length} della palizzata.`);
         return;
       }
+      // Do not declare the wall finished just because a route was momentarily unavailable.
+      u.task={type:'build',target:next.id,palisadeQueue:before.queue,palisadeLineId:before.lineId,palisadeQueueIndex:i,workSpot:null};
+      u.path=[];u.state='building';
+      return;
     }
     const remaining=before.queue.some(id=>this.buildings.some(b=>b.id===id&&b.alive&&!b.built));
     if(!remaining){
@@ -229,6 +273,16 @@
     }
     this.pendingBuildPlan=null;this.buildMode=null;this.buildPreview=null;this.pendingBuildCrop=null;
     this.syncModeButtons();this.updateUI();return true;
+  };
+
+  Game.prototype.palisadeTurnCount=function(items){
+    let turns=0;
+    for(let i=1;i<(items?.length||0)-1;i++){
+      const a=items[i-1],b=items[i],d=items[i+1];
+      const ax=b.x-a.x,ay=b.y-a.y,bx=d.x-b.x,by=d.y-b.y;
+      if((ax===0)!==(bx===0))turns++;
+    }
+    return turns;
   };
 
   Game.prototype.palisadeConnections=function(item,networkItems=[]){
