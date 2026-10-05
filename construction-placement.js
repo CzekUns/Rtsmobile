@@ -289,13 +289,16 @@
     const left=this.palisadeNeighbor(tx-1,ty,networkItems),right=this.palisadeNeighbor(tx+1,ty,networkItems);
     const up=this.palisadeNeighbor(tx,ty-1,networkItems),down=this.palisadeNeighbor(tx,ty+1,networkItems);
     const lo=this.palisadeOrientationOf(left),ro=this.palisadeOrientationOf(right),uo=this.palisadeOrientationOf(up),do_=this.palisadeOrientationOf(down);
+    const sameLeft=!!left&&lo===orientation,sameRight=!!right&&ro===orientation;
+    const sameUp=!!up&&uo===orientation,sameDown=!!down&&do_===orientation;
     const perpLeft=!!left&&lo&&lo!==orientation,perpRight=!!right&&ro&&ro!==orientation;
     const perpUp=!!up&&uo&&uo!==orientation,perpDown=!!down&&do_&&do_!==orientation;
+    const hasPerp=perpLeft||perpRight||perpUp||perpDown;
     const logs=new Map();
     const add=(gx,gy)=>logs.set(gx.toFixed(2)+','+gy.toFixed(2),[gx,gy]);
     const block3=(cx,cy)=>{for(let yy=-1;yy<=1;yy++)for(let xx=-1;xx<=1;xx++)add(cx+xx,cy+yy);};
     const halfCorner=(edge)=>{
-      // One shared 4x4 node: each adjacent tile contributes exactly one 2x4 half.
+      // Shared 4x4 node: exactly 2x4 logs are drawn by each of the two adjacent tiles.
       if(edge==='left'||edge==='right'){
         const xs=edge==='left'?[.5,1.5]:[3.5,4.5];
         for(const x of xs)for(const y of [1,2,3,4])add(x,y);
@@ -305,25 +308,41 @@
       }
     };
 
-    // Main strip. At a perpendicular join it stops one log inside before entering the shared corner node.
+    // The straight strip stops at the centre when it bends into a perpendicular neighbour.
     if(orientation==='horizontal'){
-      const from=perpLeft?1:0,to=perpRight?3:4;
+      let from=0,to=4;
+      if(perpLeft)from=2;
+      if(perpRight)to=2;
+      if(perpUp||perpDown){
+        if(sameLeft&&!sameRight)to=2;
+        else if(sameRight&&!sameLeft)from=2;
+        else if(!sameLeft&&!sameRight)from=to=2;
+      }
       for(let x=from;x<=to;x++)add(x+.5,2.5);
     }else{
-      const from=perpUp?1:0,to=perpDown?3:4;
+      let from=0,to=4;
+      if(perpUp)from=2;
+      if(perpDown)to=2;
+      if(perpLeft||perpRight){
+        if(sameUp&&!sameDown)to=2;
+        else if(sameDown&&!sameUp)from=2;
+        else if(!sameUp&&!sameDown)from=to=2;
+      }
       for(let y=from;y<=to;y++)add(2.5,y+.5);
     }
 
-    // Free ends keep the 3x3 log agglomerate.
-    if(orientation==='horizontal'){
-      if(!left)block3(1.5,2.5);
-      if(!right)block3(3.5,2.5);
-    }else{
-      if(!up)block3(2.5,1.5);
-      if(!down)block3(2.5,3.5);
+    // 3x3 terminal posts exist only on genuinely free ends.
+    // At a corner they disappear completely: the shared 4x4 node replaces both terminals.
+    if(!hasPerp){
+      if(orientation==='horizontal'){
+        if(!sameLeft)block3(1.5,2.5);
+        if(!sameRight)block3(3.5,2.5);
+      }else{
+        if(!sameUp)block3(2.5,1.5);
+        if(!sameDown)block3(2.5,3.5);
+      }
     }
 
-    // Perpendicular neighbors replace the two terminal 3x3 blocks with a single 4x4 shared node.
     if(perpLeft)halfCorner('left');
     if(perpRight)halfCorner('right');
     if(perpUp)halfCorner('up');

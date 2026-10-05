@@ -20,7 +20,7 @@ if ('serviceWorker' in navigator) {
         reloading=true;
         location.reload();
       });
-      const registration=await navigator.serviceWorker.register('./sw.js?v=116', {updateViaCache:'none'});
+      const registration=await navigator.serviceWorker.register('./sw.js?v=117', {updateViaCache:'none'});
       await registration.update();
       if(registration.waiting)registration.waiting.postMessage({type:'SKIP_WAITING'});
       registration.addEventListener('updatefound', () => {
