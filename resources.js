@@ -79,7 +79,7 @@
         const tileX=cx+col,tileY=cy+row;
         const orientation=((row+col)&1)?'down':'up';
         const px=orientation==='up'?tileX+.5:tileX+1;
-        const py=orientation==='up'?tileY+.675:tileY+.325;
+        const py=tileY+.5;
         const t=this.tile(tileX,tileY);
         if(!t||!BIOME[t.biome].walk||['sea','river','marsh'].includes(t.biome))continue;
 
