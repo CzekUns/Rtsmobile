@@ -45,6 +45,27 @@
       const img=RESOURCE_TILES[key],p=this.worldToScreen(r.x*TILE,r.y*TILE);
       const size=TILE*1.03*z;
       if(!drawCentered(ctx,img,p.x,p.y,size,size,0,true))return oldDrawResource.call(this,r);
+      // The source forest SVG has a baked rust-colored frame. Paint only that visible frame
+      // at render time so the internal tree artwork remains untouched.
+      const hw=size/2,hh=size/2;
+      const pts=[
+        [p.x,p.y-hh*.994],
+        [p.x+hw*.993,p.y-hh*.5],
+        [p.x+hw*.993,p.y+hh*.5],
+        [p.x,p.y+hh*.994],
+        [p.x-hw*.993,p.y+hh*.5],
+        [p.x-hw*.993,p.y-hh*.5]
+      ];
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(pts[0][0],pts[0][1]);
+      for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);
+      ctx.closePath();
+      ctx.strokeStyle='#705c33';
+      ctx.lineWidth=Math.max(2.6*z,2);
+      ctx.lineJoin='round';
+      ctx.stroke();
+      ctx.restore();
       return;
     }
 
