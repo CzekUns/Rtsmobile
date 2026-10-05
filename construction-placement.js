@@ -11,6 +11,7 @@
   const oldDraw=Game.prototype.draw;
   const oldDrawBuilding=Game.prototype.drawBuilding;
   const oldBuildTick=Game.prototype.buildTick;
+  const oldOnUnitArrive=Game.prototype.onUnitArrive;
   const oldRefreshContextDock=Game.prototype.refreshContextDock;
   const oldInitUI=Game.prototype.initUI;
   const oldNewGame=Game.prototype.newGame;
@@ -172,7 +173,12 @@
       master.palisadeLineMaster=true;
       master.palisadeLineIds=created.map(b=>b.id);
       master.palisadeLineWork=.08;
-      if(builder)this.assignBuild(builder,master);
+      if(builder&&this.assignBuild(builder,master)&&builder.task){
+        builder.task.palisadeLine=true;
+        builder.task.palisadeWorkIndex=-1;
+        builder.task.palisadeWorkPartId=null;
+        builder.task.palisadeWorkSpot=null;
+      }
     }
     // Keep the player's current selection; the outer confirmation refreshes UI once.
     const join=reused.length?' · raccordo creato':'';
@@ -180,28 +186,67 @@
     return true;
   };
 
+  Game.prototype.palisadeWorkRoute=function(u,part){
+    const doors=this.buildingDoors(part).slice();
+    const horizontal=(part.palisadeOrientation||'horizontal')==='horizontal';
+    const penalty=p=>horizontal?(Math.abs(p.y-part.y)>.6?0:1):(Math.abs(p.x-part.x)>.6?0:1);
+    doors.sort((a,b)=>penalty(a)-penalty(b)||Math.hypot(u.x-a.x,u.y-a.y)-Math.hypot(u.x-b.x,u.y-b.y));
+    for(const spot of doors){
+      const d=Math.hypot(u.x-spot.x,u.y-spot.y);
+      if(d<.12)return{spot,path:[]};
+      let path=this.findPath(u.x,u.y,Math.floor(spot.x),Math.floor(spot.y),1);
+      if(!path.length&&Math.floor(u.x)===Math.floor(spot.x)&&Math.floor(u.y)===Math.floor(spot.y))path=[{x:spot.x,y:spot.y}];
+      if(path.length)return{spot,path};
+    }
+    return null;
+  };
+
+  Game.prototype.onUnitArrive=function(u){
+    if(u.task?.type==='build'&&u.task.palisadeLine){u.state='building';return;}
+    return oldOnUnitArrive.call(this,u);
+  };
+
   Game.prototype.buildTick=function(u,dt){
     const master=u.task?.type==='build'?this.buildings.find(b=>b.id===u.task.target):null;
-    if(!master||master.type!=='palisade'||!master.palisadeLineMaster)return oldBuildTick.call(this,u,dt);
+    if(!master||master.type!=='palisade'||!master.palisadeLineMaster||!u.task?.palisadeLine)return oldBuildTick.call(this,u,dt);
     if(!master.alive){this.cancelTask(u);return;}
-    if(this.buildingDistance(u,master)>1.15){
-      const path=this.pathToBuilding(u,master,true);
-      if(path===null){this.cancelTask(u);this.message('Palizzata non raggiungibile.');return;}
-      u.path=path;u.state=path.length?'moving':'building';return;
-    }
     const ids=master.palisadeLineIds||[master.id];
     const parts=ids.map(id=>this.buildings.find(b=>b.id===id)).filter(b=>b?.alive);
     if(!parts.length){this.cancelTask(u);return;}
+    const work=Math.min(parts.length,master.palisadeLineWork||.08);
+    if(work>=parts.length){for(const p of parts)p.progress=1;this.cancelTask(u);return;}
+    const index=Math.min(parts.length-1,Math.floor(work));
+    const part=parts[index];
+
+    // Every section has its own physical work spot. The job target remains the line master.
+    if(u.task.palisadeWorkIndex!==index||u.task.palisadeWorkPartId!==part.id){
+      const route=this.palisadeWorkRoute(u,part);
+      if(!route){this.cancelTask(u);this.message('Non c’è spazio raggiungibile accanto alla sezione '+(index+1)+' della palizzata.');return;}
+      u.task.palisadeWorkIndex=index;
+      u.task.palisadeWorkPartId=part.id;
+      u.task.palisadeWorkSpot=route.spot;
+      u.path=route.path;
+      u.state=route.path.length?'moving':'building';
+      if(route.path.length)return;
+    }
+    const spot=u.task.palisadeWorkSpot;
+    if(spot&&Math.hypot(u.x-spot.x,u.y-spot.y)>.28){
+      const route=this.palisadeWorkRoute(u,part);
+      if(!route){this.cancelTask(u);return;}
+      u.task.palisadeWorkSpot=route.spot;u.path=route.path;u.state=route.path.length?'moving':'building';
+      if(route.path.length)return;
+    }
+
     const speed=.06+u.skills.construction*.012;
-    master.palisadeLineWork=Math.min(parts.length,(master.palisadeLineWork||.08)+dt*speed);
-    const work=master.palisadeLineWork;
+    master.palisadeLineWork=Math.min(parts.length,work+dt*speed);
+    const nextWork=master.palisadeLineWork;
     for(let i=0;i<parts.length;i++){
       const p=parts[i];
-      p.progress=Math.max(p.progress||.08,Math.min(1,Math.max(.08,work-i)));
+      p.progress=Math.max(p.progress||.08,Math.min(1,Math.max(.08,nextWork-i)));
       p.materialsConsumed=true;p.requiredMaterials=null;
     }
     u.gain('construction',dt*.4);
-    if(work>=parts.length){
+    if(nextWork>=parts.length){
       for(const p of parts)p.progress=1;
       this.cancelTask(u);
       this.message(u.name+' ha terminato tutta la palizzata ('+parts.length+' sezioni).');
@@ -244,34 +289,51 @@
     const left=this.palisadeNeighbor(tx-1,ty,networkItems),right=this.palisadeNeighbor(tx+1,ty,networkItems);
     const up=this.palisadeNeighbor(tx,ty-1,networkItems),down=this.palisadeNeighbor(tx,ty+1,networkItems);
     const lo=this.palisadeOrientationOf(left),ro=this.palisadeOrientationOf(right),uo=this.palisadeOrientationOf(up),do_=this.palisadeOrientationOf(down);
-    const occupied=new Set();
-    const add=(cx,cy)=>{if(cx>=0&&cx<5&&cy>=0&&cy<5)occupied.add(cx+','+cy);};
-    const block3=(cx,cy)=>{for(let yy=cy-1;yy<=cy+1;yy++)for(let xx=cx-1;xx<=cx+1;xx++)add(xx,yy);};
+    const perpLeft=!!left&&lo&&lo!==orientation,perpRight=!!right&&ro&&ro!==orientation;
+    const perpUp=!!up&&uo&&uo!==orientation,perpDown=!!down&&do_&&do_!==orientation;
+    const logs=new Map();
+    const add=(gx,gy)=>logs.set(gx.toFixed(2)+','+gy.toFixed(2),[gx,gy]);
+    const block3=(cx,cy)=>{for(let yy=-1;yy<=1;yy++)for(let xx=-1;xx<=1;xx++)add(cx+xx,cy+yy);};
+    const halfCorner=(edge)=>{
+      // One shared 4x4 node: each adjacent tile contributes exactly one 2x4 half.
+      if(edge==='left'||edge==='right'){
+        const xs=edge==='left'?[.5,1.5]:[3.5,4.5];
+        for(const x of xs)for(const y of [1,2,3,4])add(x,y);
+      }else{
+        const ys=edge==='up'?[.5,1.5]:[3.5,4.5];
+        for(const y of ys)for(const x of [1,2,3,4])add(x,y);
+      }
+    };
 
-    // Base strip: one log is exactly one 1/25 cell of the tile.
-    if(orientation==='horizontal')for(let x=0;x<5;x++)add(x,2);
-    else for(let y=0;y<5;y++)add(2,y);
-
-    // Adjacent perpendicular walls bend into one another inside this tile.
-    if(left&&lo&&lo!==orientation){add(0,2);add(1,2);add(2,2);}
-    if(right&&ro&&ro!==orientation){add(2,2);add(3,2);add(4,2);}
-    if(up&&uo&&uo!==orientation){add(2,0);add(2,1);add(2,2);}
-    if(down&&do_&&do_!==orientation){add(2,2);add(2,3);add(2,4);}
-
-    // External ends are 3x3 agglomerates of 1/25-tile logs.
+    // Main strip. At a perpendicular join it stops one log inside before entering the shared corner node.
     if(orientation==='horizontal'){
-      if(!left)block3(1,2);
-      if(!right)block3(3,2);
+      const from=perpLeft?1:0,to=perpRight?3:4;
+      for(let x=from;x<=to;x++)add(x+.5,2.5);
     }else{
-      if(!up)block3(2,1);
-      if(!down)block3(2,3);
+      const from=perpUp?1:0,to=perpDown?3:4;
+      for(let y=from;y<=to;y++)add(2.5,y+.5);
     }
 
-    c.save();c.globalAlpha*=alpha;c.fillStyle=fill;c.strokeStyle=stroke;c.lineWidth=Math.max(.7,.7*this.camera.zoom);
-    for(const key of occupied){
-      const [cx,cy]=key.split(',').map(Number),x=p.x+cx*q,y=p.y+cy*q;
-      c.fillRect(x+.06*q,y+.06*q,q*.88,q*.88);
-      c.strokeRect(x+.06*q,y+.06*q,q*.88,q*.88);
+    // Free ends keep the 3x3 log agglomerate.
+    if(orientation==='horizontal'){
+      if(!left)block3(1.5,2.5);
+      if(!right)block3(3.5,2.5);
+    }else{
+      if(!up)block3(2.5,1.5);
+      if(!down)block3(2.5,3.5);
+    }
+
+    // Perpendicular neighbors replace the two terminal 3x3 blocks with a single 4x4 shared node.
+    if(perpLeft)halfCorner('left');
+    if(perpRight)halfCorner('right');
+    if(perpUp)halfCorner('up');
+    if(perpDown)halfCorner('down');
+
+    c.save();c.globalAlpha*=alpha;c.fillStyle=fill;c.strokeStyle=stroke;c.lineWidth=Math.max(.65,.65*this.camera.zoom);
+    const radius=q*.43;
+    for(const [gx,gy] of logs.values()){
+      const cx=p.x+gx*q,cy=p.y+gy*q;
+      c.beginPath();c.arc(cx,cy,radius,0,Math.PI*2);c.fill();c.stroke();
     }
     c.restore();
   };
