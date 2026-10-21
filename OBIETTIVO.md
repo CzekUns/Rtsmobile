@@ -124,6 +124,13 @@ Esempi:
 
 I magazzini, i collegamenti tra edifici e le politiche di trasferimento devono rendere leggibile il flusso economico.
 
+#### Insediamento, totem e scambio
+
+- Il **totem è la struttura zero**: identifica l’insediamento e stabilisce a quale comunità appartiene la città. Per ora è un segnaposto identitario; le sue funzioni centrali future restano da progettare.
+- I magazzini collegati al totem custodiscono le scorte comunitarie utilizzabili per costruire. Il giocatore deve poter configurare i collegamenti e le regole di trasferimento tra magazzini, mercati e strutture produttive.
+- L’economia iniziale non usa denaro: gli scambi avvengono attraverso merci e carovane. Il mercato riceve le eccedenze destinate allo scambio e inoltra materie prime alle strutture di trasformazione; i prodotti lavorati possono tornare ai magazzini comunitari secondo quote configurabili.
+- Il cibo sostiene la crescita della popolazione e la disponibilità di lavoratori per produzione e trasformazione. Va trattato come necessità concreta e incentivo al lavoro; tasse e salari monetari restano fuori finché non saranno progettati esplicitamente.
+
 ---
 
 ### 3.4 Agricoltura legata al territorio
@@ -132,8 +139,9 @@ Le colture non devono essere una produzione automatica scollegata dal mondo.
 
 Principi:
 
-- il giocatore **sceglie la coltura prima di piazzare il campo**;
-- grano, orzo, vite e olivo hanno ingombri, tempi, numero di lavoratori e rese differenti;
+- il giocatore **sceglie la coltura prima di piazzare il campo** e vede nel fantasma l’ingombro corrispondente;
+- dimensioni approvate: **grano 2 × 2 tile** e **olivo 3 × 3 tile**; le altre misure restano nella specifica agricola e possono essere bilanciate;
+- grano, orzo, vite e olivo hanno tempi, numero di lavoratori e rese differenti;
 - crescita e resa dipendono da terreno, acqua, stagione e skill;
 - il lavoro deve richiedere la presenza fisica degli abitanti;
 - i contadini possono camminare sul campo e riposizionarsi mentre lavorano;
@@ -157,6 +165,15 @@ Direzione approvata:
 - ricrescita lenta dove sensato;
 - possibilità di esaurire/radere una risorsa;
 - un raccoglitore che termina uno spot deve poter continuare su uno spot vicino dello stesso tipo senza perdere il flusso di lavoro.
+
+#### Grammatica delle forme sul terreno
+
+- abitanti e animali: token circolari;
+- strutture fisse: ingombri quadrati;
+- giacimenti non rinnovabili come pietra e ferro: celle triangolari che compongono rilievi estesi e concentrati;
+- risorse rinnovabili: gruppi di celle incastrate, con forma esagonale o pentagonale (**scelta visiva ancora da definire**).
+
+La forma deve rendere riconoscibile la categoria e il comportamento della risorsa senza suggerire un’altezza o una tridimensionalità non presente nel gameplay.
 
 ---
 
@@ -441,6 +458,9 @@ Formato consigliato:
 - **[APPROVATA]** Espandere le filiere agricole fino a prodotti trasformati reali.
 - **[APPROVATA]** Rendere villaggi, mercati e fazioni parti vive della simulazione.
 - **[APPROVATA]** Far crescere la profondità individuale di abitanti, skill ed equipaggiamento senza sacrificare la gestione RTS.
+- **[APPROVATA]** Usare il totem come identificatore iniziale dell’insediamento e rendere configurabili i flussi tra magazzini comunitari, mercati e strutture produttive.
+- **[APPROVATA]** Costruire i campi scegliendo prima la coltura; grano 2 × 2 tile e olivo 3 × 3 tile.
+- **[DA DECIDERE]** Scegliere se le risorse rinnovabili useranno celle esagonali o pentagonali.
 
 ---
 
