@@ -34,10 +34,27 @@ Se un abitante cambia attività, il cambiamento deve essere leggibile nel mondo.
 
 I riferimenti servono a trasferire principi, non a copiare giochi.
 
-- **Ultima Online**: identità individuale, skill separate, crescita tramite uso, equipaggiamento/paperdoll.
-- **Seven Kingdoms: Ancient Adversaries**: villaggio come comunità, popolazione, mobilitazione, neutrali, influenza e rapporti fra fazioni.
-- **Caravaneer**: economie locali, merci, carico, trasporto, convenienza delle rotte e scambi.
-- **Mindustry**: leggibilità dei flussi, input/output, automazione e chiarezza su mobile.
+### La formula
+
+Ver Sacrum deve essere pensato come un **mix intenzionale** di:
+
+- **Ultima Online** per il rapporto con il singolo abitante: identità persistente, skill separate, crescita attraverso l'uso, inventario ed equipaggiamento/paperdoll;
+- **Seven Kingdoms: Ancient Adversaries** per il rapporto con il villaggio: popolazione, lavoro, mobilitazione, comunità neutrali, influenza e rapporti fra fazioni;
+- **Caravaneer** per il rapporto con l'economia: merci reali, carico, capacità, trasporto, distanze, convenienza delle rotte e commercio fra economie locali;
+- **Mindustry** per il rapporto con i flussi: input/output chiari, catene produttive leggibili, automazione e immediatezza dei sistemi soprattutto su mobile.
+
+In una frase:
+
+> **Ultima Online nel singolo + Seven Kingdoms nella comunità + Caravaneer nell'economia + Mindustry nella leggibilità dei flussi, dentro un RTS sandbox preromano mobile-first.**
+
+Il risultato però deve avere una propria identità. Non bisogna sommare meccanicamente quattro giochi: ogni riferimento va filtrato attraverso ambientazione, simulazione e scala di Ver Sacrum.
+
+### Cosa prendere e cosa non prendere
+
+- **Ultima Online**: prendere profondità individuale e skill; non MMO, magia o struttura online.
+- **Seven Kingdoms**: prendere comunità, residenti, fazioni e influenza; non copiare interfaccia o regole 1:1.
+- **Caravaneer**: prendere logica economica e fisicità delle merci; non il combattimento a turni.
+- **Mindustry**: prendere chiarezza di produzione e collegamenti; non nastri industriali, estetica sci-fi o torrette automatiche come centro del gioco.
 
 Non sono obiettivi: MMO, magia, nastri industriali, torrette futuristiche o una copia fedele dei sistemi dei giochi citati.
 
