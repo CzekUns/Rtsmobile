@@ -1,0 +1,43 @@
+name: Seven Kingdoms HTML - JS tests and stream scope
+
+on:
+  push:
+    paths:
+      - 'seven-kingdoms-html/**'
+      - '.github/workflows/seven-kingdoms-html-ci.yml'
+  pull_request:
+    paths:
+      - 'seven-kingdoms-html/**'
+      - '.github/workflows/seven-kingdoms-html-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sevenkingdoms-html-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  js-tests-and-stream-scope:
+    name: JS tests & stream scope
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout full history for PR scope comparisons
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax checks for native JS
+        run: npm --prefix seven-kingdoms-html run check
+      - name: Node unit tests (recursively discovered)
+        run: npm --prefix seven-kingdoms-html test
+      - name: Enforce ownership on agent branches only
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_BRANCH: ${{ github.head_ref }}
+        run: node seven-kingdoms-html/tools/check-workstream.mjs
