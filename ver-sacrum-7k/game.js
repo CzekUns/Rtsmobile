@@ -6,12 +6,14 @@ const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 const scene=new Scene($('world'),$('minimap'));
 let game=Strategy.restore()||new Strategy();
 let selected=null,placement=null,activeTab='people';
-let last=0,lastUI=0,lastSave=0,notificationTimer;
+let last=0,lastUI=0,lastSave=0,notificationTimer,lastNewsStamp=0;
 const pointers=new Map();
 let drag=null,pinch=null;
-const portraitBlocked=window.matchMedia('(orientation: landscape) and (pointer: coarse)');
+const portraitBlocked=window.matchMedia('(orientation: portrait)');
 function show(message){
   const notice=$('notice');notice.textContent=message;notice.hidden=false;
+  $('newsTicker').textContent=message;
+  lastNewsStamp=Date.now();
   clearTimeout(notificationTimer);notificationTimer=setTimeout(()=>{notice.hidden=true;},3200);
 }
 function escapeText(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -29,8 +31,13 @@ function updateHud(){
   $('population').textContent=capacityLabel();
   const seasons=['Primavera','Estate','Autunno','Inverno'];
   $('season').textContent=seasons[Math.floor((game.day-1)/30)%4]+' · giorno '+game.day;
-  $('pauseBtn').textContent=game.paused?'▶':'Ⅱ';
-  $('clock').textContent=game.paused?'In pausa':'1×';
+  $('pauseBtn').textContent=game.paused?'▶ Riprendi':'Ⅱ Pausa';
+  $('clock').textContent=game.paused?'In pausa':'1× · LE GENTI';
+  $('sidePopulation').textContent='Pop. '+capacityLabel();
+  if(Date.now()-lastNewsStamp>6500){
+    const recent=game.events[0];
+    $('newsTicker').textContent=recent?recent.message:'Seleziona un abitante, un villaggio o una struttura sulla mappa.';
+  }
 }
 function selectedInfo(){
   let title='Il tuo insediamento',tag='Inizio';
@@ -65,6 +72,7 @@ function selectedInfo(){
     }
   }
   $('selectedTitle').textContent=title;$('statusChip').textContent=tag;
+  $('selectionColor').style.background=FACTIONS.find(f=>f.id===(p?.owner??b?.owner??0))?.color||'#97876a';
   if($('selectedDetails').innerHTML!==details)$('selectedDetails').innerHTML=details;
 }
 function updatePeople(){
@@ -91,16 +99,55 @@ function updateChronicles(){
   ).join('');
   if($('chronicleList').innerHTML!==html)$('chronicleList').innerHTML=html;
 }
+
+function stablePanel(id,html){if($(id).innerHTML!==html)$(id).innerHTML=html;}
+function updateEconomy(){
+  const s=game.stocks(),fields=game.buildings.filter(b=>b.owner===0&&b.type==='farm'&&b.done);
+  const working=game.people.filter(p=>['gather','farm'].includes(p.task?.kind)).length;
+  stablePanel('economyList','<article class="report-card"><b>Economia comunitaria</b>'+
+    '<p>Cibo '+s.food+' · Legname '+s.wood+' · Pietra '+s.stone+'</p>'+
+    '<p>Campi '+fields.length+' · Raccoglitori e contadini '+working+'</p></article>'+
+    game.warehouses.map((b,i)=>'<article class="report-card"><b>Magazzino '+(i+1)+'</b>'+
+      '<p>🌾 '+b.stock.food+' · 🪵 '+b.stock.wood+' · 🪨 '+b.stock.stone+'</p></article>').join(''));
+}
+function updateTrade(){
+  const markets=game.buildings.filter(b=>b.type==='market'&&b.done);
+  stablePanel('tradeList','<article class="report-card"><b>Mercati sulla mappa: '+markets.length+'</b>'+
+    '<p>Le carovane automatiche non sono ancora implementate; puoi migliorare i rapporti con le genti vicine dal menu Regni.</p></article>'+
+    game.neighbours.map(n=>'<article class="report-card"><b>'+escapeText(n.name)+'</b>'+
+    '<p>Relazioni '+escapeText(n.relation)+' · Influenza '+n.influence+'/100</p></article>').join(''));
+}
+function updateMilitary(){
+  const soldiers=game.people.filter(p=>p.soldier);
+  stablePanel('militaryList','<article class="report-card"><b>Soldati mobilitati: '+soldiers.length+'</b>'+
+    '<p>Mobilita i residenti dalle loro schede. I combattimenti non sono ancora implementati.</p></article>'+
+    soldiers.map(p=>'<button class="person" data-person="'+p.id+'" type="button">'+escapeText(p.name)+
+    ' · Combattimento '+p.skills.combat.toFixed(1)+'</button>').join(''));
+}
+function updateSkills(){
+  const list=game.people.slice().sort((a,b)=>(b.skills.gather+b.skills.build+b.skills.farm)-(a.skills.gather+a.skills.build+a.skills.farm));
+  stablePanel('skillsList','<article class="report-card"><b>Esperienza individuale</b>'+
+    '<p>Ogni abitante mantiene le proprie abilità persistenti.</p></article>'+
+    list.map(p=>'<button class="person" data-person="'+p.id+'" type="button">'+escapeText(p.name)+
+      ' · R '+p.skills.gather.toFixed(1)+' · C '+p.skills.build.toFixed(1)+' · A '+p.skills.farm.toFixed(1)+'</button>').join(''));
+}
+
 function refresh(){
   updateHud();selectedInfo();
   if(activeTab==='people')updatePeople();
   if(activeTab==='politics')updateNeighbours();
   if(activeTab==='chronicle')updateChronicles();
+  if(activeTab==='economy')updateEconomy();
+  if(activeTab==='trade')updateTrade();
+  if(activeTab==='military')updateMilitary();
+  if(activeTab==='skills')updateSkills();
 }
 function activateTab(name){
   activeTab=name;
   document.querySelectorAll('[data-tab]').forEach(btn=>btn.classList.toggle('active',btn.dataset.tab===name));
   document.querySelectorAll('.tab-panel').forEach(panel=>panel.hidden=panel.id!=='tab-'+name);
+  $('gameMenuPopup').hidden=true;
+  $('menuBtn').setAttribute('aria-expanded','false');
   refresh();
 }
 function select(kind,id){
@@ -225,6 +272,22 @@ $('minimap').addEventListener('click',e=>{
   scene.center((e.clientX-r.left)*MAP_W/r.width,(e.clientY-r.top)*MAP_H/r.height);
 });
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>activateTab(b.dataset.tab)));
+document.querySelectorAll('[data-minimap-mode]').forEach(b=>b.addEventListener('click',()=>{
+  scene.minimapMode=b.dataset.minimapMode;
+  scene.lastMini=0;
+  document.querySelectorAll('[data-minimap-mode]').forEach(btn=>btn.classList.toggle('active',btn===b));
+}));
+$('menuBtn').addEventListener('click',()=>{
+  const popup=$('gameMenuPopup');
+  popup.hidden=!popup.hidden;
+  $('menuBtn').setAttribute('aria-expanded',popup.hidden?'false':'true');
+});
+document.addEventListener('pointerdown',e=>{
+  if(!e.target.closest('.hud-right')){
+    $('gameMenuPopup').hidden=true;
+    $('menuBtn').setAttribute('aria-expanded','false');
+  }
+});
 document.querySelectorAll('[data-build]').forEach(b=>b.addEventListener('click',()=>startConstruction(b.dataset.build)));
 $('confirmBuild').addEventListener('click',commitConstruction);
 $('cancelBuild').addEventListener('click',cancelConstruction);
@@ -238,18 +301,18 @@ $('fullscreenBtn').addEventListener('click',async()=>{
       await document.documentElement.requestFullscreen({navigationUI:'hide'});
       // Supported primarily in installed PWAs or fullscreen on Android.
       if(screen.orientation?.lock){
-        try{await screen.orientation.lock('portrait');}catch(_){/* CSS landscape gate below */ }
+        try{await screen.orientation.lock('landscape');}catch(_){/* CSS landscape gate below */ }
       }
     }else if(document.fullscreenElement&&document.exitFullscreen){
       await document.exitFullscreen();
     }else{
-      show('Il browser non consente lo schermo intero. Gioca in verticale.');
+      show('Il browser non consente lo schermo intero. Gioca in orizzontale.');
     }
-  }catch(_){show('Schermo intero non disponibile. Il gioco resta utilizzabile in verticale.');}
+  }catch(_){show('Schermo intero non disponibile. Il gioco resta utilizzabile in orizzontale.');}
 });
 document.addEventListener('fullscreenchange',()=>{
   $('fullscreenBtn').textContent=document.fullscreenElement?'⤢':'⛶';
-  $('fullscreenBtn').setAttribute('aria-label',document.fullscreenElement?'Esci da schermo intero':'Schermo intero verticale');
+  $('fullscreenBtn').setAttribute('aria-label',document.fullscreenElement?'Esci da schermo intero':'Schermo intero orizzontale');
 });
 if(portraitBlocked.addEventListener){
   portraitBlocked.addEventListener('change',()=>{last=0;refresh();});
@@ -286,10 +349,12 @@ $('selectedDetails').addEventListener('click',e=>{
   }
   refresh();
 });
-$('peopleList').addEventListener('click',e=>{
-  const id=e.target.closest('[data-person]')?.dataset.person;
-  if(id){focusPerson(game.person(id));activateTab('people');}
-});
+for(const panelId of ['peopleList','militaryList','skillsList']){
+  $(panelId).addEventListener('click',e=>{
+    const id=e.target.closest('[data-person]')?.dataset.person;
+    if(id){focusPerson(game.person(id));activateTab('people');}
+  });
+}
 $('factionsList').addEventListener('click',e=>{
   const gift=e.target.closest('[data-gift]'),annex=e.target.closest('[data-annex]');
   if(gift){
@@ -317,8 +382,7 @@ window.addEventListener('pagehide',()=>game.save());
 function frame(stamp){
   if(!last)last=stamp;
   const dt=Math.min((stamp-last)/1000,.05);last=stamp;
-  // Do not progress the simulation while a touchscreen is in landscape.
-  // The media-query overlay requires the player to return to portrait.
+  // Landscape-only: the portrait overlay pauses simulation, even in browser tabs.
   if(!portraitBlocked.matches){
     game.update(dt);
     scene.draw(game,selected,placement);
