@@ -1,11 +1,16 @@
 /* Seven Kingdoms HTML Edition — browser runtime and controls.
  * Game rules live in rules.js, drawing in view.js. GPL-2.0-only.
  */
-import {SevenGame,NATIONS,FIRMS,WORLD_W,WORLD_H} from './rules.js';
+import {SevenGame,NATIONS,FIRMS,WORLD_W,WORLD_H,SAVE_KEY} from './rules.js';
+import {createFrameAccumulator,accumulateFrame} from './core/clock.js';
+import {issuePlaytestOrder,advancePlaytestRoutes} from './playtest/path-routes.js';
 import {WorldView} from './view.js';
 const $=id=>document.getElementById(id);
 const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let game=SevenGame.load()||new SevenGame();
+const playtest=new URLSearchParams(location.search).get('playtest')==='1';
+const saveKey=playtest?'seven-kingdoms-html-quick-playtest-v1':SAVE_KEY;
+let fixedClock=createFrameAccumulator({tickUs:50000,maxFrameUs:250000});
+let game=SevenGame.load(saveKey)||new SevenGame();
 const view=new WorldView($('world'),$('minimap'));
 let selection=game.towns.find(t=>t.owner===1)?.id||null;
 let report='towns',placing=null,ghost=null,newsUntil=0,last=0,lastPanel=0,lastSave=0;
@@ -154,9 +159,9 @@ function runAction(action){
  if(action==='persuade')r=game.persuade(obj.id);
  if(action==='annex')r=game.annex(obj.id);
  if(action==='dismiss')r=game.dismiss(obj.id);
- if(action==='stop'&&game.units.includes(obj)){obj.target=null;r={ok:true,msg:'Unità fermata.'}}
+ if(action==='stop'&&game.units.includes(obj)){obj.target=null;obj.route=[];r={ok:true,msg:'Unità fermata.'}}
  status(r.msg);
- if(r.ok)game.save();
+ if(r.ok)game.save(saveKey);
  if(r.unit)selection=r.unit.id;
  renderPanel();renderHud();
 }
@@ -168,29 +173,32 @@ function buildMode(kind){
  status('Indica il luogo del nuovo edificio.');
 }
 function cancelBuild(){placing=null;ghost=null;$('buildBar').hidden=true}
+function sendOrder(unitId,x,y){
+ return playtest?issuePlaytestOrder(game,unitId,x,y):game.order(unitId,x,y);
+}
 function mapClick(sx,sy,right=false){
  const p=view.worldAt(sx,sy);let x=p.x,y=p.y;
  if(placing){
   const result=game.build(placing,x,y);status(result.msg);
-  if(result.ok){selection=result.firm.id;cancelBuild();game.save();renderPanel();}
+  if(result.ok){selection=result.firm.id;cancelBuild();game.save(saveKey);renderPanel();}
   return;
  }
  const hit=view.pick(game,x,y),unit=selected();
  const canOrder=unit&&game.units.includes(unit)&&unit.owner===1;
  if(right&&canOrder){
-  const r=game.order(unit.id,x,y);status(r.msg);renderPanel();return;
+  const r=sendOrder(unit.id,x,y);status(r.msg);renderPanel();return;
  }
  if(hit){
   const item=game.get(hit);
   if(canOrder&&item&&game.firms.includes(item)&&item.owner===1&&item.id!==unit.id){
-   const r=game.order(unit.id,x,y);status(r.msg);
+   const r=sendOrder(unit.id,x,y);status(r.msg);
    if(r.ok&&r.unit)selection=r.unit.id;
    renderPanel();return;
   }
   select(hit);return;
  }
  if(canOrder){
-  const r=game.order(unit.id,x,y);status(r.msg);renderPanel();return;
+  const r=sendOrder(unit.id,x,y);status(r.msg);renderPanel();return;
  }
  select(null);
 }
@@ -258,9 +266,9 @@ document.addEventListener('click',e=>{
   if(camera.dataset.camera==='center'){const t=game.ownTowns()[0];if(t)view.center(t.x+2,t.y+2);}
  }
  if(menu){
-  if(menu.dataset.menu==='save')status(game.save()?'Partita salvata nel browser.':'Salvataggio non disponibile.');
+  if(menu.dataset.menu==='save')status(game.save(saveKey)?'Partita salvata nel browser.':'Salvataggio non disponibile.');
   if(menu.dataset.menu==='new'&&confirm('Cominciare una nuova partita? Il salvataggio attuale verrà sostituito.')){
-   game=new SevenGame(Math.floor(Math.random()*1000000));selection=game.ownTowns()[0]?.id||null;cancelBuild();view.center(27,27);game.save();setReport('towns');status('Nuova partita avviata.');
+   game=new SevenGame(Math.floor(Math.random()*1000000));selection=game.ownTowns()[0]?.id||null;cancelBuild();view.center(27,27);game.save(saveKey);setReport('towns');status('Nuova partita avviata.');
   }
   if(menu.dataset.menu==='help')$('helpDialog').showModal();
   if(menu.dataset.menu==='speed'){game.setSpeed(game.paused?1:game.speed===5?0:game.speed+1);renderHud();}
@@ -294,22 +302,33 @@ document.addEventListener('keydown',e=>{
  if(e.key==='Escape'){cancelBuild();$('gameMenu').hidden=true;return;}
  if(e.key===' '||e.key==='0'){e.preventDefault();game.paused=!game.paused;renderHud();return;}
  if(/^[1-5]$/.test(e.key)){game.setSpeed(Number(e.key));renderHud();return;}
- if(e.key.toLowerCase()==='s'&&!e.ctrlKey){e.preventDefault();status(game.save()?'Partita salvata.':'Errore di salvataggio.');return;}
+ if(e.key.toLowerCase()==='s'&&!e.ctrlKey){e.preventDefault();status(game.save(saveKey)?'Partita salvata.':'Errore di salvataggio.');return;}
  const reports=['kingdoms','towns','economy','trade','military','tech','spies','ranking','news'];
  const index=Number(e.key.slice(1));
  if(e.key.startsWith('F')&&index>=1&&index<=9){e.preventDefault();setReport(reports[index-1]);}
 });
-document.addEventListener('visibilitychange',()=>{if(document.hidden){game.paused=true;game.save()}else{last=0;renderHud();}});
-window.addEventListener('pagehide',()=>game.save());
+document.addEventListener('visibilitychange',()=>{if(document.hidden){game.paused=true;game.save(saveKey)}else{last=0;renderHud();}});
+window.addEventListener('pagehide',()=>game.save(saveKey));
 function tick(t){
  if(!last)last=t;
- const dt=Math.min(.15,(t-last)/1000);last=t;
- if(!portrait.matches){game.update(dt);view.draw(game,selection,ghost);}
+ const rawDt=Math.max(0,(t-last)/1000);last=t;
+ if(!portrait.matches){
+  if(playtest){
+   const frame=accumulateFrame(fixedClock,Math.max(0,Math.round(rawDt*1e6)),game.paused);
+   fixedClock=frame.accumulator;
+   for(let i=0;i<frame.ticks;i++){
+    game.update(.05,{moveUnits:false});
+    advancePlaytestRoutes(game,.05*game.speed);
+   }
+  }else game.update(Math.min(.15,rawDt));
+  view.draw(game,selection,ghost);
+ }
  if(t-lastPanel>400){renderPanel();renderHud();lastPanel=t}
- if(t-lastSave>20000){game.save();lastSave=t}
+ if(t-lastSave>20000){game.save(saveKey);lastSave=t}
  requestAnimationFrame(tick);
 }
 renderPanel();renderHud();
+if(playtest)status('MODALITÀ TEST · percorsi attorno ad acqua ed edifici · salvataggio separato.');
 if(!localStorage.getItem('seven-kingdoms-html-instructions-v1')){
  localStorage.setItem('seven-kingdoms-html-instructions-v1','1');
  try{$('helpDialog').showModal()}catch(_){}
