@@ -51,7 +51,8 @@ export class Strategy {
   }
   addPerson(name,homeId,inside=true){
     const b=this.building(homeId);
-    const p={id:this.id('p'),name,homeId,inside,owner:0,x:b.x+2,y:b.y+5,
+    const n=this.people.filter(other=>!other.inside).length;
+    const p={id:this.id('p'),name,homeId,inside,owner:0,x:b.x+1.2+(n%4)*.75,y:b.y+5+Math.floor(n/4)*.75,
       health:100,skills:{gather:1,build:1,farm:1,combat:1},soldier:false,
       cargo:{type:null,amount:0},task:null,progress:0};
     this.people.push(p);return p;
@@ -128,7 +129,15 @@ export class Strategy {
     if(!p||!p.inside)return false;
     const town=this.building(p.homeId);
     if(!town||town.owner!==0||!town.done)return false;
-    p.inside=false;p.x=town.x+2;p.y=town.y+this.footprint(town)+.7;p.task=null;
+    p.inside=false;
+    const others=this.people.filter(o=>!o.inside&&o.id!==p.id);
+    const baseY=town.y+this.footprint(town)+.7;
+    let spawn={x:town.x+2,y:baseY};
+    for(let i=0;i<24;i++){
+      const point={x:town.x+1.05+(i%6)*.57,y:baseY+Math.floor(i/6)*.65};
+      if(others.every(o=>distance(o,point)>.47)){spawn=point;break;}
+    }
+    p.x=spawn.x;p.y=spawn.y;p.task=null;
     this.event(p.name+' è uscito dal villaggio.');
     return true;
   }
