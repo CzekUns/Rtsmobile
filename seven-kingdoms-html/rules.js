@@ -17,6 +17,14 @@ export const FIRMS={
   inn:{label:'Locanda',cost:210,size:3,description:'Luogo di incontro, reclutamento e ospitalità.'}
 };
 export const SAVE_KEY='seven-kingdoms-html-native-v1';
+// Exact starting constants from upstream 7KAA include/OTOWN.h and GAMEDEF.h.
+// The simplified one-culture-per-town data model is still being ported.
+export const RULE_CONSTANTS=Object.freeze({
+ MAX_TOWN_POPULATION:60, TAX_PER_PERSON:5,
+ COLLECT_TAX_LOYALTY_DECREASE:10,
+ TOWN_REWARD_PER_PERSON:10,TOWN_REWARD_LOYALTY_INCREASE:10,
+ PEASANT_FOOD_YEAR_PRODUCTION:30,PERSON_FOOD_YEAR_CONSUMPTION:10
+});
 const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
 const rnd=(seed,x,y)=>{
  let h=((seed|0)^(x*374761393)^(y*668265263))|0;
@@ -49,6 +57,7 @@ export class SevenGame{
    const g=Object.create(SevenGame.prototype);
    Object.assign(g,data);g.events??=[];g.unitTimer??=0;g.dayTimer??=0;
    g.towns??=[];g.firms??=[];g.units??=[];g.paused=false;
+   for(const town of g.towns){town.taxPenalty??=0;town.rewardPenalty??=0;town.recruitPenalty??=0;}
    const all=[...g.towns,...g.firms,...g.units];
    nextId=Math.max(1,...all.map(o=>Number(String(o.id).slice(1))||0))+1;
    return g;
@@ -64,7 +73,7 @@ export class SevenGame{
    {name:'Naxos',owner:0,x:14,y:45,pop:22,loyalty:0,resistance:52,culture:'Greci'},
    {name:'Thasos',owner:0,x:57,y:13,pop:26,loyalty:0,resistance:71,culture:'Normanni'}
   ];
-  towns.forEach(t=>this.towns.push(entity('t',{...t,size:4,growth:0,taxCounter:0})));
+  towns.forEach(t=>this.towns.push(entity('t',{...t,size:4,growth:0,taxCounter:0,taxPenalty:0,rewardPenalty:0,recruitPenalty:0})));
   const add=(kind,owner,x,y,workers=0)=>this.firms.push(entity('f',{kind,owner,x,y,size:3,workers,experience:0,progress:0,stock:0}));
   add('fort',1,30,24,3);add('market',1,25,30,2);add('mine',1,18,27,2);
   add('fort',2,49,35,4);add('factory',2,55,41,3);
@@ -89,7 +98,10 @@ export class SevenGame{
   if(!t||t.owner!==1)return {ok:false,msg:'Questo non è un tuo villaggio.'};
   if(t.pop<=4)return {ok:false,msg:'Popolazione insufficiente.'};
   if(t.loyalty<27)return {ok:false,msg:'La fedeltà del villaggio è troppo bassa.'};
-  t.pop--;t.loyalty=clamp(t.loyalty-3,0,100);
+  // Upstream OTOWNIF.cpp Town::recruit_dec_loyalty, simplified to one ethnic group.
+  const loyaltyDec=Math.min(10,Math.min(5,RULE_CONSTANTS.MAX_TOWN_POPULATION/t.pop)+(t.recruitPenalty||0)/5);
+  t.recruitPenalty=(t.recruitPenalty||0)+5;
+  t.pop--;t.loyalty=clamp(t.loyalty-loyaltyDec,0,100);
   const u=entity('u',{owner:1,x:t.x+t.size+1,y:t.y+1,kind:'peasant',hp:100,level:1,target:null,training:0});
   this.units.push(u);this.note('Un abitante è stato reclutato a '+t.name+'.');
   return {ok:true,msg:'Abitante reclutato.',unit:u};
@@ -97,19 +109,29 @@ export class SevenGame{
  tax(townId){
   const t=this.get(townId);
   if(!t||t.owner!==1)return {ok:false,msg:'Non puoi riscuotere tasse qui.'};
-  if(t.loyalty<38)return {ok:false,msg:'Fedeltà troppo bassa per altre tasse.'};
-  const income=Math.max(10,Math.round(t.pop*3));
-  t.loyalty=clamp(t.loyalty-7,0,100);this.cash+=income;
-  this.note(t.name+' ha versato '+income+' monete di tasse.');
-  return {ok:true,msg:'Riscosse '+income+' monete.'};
+  if(!this.ownFirms().some(f=>f.kind==='fort'&&this.linked(f,t)))return {ok:false,msg:'Occorre un forte amico collegato.'};
+  if(t.loyalty<=RULE_CONSTANTS.COLLECT_TAX_LOYALTY_DECREASE)return {ok:false,msg:'Fedeltà troppo bassa per altre tasse.'};
+  // Port of OTOWN.cpp Town::collect_tax: escalating levy penalty, bounded to +10.
+  const decrease=Math.min(20,RULE_CONSTANTS.COLLECT_TAX_LOYALTY_DECREASE+(t.taxPenalty||0)/5);
+  const before=t.loyalty;
+  t.loyalty=clamp(before-decrease,0,100);
+  const income=(before-t.loyalty)*t.pop*RULE_CONSTANTS.TAX_PER_PERSON/decrease;
+  t.taxPenalty=(t.taxPenalty||0)+10;this.cash+=income;
+  this.note(t.name+' ha versato '+Math.floor(income)+' monete di tasse.');
+  return {ok:true,msg:'Riscosse '+Math.floor(income)+' monete.'};
  }
  grant(townId){
   const t=this.get(townId);
   if(!t||t.owner!==1)return {ok:false,msg:'Non è un tuo villaggio.'};
-  if(this.cash<60)return {ok:false,msg:'Occorrono 60 monete.'};
-  this.cash-=60;t.loyalty=clamp(t.loyalty+9,0,100);
-  this.note('Concessi sussidi al villaggio '+t.name+'.');
-  return {ok:true,msg:'Fedeltà migliorata.'};
+  if(!this.ownFirms().some(f=>f.kind==='fort'&&this.linked(f,t)))return {ok:false,msg:'Occorre un forte amico collegato.'};
+  const cost=t.pop*RULE_CONSTANTS.TOWN_REWARD_PER_PERSON;
+  if(this.cash<cost)return {ok:false,msg:'Occorrono '+cost+' monete.'};
+  // Port of OTOWN.cpp Town::reward: repeated grants have diminishing effect.
+  const bonus=Math.max(3,RULE_CONSTANTS.TOWN_REWARD_LOYALTY_INCREASE-(t.rewardPenalty||0)/5);
+  t.rewardPenalty=(t.rewardPenalty||0)+10;
+  this.cash-=cost;t.loyalty=clamp(t.loyalty+bonus,0,100);
+  this.note('Concessi sussidi al villaggio '+t.name+' per '+cost+' monete.');
+  return {ok:true,msg:'Fedeltà +'+bonus+' (costo '+cost+').'};
  }
  persuade(townId){
   const t=this.get(townId);
@@ -204,13 +226,24 @@ export class SevenGame{
  advanceDay(){
   this.day++;
   let people=this.towns.filter(t=>t.owner===1).reduce((sum,t)=>sum+t.pop,0);
-  const consumed=Math.max(1,Math.round(people*.045));
-  this.food=Math.max(0,this.food-consumed);
+  // 7KAA OTOWN.cpp Town::process_food: jobless peasants produce, all citizens eat.
+  // In the current one-culture simplified model, linked workers approximate employment.
+  let annualFoodBalance=0;
+  for(const town of this.ownTowns()){
+   const workers=this.ownFirms().filter(f=>this.linked(f,town)).reduce((s,f)=>s+f.workers,0);
+   const jobless=Math.max(0,town.pop-workers);
+   annualFoodBalance+=jobless*RULE_CONSTANTS.PEASANT_FOOD_YEAR_PRODUCTION-
+     town.pop*RULE_CONSTANTS.PERSON_FOOD_YEAR_CONSUMPTION;
+  }
+  this.food=Math.max(0,this.food+annualFoodBalance/365);
   if(this.food===0){
    for(const t of this.ownTowns())t.loyalty=clamp(t.loyalty-2,0,100);
    this.note('Le scorte alimentari sono esaurite; cala la fedeltà.');
   }
   for(const t of this.towns){
+   t.taxPenalty=Math.max(0,(t.taxPenalty||0)-1);
+   t.rewardPenalty=Math.max(0,(t.rewardPenalty||0)-1);
+   t.recruitPenalty=Math.max(0,(t.recruitPenalty||0)-1);
    if(t.owner===1&&this.food>0&&t.loyalty>50){
     t.growth+=(.10+t.loyalty/100*.14);
     if(t.growth>=1){t.pop++;t.growth--;}
