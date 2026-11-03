@@ -75,7 +75,7 @@ export async function run(source,out){
   const names=await readdir(source,{recursive:true,withFileTypes:true});
   const allFiles=names.filter(x=>x.isFile()).map(x=>join(x.parentPath??x.path,x.name)).sort();
   const lookup=(name)=>allFiles.find(f=>f.toUpperCase().endsWith('/'+name.toUpperCase())||f.toUpperCase().endsWith('\\\\'+name.toUpperCase()));
-  const resFiles=allFiles.filter(n=>/\\.res$/i.test(n));
+  const resFiles=allFiles.filter(n=>/\.res$/i.test(n));
   const res=[];
   for(const n of resFiles){const b=await readFile(n);res.push({file:n,sha256:sha256(b),records:parseRes(b)});}
   const tables={}; const hashes={};
@@ -100,7 +100,7 @@ export async function run(source,out){
       sprites:[],res,availableTables:Object.keys(tables),missingTables:Object.keys(fields).filter(n=>!tables[n]),
       warnings:['No verified pixel conversion; original packed DBF/STD.SET inputs needed for frame metadata']};
   await mkdir(out,{recursive:true});
-  await writeFile(join(out,'pack.json'),JSON.stringify(manifest,null,2)+'\\n');
+  await writeFile(join(out,'pack.json'),JSON.stringify(manifest,null,2)+'\n');
   return manifest;
 }
 if(process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href){
