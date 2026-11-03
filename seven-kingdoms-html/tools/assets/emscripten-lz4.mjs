@@ -22,7 +22,7 @@ export function packageMetadata(js){
  check(Array.isArray(list)&&Number.isSafeInteger(files.remote_package_size),'Invalid package file list');
  check(Array.isArray(compressed.offsets)&&Array.isArray(compressed.sizes)&&Array.isArray(compressed.successes),'Invalid LZ4 chunk metadata');
  check(compressed.sizes.length===compressed.successes.length,'Mismatched LZ4 chunk tables');
- check(compressed.offsets.length===compressed.sizes.length+1,'Mismatched offset table');
+ check(compressed.offsets.length===compressed.sizes.length,'Mismatched offset table');
  const total=list.at(-1)?.end ?? 0;
  check(list.every(f=>typeof f.filename==='string'&&Number.isSafeInteger(f.start)&&Number.isSafeInteger(f.end)&&f.start>=0&&f.end>=f.start),'Bad virtual file offsets');
  check(list.every((f,i)=>i===0?f.start===0:f.start===list[i-1].end),'Non-contiguous virtual file layout');
@@ -54,7 +54,7 @@ export function unpackData(data,meta,{paths}={}){
  const {offsets,sizes,successes}=meta.blocks;
  let decoded=Buffer.alloc(meta.virtualSize);
  for(let i=0;i<sizes.length;i++){
-  const lo=offsets[i],hi=offsets[i+1],size=sizes[i];
+  const lo=offsets[i],size=sizes[i],hi=lo+size;
   check(Number.isInteger(lo)&&hi-lo===size&&lo>=0&&hi<=data.length,'Corrupt compressed offset');
   const expected=Math.min(2048,meta.virtualSize-i*2048);
   check(expected>0,'Unexpected trailing chunk');
