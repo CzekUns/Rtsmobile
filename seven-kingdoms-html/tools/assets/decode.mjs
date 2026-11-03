@@ -72,20 +72,35 @@ export function makeManifest({source,sourceHash,sprites,actions,frames}){
       'Direction is numeric 7KAA dir_id and is not mapped to compass labels','Sprites and towns not visually verified']};
 }
 export async function run(source,out){
-  const names=await readdir(source), read=async n=>readFile(join(source,n));
-  const resFiles=names.filter(n=>/\.res$/i.test(n)).sort();
+  const names=await readdir(source,{recursive:true,withFileTypes:true});
+  const allFiles=names.filter(x=>x.isFile()).map(x=>join(x.parentPath??x.path,x.name)).sort();
+  const lookup=(name)=>allFiles.find(f=>f.toUpperCase().endsWith('/'+name.toUpperCase())||f.toUpperCase().endsWith('\\\\'+name.toUpperCase()));
+  const resFiles=allFiles.filter(n=>/\\.res$/i.test(n));
   const res=[];
-  for(const n of resFiles){const b=await read(n);res.push({file:n,sha256:sha256(b),records:parseRes(b)});}
-  const findName=n=>names.find(f=>f.toUpperCase()===n+'.DBF');
+  for(const n of resFiles){const b=await readFile(n);res.push({file:n,sha256:sha256(b),records:parseRes(b)});}
   const tables={}; const hashes={};
-  for(const n of Object.keys(fields)){const file=findName(n);if(file){const b=await read(file);tables[n]=decodeTable(n,b);hashes[n]=sha256(b);}}
+  for(const name of Object.keys(fields)){
+    const filename=lookup(name+'.DBF');
+    if(filename){const b=await readFile(filename);tables[name]=decodeTable(name,b);hashes[name]=sha256(b);}
+  }
+  const setFile=lookup('STD.SET');
+  if(setFile){
+    const b=await readFile(setFile),index=parseRes(b);
+    for(const name of Object.keys(fields)){
+      const rec=index.find(x=>x.name.toUpperCase()===name);
+      if(rec){
+        const bytes=b.subarray(rec.offset,rec.offset+rec.size);
+        tables[name]=decodeTable(name,bytes);hashes[name]=sha256(bytes);
+      }
+    }
+  }
   const full=Object.keys(tables).length===3;
   const manifest=full?makeManifest({source:'local-7kaa-source',sourceHash:hashes,sprites:tables.SPRITE,actions:tables.SACTION,frames:tables.SFRAME}):
     {schemaVersion:1,source:'local-7kaa-source',sourceHash:hashes,license:'UNVERIFIED_ASSET_LICENSE',status:'inventory-only',
       sprites:[],res,availableTables:Object.keys(tables),missingTables:Object.keys(fields).filter(n=>!tables[n]),
-      warnings:['No verified pixel conversion; packed DBF inputs needed for frame metadata']};
+      warnings:['No verified pixel conversion; original packed DBF/STD.SET inputs needed for frame metadata']};
   await mkdir(out,{recursive:true});
-  await writeFile(join(out,'pack.json'),JSON.stringify(manifest,null,2)+'\n');
+  await writeFile(join(out,'pack.json'),JSON.stringify(manifest,null,2)+'\\n');
   return manifest;
 }
 if(process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href){
