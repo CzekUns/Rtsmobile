@@ -6,6 +6,12 @@
 >
 > **Questo documento è una pianificazione, non l'indicazione che i lavori futuri siano già stati eseguiti o programmati automaticamente.** Il codice della prima demo esiste, ma la conversione completa è ancora lontana. Le date sono **stime** di lavoro, da ricalibrare dopo F00–F02 e a ogni gate.
 
+## Organizzazione multi-agente (attiva per la gestione del progetto)
+
+Il progetto è suddiviso in **cinque corsie parallele**, più una corsia esclusiva di integrazione, secondo [PARALLEL_WORK.md](./PARALLEL_WORK.md) e [AGENTS.md](./AGENTS.md). Le issue operative in GitHub sono **SKH-101 asset, SKH-102 villaggi, SKH-103 UI classica, SKH-104 core, SKH-105 movimento, SKH-106 integrazione**; i branch usano il prefisso `agent/skh-*/`. I file centrali `game.js`, `rules.js`, `view.js`, `index.html` e `style.css` sono riservati alla corsia integrazione.
+
+Ogni PR degli agenti viene verificata sui path da [WORKSTREAMS.json](./WORKSTREAMS.json) e sulla suite `node --test`. Il branch `main` non è stato reso protetto automaticamente: il maintainer deve impostare required checks/branch protection. Nessun agente è stato avviato automaticamente dalla creazione del piano.
+
 ## 0. Come si legge e come va aggiornato
 
 - **P0** = necessario per una versione originale realmente giocabile; **P1** = importante per completezza e qualità; **P2** = miglioramento successivo.
