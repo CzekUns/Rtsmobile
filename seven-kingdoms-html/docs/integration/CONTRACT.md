@@ -64,3 +64,30 @@ python3 -m http.server 8000
 ```
 
 At preparation time GitHub connector inspection succeeded; local clone failed because the execution container could not resolve github.com. Therefore no Node/browser/handheld test is claimed as executed locally. The new tests are pending GitHub CI or an environment with a checked-out workspace.
+
+## QA review update — 2026-11-04
+
+The user-provided numeric reference `#6` is **not a new Seven Kingdoms issue**: GitHub resolves it to closed PR #6 ("BUILD 54: asset P16 approvati"), which relates to the older Ver Sacrum effort. Do not implement or reopen that closed PR under SKH-106. The active integration mandate remains issue #12 / PR #18 until a new Seven Kingdoms issue exists.
+
+### Five-lane PR status (observed GitHub head checks)
+
+| Lane | PR | CI on inspected PR head | First-pass compatibility finding | Integration gate |
+| --- | --- | --- | --- | --- |
+| Assets | #13 | Green | Catalog/decoder only; no validated decoded sprites or license-cleared final atlas | Blocked on actual images and visual + license checks |
+| Towns | #15 | Green | Pure racial town state vs existing scalar one-culture `SevenGame` state; source commit unpinned | Blocked on migration fixture and 7KAA parity |
+| UI | #16 | Green | Eight classic report buttons vs nine prototype tabs; overlaid Canvas requires explicit pointer routing; no pixel-matched screenshot | Blocked on input and visual verification |
+| Core | #14 | Green | `stepClock` consumes ticks, not seconds; must not multiply speed twice; legacy ID/save migration not collision-safe by default | Blocked on runtime adapter and migration fixture |
+| Movement | #17 | Green | Paths include start tile; coordinates top-left integers; collision must include units + terrain; may return no route | Blocked on occupancy/blocked-goal adapter and in-game checks |
+
+All five changed-file lists compared against `main` were limited to their assigned `seven-kingdoms-html/` prefixes when inspected; green CI alone does **not** authorize merge or award parity. The five feature PRs remain unmerged. No branch content has been cherry-picked into this integration branch.
+
+### Additional executable QA
+
+The stream scope checker now invokes `git diff --no-renames --name-only --diff-filter=ACMRD` instead of ignoring deletions. This flags both ends of cross-stream renames (delete + add) and deleted files outside ownership. Four new Node regression tests create temporary Git histories and verify:
+
+1. Permitted in-scope addition passes.
+2. Deleting a forbidden out-of-scope file fails.
+3. Renaming a file from outside into the assigned directory fails.
+4. Renaming an in-scope file outside fails.
+
+Use `npm --prefix seven-kingdoms-html test` in CI as evidence. This is an actual enforcement improvement, not a runtime integration of unmerged systems. This review does not replace missing real-device, original-game or asset-license checks.
