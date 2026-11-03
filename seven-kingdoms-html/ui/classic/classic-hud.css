@@ -1,0 +1,10 @@
+/* Scoped adapter stylesheet. Integrator mounts canvas above world, without intercepting map gestures. */
+.sk-classic-host{position:relative;width:800px;height:600px;overflow:hidden;touch-action:none}
+.sk-classic-overlay{position:absolute;inset:0;width:800px;height:600px;image-rendering:pixelated;pointer-events:none}
+.sk-classic-controls{position:absolute;inset:0;pointer-events:none}
+.sk-classic-controls button{pointer-events:auto;touch-action:manipulation}
+.sk-classic-rotate{display:none}
+@media(orientation:portrait){
+ .sk-classic-host{visibility:hidden}
+ .sk-classic-rotate{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#1a1c19;color:#eee6ce;font:700 18px Georgia,serif;text-align:center;z-index:9999}
+}
