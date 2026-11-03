@@ -6,7 +6,7 @@ export class Scene {
   constructor(canvas,minimap){
     this.canvas=canvas;this.ctx=canvas.getContext('2d');
     this.mini=minimap;this.mctx=minimap.getContext('2d');
-    this.camera={x:27,y:24,zoom:1.05};this.lastMini=0;
+    this.camera={x:27,y:24,zoom:1.05};this.lastMini=0;this.minimapMode='terrain';
   }
   size(){return {w:this.canvas.clientWidth||800,h:this.canvas.clientHeight||600};}
   scale(){return TILE*this.camera.zoom;}
@@ -134,15 +134,35 @@ export class Scene {
       ctx.strokeStyle='#fff2b1';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(at.x,at.y,r+4,0,Math.PI*2);ctx.stroke();
     }
   }
+  centerOfVillage(village){return {x:village.x+2,y:village.y+2};}
   drawMini(game){
     const ctx=this.mctx,w=this.mini.width,h=this.mini.height,dx=w/MAP_W,dy=h/MAP_H;
     ctx.clearRect(0,0,w,h);
+    const villages=game.buildings.filter(b=>b.type==='village'&&b.done);
     for(let y=0;y<MAP_H;y+=2)for(let x=0;x<MAP_W;x+=2){
-      ctx.fillStyle=PALETTE[terrain(x,y,game.seed)];ctx.fillRect(x*dx,y*dy,2*dx+1,2*dy+1);
+      let tint=PALETTE[terrain(x,y,game.seed)];
+      if(this.minimapMode==='politics'&&villages.length){
+        let closest=villages[0],best=Infinity;
+        for(const village of villages){
+          const q=this.centerOfVillage(village),dist=(x-q.x)**2+(y-q.y)**2;
+          if(dist<best){best=dist;closest=village;}
+        }
+        tint=FACTIONS.find(f=>f.id===closest.owner)?.color||'#b4a58e';
+      }else if(this.minimapMode==='villages'){
+        tint='#747d65';
+      }
+      ctx.fillStyle=tint;ctx.fillRect(x*dx,y*dy,2*dx+1,2*dy+1);
     }
     for(const b of game.buildings){
       ctx.fillStyle=FACTIONS.find(f=>f.id===b.owner)?.color||'#fff';
-      ctx.fillRect(b.x*dx,b.y*dy,BUILDINGS[b.type].size*dx,BUILDINGS[b.type].size*dy);
+      const scale=this.minimapMode==='villages'?1.5:1;
+      const bx=(b.x+BUILDINGS[b.type].size*(1-scale)/2)*dx;
+      const by=(b.y+BUILDINGS[b.type].size*(1-scale)/2)*dy;
+      ctx.fillRect(bx,by,BUILDINGS[b.type].size*dx*scale,BUILDINGS[b.type].size*dy*scale);
+      if(this.minimapMode==='villages'){
+        ctx.strokeStyle='#242822';ctx.lineWidth=.5;
+        ctx.strokeRect(bx,by,BUILDINGS[b.type].size*dx*scale,BUILDINGS[b.type].size*dy*scale);
+      }
     }
     const {w:vw,h:vh}=this.size(),cw=vw/this.scale(),ch=vh/this.scale();
     ctx.strokeStyle='#fff9d6';ctx.lineWidth=1.6;
