@@ -9,6 +9,7 @@ let selected=null,placement=null,activeTab='people';
 let last=0,lastUI=0,lastSave=0,notificationTimer;
 const pointers=new Map();
 let drag=null,pinch=null;
+const portraitBlocked=window.matchMedia('(orientation: landscape) and (pointer: coarse)');
 function show(message){
   const notice=$('notice');notice.textContent=message;notice.hidden=false;
   clearTimeout(notificationTimer);notificationTimer=setTimeout(()=>{notice.hidden=true;},3200);
@@ -63,28 +64,32 @@ function selectedInfo(){
       details='Quantità disponibile: '+r.quantity+'. Seleziona una persona e tocca questo punto per raccogliere la risorsa.';
     }
   }
-  $('selectedTitle').textContent=title;$('statusChip').textContent=tag;$('selectedDetails').innerHTML=details;
+  $('selectedTitle').textContent=title;$('statusChip').textContent=tag;
+  if($('selectedDetails').innerHTML!==details)$('selectedDetails').innerHTML=details;
 }
 function updatePeople(){
-  $('peopleList').innerHTML=game.people.map(p=>
+  const html=game.people.map(p=>
     '<button class="person '+(selected?.kind==='person'&&selected.id===p.id?'active':'')+
     '" data-person="'+p.id+'" type="button"><strong>'+escapeText(p.name)+'</strong>'+
     '<small>'+taskLabel(p)+'</small><small>Raccolta '+p.skills.gather.toFixed(1)+'</small></button>'
   ).join('');
+  if($('peopleList').innerHTML!==html)$('peopleList').innerHTML=html;
   $('mobilizeBtn').disabled=!game.people.some(p=>p.inside);
 }
 function updateNeighbours(){
-  $('factionsList').innerHTML=game.neighbours.map(n=>
+  const html=game.neighbours.map(n=>
     '<article class="faction"><h3>'+escapeText(n.name)+'</h3>'+
     '<p>'+escapeText(n.relation)+' · Influenza '+n.influence+'/100 · Fiducia '+n.loyalty+'/100</p>'+
     '<button data-gift="'+n.owner+'" type="button">Offri 5 cibo</button> '+
     '<button data-annex="'+n.owner+'" type="button" '+(n.influence<75||n.loyalty<55?'disabled':'')+'>Unisci la comunità</button></article>'
   ).join('')||'<p class="muted">Tutti i popoli conosciuti si sono uniti alla comunità.</p>';
+  if($('factionsList').innerHTML!==html)$('factionsList').innerHTML=html;
 }
 function updateChronicles(){
-  $('chronicleList').innerHTML=game.events.slice(0,25).map(e=>
+  const html=game.events.slice(0,25).map(e=>
     '<div class="event"><small>Giorno '+e.day+'</small>'+escapeText(e.message)+'</div>'
   ).join('');
+  if($('chronicleList').innerHTML!==html)$('chronicleList').innerHTML=html;
 }
 function refresh(){
   updateHud();selectedInfo();
@@ -227,6 +232,28 @@ $('zoomIn').addEventListener('click',()=>scene.zoom(1.2));
 $('zoomOut').addEventListener('click',()=>scene.zoom(1/1.2));
 $('center').addEventListener('click',()=>{const town=game.town;if(town){const p=game.center(town);scene.center(p.x,p.y);}});
 $('pauseBtn').addEventListener('click',()=>{game.paused=!game.paused;refresh();show(game.paused?'Partita in pausa.':'Simulazione ripresa.');});
+$('fullscreenBtn').addEventListener('click',async()=>{
+  try{
+    if(!document.fullscreenElement&&document.documentElement.requestFullscreen){
+      await document.documentElement.requestFullscreen({navigationUI:'hide'});
+      // Supported primarily in installed PWAs or fullscreen on Android.
+      if(screen.orientation?.lock){
+        try{await screen.orientation.lock('portrait');}catch(_){/* CSS landscape gate below */ }
+      }
+    }else if(document.fullscreenElement&&document.exitFullscreen){
+      await document.exitFullscreen();
+    }else{
+      show('Il browser non consente lo schermo intero. Gioca in verticale.');
+    }
+  }catch(_){show('Schermo intero non disponibile. Il gioco resta utilizzabile in verticale.');}
+});
+document.addEventListener('fullscreenchange',()=>{
+  $('fullscreenBtn').textContent=document.fullscreenElement?'⤢':'⛶';
+  $('fullscreenBtn').setAttribute('aria-label',document.fullscreenElement?'Esci da schermo intero':'Schermo intero verticale');
+});
+if(portraitBlocked.addEventListener){
+  portraitBlocked.addEventListener('change',()=>{last=0;refresh();});
+}
 $('saveBtn').addEventListener('click',()=>show(game.save()?'Partita salvata.':'Salvataggio locale non disponibile.'));
 $('newBtn').addEventListener('click',()=>{
   if(!confirm('Creare un nuovo territorio? Il salvataggio esistente verrà sostituito.'))return;
@@ -290,8 +317,12 @@ window.addEventListener('pagehide',()=>game.save());
 function frame(stamp){
   if(!last)last=stamp;
   const dt=Math.min((stamp-last)/1000,.05);last=stamp;
-  game.update(dt);
-  scene.draw(game,selected,placement);
+  // Do not progress the simulation while a touchscreen is in landscape.
+  // The media-query overlay requires the player to return to portrait.
+  if(!portraitBlocked.matches){
+    game.update(dt);
+    scene.draw(game,selected,placement);
+  }
   if(stamp-lastUI>350){refresh();lastUI=stamp;}
   if(stamp-lastSave>20000){game.save();lastSave=stamp;}
   requestAnimationFrame(frame);
