@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="theme-color" content="#171c18">
+  <title>Ver Sacrum · Le Genti — Prototipo strategico</title>
+  <meta name="description" content="Prototipo RTS autonomo: comunità preromane, persone persistenti, economia locale e diplomazia.">
+  <link rel="stylesheet" href="./style.css?v=1">
+</head>
+<body>
+<main class="game-shell">
+  <header class="hud" aria-label="Stato comunità">
+    <div class="brand"><small>PROTOTIPO INDIPENDENTE · 01</small><strong>VER SACRUM <em>LE GENTI</em></strong></div>
+    <div class="hud-numbers" aria-live="off">
+      <span title="Cibo">🌾 <b id="food">0</b></span>
+      <span title="Legname">🪵 <b id="wood">0</b></span>
+      <span title="Pietra">🪨 <b id="stone">0</b></span>
+      <span title="Popolazione">♟ <b id="population">0</b></span>
+    </div>
+    <div class="hud-actions">
+      <span id="season">Primavera · giorno 1</span>
+      <button id="pauseBtn" type="button" aria-label="Pausa o riprendi">Ⅱ</button>
+      <button id="saveBtn" type="button" title="Salva la partita">Salva</button>
+      <button id="newBtn" type="button" title="Inizia una nuova partita">↻</button>
+    </div>
+  </header>
+  <div class="workspace">
+    <section class="map-area" aria-label="Territorio">
+      <canvas id="world" aria-label="Mappa interattiva del territorio"></canvas>
+      <div class="map-overlay">
+        <div class="map-legend"><span class="legend-dot yours"></span> La tua gente <span class="legend-dot neutral"></span> Altre genti</div>
+        <div class="zoom-controls">
+          <button id="zoomIn" type="button" aria-label="Ingrandisci mappa">+</button>
+          <button id="zoomOut" type="button" aria-label="Riduci mappa">−</button>
+          <button id="center" type="button" aria-label="Torna al villaggio">⌖</button>
+        </div>
+      </div>
+      <div id="placement" class="placement" hidden>
+        <div><strong id="placementName">Costruzione</strong><small id="placementHint">Tocca una casella per scegliere il luogo</small></div>
+        <button id="confirmBuild" type="button">✓ Conferma</button>
+        <button id="cancelBuild" type="button">✕</button>
+      </div>
+      <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+      <div class="map-bottom"><canvas id="minimap" width="120" height="96" aria-label="Minimappa"></canvas><span>Tocca per selezionare · trascina per esplorare</span></div>
+    </section>
+    <aside class="command-panel" aria-label="Comandi di gioco">
+      <div class="panel-title"><div><small>LA TUA COMUNITÀ</small><h2 id="selectedTitle">Il tuo insediamento</h2></div><span id="statusChip">Inizio</span></div>
+      <div id="selectedDetails" class="details"></div>
+      <nav class="tabs" aria-label="Sezioni strategiche">
+        <button type="button" class="active" data-tab="people">Persone</button>
+        <button type="button" data-tab="build">Costruisci</button>
+        <button type="button" data-tab="politics">Genti</button>
+        <button type="button" data-tab="chronicle">Cronache</button>
+      </nav>
+      <div class="panel-content">
+        <section id="tab-people" class="tab-panel">
+          <div id="peopleList" class="people-list"></div>
+          <div class="panel-actions"><button id="mobilizeBtn" type="button">Mobilita un residente</button><button id="idleBtn" type="button">Trova un libero</button></div>
+        </section>
+        <section id="tab-build" class="tab-panel" hidden>
+          <p class="muted">Scegli un edificio, indica il terreno e conferma. Un abitante dovrà raggiungere il cantiere.</p>
+          <div class="build-grid">
+            <button data-build="village" type="button">⌂ <b>Villaggio</b><small>24 legno · 10 pietra</small></button>
+            <button data-build="warehouse" type="button">▣ <b>Magazzino</b><small>18 legno · 8 pietra</small></button>
+            <button data-build="farm" type="button">▤ <b>Campo</b><small>10 legno</small></button>
+            <button data-build="market" type="button">◇ <b>Mercato</b><small>22 legno · 10 pietra</small></button>
+          </div>
+        </section>
+        <section id="tab-politics" class="tab-panel" hidden>
+          <p class="muted">I villaggi vicini non sono automaticamente nemici. Relazioni e influenza sono parte della strategia.</p>
+          <div id="factionsList"></div>
+        </section>
+        <section id="tab-chronicle" class="tab-panel" hidden>
+          <p class="muted">Ogni avvenimento appartiene alla comunità, non a un punteggio astratto.</p>
+          <div id="chronicleList"></div>
+          <button id="helpBtn" type="button">Come si gioca</button>
+        </section>
+      </div>
+      <footer class="panel-footer"><span>Ver Sacrum / Le Genti</span><span id="clock">1×</span></footer>
+    </aside>
+  </div>
+</main>
+<dialog id="helpDialog">
+  <h2>Prime mosse</h2>
+  <p>Seleziona una persona sul terreno o nell'elenco. Tocca una risorsa per ordinarle di raccoglierla. La persona raggiunge il luogo, carica la merce e la consegna fisicamente a un magazzino.</p>
+  <p>In <b>Costruisci</b> scegli un edificio, indica il terreno e conferma. Assegna un lavoratore al cantiere toccandolo dopo aver selezionato la persona. Per i campi, il lavoratore coltiva e trasporta il raccolto.</p>
+  <p>Dal villaggio puoi mobilitare un residente: resta la stessa persona, con nome e abilità. In <b>Genti</b> puoi avviare i primi rapporti diplomatici.</p>
+  <p>La partita si salva solo in questo percorso del browser, senza interferire con il Ver Sacrum originale.</p>
+  <form method="dialog"><button>Ho capito</button></form>
+</dialog>
+<script type="module" src="./game.js?v=1"></script>
+</body>
+</html>
