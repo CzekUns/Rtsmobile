@@ -19,6 +19,30 @@ test('taxes, grants and recruitment change population, loyalty and treasury',()=
  assert.equal(town.pop,pop-1);
  assert.equal(g.grant(town.id).ok,true);
 });
+test('taxes and grants follow 7kaa OTOWN.cpp constants and cumulative penalties',()=>{
+ const g=new SevenGame(),t=g.ownTowns()[0];
+ const cash=g.cash;
+ assert.equal(g.tax(t.id).ok,true);
+ assert.equal(g.cash-cash,42*5);
+ assert.equal(t.loyalty,68);
+ const afterTax=g.cash;
+ assert.equal(g.grant(t.id).ok,true);
+ assert.equal(afterTax-g.cash,42*10);
+ assert.equal(t.loyalty,78);
+ assert.equal(g.tax(t.id).ok,true);
+ assert.equal(t.loyalty,66); // next levy: 10 + 10/5 = 12
+ assert.equal(g.grant(t.id).ok,true);
+ assert.equal(t.loyalty,74); // next grant: 10 - 10/5 = 8
+});
+test('food follows 7kaa food-per-year values for jobless and all citizens',()=>{
+ const g=new SevenGame();
+ const before=g.food;
+ const t=g.ownTowns()[0];
+ const linkedWorkers=g.ownFirms().filter(f=>g.linked(f,t)).reduce((sum,f)=>sum+f.workers,0);
+ const expected=(Math.max(0,t.pop-linkedWorkers)*30-t.pop*10)/365;
+ g.advanceDay();
+ assert.ok(Math.abs((g.food-before)-expected)<1e-5);
+});
 test('a nearby fort permits persuasion and voluntary annexation',()=>{
  const g=new SevenGame();
  const town=g.towns.find(t=>t.owner===0&&g.ownFirms().some(f=>f.kind==='fort'&&g.linked(f,t)));
