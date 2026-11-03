@@ -8,3 +8,14 @@
  .sk-classic-host{visibility:hidden}
  .sk-classic-rotate{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#1a1c19;color:#eee6ce;font:700 18px Georgia,serif;text-align:center;z-index:9999}
 }
+
+/* Mount .sk-classic-touch outside the stage that gets transform:scale(...).
+   CSS pixels are thus device CSS pixels, not shrunk 800x600 game pixels. */
+.sk-classic-touch{position:fixed;z-index:120;right:max(8px,env(safe-area-inset-right));bottom:max(8px,env(safe-area-inset-bottom));pointer-events:none;font:14px system-ui,sans-serif}
+.sk-classic-touch button{min-width:44px;min-height:44px;touch-action:manipulation;pointer-events:auto;font:600 13px system-ui,sans-serif}
+.sk-classic-touch-toggle{background:#c7bfac;color:#211e19;border:2px outset #f1e6d1;min-width:66px!important}
+.sk-classic-touch-panel{position:absolute;right:0;bottom:52px;width:min(300px,calc(100vw - 16px));max-height:min(72dvh,360px);overflow-y:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:8px;border:3px ridge #b7aa8b;background:#292c26ee;box-shadow:0 4px 16px #000b;overscroll-behavior:contain}
+.sk-classic-touch-panel[hidden]{display:none}
+.sk-classic-touch-panel button{min-width:0;padding:6px 3px;overflow-wrap:anywhere;background:#c8c0ac;color:#231e18;border:2px outset #e6ddc7}
+.sk-classic-touch button:focus-visible{outline:3px solid #ffe26c;outline-offset:2px}
+@media(orientation:portrait){.sk-classic-touch{display:none}}
