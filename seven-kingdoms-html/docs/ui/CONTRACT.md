@@ -83,3 +83,53 @@ Exports: above. Test command: `npm --prefix seven-kingdoms-html test`.
 Dependencies: none; no 7kaa WASM or Ver Sacrum.
 Changes: UI module/style, tests, contract and diagram only.
 Outstanding decision: calibrate exact original bitmap UI and per-context action grids with game screenshots prior to G2 parity signoff.
+
+
+## SKH-109 second-pass addendum — issue #21
+
+**Sources used for the second pass, with confidence and limitation:**
+- Playable WebAssembly witness: `CzekUns/sevenkindomsmobile` (`7kaa.wasm` and its wrapper). Access to the interactive binary was NOT available for direct browser capture in this run.
+- Original 7KAA manual, information interface, available at https://cdn.cloudflare.steamstatic.com/steam/apps/450140/manuals/Seven_Kingdoms_Ancient_Adversaries_manual.pdf. The manual confirms eight scrolls in **four columns, two rows**: Kingdoms/Villages/Economy/Trade on the first row and Military/Technology/Espionage/Ranking on the second; F1–F8 (not F9).
+- The same manual describes **three minimap modes**: terrain, borders, villages. The borders control toggles a second state; this state transition belongs to the integrator's simulation/ViewModel.
+- Representative original interface crops: https://www.moddb.com/games/seven-kingdoms-ancient-adversaries/images/screenshot29 (fort); https://www.mobygames.com/images/shots/l/84153-seven-kingdoms-windows-screenshot-trade-with-other-kingdoms.jpg (market). These are publicly viewable **512×512 preview crops** rather than verified 800×600 full game captures. They confirm the relative visual arrangement but cannot prove exact native pixel coordinates. Therefore the rectangles below remain estimates, and no image has been silently rescaled as authoritative.
+- Source code pointers for future exact comparison: upstream `OINFO.cpp`, `OTOWNIF.cpp`, `OFIRMIF.cpp`, `OUNITIF.cpp`. No pixel offsets are claimed from uninspected source.
+
+**Comparison baseline / current delta ledger**
+
+| Feature | Original evidence | Implemented now | Remaining delta |
+|---|---|---|---|
+| Main game viewport | Dominant left region, right sidebar | 610px map / 190px right region in 800px reference frame | Native breakpoint not yet measured from WASM 800px screenshot |
+| Top scrolls | 4 columns × 2 rows, 8 scrolls, F1–F8 | 4×2, first/second row order fixed | Original scroll artwork, exact glyphs and top bar pixels missing |
+| Food, cash and net change | Two compact rows with deltas | Cash/food displayed with rates | Icon bitmaps and numbers style still approximated |
+| Calendar | Date and day at top center-right | Calendar and day displayed | Exact alignment and date style missing |
+| Mini map modes | Terrain/borders/villages globe controls | Three distinct mode command IDs | Original circular icons absent; repeated borders mode handled by integration |
+| Mini map | Above information panel | Canvas minimap image supplied via ViewModel | No 7KAA bitmap/mask/viewport cursor |
+| Fort, market, town, unit panels | Right panel with health bar, portrait/stats/actions; per-type layouts | Generic selection field list, action grid, disabled handling | Distinct original subviews and icon placement, worker/stock controls |
+| News/events | Bottom overlay area | Optional two-line event overlay | Original event skins and dismissal behaviour |
+| Android landscape | Original 800×600 preserved via uniform scale | `landscapeFit` and new separate 44 CSS px touch palette | No real Android device capture; native orientation lock may be denied |
+
+**New exports and input routing:**
+- `toClassicPoint(clientX,clientY,stageBoundingRect)` converts a scaled stage coordinate to native 800×600 coordinates.
+- `mobileTouchSpec(width,height)` returns portrait/scale and a 44 CSS-pixel minimum touch requirement; 800×360 gives 0.6 and 915×412 gives ~0.687.
+- `createClassicHud(canvas,{onCommand,listenPointer:false})`: **default does not install a canvas-wide pointer listener.** An integrator must direct only HUD region events to `dispatchPoint` or choose `listenPointer:true` on a separately interactive canvas. A world-map click yields `null`, not a HUD command.
+- `createClassicTouchControls(host,hud,{documentRef})` in `ui/classic/touch-controls.js` returns `{element,refresh,setOpen,dispose}`. **Host must be outside** the scaled stage: if nested inside it, 44 CSS-pixel controls shrink on screen. The overlay has its own buttons and `pointer-events:none` outside the button/palette area. Invoke `refresh()` after an updated selection is rendered. A keyboard user can Tab through the native buttons. Disabled actions are omitted, since they are not registered as hit targets by the HUD.
+- `ui/classic/classic-hud.css` contains the optional palette styles (safe-area offsets, max-height and focus ring).
+
+**Manual reproducible comparison:**
+1. Launch the reference game from https://github.com/CzekUns/sevenkindomsmobile in a browser that supports WebAssembly. Capture a genuine **800×600** gameplay screenshot without scaling and record version/commit, scenario, DPI, browser and selected object (town, fort, market, unit).
+2. Open `seven-kingdoms-html/docs/ui/compare.html` from a local HTTP server (ES modules need HTTP). Load the reference PNG. It **rejects** non-800×600 images; it does not include reference pixels in the repo.
+3. Select the matching context, inspect source against native overlay, export HUD PNG and review the RGB difference canvas. **The current overlay does not render the world**: comparison outside the HUD regions is expected to be noisy. The per-pixel delta is a diagnostic, not a parity claim.
+4. For proper game-vs-game comparison, integrate this overlay over a fixed-state world renderer and capture both at the same tick/date and camera pose. Capture four contexts separately; file the original crops/diffs under `docs/ui/` only with provenance and redistribution authorization.
+
+**Android manual verification matrix (not executed on physical hardware here):**
+
+| Viewport | Expected scale | Expected behavior | Validation |
+|---|---:|---|---|
+| Desktop 800×600 | 1 | Full native stage | Scripted geometry test |
+| Android landscape 800×360 | 0.6 | Stage centered; unscaled external palette min 44px targets | Computed test; real browser pending |
+| Android landscape 915×412 | 0.6867 | Stage centered; palette above stage, safe-area aware | Computed test; real browser pending |
+| Portrait 360×800 | 0.45 | Rotate instruction; palette hidden | CSS inspection + computed test; real browser pending |
+| Fullscreen | Browser-dependent | `requestFullscreen` resolves true only on success; orientation lock best effort, failure ignored | Manual user gesture test pending |
+| Touch map | Any landscape | Outside HUD/palette pointer events reach world; HUD command only on hit regions | Dispatch test; browser propagation test pending |
+
+**Remaining blocker:** No original 800×600 screenshot captured directly from the WebAssembly executable in this environment and no browser screenshot automation/device lab; exact pixel measurements, actual screenshot differences and G2 pixel-perfect/parity status cannot be signed off.
