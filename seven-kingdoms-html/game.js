@@ -56,10 +56,11 @@ function selectedContent(){
     '<br>'+(independent?'Resistenza <strong>'+Math.floor(item.resistance)+'</strong>/100':
                    'Fedeltà <strong>'+Math.floor(item.loyalty)+'</strong>/100')+
     '<br>Regno: '+esc(nation.name);
+  const ownFortLinked=game.ownFirms().some(f=>f.kind==='fort'&&game.linked(f,item));
   const actions=item.owner===1?[
     btn('recruit','Recluta',item.pop<=4||item.loyalty<27),
-    btn('tax','Tasse',item.loyalty<38),
-    btn('grant','Sussidio (60)',game.cash<60),
+    btn('tax','Tasse',item.loyalty<=10||!ownFortLinked),
+    btn('grant','Sussidio ('+(item.pop*10)+')',game.cash<item.pop*10||!ownFortLinked),
   ].join(''):independent?[
     btn('persuade','Influenza (100)',game.cash<100||!game.ownFirms().some(f=>f.kind==='fort'&&game.linked(f,item))),
     btn('annex','Unisci al regno',item.resistance>15)
