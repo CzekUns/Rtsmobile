@@ -22,10 +22,10 @@ Apri poi `http://localhost:8000/ver-sacrum-7k/`. I moduli JavaScript ES richiedo
 
 ```text
 ver-sacrum-7k/
-├── index.html    # Schermata portrait, HUD, minimappa e console strategica
-├── manifest.webmanifest # Schermo verticale in modalità PWA
-├── style.css     # UI classica RTS in verticale, con blocco landscape touch
-├── game.js       # Comandi touch, orientamento, ordini e salvataggio automatico
+├── index.html    # Layout orizzontale stile 7K, top bar, mappa e pannello destro
+├── manifest.webmanifest # Schermo orizzontale in modalità PWA
+├── style.css     # UI classica RTS orizzontale, con blocco portrait
+├── game.js       # Comandi touch, menu e rapporti, orientamento e salvataggio
 ├── sim.js        # Regole, mondo, abitanti, risorse, costruzioni, diplomazia
 ├── render.js     # Rendering top-down su Canvas 2D, minimappa e camera
 ├── tests/
@@ -59,16 +59,17 @@ Per staccare il progetto in futuro sarà sufficiente spostare **tutta questa car
 - Influenza e fiducia verso le comunità indipendenti; doni alimentari e unione pacifica al raggiungimento delle soglie.
 - Pausa, diario degli eventi, salvataggio locale automatico e ripristino.
 
-## Interfaccia mobile verticale (UI v2)
+## Interfaccia Seven Kingdoms — orizzontale obbligatorio (UI v3)
 
-Questa derivazione usa una **interfaccia RTS classica ispirata alla disposizione dei comandi di Seven Kingdoms**, ma con elementi grafici originali (pietra, pergamena, ottone).
+Il gioco riprende la **geometria dell'interfaccia classica di Seven Kingdoms** (non il motore originale o le sue texture): barra superiore con otto rapporti su due righe, risorse e data, tre modalità della minimappa e pulsante MENU; grande mappa principale a sinistra; minimappa navigabile nell'angolo alto destro e scheda di selezione/azioni nella colonna destra.
 
-- **Orientamento verticale obbligatorio sugli schermi touch:** se il dispositivo viene ruotato in orizzontale, un avviso sostituisce la schermata di gioco e la simulazione non avanza. Si torna a giocare rimettendo il dispositivo in verticale.
-- **PWA:** il manifest in questa cartella richiede l'orientamento `portrait` quando il browser e il sistema operativo lo supportano. Il pulsante ⛶ prova a entrare a schermo intero e a bloccare la rotazione quando consentito dall'API; nei normali tab il browser può rifiutare il blocco, quindi l'avviso in CSS resta il comportamento garantito.
-- **Desktop orizzontale:** il gioco rimane una colonna verticale centrata, anziché trasformarsi in un layout orizzontale.
-- **Mappa in alto**, comandi di zoom sulla destra; **console in basso** con minimappa navigabile, pannello contestuale e quattro schede Villaggi, Costruisci, Genti, Cronache.
-- Le azioni di gestione restano disponibili nei pannelli, senza cambiare il motore di simulazione.
-- Salvataggi e simulazione del Ver Sacrum principale restano isolati.
+- **Solo orizzontale.** In verticale la pagina mostra una schermata di rotazione e la simulazione si ferma, senza alterare i dati.
+- Il manifest dell'app richiede `landscape`; il pulsante a schermo intero prova anche a bloccare l'orientamento, dove il browser lo permette.
+- In ogni finestra orizzontale l'interfaccia mantiene la disposizione 7K con pannello laterale destro, invece di spostarlo sotto la mappa.
+- Gli otto rapporti sono `Regni`, `Villaggi`, `Economia`, `Scambi`, `Militari`, `Saperi`, `Costruisci`, `Cronache`. I rapporti non inventano funzionalità non implementate: commercio automatizzato e combattimenti sono indicati come futuri.
+- Le tre viste della minimappa sono `Terreno`, `Confini` e `Villaggi`.
+- `MENU` contiene pausa/riprendi, salva, nuova partita, schermo intero e guida.
+- Nessun file del Ver Sacrum principale o di Seven Kingdoms originale è stato modificato.
 
 ## Comandi
 
