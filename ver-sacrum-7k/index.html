@@ -7,7 +7,7 @@
   <meta name="application-name" content="Ver Sacrum · Le Genti">
   <meta name="description" content="RTS in JavaScript: interfaccia orizzontale ispirata alla disposizione classica di Seven Kingdoms.">
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./style.css?v=3">
+  <link rel="stylesheet" href="./style.css?v=4">
   <title>Ver Sacrum · Le Genti — RTS</title>
 </head>
 <body>
@@ -41,12 +41,12 @@
         <button type="button" data-minimap-mode="politics" aria-label="Mappa dei regni" title="Confini">◈</button>
         <button type="button" data-minimap-mode="villages" aria-label="Mappa degli insediamenti" title="Villaggi">⌂</button>
       </div>
+      <button id="fullscreenBtn" class="fullscreen-btn" type="button" title="Schermo intero" aria-label="Attiva schermo intero" aria-pressed="false">⛶</button>
       <button id="menuBtn" class="menu-btn" type="button" aria-expanded="false" aria-controls="gameMenuPopup">MENU</button>
       <div class="menu-popup" id="gameMenuPopup" hidden>
         <button id="pauseBtn" type="button">Ⅱ Pausa</button>
         <button id="saveBtn" type="button">Salva partita</button>
         <button id="newBtn" type="button">Nuovo territorio</button>
-        <button id="fullscreenBtn" type="button">⛶ Schermo intero</button>
         <button id="helpBtn" type="button">Come si gioca</button>
       </div>
     </div>
@@ -135,6 +135,6 @@
   <p>Questa versione JavaScript e i suoi salvataggi sono separati dal Ver Sacrum originale.</p>
   <form method="dialog"><button type="submit">Continua la partita</button></form>
 </dialog>
-<script type="module" src="./game.js?v=3"></script>
+<script type="module" src="./game.js?v=4"></script>
 </body>
 </html>
