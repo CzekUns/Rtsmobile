@@ -75,7 +75,7 @@ export function createClassicHud(canvas,{onCommand=()=>{},listenPointer=false}={
     inscription(ctx,model.date,396,18,176,'#181715',15);
     inscription(ctx,'♜ '+n(model.day),434,36,100,'#29261f',12);
     const top=[['terrain','Terrain'],['borders','Borders'],['villages-map','Village'],['menu','MENU']];
-    top.forEach(([id,label],i)=>{const r=rect(620+i*44,4,42,36);key(ctx,label,r);hit('map-mode',r,{mode:id})});
+    top.forEach(([id,label],i)=>{const r=rect(620+i*44,4,42,36);key(ctx,label,r);if(id==='menu')hit('menu',r);else hit('map-mode',r,{mode:id})});
     const minimap=CLASSIC_RECTS.minimap;
     ctx.fillStyle='#273b30';ctx.fillRect(617,47,180,170);
     if(model.minimap?.image){ctx.drawImage(model.minimap.image,618,48,178,168);}
