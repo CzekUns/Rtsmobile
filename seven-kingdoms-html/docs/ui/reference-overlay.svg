@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+<title>Seven Kingdoms UI zone guide — schematic, not an original game screenshot</title>
+<rect width="800" height="600" fill="#758b69"/><rect width="800" height="44" fill="#bebbad"/>
+<rect x="0" y="0" width="218" height="44" fill="#dad6c5" stroke="#413e36"/><rect x="218" y="0" width="150" height="44" fill="#b9b5a7" stroke="#413e36"/>
+<rect x="368" y="0" width="250" height="44" fill="#d8d3bd" stroke="#413e36"/><rect x="618" y="0" width="182" height="44" fill="#aba795" stroke="#413e36"/>
+<rect x="610" y="44" width="190" height="556" fill="#999788" stroke="#35332c"/><rect x="614" y="44" width="186" height="176" fill="#3b664d" stroke="#dedaca" stroke-width="4"/>
+<rect x="614" y="224" width="186" height="376" fill="#c4c0b2" stroke="#5a5748" stroke-width="3"/>
+<g font-family="Georgia" font-size="13" fill="#171711"><text x="14" y="25">Eight reports</text><text x="231" y="25">Food / Cash</text><text x="406" y="25">Calendar / Day</text><text x="640" y="25">Tools / Menu</text><text x="220" y="330" fill="#fff">Game viewport</text><text x="674" y="122" fill="#fff">Mini map</text><text x="631" y="260">Selection</text><text x="631" y="295">Statistics</text><text x="631" y="330">Action grid</text></g>
+</svg>
