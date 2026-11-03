@@ -2,7 +2,7 @@
 Issue: #8 · Branch: `agent/skh-towns/parity` · PR: see GitHub branch PR.
 
 ## Scope and licensing
-Native JavaScript, no imports/dependencies or global I/O. Source-of-truth: **Seven Kingdoms: Ancient Adversaries**, 7kaa repository `the3dfxdude/7kaa`, `master`, files `src/OTOWN.cpp`, `src/OTOWNIF.cpp`, `src/OTOWNIND.cpp`, `include/OTOWN.h` (GPLv2-or-later). Use an upstream commit pin before claiming cross-version binary parity. No Ver Sacrum sources.
+Native JavaScript, no imports/dependencies or global I/O. Source-of-truth: **Seven Kingdoms: Ancient Adversaries**, 7kaa repository `the3dfxdude/7kaa`, pinned commit [`14e6fdfba9481af4dc3a54722614a608776e20bc`](https://github.com/the3dfxdude/7kaa/commit/14e6fdfba9481af4dc3a54722614a608776e20bc), files `src/OTOWN.cpp`, `src/OTOWNIF.cpp`, `src/OTOWNIND.cpp`, `include/OTOWN.h` (GPLv2-or-later). The source is pinned; actual C++ executable parity is still unverified. No Ver Sacrum sources.
 
 ## State schema
 `TownState = { nationId, hasLinkedOwnCamp, hasLinkedEnemyCamp, races: [{population,jobless,spies,loyalty,targetLoyalty?,growth?,resistance?:number[],targetResistance?:number[]}], accumulatedCollectTaxPenalty?, accumulatedRewardPenalty?, accumulatedRecruitPenalty?, trainingRaceId?, townDefenderCount?, rebelId? }`.
@@ -46,3 +46,41 @@ Action-like functions return `{ok,reason?,nextTown,cashDelta,effects[]}`; no inp
 - `updateResistance` only flags surrender eligibility; military/rebel integration decides if it can proceed. JS double precision differs from original float32 in boundary cases.
 - No direct changes to `rules.js`, engine, renderer or `package.json`. Import from `./systems/towns/index.js` at the integration stage and call with the original scheduler cadence.
 - Test: `node --test seven-kingdoms-html/tests/towns/*.test.js`. Existing overall suite: `npm --prefix seven-kingdoms-html test`.
+
+## Second cycle — SKH-108 / issue #20 / PR #15
+
+### Pinned upstream source and comparison matrix
+
+Source SHA: `14e6fdfba9481af4dc3a54722614a608776e20bc` (the3dfxdude/7kaa). The actual C++ gameplay binary is **not** run in this branch.
+
+| Source | Original behavior | Pure JS export | Status |
+|---|---|---|---|
+| OTOWN.cpp `next_day` | decrement 4 nonzero accumulated penalty counters each day | `decayPenalties` | formula ported |
+| OTOWN.cpp `collect_yearly_tax` | once Jan 1: population × 5, no loyalty loss | `collectYearlyTax` | formula ported |
+| OTOWN.cpp `process_food` | jobless × annual producer constant /365; population × annual consumer constant /365 | `processFood` | formula ported, constants adapter pending |
+| OTOWN.cpp `update_camp_link` | enable AI/non-human-owned camp links, require enabled camp and overseer | `updateCampLinks` | subset ported; link topology external |
+| OTOWN.cpp `camp_influence` | truncated leadership ×2/3, racial similarity bonus 1/3, reputation/2, max 100 | `campInfluence` | formula ported |
+| OTOWN.cpp `update_target_loyalty` | harmony/3, reputation/4, employment, king race, camps and QOL | `updateTargetLoyalty` | formula ported; harmony and culture equivalence injected |
+| OTOWN.cpp `update_target_resistance` | strongest linked camp, commander race + nation only | `updateTargetResistance` | formula ported |
+| OTOWN.cpp `update_resistance` | every five days reduce to target, auto-surrender if zero | `updateResistance` | numerical part, surrender event only |
+| OTOWN.cpp `population_grow` | every 30 days accumulator + population, QOL modifier when ruled | `populationGrow` | formula ported; scheduler external |
+| OTOWNIF.cpp `recruit` | random selection among recruits including spies, training unit and cost | `planRecruit` | planning phase, side effects external |
+| OTOWNIF.cpp `recruit_dec_loyalty` | race-dependent loyalty cost and cumulative penalty | `recruitLoyaltyPenalty` | formula ported |
+| OTOWNIND.cpp `think_independent_town` | links every 15d, units every 60d, new nations every 365d | `independentSchedule` | scheduling only |
+| OTOWNIND.cpp `think_independent_set_link` | resistance <=50 enables foreign civilian firm links | `independentFirmLink` | decision ported |
+
+### Second-cycle API additions
+All immutable. `decayPenalties(t)`, `collectYearlyTax(t,{month,day})`, `processFood(t,{peasantFoodYearProduction,personFoodYearConsumption})`, `updateCampLinks(t,{camps,isHumanNation})`, `campInfluence({leadership,reputation,sameRulerRace})`, `updateTargetResistance(t,{camps,nationCount})`, `updateTargetLoyalty(t,{raceHarmony,reputation,kingRaceId,camps,qualityOfLife,enableQualityOfLife,sameRace})`, `planRecruit(t,raceId,{skillId,canPlaceUnit,randomRoll,fixRecruitDecLoyalty})`, `migrateScalarTown(s,{raceId,races})`.
+
+`processFood` returns **food production and consumption intents**, not famine casualties. C++ calls `Nation::consume_food` which requires nation food stocks and nutrition processing; no invented starvation effects here. The adapter must supply original named constants and apply `add_food` followed by `consume_food`. `updateCampLinks` effects include proposed link changes; an adapter must commit these with the original bidirectional toggle rules. `planRecruit` accepts the deterministic roll supplied by the core RNG and returns either an ordinary mobilization, a pending training event, or explicit demand for the spy adapter. Skill ID `-1` recruits immediately; `0` and positive skill IDs queue training, positive skill additionally costs 30. The caller must handle a five-day training lifecycle, unit records and world placement. No false completed-training event.
+
+### Scalar-to-multi-race migration
+Example input: `{nationId:1,population:10,joblessPopulation:6,loyalty:45}`.
+Explicit racial allocation required: `migrateScalarTown(s,{raceId:1,races:[{population:7,jobless:4,loyalty:45},{population:3,jobless:2,loyalty:50}]})`.
+The converter rejects mismatched totals and missing loyalty for nonempty secondary races; it **never guesses the distribution**. The adapter is responsible for determining original race records and persisting new schema version in the core save layer. This is not an automatic in-place save mutation.
+
+### Events vs actual state
+`think-rebel-required`, `surrender-candidate`, `spy-mobilization-required` and `training-unit-pending` are **events or planning intents**, NOT spawned rebels, automatic annexation, a completed spy mobilization, or a newly created unit. Military, spy and scheduler adapters must execute real transitions and feed their outcomes back. The independent town never acquires a nation solely because its resistance decreases to a low threshold unless the original surrender mechanism runs.
+
+### Test evidence and remaining work
+Second-cycle fixture additions: 9 deterministic scenarios (penalty decay, yearly tax, food flows, camp ownership, influence, resistance, target loyalty, recruit transitions, migration) in `tests/towns/towns.test.js`; original 13 preserved. JavaScript in-memory test harness checks math/branches; Node CI must separately be confirmed. Still missing source-exact food constants in this adapter, nation-level famine logic, training queue completion, spy unit mobilization, `race_harmony` and true bidirectional `toggle_firm_link`, random rebel units and actual surrender. Test parity against a runnable C++ build remains required for G4.
