@@ -9,9 +9,8 @@ export const CLASSIC_RECTS=Object.freeze({
   selection:{x:614,y:224,w:186,h:376}
 });
 export const REPORTS=Object.freeze([
-  ['kingdoms','Kingdoms'],['villages','Villages'],['economy','Economy'],
-  ['trade','Trade'],['military','Military'],['technology','Technology'],
-  ['espionage','Espionage'],['ranking','Ranking']
+  ['kingdoms','Kingdoms'],['villages','Villages'],['economy','Economy'],['trade','Trade'],
+  ['military','Military'],['technology','Technology'],['espionage','Espionage'],['ranking','Ranking']
 ]);
 const rect=(x,y,w,h)=>({x,y,w,h});
 const within=(p,r)=>p.x>=r.x&&p.x<r.x+r.w&&p.y>=r.y&&p.y<r.y+r.h;
@@ -55,7 +54,7 @@ export function normalizeClassicViewModel(model={}){
     actions:Array.isArray(model.actions)?model.actions:[]
   };
 }
-export function createClassicHud(canvas,{onCommand=()=>{}}={}){
+export function createClassicHud(canvas,{onCommand=()=>{},listenPointer=false}={}){
   if(!canvas||typeof canvas.getContext!=='function')throw new TypeError('A canvas is required');
   const ctx=canvas.getContext('2d');if(!ctx)throw new TypeError('2d context required');
   canvas.width=800;canvas.height=600;
@@ -75,8 +74,8 @@ export function createClassicHud(canvas,{onCommand=()=>{}}={}){
     inscription(ctx,'◉ '+n(model.resources.cash)+' ['+val(model.resources.cashRate,'0')+']',225,35,142);
     inscription(ctx,model.date,396,18,176,'#181715',15);
     inscription(ctx,'♜ '+n(model.day),434,36,100,'#29261f',12);
-    const top=[['map','Map'],['mode','Mode'],['help','?'],['menu','MENU']];
-    top.forEach(([id,label],i)=>{const r=rect(620+i*44,4,42,36);key(ctx,label,r);hit(id,r)});
+    const top=[['terrain','Terrain'],['borders','Borders'],['villages-map','Village'],['menu','MENU']];
+    top.forEach(([id,label],i)=>{const r=rect(620+i*44,4,42,36);key(ctx,label,r);hit('map-mode',r,{mode:id})});
     const minimap=CLASSIC_RECTS.minimap;
     ctx.fillStyle='#273b30';ctx.fillRect(617,47,180,170);
     if(model.minimap?.image){ctx.drawImage(model.minimap.image,618,48,178,168);}
@@ -116,7 +115,7 @@ export function createClassicHud(canvas,{onCommand=()=>{}}={}){
     const p={x,y};
     const t=[...targets].reverse().find(t=>within(p,t.rect));
     if(!t)return null;
-    const command={type:t.id,...(t.report?{report:t.report}:{}),...(t.action?{action:t.action}:{})};
+    const command={type:t.id,...(t.report?{report:t.report}:{}),...(t.action?{action:t.action}:{}),...(t.mode?{mode:t.mode}:{})};
     if(t.id==='minimap'){
       command.x=Math.max(0,Math.min(1,(x-t.rect.x)/t.rect.w));
       command.y=Math.max(0,Math.min(1,(y-t.rect.y)/t.rect.h));
@@ -129,10 +128,10 @@ export function createClassicHud(canvas,{onCommand=()=>{}}={}){
     const x=(e.clientX-r.left)*800/r.width,y=(e.clientY-r.top)*600/r.height;
     dispatchPoint(x,y);
   }
-  canvas.addEventListener('pointerup',onPointer);
+  if(listenPointer)canvas.addEventListener('pointerup',onPointer);
   render();
   return {render,dispatchPoint,getModel:()=>model,getTargets:()=>targets.map(t=>({...t,rect:{...t.rect}})),
-    dispose:()=>canvas.removeEventListener('pointerup',onPointer)};
+    dispose:()=>{if(listenPointer)canvas.removeEventListener('pointerup',onPointer)}};
 }
 export function landscapeFit(width,height){
   const w=Number(width)||0,h=Number(height)||0;
@@ -145,4 +144,21 @@ export function requestClassicFullscreen(element,screenObject=globalThis.screen)
     try{await screenObject?.orientation?.lock?.('landscape')}catch{}
     return true;
   }).catch(()=>false);
+}
+
+
+/** Convert a point from a uniformly-scaled 800x600 stage into native coordinates.
+ * The caller must supply the *stage element* bounding rect (not the full viewport).
+ */
+export function toClassicPoint(clientX,clientY,bounds){
+  if(!bounds||!(bounds.width>0)||!(bounds.height>0))return null;
+  return {x:(clientX-bounds.left)*800/bounds.width,y:(clientY-bounds.top)*600/bounds.height};
+}
+/** Minimum device-pixel targets: return explicit DOM button dimensions.
+ * Keep classic art untouched and provide mobile controls outside the canvas. */
+export function mobileTouchSpec(viewWidth,viewHeight){
+  const fit=landscapeFit(viewWidth,viewHeight);
+  return {orientationRequired:fit.portrait,scale:fit.scale,
+    minTargetCssPx:44,needsAlternateControls:fit.scale<1,
+    mode:'overlay-menu',controlCount:REPORTS.length};
 }
