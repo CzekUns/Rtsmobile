@@ -32,7 +32,7 @@ export function terrain(x,y,seed){
 }
 export class Strategy {
   constructor(seed=45172){
-    this.seed=seed;this.day=1;this.dayFraction=0;this.paused=false;this.seq=1;
+    this.version=1;this.seed=seed;this.day=1;this.dayFraction=0;this.paused=false;this.seq=1;
     this.people=[];this.buildings=[];this.resources=[];this.events=[];this.neighbours=[
       {owner:1,name:'Genti del Guado',influence:12,loyalty:48,relation:'Neutrali'},
       {owner:2,name:'Lega dei Colli',influence:5,loyalty:37,relation:'Neutrali'}
@@ -275,5 +275,4 @@ export class Strategy {
       return game;
     }catch(_){return null;}
   }
-  get version(){return 1;}
 }
