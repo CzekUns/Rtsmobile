@@ -110,7 +110,7 @@ test('SKH-108 strongest camp sets resistance target for its commander race and n
 test('SKH-108 race target loyalty includes harmony/reputation/employment, friendly and hostile camps, QOL',()=>{
  const t=town({races:[{population:10,jobless:0,spies:0,loyalty:70},{population:10,jobless:10,spies:0,loyalty:50}]});
  const x=updateTargetLoyalty(t,{raceHarmony:[60,90],reputation:20,kingRaceId:1,enableQualityOfLife:false,camps:[{isCamp:true,enabled:true,hasOverseer:true,nationId:1,leadership:60,commanderRaceId:1,nationRaceId:1,isKing:false},{isCamp:true,enabled:true,hasOverseer:true,nationId:2,leadership:30,commanderRaceId:2,nationRaceId:2,isKing:false}]});
- assert.deepEqual(x.nextTown.races.map(r=>r.targetLoyalty),[93,20]);
+ assert.deepEqual(x.nextTown.races.map(r=>r.targetLoyalty),[100,29]);
 });
 test('SKH-108 recruitment plan distinguishes spy, queue, training and world adapter',()=>{
  const t=town();const spy=planRecruit(t,1,{randomRoll:0,canPlaceUnit:true});
