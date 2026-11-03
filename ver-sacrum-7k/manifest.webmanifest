@@ -2,12 +2,12 @@
   "id": "./",
   "name": "Ver Sacrum - Le Genti",
   "short_name": "Le Genti",
-  "description": "RTS preromano indipendente in JavaScript, ottimizzato per schermo verticale.",
+  "description": "RTS preromano JavaScript con layout orizzontale ispirato a Seven Kingdoms.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "orientation": "portrait",
+  "orientation": "landscape",
   "background_color": "#191f16",
-  "theme_color": "#35392f",
+  "theme_color": "#777669",
   "lang": "it"
 }
