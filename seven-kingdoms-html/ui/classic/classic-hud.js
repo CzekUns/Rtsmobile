@@ -67,7 +67,7 @@ export function createClassicHud(canvas,{onCommand=()=>{}}={}){
     // Transparent over the world. This module must not draw the world itself.
     surface(ctx,0,0,800,44);surface(ctx,610,44,190,556);
     REPORTS.forEach(([id,label],i)=>{
-      const r=rect(2+(i%2)*106,2+Math.floor(i/2)*10,104,10);
+      const r=rect(2+(i%4)*54,2+Math.floor(i/4)*20,53,19);
       key(ctx,label,r,id===model.report);hit('report',r,{report:id});
     });
     surface(ctx,218,0,150,44);
