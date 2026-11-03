@@ -15,6 +15,15 @@ python3 -m http.server 8000
 
 **Nessuna dipendenza, nessuna compilazione, nessun .wasm.** Richiede un browser moderno con moduli ES e Canvas 2D.
 
+## Lavoro parallelo con agenti
+
+**[AGENTS.md](./AGENTS.md)** — regole operative per ogni agente e file vietati/condivisi.
+**[PARALLEL_WORK.md](./PARALLEL_WORK.md)** — sei filoni isolati, branch, contratti, worktree, handoff e sequenza di integrazione.
+**[WORKSTREAMS.json](./WORKSTREAMS.json)** — definizione machine-readable dei path esclusivi, verificata su pull request dal workflow `Seven Kingdoms HTML - JS tests and stream scope`.
+**[Issue SKH-101–106](https://github.com/CzekUns/Rtsmobile/issues)** — incarichi pronti da assegnare agli agenti; **la loro creazione non implica agenti attivi**.
+
+Le altre attività `work/T*` appartengono al lavoro precedente sul gioco Ver Sacrum e NON vanno riutilizzate per la riscrittura Seven Kingdoms.
+
 ## Piano maestro di sviluppo e asset
 
 **[PIANO_DI_SVILUPPO.md](./PIANO_DI_SVILUPPO.md)** — calendario per fasi, priorità, dipendenze, gate di collaudo, backlog completo di gioco, mod e asset da convertire/creare. È il documento da leggere per primo prima di implementare nuove funzionalità; include una checklist immediata e il registro di avanzamento.
