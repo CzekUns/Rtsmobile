@@ -12,7 +12,7 @@ test('baseline exposes a native JS game with separate domain and browser modules
  assert.match(source('game.js'),/from ['"]\.\/view\.js['"]/);
  assert.doesNotMatch(html,/\.wasm(?:["'?]|\b)/i);
  for(const id of ['stage','world','minimap','selectionActions','reportBody','fullscreenBtn','rotate']){
-  assert.match(html,new RegExp('id=["\\']'+id+'["\\']'));
+  assert.match(html,new RegExp('id="'+id+'"'));
  }
  assert.equal(WORLD_W,76);
  assert.equal(WORLD_H,66);
