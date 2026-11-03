@@ -181,3 +181,130 @@ export function independentFirmLink(t,{isCamp=false,firmNationId=0,averageResist
   if(isCamp)return null; // Original AI does not toggle links to military camps.
   return firmNationId===0||averageResistance<=50;
 }
+
+// OTOWN.cpp Town::next_day: every day, all four accumulated penalties decay by one.
+export function decayPenalties(t) {
+  check(t);
+  const out=clone(t);
+  for(const key of ["accumulatedCollectTaxPenalty","accumulatedRewardPenalty","accumulatedRecruitPenalty","accumulatedEnemyGrantPenalty"]){
+    if((out[key]??0)>0)out[key]--;
+  }
+  return result(out,true,null);
+}
+// OTOWN.cpp Town::collect_yearly_tax: January 1, no loyalty reduction.
+export function collectYearlyTax(t,{month,day}={}) {
+  check(t);
+  if(!t.nationId||month!==1||day!==1)return result(t,false,"not-yearly-tax-day");
+  return result(t,true,null,{cashDelta:townPopulation(t)*TOWN_CONSTANTS.TAX_PER_PERSON,effects:[{type:"yearly-tax"}]});
+}
+// OTOWN.cpp Town::process_food. Rates are supplied by upstream constant adapter;
+// absent verified constants, fail closed rather than using fabricated values.
+export function processFood(t,{peasantFoodYearProduction,personFoodYearConsumption}={}) {
+  check(t);
+  if(!t.nationId)return {ok:false,reason:"independent-town",nextTown:t,foodProduced:0,foodConsumed:0,foodDelta:0,effects:[]};
+  if(!Number.isFinite(peasantFoodYearProduction)||!Number.isFinite(personFoodYearConsumption)||peasantFoodYearProduction<0||personFoodYearConsumption<0)
+    throw new RangeError("Original food production and consumption constants required");
+  const produced=joblessPopulation(t)*peasantFoodYearProduction/365;
+  const consumed=townPopulation(t)*personFoodYearConsumption/365;
+  return {ok:true,nextTown:t,foodProduced:produced,foodConsumed:consumed,foodDelta:produced-consumed,effects:[{type:"nation-food-production",amount:produced},{type:"nation-food-consumption",amount:consumed}]};
+}
+// OTOWN.cpp Town::update_camp_link: AI auto-enables links, human own camp links
+// remain under player control. Only an enabled camp WITH overseer counts.
+export function updateCampLinks(t,{camps=[],isHumanNation=false}={}) {
+  check(t);
+  const out=clone(t),links=camps.map(c=>{
+    if(!c.isCamp)return {...c};
+    const isHumanOwn=Boolean(t.nationId&&isHumanNation&&c.nationId===t.nationId);
+    return {...c,enabled:isHumanOwn?Boolean(c.enabled):true};
+  });
+  out.hasLinkedOwnCamp=links.some(c=>c.isCamp&&c.enabled&&c.hasOverseer&&c.nationId===t.nationId);
+  out.hasLinkedEnemyCamp=links.some(c=>c.isCamp&&c.enabled&&c.hasOverseer&&c.nationId!==t.nationId);
+  return result(out,true,null,{effects:[{type:"camp-links-updated",links}]});
+}
+// OTOWN.cpp Town::camp_influence, C++ truncation toward zero at each division.
+export function campInfluence({leadership,reputation,sameRulerRace=false}={}) {
+  if(!Number.isFinite(leadership)||!Number.isFinite(reputation))throw new RangeError("Missing camp influence inputs");
+  let influence=Math.trunc(leadership*2/3);
+  if(sameRulerRace)influence+=Math.trunc(influence/3);
+  influence+=Math.trunc(reputation/2);
+  return Math.min(100,influence);
+}
+// OTOWN.cpp Town::update_target_resistance: ONLY commander race + commander's nation;
+// strongest eligible camp wins. Caller supplies computed influence.
+export function updateTargetResistance(t,{camps=[],nationCount}={}) {
+  check(t);
+  if(t.nationId)return result(t,false,"not-independent");
+  if(!townPopulation(t)||!camps.length)return result(t,true,null);
+  if(!integer(nationCount)||nationCount===0)throw new RangeError("nationCount required");
+  const out=clone(t);
+  for(const r of out.races)r.targetResistance=Array(nationCount).fill(-1);
+  if(t.rebelId)return result(out,true,null);
+  for(const c of camps){
+    if(!c.isCamp||!c.enabled||!c.hasOverseer)continue;
+    const r=out.races[c.commanderRaceId-1],idx=c.nationId-1;
+    if(!r||idx<0||idx>=nationCount||!Number.isFinite(c.influence))throw new RangeError("Invalid camp");
+    const target=100-c.influence;
+    if(target<0)throw new RangeError("Camp influence exceeds 100");
+    if(r.targetResistance[idx]===-1||target<r.targetResistance[idx])r.targetResistance[idx]=target;
+  }
+  return result(out,true,null);
+}
+// OTOWN.cpp Town::update_target_loyalty: harmony, employment, reputation, commander
+// influence and quality of life. All external cultural inputs are explicit.
+export function updateTargetLoyalty(t,{raceHarmony=[],reputation,kingRaceId,camps=[],qualityOfLife=50,enableQualityOfLife=true,sameRace=(a,b)=>a===b}={}) {
+  check(t);if(!t.nationId)return result(t,false,"independent-town");
+  if(!Number.isFinite(reputation)||!Number.isFinite(kingRaceId))throw new RangeError("Missing nation inputs");
+  const out=clone(t);
+  for(let i=0;i<out.races.length;i++){
+    const r=out.races[i];if(!r.population)continue;
+    if(!Number.isFinite(raceHarmony[i]))throw new RangeError("Missing race harmony");
+    let target=Math.trunc(raceHarmony[i]/3)+Math.trunc(reputation/4);
+    target+=30-Math.trunc(30*r.jobless/r.population);
+    if(sameRace(i+1,kingRaceId))target+=10;
+    r.targetLoyalty=clamp(target);
+  }
+  for(const c of camps){
+    if(!c.isCamp||!c.enabled||!c.hasOverseer)continue;
+    if(!Number.isFinite(c.leadership)||!Number.isFinite(c.commanderRaceId)||!Number.isFinite(c.nationRaceId))throw new RangeError("Missing commander inputs");
+    const base=Math.trunc(c.leadership/3)+(c.isKing?20:0);
+    for(let i=0;i<out.races.length;i++){
+      const r=out.races[i];if(!r.population)continue;
+      const inf=base+(c.commanderRaceId===i+1?8:0)+(c.nationRaceId===i+1?8:0);
+      if(c.nationId===t.nationId)r.targetLoyalty=Math.min(100,r.targetLoyalty+inf);
+      else if(c.commanderRaceId===i+1)r.targetLoyalty=Math.max(0,r.targetLoyalty-inf);
+    }
+  }
+  const qol=enableQualityOfLife?Math.trunc((qualityOfLife-50)/3):0;
+  for(const r of out.races)if(r.population&&r.targetLoyalty>30)
+    r.targetLoyalty=Math.min(100,Math.max(30,r.targetLoyalty+qol));
+  return result(out,true,null);
+}
+// OTOWNIF.cpp Town::recruit: explicit and side-effect-free training / spy plans.
+// External adapter owns unit creation, spy mobilization, queue timing and placement.
+export function planRecruit(t,raceId,{skillId=-1,canPlaceUnit=false,randomRoll=0,fixRecruitDecLoyalty=false}={}) {
+  check(t);
+  if(!t.nationId)return result(t,false,"independent-town");
+  if(skillId>=1&&t.trainingRaceId)return result(t,false,"training-in-progress");
+  const count=recruitableRacePop(t,raceId,{recruitSpy:true});
+  if(!count)return result(t,false,"no-recruitable-population");
+  if(!Number.isInteger(randomRoll)||randomRoll<0||randomRoll>=count)throw new RangeError("randomRoll must match misc.random(recruitableCount)");
+  if(!canPlaceUnit)return result(t,false,"no-unit-placement");
+  const r=t.races[raceId-1],shouldTrainSpy=r.spies>=randomRoll+1;
+  if(shouldTrainSpy)return result(t,false,"spy-selection-required",{effects:[{type:"spy-mobilization-required",raceId,skillId}]});
+  if(r.jobless-r.spies-(t.trainingRaceId===raceId?1:0)<=0)return result(t,false,"no-ordinary-recruit");
+  if(skillId===-1)return recruitUnskilled(t,raceId,{canPlaceUnit:true,fixRecruitDecLoyalty});
+  const out=clone(t);out.trainingRaceId=raceId;
+  const cashDelta=skillId>0?-TOWN_CONSTANTS.TRAIN_SKILL_COST:0;
+  return result(out,true,null,{cashDelta,effects:[{type:"training-unit-pending",raceId,skillId,days:5}]});
+}
+// Transitional adapter from scalar prototype. No invented population distribution:
+// caller must provide exact racial counts; conversion refuses ambiguous layouts.
+export function migrateScalarTown(s,{raceId,races}={}) {
+  if(!s||!Array.isArray(races)||!races.length||!integer(raceId)||raceId<1)throw new RangeError("Explicit race mapping required");
+  const pop=s.population??s.pop,jobless=s.joblessPopulation??s.jobless;
+  if(!integer(pop)||!integer(jobless)||jobless>pop)throw new RangeError("Invalid scalar totals");
+  const mapped=races.map((r,i)=>({population:r.population??0,jobless:r.jobless??0,spies:r.spies??0,loyalty:r.loyalty??(i+1===raceId?s.loyalty:undefined),targetLoyalty:r.targetLoyalty??(i+1===raceId?s.targetLoyalty:undefined),growth:r.growth??0}));
+  const town={nationId:s.nationId??s.owner??0,hasLinkedOwnCamp:!!s.hasLinkedOwnCamp,hasLinkedEnemyCamp:!!s.hasLinkedEnemyCamp,races:mapped};
+  if(townPopulation(town)!==pop||joblessPopulation(town)!==jobless||!validateTown(town))throw new RangeError("Scalar totals do not match race allocation");
+  return town;
+}
