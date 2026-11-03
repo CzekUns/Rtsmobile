@@ -3,15 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-  <meta name="theme-color" content="#171c18">
+  <meta name="theme-color" content="#35392f">
+  <meta name="application-name" content="Ver Sacrum · Le Genti">
+  <link rel="manifest" href="./manifest.webmanifest">
   <title>Ver Sacrum · Le Genti — Prototipo strategico</title>
   <meta name="description" content="Prototipo RTS autonomo: comunità preromane, persone persistenti, economia locale e diplomazia.">
-  <link rel="stylesheet" href="./style.css?v=1">
+  <link rel="stylesheet" href="./style.css?v=2">
 </head>
 <body>
 <main class="game-shell">
   <header class="hud" aria-label="Stato comunità">
-    <div class="brand"><small>PROTOTIPO INDIPENDENTE · 01</small><strong>VER SACRUM <em>LE GENTI</em></strong></div>
+    <div class="brand"><small>LE GENTI · RTS CLASSICO</small><strong>VER SACRUM <em>LE GENTI</em></strong></div>
     <div class="hud-numbers" aria-live="off">
       <span title="Cibo">🌾 <b id="food">0</b></span>
       <span title="Legname">🪵 <b id="wood">0</b></span>
@@ -20,6 +22,7 @@
     </div>
     <div class="hud-actions">
       <span id="season">Primavera · giorno 1</span>
+      <button id="fullscreenBtn" type="button" title="Schermo intero verticale" aria-label="Schermo intero verticale">⛶</button>
       <button id="pauseBtn" type="button" aria-label="Pausa o riprendi">Ⅱ</button>
       <button id="saveBtn" type="button" title="Salva la partita">Salva</button>
       <button id="newBtn" type="button" title="Inizia una nuova partita">↻</button>
@@ -42,16 +45,23 @@
         <button id="cancelBuild" type="button">✕</button>
       </div>
       <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
-      <div class="map-bottom"><canvas id="minimap" width="120" height="96" aria-label="Minimappa"></canvas><span>Tocca per selezionare · trascina per esplorare</span></div>
     </section>
-    <aside class="command-panel" aria-label="Comandi di gioco">
-      <div class="panel-title"><div><small>LA TUA COMUNITÀ</small><h2 id="selectedTitle">Il tuo insediamento</h2></div><span id="statusChip">Inizio</span></div>
-      <div id="selectedDetails" class="details"></div>
+    <aside class="command-panel" aria-label="Console strategica">
+      <div class="console-top">
+        <div class="minimap-frame" aria-label="Mappa del mondo">
+          <div class="minimap-heading">MONDO <span>◈</span></div>
+          <canvas id="minimap" width="160" height="120" aria-label="Minimappa navigabile"></canvas>
+        </div>
+        <div class="selection-console">
+          <div class="panel-title"><div><small>SELEZIONE</small><h2 id="selectedTitle">Il tuo insediamento</h2></div><span id="statusChip">Inizio</span></div>
+          <div id="selectedDetails" class="details"></div>
+        </div>
+      </div>
       <nav class="tabs" aria-label="Sezioni strategiche">
-        <button type="button" class="active" data-tab="people">Persone</button>
-        <button type="button" data-tab="build">Costruisci</button>
-        <button type="button" data-tab="politics">Genti</button>
-        <button type="button" data-tab="chronicle">Cronache</button>
+        <button type="button" class="active" data-tab="people"><span class="tab-icon" aria-hidden="true">⌂</span>Villaggi</button>
+        <button type="button" data-tab="build"><span class="tab-icon" aria-hidden="true">⚒</span>Costruisci</button>
+        <button type="button" data-tab="politics"><span class="tab-icon" aria-hidden="true">⚑</span>Genti</button>
+        <button type="button" data-tab="chronicle"><span class="tab-icon" aria-hidden="true">≡</span>Cronache</button>
       </nav>
       <div class="panel-content">
         <section id="tab-people" class="tab-panel">
@@ -81,6 +91,11 @@
     </aside>
   </div>
 </main>
+<div id="rotateNotice" class="rotate-notice" role="alert" aria-live="polite">
+  <div class="rotate-phone" aria-hidden="true"><span>↑</span></div>
+  <h2>Gioca in verticale</h2>
+  <p>Ver Sacrum · Le Genti utilizza esclusivamente lo schermo verticale. Ruota lo smartphone per continuare.</p>
+</div>
 <dialog id="helpDialog">
   <h2>Prime mosse</h2>
   <p>Seleziona una persona sul terreno o nell'elenco. Tocca una risorsa per ordinarle di raccoglierla. La persona raggiunge il luogo, carica la merce e la consegna fisicamente a un magazzino.</p>
@@ -89,6 +104,6 @@
   <p>La partita si salva solo in questo percorso del browser, senza interferire con il Ver Sacrum originale.</p>
   <form method="dialog"><button>Ho capito</button></form>
 </dialog>
-<script type="module" src="./game.js?v=1"></script>
+<script type="module" src="./game.js?v=2"></script>
 </body>
 </html>
