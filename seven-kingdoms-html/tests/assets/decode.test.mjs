@@ -12,9 +12,9 @@ const dbf=(rows)=>{const size=rows[0].length,b=Buffer.alloc(13+rows.length*size)
  rows.forEach((r,i)=>r.copy(b,13+i*size));return b;};
 test('packed DBF reads 1-based record sequence',()=>{const b=dbf([Buffer.from('abc'),Buffer.from('def')]);assert.equal(parseDbf(b).records[1].toString(),'def')});
 test('SFRAME preserves signed offsets and binary little-endian bitmap pointer',()=>{
- const b=Buffer.alloc(44,32);let p=0;
+ const b=Buffer.alloc(40,32);let p=0;
  for(const [s,n] of [['ROME',8],['M',2],['01',2],['01',2],['-012',4],['0007',4],['025',3],['031',3],['ROME',8]]){b.write(s,p,'latin1');p+=n;}
- b.writeUInt32LE(74565,40);
+ b.writeUInt32LE(74565,36);
  const r=decodeTable('SFRAME',dbf([b]))[0];
  assert.equal(r.offsetX,-12);assert.equal(r.bitmapOffset,74565);assert.equal(r.width,25);
 });
