@@ -2,6 +2,16 @@
 
 > **Stato: riscrittura JavaScript nativa, fase 1 — incompleta.** Non è Ver Sacrum, non è il vecchio prototipo `ver-sacrum-7k` e non è una conversione integrale di Seven Kingdoms. Questa nuova base ricalca, per ora in scala ridotta, le meccaniche e l'interfaccia di **Seven Kingdoms: Ancient Adversaries**.
 
+## Prova rapida della prima integrazione
+
+**[Apri la build di prova Core + Movimento](https://czekuns.github.io/Rtsmobile/seven-kingdoms-html/?playtest=1)**
+
+Questa modalità è **opzionale**: la versione normale dello stesso indirizzo senza `?playtest=1` resta invariata. La partita di prova usa una diversa chiave di salvataggio (`seven-kingdoms-html-quick-playtest-v1`), quindi non sovrascrive la demo precedente.
+
+Cosa testare in 2 minuti: aprire in orizzontale, chiudere la guida, toccare un soldato vicino a Corinto, quindi un terreno libero oltre un edificio o una striscia d'acqua; l'unità deve cercare un percorso senza attraversare il blocco. Verificare pausa/riprendi, costruzione e salvataggio. Se il punto è occupato, compare un messaggio: scegliere una casella libera.
+
+**Cosa è integrato qui:** moduli Core e Movimento indipendenti, accumulatore temporale a passo fisso, A* di movimento locale limitato alle unità della demo, test regressione. **Cosa NON è ancora integrato:** sprite originali, UI pixel-perfect, popolazione multietnica completa, combattimento, commercio fisico, salvataggi C++ e reale parità 7KAA. L'assegnazione del lavoratore a un edificio conserva la scorciatoia della demo.
+
 ## Avvio
 
 [Apri il prototipo HTML/JS](https://czekuns.github.io/Rtsmobile/seven-kingdoms-html/)

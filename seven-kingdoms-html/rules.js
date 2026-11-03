@@ -50,9 +50,9 @@ export class SevenGame{
   this.events=[];this.towns=[];this.firms=[];this.units=[];
   this.createSkirmish();
  }
- static load(){
+ static load(key=SAVE_KEY){
   try{
-   const data=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');
+   const data=JSON.parse(localStorage.getItem(key)||'null');
    if(!data||data.version!==1)return null;
    const g=Object.create(SevenGame.prototype);
    Object.assign(g,data);g.events??=[];g.unitTimer??=0;g.dayTimer??=0;
@@ -63,7 +63,7 @@ export class SevenGame{
    return g;
   }catch(_){return null;}
  }
- save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(this));return true}catch(_){return false}}
+ save(key=SAVE_KEY){try{localStorage.setItem(key,JSON.stringify(this));return true}catch(_){return false}}
  note(message){this.events.unshift({day:this.day,text:message});this.events=this.events.slice(0,70);}
  createSkirmish(){
   const towns=[
@@ -194,11 +194,12 @@ export class SevenGame{
   return {ok:true,msg:'Lavoratore uscito.',unit:u};
  }
  setSpeed(n){if([0,1,2,3,4,5].includes(n)){this.paused=n===0;this.speed=n||1}}
- update(dt){
+ update(dt,{moveUnits=true}={}){
   if(this.paused)return;
   const step=clamp(dt,0,.15)*this.speed;
   this.elapsed+=step;
-  for(const u of this.units){
+  // Legacy demo movement stays available outside the opt-in playtest.
+  if(moveUnits)for(const u of this.units){
    if(!u.target)continue;
    const d=range(u,u.target);
    if(d<.05){u.target=null;continue;}
