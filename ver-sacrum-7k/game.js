@@ -296,23 +296,43 @@ $('zoomOut').addEventListener('click',()=>scene.zoom(1/1.2));
 $('center').addEventListener('click',()=>{const town=game.town;if(town){const p=game.center(town);scene.center(p.x,p.y);}});
 $('pauseBtn').addEventListener('click',()=>{game.paused=!game.paused;refresh();show(game.paused?'Partita in pausa.':'Simulazione ripresa.');});
 $('fullscreenBtn').addEventListener('click',async()=>{
+  // Must be invoked directly from the user's tap (browser gesture requirement).
+  const menu=$('gameMenuPopup');
+  menu.hidden=true;
+  $('menuBtn').setAttribute('aria-expanded','false');
   try{
-    if(!document.fullscreenElement&&document.documentElement.requestFullscreen){
-      await document.documentElement.requestFullscreen({navigationUI:'hide'});
-      // Supported primarily in installed PWAs or fullscreen on Android.
-      if(screen.orientation?.lock){
-        try{await screen.orientation.lock('landscape');}catch(_){/* CSS landscape gate below */ }
+    if(document.fullscreenElement){
+      if(document.exitFullscreen)await document.exitFullscreen();
+      if(screen.orientation?.unlock){
+        try{screen.orientation.unlock();}catch(_){}
       }
-    }else if(document.fullscreenElement&&document.exitFullscreen){
-      await document.exitFullscreen();
     }else{
-      show('Il browser non consente lo schermo intero. Gioca in orizzontale.');
+      const request=document.documentElement.requestFullscreen||
+        document.documentElement.webkitRequestFullscreen;
+      if(!request){
+        show('Questo browser non supporta lo schermo intero da una pagina web.');
+        return;
+      }
+      try{await request.call(document.documentElement,{navigationUI:'hide'});}
+      catch(error){
+        if(!document.fullscreenElement)await request.call(document.documentElement);
+      }
+      if(screen.orientation?.lock){
+        try{await screen.orientation.lock('landscape');}
+        catch(_){/* The landscape-only overlay remains available as fallback. */}
+      }
     }
-  }catch(_){show('Schermo intero non disponibile. Il gioco resta utilizzabile in orizzontale.');}
+  }catch(_){
+    show('Il browser non consente lo schermo intero. Usa il menu del browser oppure installa la PWA.');
+  }
 });
 document.addEventListener('fullscreenchange',()=>{
-  $('fullscreenBtn').textContent=document.fullscreenElement?'⤢':'⛶';
-  $('fullscreenBtn').setAttribute('aria-label',document.fullscreenElement?'Esci da schermo intero':'Schermo intero orizzontale');
+  const on=!!document.fullscreenElement;
+  $('fullscreenBtn').textContent=on?'⤢':'⛶';
+  $('fullscreenBtn').setAttribute('aria-label',on?'Esci da schermo intero':'Attiva schermo intero');
+  $('fullscreenBtn').setAttribute('aria-pressed',String(on));
+  $('fullscreenBtn').title=on?'Esci dallo schermo intero':'Schermo intero';
+  last=0;
 });
 if(portraitBlocked.addEventListener){
   portraitBlocked.addEventListener('change',()=>{last=0;refresh();});
