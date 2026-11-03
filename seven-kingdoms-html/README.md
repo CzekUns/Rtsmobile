@@ -15,6 +15,12 @@ python3 -m http.server 8000
 
 **Nessuna dipendenza, nessuna compilazione, nessun .wasm.** Richiede un browser moderno con moduli ES e Canvas 2D.
 
+## Piano maestro di sviluppo e asset
+
+**[PIANO_DI_SVILUPPO.md](./PIANO_DI_SVILUPPO.md)** — calendario per fasi, priorità, dipendenze, gate di collaudo, backlog completo di gioco, mod e asset da convertire/creare. È il documento da leggere per primo prima di implementare nuove funzionalità; include una checklist immediata e il registro di avanzamento.
+
+**[PORTING_MAP.md](./PORTING_MAP.md)** — corrispondenze tra sorgenti C++ originali e moduli JavaScript per verificare che la conversione segua Seven Kingdoms e non Ver Sacrum.
+
 ## Cosa deve essere questo progetto
 
 Si vuole **riscrivere Seven Kingdoms**, un modulo alla volta, per poter personalizzare in JavaScript il comportamento del gioco. Il riferimento è l'originale 7KAA GPLv2, non il game design di Ver Sacrum.
