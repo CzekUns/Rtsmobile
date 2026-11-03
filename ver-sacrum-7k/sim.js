@@ -149,7 +149,7 @@ export class Strategy {
   }
   walk(p,target,dt,stop=.65){
     const d=distance(p,target);
-    if(d<=stop)return true;
+    if(d<=stop+0.0001)return true;
     const delta=Math.min(dt*2.9,d-stop);
     if(d>0){p.x+=(target.x-p.x)*delta/d;p.y+=(target.y-p.y)*delta/d;}
     return false;
