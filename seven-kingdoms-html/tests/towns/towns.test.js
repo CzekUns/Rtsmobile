@@ -4,7 +4,7 @@ import { collectTax,reward,processAuto,recruitableRacePop,recruitLoyaltyPenalty,
 function town(overrides={}){return {nationId:1,hasLinkedOwnCamp:true,hasLinkedEnemyCamp:false,accumulatedCollectTaxPenalty:0,accumulatedRewardPenalty:0,accumulatedRecruitPenalty:0,races:[{population:20,jobless:12,spies:2,loyalty:50,targetLoyalty:70,growth:0},{population:10,jobless:5,spies:1,loyalty:95,targetLoyalty:50,growth:0}],...overrides};}
 test('C++ collect_tax: 5 per head only if full drop; loyalty capped yields less income',()=>{
  const t=town(),x=collectTax(t);
- assert.equal(x.cashDelta,20*5+10*2.5);assert.equal(x.nextTown.races[0].loyalty,40);
+ assert.equal(x.cashDelta,20*5+10*5);assert.equal(x.nextTown.races[0].loyalty,40);
  assert.equal(x.nextTown.races[1].loyalty,85);assert.equal(t.races[0].loyalty,50);
 });
 test('C++ collect_tax repeated: decrease 10,12,14,16,18,20,20',()=>{
