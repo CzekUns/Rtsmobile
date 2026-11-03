@@ -6,8 +6,8 @@ import {createHash} from 'node:crypto';
 export const checksum=b=>createHash('sha256').update(b).digest('hex');
 const check=(v,m)=>{if(!v)throw Error(m)};
 function jsonObjectAfter(js,needle){
- const pos=js.indexOf(needle);check(pos>=0,'Missing Emscripten metadata: '+needle);
- const start=js.indexOf('{',pos+needle.length);check(start>=0,'No JSON object for '+needle);
+ const pos=needle==='loadPackage({'?js.lastIndexOf(needle):js.indexOf(needle);check(pos>=0,'Missing Emscripten metadata: '+needle);
+ const start=needle==='loadPackage({'?pos+needle.length-1:js.indexOf('{',pos+needle.length);check(start>=0,'No JSON object for '+needle);
  let depth=0,quoted=false,escaped=false;
  for(let i=start;i<js.length;i++){
   const c=js[i];if(quoted){if(escaped)escaped=false;else if(c==='\\')escaped=true;else if(c==='"')quoted=false;continue;}
@@ -17,7 +17,7 @@ function jsonObjectAfter(js,needle){
 }
 export function packageMetadata(js){
  const compressed=jsonObjectAfter(js,'var compressedData = ');
- const files=jsonObjectAfter(js,'loadPackage(');
+ const files=jsonObjectAfter(js,'loadPackage({');
  const list=files.files;
  check(Array.isArray(list)&&Number.isSafeInteger(files.remote_package_size),'Invalid package file list');
  check(Array.isArray(compressed.offsets)&&Array.isArray(compressed.sizes)&&Array.isArray(compressed.successes),'Invalid LZ4 chunk metadata');
