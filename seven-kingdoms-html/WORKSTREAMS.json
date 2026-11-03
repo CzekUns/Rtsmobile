@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "project": "Seven Kingdoms HTML Edition",
+  "baseBranch": "main",
+  "projectRoot": "seven-kingdoms-html/",
+  "note": "Scope enforcement for agent/skh-<stream>/<task> pull requests. Other repository branches are unaffected.",
+  "streams": [
+    {
+      "id": "assets",
+      "branchPrefix": "agent/skh-assets/",
+      "issueId": "SKH-101",
+      "role": "Original sprite/archive conversion pipeline",
+      "allowedPaths": [
+        "seven-kingdoms-html/tools/assets/",
+        "seven-kingdoms-html/assets/manifests/",
+        "seven-kingdoms-html/assets/previews/",
+        "seven-kingdoms-html/tests/assets/",
+        "seven-kingdoms-html/docs/assets/"
+      ],
+      "readOnlyDependencies": [
+        "CzekUns/sevenkindomsmobile/data/",
+        "upstream 7KAA source and docs"
+      ]
+    },
+    {
+      "id": "towns",
+      "branchPrefix": "agent/skh-towns/",
+      "issueId": "SKH-102",
+      "role": "Pure original Seven Kingdoms town rules and parity tests",
+      "allowedPaths": [
+        "seven-kingdoms-html/systems/towns/",
+        "seven-kingdoms-html/tests/towns/",
+        "seven-kingdoms-html/docs/towns/"
+      ],
+      "readOnlyDependencies": [
+        "seven-kingdoms-html/rules.js",
+        "upstream 7KAA src/OTOWN*.cpp"
+      ]
+    },
+    {
+      "id": "ui",
+      "branchPrefix": "agent/skh-ui/",
+      "issueId": "SKH-103",
+      "role": "Classic 800x600 UI components and reference overlays",
+      "allowedPaths": [
+        "seven-kingdoms-html/ui/classic/",
+        "seven-kingdoms-html/tests/ui/",
+        "seven-kingdoms-html/docs/ui/"
+      ],
+      "readOnlyDependencies": [
+        "seven-kingdoms-html/index.html",
+        "seven-kingdoms-html/style.css",
+        "upstream screenshots"
+      ]
+    },
+    {
+      "id": "core",
+      "branchPrefix": "agent/skh-core/",
+      "issueId": "SKH-104",
+      "role": "Simulation clock, RNG, persistent IDs and versioned saves",
+      "allowedPaths": [
+        "seven-kingdoms-html/core/",
+        "seven-kingdoms-html/tests/core/",
+        "seven-kingdoms-html/docs/core/"
+      ],
+      "readOnlyDependencies": [
+        "seven-kingdoms-html/rules.js",
+        "seven-kingdoms-html/game.js"
+      ]
+    },
+    {
+      "id": "movement",
+      "branchPrefix": "agent/skh-movement/",
+      "issueId": "SKH-105",
+      "role": "Grid collision and deterministic pathfinding primitives",
+      "allowedPaths": [
+        "seven-kingdoms-html/systems/movement/",
+        "seven-kingdoms-html/tests/movement/",
+        "seven-kingdoms-html/docs/movement/"
+      ],
+      "readOnlyDependencies": [
+        "seven-kingdoms-html/rules.js",
+        "seven-kingdoms-html/view.js",
+        "upstream OUNITM.cpp"
+      ]
+    },
+    {
+      "id": "integration",
+      "branchPrefix": "agent/skh-integration/",
+      "issueId": "SKH-106",
+      "role": "Contract verification, wiring and release QA; only stream authorized to edit shared entrypoints",
+      "allowedPaths": [
+        "seven-kingdoms-html/",
+        ".github/workflows/seven-kingdoms-html-ci.yml"
+      ],
+      "readOnlyDependencies": [
+        "other streams' approved PRs and contracts"
+      ]
+    }
+  ],
+  "sharedEntrypoints": [
+    "seven-kingdoms-html/game.js",
+    "seven-kingdoms-html/rules.js",
+    "seven-kingdoms-html/view.js",
+    "seven-kingdoms-html/index.html",
+    "seven-kingdoms-html/style.css",
+    "seven-kingdoms-html/package.json",
+    "seven-kingdoms-html/README.md",
+    "seven-kingdoms-html/PIANO_DI_SVILUPPO.md",
+    "seven-kingdoms-html/PORTING_MAP.md",
+    "seven-kingdoms-html/AGENTS.md",
+    "seven-kingdoms-html/WORKSTREAMS.json",
+    "seven-kingdoms-html/PARALLEL_WORK.md"
+  ],
+  "policy": "No feature stream writes shared files. Integration stream wires approved exports after review; rebase from main; one PR per task."
+}
