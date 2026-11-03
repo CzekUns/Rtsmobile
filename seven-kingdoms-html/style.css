@@ -1,0 +1,65 @@
+/* Native HTML edition of Seven Kingdoms. 800x600 original game geometry.
+   GPL-2.0-only. Original UI recreation, not original copyrighted bitmaps. */
+:root{color-scheme:light;--parchment:#d9d7c7;--stone:#a7a99a;--dark:#676b5d;--ink:#242922;--bronze:#a18e61}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none;background:#141612;color:var(--ink);font:12px Georgia,"Times New Roman",serif}
+button{border:2px outset #e2dfcf;border-right-color:#74786d;border-bottom-color:#75776a;background:linear-gradient(145deg,#eae8dc,#b7b9aa);color:#343329;font:700 11px Georgia,serif;cursor:pointer;padding:3px 5px;touch-action:manipulation}
+button:active{border-style:inset;background:#a3a494}
+button:disabled{opacity:.5}
+button:focus-visible{outline:2px solid #e9bc60}
+[hidden]{display:none!important}
+#stage{position:absolute;left:50%;top:50%;width:800px;height:600px;transform:translate(-50%,-50%) scale(1);transform-origin:center center;background:var(--stone);border:3px ridge #d5d3c1;overflow:hidden;box-shadow:0 0 0 1px #111,0 12px 40px #000c}
+.topbar{width:794px;height:66px;display:grid;grid-template-columns:269px 169px 157px 199px;gap:0;background:radial-gradient(#67705d1f .8px,transparent 1px) 0 0/4px 4px,linear-gradient(#e0dfd0,#aeb1a2);border-bottom:3px ridge #777b6e;padding:1px}
+.reports{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:1px;padding-right:3px}
+.reports button{padding:0;font-size:10px;line-height:1;white-space:nowrap;font-style:italic}
+.reports button.active{background:linear-gradient(#f4dcaa,#b9a171);color:#342918;border-color:#a2834a}
+.treasury{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:0;padding:2px 4px;align-items:center;border-right:2px ridge #dcd7c5}
+.treasury span{padding:2px 5px;display:flex;align-items:center;gap:5px;border-bottom:1px solid #b4b3a5;font-size:14px;white-space:nowrap}
+.treasury b{font-size:12px;font-variant-numeric:tabular-nums}
+.datebox{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:5px;border-right:2px ridge #9e9e8f}
+.datebox strong{font-size:14px}
+.datebox small{font-size:10px;color:#615e4e}
+.toptools{display:flex;justify-content:flex-end;align-items:stretch;gap:2px;position:relative;padding:3px}
+.toptools>button{min-width:37px;font-size:19px}
+.toptools #menuBtn{width:76px;font-size:13px}
+.menu{position:absolute;top:56px;right:0;width:167px;z-index:40;display:grid;gap:4px;padding:6px;border:3px ridge #a6a799;box-shadow:0 9px 18px #0009;background:linear-gradient(145deg,#dedacc,#b6b9aa)}
+.menu button{min-height:29px}
+.playfield{display:grid;grid-template-columns:612px 182px;height:528px;min-height:0}
+.land{position:relative;width:612px;height:528px;overflow:hidden;background:#6d8466}
+#world{width:612px;height:528px;display:block;touch-action:none;cursor:crosshair}
+.ticker{position:absolute;bottom:0;left:0;right:0;min-height:22px;padding:3px 8px;background:#e4e0cacf;border-top:2px ridge #d2c9a4;font:bold 11px Georgia,serif;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;pointer-events:none}
+.map-tools{position:absolute;right:6px;top:6px;display:grid;gap:2px;opacity:.83}
+.map-tools button{width:28px;height:27px;font-size:17px;padding:0}
+.build-bar{position:absolute;top:4px;left:50%;transform:translateX(-50%);z-index:5;display:flex;align-items:center;gap:8px;padding:5px 7px;border:3px ridge #9b977e;box-shadow:0 5px 12px #0007;background:#e2d9bf}
+.build-bar strong{white-space:nowrap}
+.build-bar button{min-height:24px}
+.sidebar{width:182px;height:528px;min-height:0;background:#aeb0a1;border-left:4px ridge #818579}
+.minimap-wrap{width:178px;height:142px;padding:2px;border-bottom:4px ridge #d5d1c1;background:#656f61}
+#minimap{width:172px;height:135px;display:block;cursor:crosshair;touch-action:manipulation}
+.overview{height:386px;display:flex;flex-direction:column;overflow:hidden;border:2px ridge #c8c9b8;background:radial-gradient(#56574716 .75px,transparent 1.2px) 0 0/4px 4px,linear-gradient(#cecebf,#aaa99b)}
+.selection-header{flex:0 0 26px;display:flex;align-items:center;gap:6px;padding:2px 5px;background:#d4d3c5;border-bottom:2px ridge #aaa99b}
+.selection-header h1{margin:0;font:bold 13px Georgia,serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#flag{display:inline-block;width:14px;height:14px;background:#c94741;border:2px ridge #faf0d4;flex:0 0 14px}
+.selection-meta{flex:0 0 18px;text-align:center;font:bold 10px Georgia,serif;color:#4c4738;padding:3px;border-bottom:1px solid #95998b}
+.selection-info{flex:0 0 auto;max-height:78px;min-height:40px;overflow:auto;font:11px/1.35 Georgia,serif;padding:6px 6px 4px;border-bottom:1px solid #878c80}
+.selection-info strong{color:#513f22}
+.selection-actions{flex:0 0 auto;max-height:102px;min-height:34px;overflow:auto;display:flex;align-items:flex-start;align-content:flex-start;gap:3px;flex-wrap:wrap;padding:5px;border-bottom:3px ridge #969c8c}
+.selection-actions button{font-size:10px;padding:5px 4px;min-height:26px;max-width:100%}
+.report-header{flex:0 0 21px;padding:3px;text-align:center;letter-spacing:.07em;font:bold 11px Georgia,serif;background:#bbbdb0;border-bottom:1px solid #7b8173}
+.report-body{flex:1;min-height:0;overflow:auto;padding:4px 5px 7px;overscroll-behavior:contain}
+.report-body .report-item{display:block;width:100%;text-align:left;padding:5px 4px;margin:0 0 4px;font:11px/1.25 Georgia,serif}
+.report-body small{display:block;color:#666454;font-size:10px}
+.report-body p{font:11px/1.25 Georgia,serif;margin:3px 0 6px}
+.report-body .card{border:1px ridge #969b8c;background:#d1d0c280;padding:5px;margin-bottom:5px}
+.report-body .card b{display:block;margin-bottom:3px}
+#rotate{display:none}
+dialog{max-width:500px;max-height:80dvh;overflow:auto;background:#d9d6c7;color:#282c22;border:5px ridge #9e9c82;padding:20px;font:13px/1.5 Georgia,serif}
+dialog::backdrop{background:#080b08bd}
+dialog button{min-height:35px;padding:6px 15px}
+@media(orientation:portrait){
+  #stage{visibility:hidden}
+  #rotate{position:fixed;inset:0;z-index:99;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:22px;color:#efe7d2;background:linear-gradient(135deg,#343a30,#151a13);text-align:center}
+  #rotate h2{margin:0;font:bold 23px Georgia,serif}
+  #rotate p{max-width:360px;margin:0;font:14px/1.5 Georgia,serif}
+  .phone-icon{width:88px;height:52px;border:5px solid #e1bd7e;border-radius:12px;display:grid;place-items:center;font-size:30px}
+}
