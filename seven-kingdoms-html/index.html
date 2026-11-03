@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#777668">
+<title>Seven Kingdoms · HTML Edition (JS nativo)</title>
+<meta name="description" content="Ricostruzione sperimentale del gioco Seven Kingdoms in JavaScript nativo.">
+<link rel="stylesheet" href="style.css?v=1">
+</head>
+<body>
+<div id="stage" role="application" aria-label="Seven Kingdoms HTML Edition">
+  <header class="topbar">
+    <div class="reports" aria-label="Rapporti">
+      <button data-report="kingdoms" title="Regni · F1">Regni</button>
+      <button data-report="towns" title="Villaggi · F2" class="active">Villaggi</button>
+      <button data-report="economy" title="Economia · F3">Economia</button>
+      <button data-report="trade" title="Commercio · F4">Scambi</button>
+      <button data-report="military" title="Militari · F5">Militari</button>
+      <button data-report="tech" title="Tecnologia · F6">Tecnologia</button>
+      <button data-report="spies" title="Spie · F7">Spie</button>
+      <button data-report="ranking" title="Classifica · F8">Classifica</button>
+      <button data-report="news" title="Notizie · F9">Notizie</button>
+    </div>
+    <div class="treasury" aria-label="Risorse del regno">
+      <span title="Denaro">◉ <b id="cash">0</b></span>
+      <span title="Cibo">❖ <b id="food">0</b></span>
+      <span title="Minerali">▣ <b id="raw">0</b></span>
+      <span title="Prodotti">◈ <b id="goods">0</b></span>
+    </div>
+    <div class="datebox"><strong id="date">Giorno 1</strong><small id="gameSpeed">Velocità 1×</small></div>
+    <div class="toptools">
+      <button id="pauseBtn" type="button" title="Pausa / Riprendi · Spazio">Ⅱ</button>
+      <button id="fullscreenBtn" type="button" title="Schermo intero">⛶</button>
+      <button id="menuBtn" type="button" aria-controls="gameMenu" aria-expanded="false">MENU</button>
+      <div id="gameMenu" class="menu" hidden>
+        <button data-menu="save" type="button">Salva</button>
+        <button data-menu="new" type="button">Nuova partita</button>
+        <button data-menu="help" type="button">Istruzioni</button>
+        <button data-menu="speed" type="button">Velocità</button>
+        <button data-menu="source" type="button">Codice sorgente</button>
+      </div>
+    </div>
+  </header>
+  <div class="playfield">
+    <div class="land">
+      <canvas id="world" width="612" height="528" aria-label="Mappa interattiva"></canvas>
+      <div id="buildBar" class="build-bar" hidden>
+        <strong id="buildLabel">Costruzione</strong>
+        <button id="cancelBuild" type="button">Annulla ✕</button>
+      </div>
+      <div class="map-tools">
+        <button data-camera="plus" type="button" title="Zoom +">+</button>
+        <button data-camera="minus" type="button" title="Zoom −">−</button>
+        <button data-camera="center" type="button" title="Torna a Corinto">⌖</button>
+      </div>
+      <div id="ticker" class="ticker">Un nuovo regno greco sorge presso Corinto.</div>
+    </div>
+    <aside class="sidebar" aria-label="Minimappa e ordini">
+      <div class="minimap-wrap"><canvas id="minimap" width="184" height="137" aria-label="Minimappa navigabile"></canvas></div>
+      <div class="overview">
+        <div class="selection-header"><i id="flag"></i><h1 id="selectionTitle">Corinto</h1></div>
+        <div id="selectionMeta" class="selection-meta">Villaggio greco</div>
+        <div id="selectionInfo" class="selection-info"></div>
+        <div id="selectionActions" class="selection-actions"></div>
+        <div class="report-header" id="reportTitle">VILLAGGI</div>
+        <div id="reportBody" class="report-body"></div>
+      </div>
+    </aside>
+  </div>
+</div>
+<div id="rotate" aria-live="polite">
+ <div class="phone-icon">⟲</div><h2>Ruota lo smartphone</h2><p>La ricostruzione di Seven Kingdoms usa l'interfaccia orizzontale 800×600.</p>
+</div>
+<dialog id="helpDialog">
+<h2>Seven Kingdoms · HTML Edition</h2>
+<p>Questa è la prima ricostruzione <strong>JavaScript nativa</strong>, ancora parziale, del gioco originale. Non è il gioco completo e non usa WebAssembly.</p>
+<p><strong>Comandi:</strong> tocca o clicca un villaggio, una struttura o un'unità. Con un'unità selezionata, tocca un punto vuoto per farla camminare. Tieni premuto e trascina per scorrere la mappa. Tocca la minimappa per cambiare zona.</p>
+<p><strong>Villaggi:</strong> recluta abitanti, riscuoti tasse e concedi sussidi. La fedeltà influenza il governo; per unire un villaggio indipendente serve un forte vicino e una resistenza bassa.</p>
+<p><strong>Strutture:</strong> dalla scheda Economia scegli un edificio, poi indica sulla mappa dove costruirlo. Recluta abitanti dal villaggio e assegnali agli edifici. Minerali → Fabbriche → Mercati è la prima filiera economica.</p>
+<p><strong>PC:</strong> tasto destro su destinazione per spostare l'unità, F1–F9 per i rapporti, 0 / Spazio per pausa, 1–5 per velocità, S per salvare.</p>
+<form method="dialog"><button type="submit">Continua</button></form>
+</dialog>
+<script type="module" src="game.js?v=1"></script>
+</body>
+</html>
