@@ -3,6 +3,7 @@
  * Core simulation: edit here, no compiler or WebAssembly required.
  */
 import {ensureFirmPersonnel,staffFromUnit,releasedUnitAttributes} from './playtest/personnel.js';
+import {findWorkerExitTile} from './playtest/worker-exit-tile.js';
 export const WORLD_W=76,WORLD_H=66;
 export const NATIONS=[
   {id:0,name:'Indipendenti',color:'#d3ba74'},
@@ -208,10 +209,19 @@ export class SevenGame{
   if(!f.staff.length)return {ok:false,msg:'Nessun lavoratore da far uscire.'};
   const index=staffId===null?f.staff.length-1:f.staff.findIndex(p=>p.id===staffId);
   if(index<0)return {ok:false,msg:'Lavoratore non trovato.'};
+  // Find a valid free tile BEFORE changing the roster: a blocked exit must
+  // never delete a person or create a unit overlapping another entity.
+  const exit=findWorkerExitTile(f,{
+   width:WORLD_W,height:WORLD_H,
+   isBlocked:(x,y)=>this.occupied(x,y)||
+    this.units.some(u=>Math.floor(u.x)===x&&Math.floor(u.y)===y)||
+    ['water'].includes(terrain(this.seed,x,y))
+  });
+  if(!exit)return {ok:false,msg:'Nessuna casella libera per far uscire il lavoratore.'};
   const [person]=f.staff.splice(index,1);
   f.workers=f.staff.length;
   const u=entity('u',{
-   ...releasedUnitAttributes(person,f),x:f.x+f.size+1,y:f.y+1
+   ...releasedUnitAttributes(person,f),x:exit.x+.5,y:exit.y+.5
   });
   this.units.push(u);
   this.note('Lavoratore '+person.id+' uscito da '+FIRMS[f.kind].label+'.');
