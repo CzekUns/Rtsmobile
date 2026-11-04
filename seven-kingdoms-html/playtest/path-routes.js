@@ -33,8 +33,9 @@ export function issuePlaytestOrder(game,unitId,x,y){
     return {ok:false,msg:'Destinazione fuori dalla mappa.'};
   const firm=game.firms.find(f=>x>=f.x&&x<f.x+f.size&&y>=f.y&&y<f.y+f.size);
   if(firm&&firm.owner===1){
-    u.route=[];u.target=null;
-    return game.assign(unitId,firm.id); // Existing demo shortcut; not authentic physical assignment.
+    const result=game.assign(unitId,firm.id); // Preserve a marching route if the firm rejects assignment.
+    if(result.ok){u.route=[];u.target=null;}
+    return result; // Existing demo shortcut; not authentic physical assignment.
   }
   const start={x:tileOf(u.x),y:tileOf(u.y)};
   const clicked={x:Math.floor(x),y:Math.floor(y)};
