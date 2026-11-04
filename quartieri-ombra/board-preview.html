@@ -5,9 +5,13 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#181310">
 <title>Quartieri d'Ombra — Plancia Five Points 1860</title>
-<link rel="stylesheet" href="./board-preview.css">
-<script src="./board-world.js" defer></script>
-<script src="./board-preview.js" defer></script>
+<link rel="stylesheet" href="./board-preview.css?v=fix-20261104-1">
+<script src="./board-world.js?v=fix-20261104-1" defer></script>
+<script src="./board-preview.js?v=fix-20261104-1" defer></script>
+<script>
+window.addEventListener("error",function(e){var t=document.getElementById("board-toast");if(t)t.textContent="ERRORE PLANCIA: "+(e.message||"script non caricato");});
+window.addEventListener("load",function(){setTimeout(function(){var t=document.getElementById("board-toast");if(!window.QOBoardWorld&&t)t.textContent="ERRORE: modello mappa non caricato. Aggiorna la pagina.";},1200)});
+</script>
 </head>
 <body>
 <div class="board-shell" id="board-shell">
