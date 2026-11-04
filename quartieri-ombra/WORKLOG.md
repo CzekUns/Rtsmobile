@@ -50,3 +50,8 @@
 - Creato test persistente `tests/defeat.test.cjs` (5 scenari) commit `3e179cf59da90069c1eea4081014560a7b487793`.
 - Verificato sul codice letto nuovamente da main: parsing JavaScript PASS, condizione aggiornata presente, 5 casi logici PASS in V8. Il test Node salvato non è stato eseguito nell'ambiente corrente; manca browser smoke e test touch.
 - Prossimo obiettivo: suite dinamica integrata per influenza/economia/IA e rendering isometrico reale.
+
+## 2026-11-04 14:00 — Worker, regressione pathfinding
+- Creato `tests/pathfinding.test.cjs`, commit `b54525c6cb8ff262effbd3199da82259363055e3`. La suite usa `node:vm` per eseguire la funzione `route()` estratta da `game.js`, anziché ricopiare l'algoritmo, e verifica 7 condizioni.
+- Verificati 4 casi dinamici direttamente in V8 sulla funzione originale (4/4 PASS). Tentato download del sorgente nel container per eseguire Node: DNS `raw.githubusercontent.com` non risolto; NON dichiarata esecuzione della suite Node né smoke browser.
+- Prossimo obiettivo: eseguire suite Node in ambiente con accesso al repository, integrare regressione su economia/influenza e proseguire isometria.
