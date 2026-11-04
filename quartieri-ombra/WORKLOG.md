@@ -1,5 +1,15 @@
 # Diario avanzamento
 
+## 2026-11-04 — Priorità landscape/fullscreen/UI bloccata allo schermo
+- Richiesta utente: grafica isometrica 100%, gioco solo orizzontale, pulsante fullscreen e ottimizzazione viewport. Evitare completamente che il gesto touch trascini l'intera UI.
+- Aggiornati `index.html`: pulsante fullscreen nella barra alta e overlay "Ruota il dispositivo" per smartphone portrait.
+- Aggiornati `style.css`: shell fissata a 100dvh e documento senza scroll/overscroll/touch-pan, HUD/score/minimappa ancorati, Canvas a 100% dell'area battaglia, layout compatto per landscape a bassa altezza.
+- Aggiornato `game.js`: pausa simulazione in portrait, Fullscreen API con tentativo facoltativo di orientation.lock e fallback, resize del backing Canvas ai pixel viewport/DPR, scala cover uniforme senza deformare sprite, mapping pointer/zoom e minimappa collegati al viewport reale.
+- Creato `tests/viewport-ui.test.cjs` per smoke test Node/V8 di rotazione, inizializzazione, resize, fullscreen e binding gesture. Verifiche già eseguite nell'ambiente tool: parsing JS in V8 riuscito; avvio simulato nel DOM mock, resize 740×315 CSS px → 1480×630 pixel, pulsante fullscreen registrato, partita facile avviata, listener touch/pointer presenti (PASS).
+- TEST NON ANCORA ESEGUITI: suite Node persistente in ambiente locale reale; browser desktop/mobile, fullscreen hardware Android, notch/safe-area, confronto visivo renderer. Non marcare queste attività completate.
+- Roadmap modificata: questa è priorità immediata sopra nuovi sistemi; renderer ancora NON isometrico 100% e deve essere affrontato dal worker come prossimo intervento.
+
+
 ## 2026-11-04 — Importazione asset v1
 - Generato un nuovo concept sheet con ulteriori edifici (taverna, mercato, magazzino, distilleria, abitazioni), terreni e UI in stile RTS 2000.
 - Creato pacchetto locale di asset derivati: 4 edifici, 2 sprite-sheet personaggio, 12 varianti terreno, foglio HUD, concept sheet; pacchetto ZIP offerto in conversazione.
