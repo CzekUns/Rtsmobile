@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#181310">
+<title>Quartieri d'Ombra — Plancia Five Points 1860</title>
+<link rel="stylesheet" href="./board-preview.css?v=20261104-b2">
+<script src="./board-world.js?v=20261104-b2" defer></script>
+<script src="./board-preview.js?v=20261104-b2" defer></script>
+<script>
+/* Board boot watchdog: errors are visible rather than a silent black canvas. */
+window.__qoBoardPainted=false;
+function boardBootError(message){
+ var panel=document.getElementById("board-ready");
+ if(panel){panel.hidden=false;panel.textContent="Plancia non avviata: "+message;}
+ var toast=document.getElementById("board-toast");if(toast)toast.textContent="DIAGNOSTICA: "+message;
+}
+window.addEventListener("error",function(e){boardBootError(e.message||"risorsa non caricata");});
+window.addEventListener("unhandledrejection",function(e){boardBootError(String(e.reason||"errore di avvio"));});
+window.addEventListener("load",function(){
+ setTimeout(function(){if(!window.__qoBoardPainted)boardBootError("caricamento incompleto. Controllare connessione e aggiornare.");},8000);
+});
+</script>
+</head>
+<body>
+<div class="board-shell" id="board-shell">
+ <header class="board-top">
+  <div class="board-brand"><strong>QUARTIERI D'OMBRA</strong><small>FIVE POINTS · NEW YORK · 1860 · B2</small></div>
+  <div class="board-state"><span>SETTORI <b>09</b></span><span>EDIFICI <b id="building-count">—</b></span><span id="sector-name">CROCEVIA DEI FIVE POINTS</span></div>
+  <nav class="top-controls" aria-label="Visualizzazione">
+   <a class="classic-link" href="./index.html" title="Gioco Alpha">ALPHA</a>
+   <button type="button" id="full-btn" title="Schermo intero" aria-label="Attiva schermo intero">⛶</button>
+  </nav>
+ </header>
+ <main class="board-stage" id="board-stage">
+   <div id="board-ready" role="status" aria-live="polite" style="position:absolute;z-index:1;top:50%;left:50%;transform:translate(-50%,-50%);border:2px ridge #9d7850;background:#211a15ee;padding:15px 22px;max-width:85%;color:#efcb92;text-align:center;font:14px Georgia,serif;pointer-events:none">Preparazione della plancia Five Points…</div>
+   <canvas id="board-canvas" aria-label="Plancia isometrica interattiva di Five Points. Trascina per esplorare, pizzica per ingrandire."></canvas>
+   <div class="board-toast" id="board-toast">NUOVA PLANCIA · Scenario in costruzione · Trascina per esplorare</div>
+   <div class="board-zoom" aria-label="Controlli mappa">
+    <button type="button" id="zoom-in" aria-label="Ingrandisci">+</button>
+    <button type="button" id="zoom-out" aria-label="Riduci">−</button>
+    <button type="button" id="home-btn" aria-label="Torna a Five Points">⌖</button>
+   </div>
+ </main>
+ <footer class="board-hud">
+  <div class="map-panel">
+    <canvas id="board-minimap" width="220" height="140" aria-label="Minimappa, tocca per centrare la visuale"></canvas>
+  </div>
+  <div class="board-info">
+    <div class="info-tag">CARTA DEL DISTRETTO</div>
+    <strong id="selected-name">Il crocevia</strong>
+    <p id="selected-description">Una ricostruzione artistica in 9 settori. Le case, le strade e i lotti sono elementi separati, non un'immagine fissa.</p>
+  </div>
+  <div class="board-actions">
+    <div class="info-tag">ESPLORA</div>
+    <div class="board-hint">Trascina: sposta mappa</div>
+    <div class="board-hint">Due dita / rotella: zoom</div>
+    <div class="board-hint">Tocca un edificio per leggerne il tipo</div>
+  </div>
+ </footer>
+</div>
+<div class="rotate-gate" aria-live="polite">
+ <div class="gate-paper"><div class="rotation-icon">↻</div><strong>RUOTA IL TELEFONO</strong><p>La plancia di Quartieri d'Ombra si esplora in orizzontale.</p></div>
+</div>
+</body>
+</html>

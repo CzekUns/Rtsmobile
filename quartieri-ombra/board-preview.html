@@ -5,18 +5,28 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#181310">
 <title>Quartieri d'Ombra — Plancia Five Points 1860</title>
-<link rel="stylesheet" href="./board-preview.css?v=fix-20261104-1">
-<script src="./board-world.js?v=fix-20261104-1" defer></script>
-<script src="./board-preview.js?v=fix-20261104-1" defer></script>
+<link rel="stylesheet" href="./board-preview.css?v=20261104-b2">
+<script src="./board-world.js?v=20261104-b2" defer></script>
+<script src="./board-preview.js?v=20261104-b2" defer></script>
 <script>
-window.addEventListener("error",function(e){var t=document.getElementById("board-toast");if(t)t.textContent="ERRORE PLANCIA: "+(e.message||"script non caricato");});
-window.addEventListener("load",function(){setTimeout(function(){var t=document.getElementById("board-toast");if(!window.QOBoardWorld&&t)t.textContent="ERRORE: modello mappa non caricato. Aggiorna la pagina.";},1200)});
+/* Board boot watchdog: errors are visible rather than a silent black canvas. */
+window.__qoBoardPainted=false;
+function boardBootError(message){
+ var panel=document.getElementById("board-ready");
+ if(panel){panel.hidden=false;panel.textContent="Plancia non avviata: "+message;}
+ var toast=document.getElementById("board-toast");if(toast)toast.textContent="DIAGNOSTICA: "+message;
+}
+window.addEventListener("error",function(e){boardBootError(e.message||"risorsa non caricata");});
+window.addEventListener("unhandledrejection",function(e){boardBootError(String(e.reason||"errore di avvio"));});
+window.addEventListener("load",function(){
+ setTimeout(function(){if(!window.__qoBoardPainted)boardBootError("caricamento incompleto. Controllare connessione e aggiornare.");},8000);
+});
 </script>
 </head>
 <body>
 <div class="board-shell" id="board-shell">
  <header class="board-top">
-  <div class="board-brand"><strong>QUARTIERI D'OMBRA</strong><small>FIVE POINTS · NEW YORK · 1860</small></div>
+  <div class="board-brand"><strong>QUARTIERI D'OMBRA</strong><small>FIVE POINTS · NEW YORK · 1860 · B2</small></div>
   <div class="board-state"><span>SETTORI <b>09</b></span><span>EDIFICI <b id="building-count">—</b></span><span id="sector-name">CROCEVIA DEI FIVE POINTS</span></div>
   <nav class="top-controls" aria-label="Visualizzazione">
    <a class="classic-link" href="./index.html" title="Gioco Alpha">ALPHA</a>
@@ -24,6 +34,7 @@ window.addEventListener("load",function(){setTimeout(function(){var t=document.g
   </nav>
  </header>
  <main class="board-stage" id="board-stage">
+   <div id="board-ready" role="status" aria-live="polite" style="position:absolute;z-index:1;top:50%;left:50%;transform:translate(-50%,-50%);border:2px ridge #9d7850;background:#211a15ee;padding:15px 22px;max-width:85%;color:#efcb92;text-align:center;font:14px Georgia,serif;pointer-events:none">Preparazione della plancia Five Points…</div>
    <canvas id="board-canvas" aria-label="Plancia isometrica interattiva di Five Points. Trascina per esplorare, pizzica per ingrandire."></canvas>
    <div class="board-toast" id="board-toast">NUOVA PLANCIA · Scenario in costruzione · Trascina per esplorare</div>
    <div class="board-zoom" aria-label="Controlli mappa">

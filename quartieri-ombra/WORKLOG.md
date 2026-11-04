@@ -1,3 +1,10 @@
+## 2026-11-04 — Fix del blocco preview Android / deploy concorrenti
+- Evidenza: due screenshot Chrome Android (23:20 e 23:22 CET) mostrano una vecchia versione con area mappa e minimappa nere, mentre `main` ospita già una pagina HTML diversa.
+- Analisi Actions: run `41924861810` ha fallito *Deploy to GitHub Pages* con errore `in progress deployment` (conflitto deploy); run `41924847763` era verde ma il passaggio Deploy risultava `skipped`. Un check verde non prova la pubblicazione.
+- Correzione in questa singola modifica: nuova URL pulita `board-1860.html` per uscire dalla cache della vecchia pagina, script con version tag `20261104-b2`, watchdog visibile sull'avvio e conferma di rendering solo al termine del primo frame e della minimappa; ingresso dal gioco aggiornato senza toccare NPC.
+- La precedente suite V8 eseguita su `board-world.js`/`board-preview.js` ha confermato 454 edifici, frame e minimappa in un mock di Canvas; la suite Node dell'artefatto Actions ha superato 5/5 test `board-world.test.cjs`. Uno screenshot Chrome locale è stato tentato, ma il browser dell'ambiente risponde `ERR_BLOCKED_BY_ADMINISTRATOR` anche su localhost/file.
+- **Pubblicazione effettiva da verificare sul job Pages e Chrome reale**; nessun test del telefono dell'utente simulato come superato. Nessuna modifica a workflow o ad altri giochi. Stato: plancia non approvata, sviluppo NPC sospeso.
+
 
 ## 2026-11-04 — Black screen reported on Android Chrome
 - User screenshot shows legacy "FIVE POINTS · PLANCIA SPERIMENTALE" shell and blank map/minimap; current main `board-preview.html` instead has "FIVE POINTS · NEW YORK · 1860", a different HUD, indicating Pages may be serving stale content. This is observed evidence, not proof of root cause.

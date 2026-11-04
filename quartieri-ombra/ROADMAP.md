@@ -1,3 +1,9 @@
+## Emergenza visibilità plancia — 2026-11-04
+- [x] Individuato conflitto nel deploy `41924861810`: `actions/deploy-pages` rifiuta un nuovo deploy mentre uno è in corso; verde dei run precedenti non equivale a deploy perché step `skipped`.
+- [x] Aggiunta URL nuova `board-1860.html`, caricamento versionato e watchdog di avvio per evitare la schermata nera senza diagnosi.
+- [ ] Verificare che l'ultimo workflow esegua **Deploy to GitHub Pages = success** (non skipped) e che il browser pubblico mostri la nuova build B2.
+- [ ] Collaudo screenshot/gesture su browser desktop e Android landscape reale; solo successivamente tornare ai miglioramenti visivi.
+
 # Roadmap operativa — aggiornare ad ogni worker
 
 ## Avanzamento reale della nuova plancia — 2026-11-04

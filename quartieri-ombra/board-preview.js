@@ -313,6 +313,9 @@ function scene(){
  ["OLD TENEMENTS","LITTLE WATER","SOUTH WORKSHOPS"]];
  $("sector-name").textContent=places[region.row][region.col];
  drawMini();
+ window.__qoBoardPainted=true;
+ const boardReady=document.getElementById("board-ready");
+ if(boardReady)boardReady.hidden=true;
 }
 function miniInfo(){
  const bounds=world.bounds,r=mini.getBoundingClientRect();
