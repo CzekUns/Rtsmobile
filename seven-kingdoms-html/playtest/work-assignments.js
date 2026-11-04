@@ -50,6 +50,8 @@ export function issueWorkOrder(game,unitId,firmId){
    return {ok:false,msg:'Costruttore occupato in un cantiere: annulla prima di assegnarlo.'};
  if(!firm||!game.firms.includes(firm)||firm.owner!==1)
    return {ok:false,msg:'Puoi assegnare lavoratori solo ai tuoi edifici.'};
+ if(firm.underConstruction)
+   return {ok:false,msg:'Il cantiere deve essere completato prima di ricevere lavoratori.'};
  if(unit.kind==='soldier'&&firm.kind!=='fort')
    return {ok:false,msg:'I soldati possono essere assegnati solo ai forti.'};
  const reserved=game.units.filter(u=>u!==unit&&u.workTargetId===firm.id).length;
