@@ -7,7 +7,12 @@
  for(const [key,src] of Object.entries({
    residence:"./assets/buildings/residential_tenement_lowres.webp",
    gendarme:"./assets/units/gendarme_idle_lowres.webp",
-   mercenary:"./assets/units/mercenary_idle_lowres.webp"
+   mercenary:"./assets/units/mercenary_idle_lowres.webp",
+   barrel:"./assets/props/barrel.svg",
+   crate:"./assets/props/crate.svg",
+   streetLamp:"./assets/props/street_lamp.svg",
+   woodenFence:"./assets/props/wooden_fence.svg",
+   lantern:"./assets/props/lantern.svg"
  })){const picture=new Image();picture.src=src;imageAssets[key]=picture}
  function paintAsset(image,x,y,w,h){
    if(!image||!image.complete||!image.naturalWidth)return false;
@@ -31,6 +36,13 @@
    {name:"Little Water Street",width:27,points:[[602,0],[594,179],[585,357],[608,680]]},
    {name:"Mulberry Bend",width:30,points:[[946,0],[947,175],[1006,334],[1019,680]]}
  ];
+ // Original street-level props: fixed scenery does not alter A* blockers or gameplay.
+ // Use local building corners rather than a second rectangular world grid.
+ const streetProps=defs.map((b,i)=>({
+   type:["barrel","crate","streetLamp","barrel","woodenFence","crate","streetLamp","barrel","lantern","crate","barrel","streetLamp","woodenFence","barrel","crate"][i],
+   x:b.x+b.w+12,
+   y:b.y+b.h*.48+(i%3-1)*9
+ })).filter(p=>p.x<W-12&&p.y>12&&p.y<H-12);
  let game=null,choice="guard",nextUnitId=1,last=performance.now(),fpsAccumulator=0,noticeTimer=0;
  const camera={zoom:1,offsetX:0,offsetY:0};
  const pointerPositions=new Map();let dragStart=null,pinchDistance=null,pinchCenter=null,gestureConsumed=false;
@@ -436,15 +448,61 @@
      }
    }
  }
+ function buildingStyle(b){
+   if(b.type==="prod")return b.id%2===0?"mill":"warehouse";
+   if(b.id%5===0||b.id===6)return "shop";
+   return b.id%3===0?"tenement":"dwelling";
+ }
+ function drawPeriodRoof(b,roof){
+   const style=buildingStyle(b);
+   if(style==="dwelling"||style==="mill"){
+     // Roof pitch is part of the building silhouette, not a screen-space rectangle.
+     const mid=(a,c)=>({x:(a.x+c.x)/2,y:(a.y+c.y)/2});
+     const ridgeA=mid(roof[0],roof[3]),ridgeB=mid(roof[1],roof[2]);
+     const lift=style==="mill"?15:11;
+     ridgeA.y-=lift;ridgeB.y-=lift;
+     isoPoly([roof[0],roof[1],ridgeB,ridgeA],style==="mill"?"#51473c":"#5b4236","#272320");
+     isoPoly([roof[3],roof[2],ridgeB,ridgeA],style==="mill"?"#39342f":"#382a26","#26211e");
+     ctx.strokeStyle="#80674f";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(ridgeA.x,ridgeA.y);ctx.lineTo(ridgeB.x,ridgeB.y);ctx.stroke();
+     if(style==="mill"){
+       // Two short ventilation skylights break the warehouse rooftop mass.
+       for(const t of [.32,.69]){
+         const a={x:ridgeA.x+(ridgeB.x-ridgeA.x)*t,y:ridgeA.y+(ridgeB.y-ridgeA.y)*t};
+         ctx.fillStyle="#241e1b";ctx.fillRect(a.x-3,a.y-9,6,7);
+         ctx.fillStyle="#9b7750";ctx.fillRect(a.x-2,a.y-8,4,3);
+       }
+     }
+   }else{
+     const c=style==="shop"?"#4d3d33":style==="tenement"?"#3b3430":"#302c28";
+     isoPoly(roof,c,"#241f1d");
+     // Parapets of flat-roofed tenements and mercantile buildings.
+     const front=style==="shop"?"#806245":"#605047";
+     isoPoly([roof[3],roof[2],{x:roof[2].x,y:roof[2].y-5},{x:roof[3].x,y:roof[3].y-5}],front);
+     if(style==="tenement"){
+       const q={x:(roof[0].x+roof[1].x)/2,y:(roof[0].y+roof[1].y)/2};
+       ctx.fillStyle="#2d2926";ctx.fillRect(q.x-6,q.y-17,12,15);
+       ctx.fillStyle="#6a6058";ctx.fillRect(q.x-7,q.y-18,14,3);
+     }
+   }
+ }
+ function drawStreetProp(prop){
+   const sizes={barrel:[16,21],crate:[21,21],streetLamp:[18,43],woodenFence:[43,22],lantern:[12,16]};
+   const [w,h]=sizes[prop.type]||[18,20],p=isoPoint(prop.x,prop.y);
+   ctx.fillStyle="#18151299";ctx.beginPath();ctx.ellipse(p.x,p.y,Math.max(6,w*.48),3,0,0,Math.PI*2);ctx.fill();
+   if(!paintAsset(imageAssets[prop.type],p.x-w/2,p.y-h,w,h)){
+     ctx.fillStyle=prop.type==="streetLamp"||prop.type==="lantern"?"#c19651":"#59402d";
+     ctx.fillRect(p.x-w*.35,p.y-h*.8,w*.7,h*.75);
+   }
+ }
  function drawIsoBuilding(b){
-   const p=isoFootprint(b.x,b.y,b.w,b.h),roof=isoTop(p,b.type==="prod"?56:48);
+   const style=buildingStyle(b);
+   const height=(style==="tenement"?66:style==="dwelling"?47:style==="shop"?58:style==="mill"?62:53)+b.id%3*3;
+   const p=isoFootprint(b.x,b.y,b.w,b.h),roof=isoTop(p,height);
    const wall=b.type==="prod"?"#54443a":"#5c4538",edge="#29231f";
    isoPoly([p[1],p[2],roof[2],roof[1]],"#342d29",edge);
    isoPoly([p[2],p[3],roof[3],roof[2]],wall,edge);
    isoPoly([p[3],p[0],roof[0],roof[3]],"#43352d",edge);
-   isoPoly(roof,b.type==="prod"?"#34312f":"#473833","#211f1e");
-   const ridge=isoPoint(b.x+b.w*.5,b.y+b.h*.5);ctx.strokeStyle="#665249";ctx.lineWidth=1;
-   ctx.beginPath();ctx.moveTo(roof[0].x,roof[0].y);ctx.lineTo(ridge.x,ridge.y-61);ctx.lineTo(roof[2].x,roof[2].y);ctx.stroke();
+   drawPeriodRoof(b,roof);
    drawPeriodFacade(b,p,roof);
    if(b.type==="prod"){
      const chimney=isoPoint(b.x+b.w*.72,b.y+b.h*.3);
@@ -481,9 +539,14 @@
    // behind buildings from appearing on top of roofs.
    const sprites=[
      ...game.buildings.map(b=>({depth:isoPoint(b.x+b.w,b.y+b.h).y,kind:"building",item:b})),
-     ...game.units.map(u=>({depth:isoPoint(u.x,u.y).y,kind:"unit",item:u}))
+     ...game.units.map(u=>({depth:isoPoint(u.x,u.y).y,kind:"unit",item:u})),
+     ...streetProps.map(prop=>({depth:isoPoint(prop.x,prop.y).y,kind:"prop",item:prop}))
    ].sort((a,b)=>a.depth-b.depth);
-   for(const sprite of sprites)if(sprite.kind==="building")drawIsoBuilding(sprite.item);else drawIsoUnit(sprite.item);
+   for(const sprite of sprites){
+     if(sprite.kind==="building")drawIsoBuilding(sprite.item);
+     else if(sprite.kind==="unit")drawIsoUnit(sprite.item);
+     else drawStreetProp(sprite.item);
+   }
    if(game.selected&&game.selected.kind==="building"){
      const b=game.buildings[game.selected.id];isoPoly(isoFootprint(b.x-5,b.y-5,b.w+10,b.h+10),"#00000000","#e3c57b");
    }
