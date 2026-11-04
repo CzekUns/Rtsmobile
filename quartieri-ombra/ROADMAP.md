@@ -110,3 +110,9 @@ Nota: la proiezione isometrica non deve essere confusa con la regolarità urbani
 - Proiezione ortografica 2:1 unica per terreno, footprint edifici, sprite unità, selezione e profondità. Mappatura inversa touch e zoom nello stesso sistema; pathfinding e influenza restano in coordinate logiche invarianti.
 - Commit codice `75326e8`; test di proiezione `1aabeba`. Parsing JS verificato prima del commit. Test Node persistente creato, non eseguito in browser reale. Layout e collocazione storica ancora da rifinire.
 - La casella renderer INTEGRALE rimane aperta finché collaudo mobile, asset e screenshot golden reference non sono verificati.
+
+## Verifica 2026-11-04 17:00 — primo layout Five Points irregolare
+- Sostituiti i 15 edifici in griglia con 15 lotti a coordinate irregolari, con distanze di sicurezza fra collisioni. Creati cinque tracciati stradali spezzati proiettati isometricamente; eliminata la ripetizione di strade ortogonali ogni N tile. Commit `d06ca32973a169ae181f84bf890aff2ae028838a`.
+- Test persistente `tests/irregular-map.test.cjs` (commit `6e0f5f67db81454eb8ad02332852026a98b6f33f`) per numero lotti, assenza sovrapposizioni, irregolarità e tracciati. Eseguiti controllo sintattico V8 e verifica geometrica diretta (PASS). Test Node/browser non ancora eseguiti.
+- ATTENZIONE: interpretazione ludica PRELIMINARE, non ricostruzione cartografica verificata. Necessaria georeferenziazione della pianta Perris 1853 e confronto con mappe/immagini originali prima di dichiarare fedeltà storica. I nomi stradali sono riferimenti storici, non attribuzioni di coordinate esatte.
+- Restano: percorso navigabile lungo le vie, allineamento dei fronti edificio, asset e test smartphone reali. Nessuna casella DoD completata.
