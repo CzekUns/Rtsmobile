@@ -17,8 +17,19 @@
  let game=null,choice="guard",nextUnitId=1,last=performance.now(),fpsAccumulator=0,noticeTimer=0;
  const camera={zoom:1,offsetX:0,offsetY:0};
  const pointerPositions=new Map();let dragStart=null,pinchDistance=null;
- function constrainCamera(){const visibleW=W/camera.zoom,visibleH=H/camera.zoom;camera.offsetX=clamp(camera.offsetX,0,Math.max(0,W-visibleW));camera.offsetY=clamp(camera.offsetY,0,Math.max(0,H-visibleH))}
- function screenPoint(e){const r=canvas.getBoundingClientRect();const scale=Math.min(r.width/W,r.height/H);const dx=(r.width-W*scale)/2,dy=(r.height-H*scale)/2;return {x:(e.clientX-r.left-dx)/scale,y:(e.clientY-r.top-dy)/scale}}
+ // Resize the Canvas backing store to its physical viewport, then draw with a
+ // uniform cover scale. The world never stretches when the phone rotates.
+ function coverScale(){return Math.max(canvas.width/W,canvas.height/H)}
+ function visibleWorld(){const scale=coverScale()*camera.zoom;return {w:canvas.width/scale,h:canvas.height/scale}}
+ function constrainCamera(){const view=visibleWorld();camera.offsetX=clamp(camera.offsetX,0,Math.max(0,W-view.w));camera.offsetY=clamp(camera.offsetY,0,Math.max(0,H-view.h))}
+ function resizeWorld(){
+   const r=canvas.getBoundingClientRect();
+   if(!r.width||!r.height)return;
+   const dpr=Math.min(window.devicePixelRatio||1,2);
+   const w=Math.max(1,Math.round(r.width*dpr)),h=Math.max(1,Math.round(r.height*dpr));
+   if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;constrainCamera()}
+ }
+ function screenPoint(e){const r=canvas.getBoundingClientRect();const scale=coverScale();return {x:(e.clientX-r.left)*(canvas.width/r.width)/scale,y:(e.clientY-r.top)*(canvas.height/r.height)/scale}}
  function worldPoint(p){return {x:camera.offsetX+p.x/camera.zoom,y:camera.offsetY+p.y/camera.zoom}}
  function zoomAt(factor,p){const before=worldPoint(p);camera.zoom=clamp(camera.zoom*factor,1,2.6);camera.offsetX=before.x-p.x/camera.zoom;camera.offsetY=before.y-p.y/camera.zoom;constrainCamera()}
  function owned(side){return game.buildings.filter(b=>b.owner===side)}
@@ -78,7 +89,7 @@
  function sendTo(u,b,mode){for(const p of nearestBuildingSpot(u,b))if(moveTo(u,p.x,p.y,mode,b.id))return true;return false}
  function setMode(m){choice=m;document.querySelectorAll("[data-mode]").forEach(b=>b.classList.toggle("active",b.dataset.mode===m))}
  function update(dt){
-  if(!game||game.over||game.paused)return;
+  if(!game||game.over||game.paused||isPortraitBlocked())return;
   game.time+=dt;game.ai-=dt;game.aiPurchase-=dt;
   for(const u of game.units){
    if(u.path.length){
@@ -203,6 +214,32 @@
   refresh();
  };
  $("pause").onclick=()=>{if(!game)return;game.paused=!game.paused;$("pause").textContent=game.paused?"▶":"Ⅱ";report(game.paused?"Partita in pausa.":"Partita ripresa.")};
+ function isPortraitBlocked(){return window.matchMedia("(orientation: portrait) and (max-width: 900px)").matches}
+ function syncFullscreenButton(){
+   const active=!!document.fullscreenElement;
+   const button=$("fullscreen");button.textContent=active?"⤢":"⛶";
+   button.title=active?"Esci da schermo intero":"Schermo intero";
+   button.setAttribute("aria-label",button.title);
+   button.setAttribute("aria-pressed",String(active));
+   resizeWorld();
+ }
+ $("fullscreen").onclick=async()=>{
+   try{
+     if(document.fullscreenElement){await document.exitFullscreen()}
+     else if(document.documentElement.requestFullscreen){
+       await document.documentElement.requestFullscreen({navigationUI:"hide"});
+       if(screen.orientation&&typeof screen.orientation.lock==="function"){
+         try{await screen.orientation.lock("landscape")}catch(_){/* Browsers can deny orientation lock. CSS gate remains. */}
+       }
+     }else report("Questo browser non supporta lo schermo intero. Puoi usare la modalità installata/PWA.");
+   }catch(_){report("Schermo intero non consentito dal browser. Usa l'orientamento orizzontale.")}
+   syncFullscreenButton();
+ };
+ document.addEventListener("fullscreenchange",syncFullscreenButton);
+ window.addEventListener("resize",resizeWorld);
+ window.addEventListener("orientationchange",resizeWorld);
+ if(typeof ResizeObserver!=="undefined"){new ResizeObserver(resizeWorld).observe(document.querySelector(".battle"))}
+ resizeWorld();
  $("help").onclick=()=>$("instructions").classList.remove("hidden");
  $("close-help").onclick=()=>$("instructions").classList.add("hidden");
  function refresh(){
@@ -224,8 +261,9 @@
   $("sel-type").textContent=type;$("sel-name").textContent=name;$("sel-desc").textContent=desc;$("sel-detail").textContent=detail;
  }
  function drawScene(){
-  ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,W,H);
-  ctx.setTransform(camera.zoom,0,0,camera.zoom,-camera.offsetX*camera.zoom,-camera.offsetY*camera.zoom);
+  ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,canvas.width,canvas.height);
+  const displayScale=coverScale()*camera.zoom;
+  ctx.setTransform(displayScale,0,0,displayScale,-camera.offsetX*displayScale,-camera.offsetY*displayScale);
   ctx.fillStyle="#292725";ctx.fillRect(0,0,W,H);
   for(let y=0;y<H;y+=35)for(let x=0;x<W;x+=35){
    let v=Math.sin(x*.29+y*.19)*14;ctx.fillStyle="rgba(6,6,5,"+(.07+Math.abs(v)/250)+")";ctx.fillRect(x+2,y+2,32,32);
@@ -276,7 +314,7 @@
   mx.fillStyle="#494137";for(let i=0;i<4;i++)mx.fillRect(0,15+i*27,180,6);
   for(const b of game.buildings){mx.fillStyle=b.owner===PLAYER?"#76a4c8":b.owner===ENEMY?"#c26b68":"#a0998f";mx.fillRect(b.x/W*180,b.y/H*108,Math.max(5,b.w/W*180),Math.max(4,b.h/H*108))}
   for(const u of game.units){mx.fillStyle=u.side===PLAYER?"#a9ddff":"#ff8f89";mx.fillRect(u.x/W*180,u.y/H*108,2,2)}
-  mx.strokeStyle="#e8cb83";mx.lineWidth=1;mx.strokeRect(camera.offsetX/W*180,camera.offsetY/H*108,180/camera.zoom,108/camera.zoom);
+  mx.strokeStyle="#e8cb83";mx.lineWidth=1;const view=visibleWorld();mx.strokeRect(camera.offsetX/W*180,camera.offsetY/H*108,view.w/W*180,view.h/H*108);
  }
  function loop(now){let dt=Math.min(.05,(now-last)/1000);last=now;if(game){update(dt);drawScene()}requestAnimationFrame(loop)}
  requestAnimationFrame(loop);
