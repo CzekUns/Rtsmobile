@@ -52,6 +52,15 @@ export class WorldView{
   }
   ctx.setLineDash([]);
   for(const town of g.towns)this.townDraw(ctx,town,selection,t);
+  for(const site of g.constructionSites||[]){
+   if(site.status!=='walking')continue;
+   const p=this.screen(site.x,site.y),w=site.size*t;
+   ctx.fillStyle='#d8ba6a52';ctx.fillRect(p.x,p.y,w,w);
+   ctx.strokeStyle='#f4cb63';ctx.lineWidth=Math.max(1,t*.07);
+   ctx.setLineDash([Math.max(3,t*.15),Math.max(3,t*.12)]);
+   ctx.strokeRect(p.x+1,p.y+1,w-2,w-2);ctx.setLineDash([]);
+   this.label(ctx,'Cantiere · in attesa',p.x+w/2,p.y+w/2,t);
+  }
   for(const firm of g.firms)this.firmDraw(ctx,firm,selection,t);
   for(const unit of g.units)this.unitDraw(ctx,unit,selection,t);
   if(ghost){
@@ -136,6 +145,16 @@ export class WorldView{
   }
   ctx.fillStyle=color;ctx.fillRect(p.x+s*.07,p.y+s*.85,s*.86,s*.08);
   ctx.strokeStyle='#3c392f';ctx.lineWidth=2;ctx.strokeRect(p.x+s*.08,p.y+s*.16,s*.86,s*.77);
+  if(firm.underConstruction){
+   const progress=Math.max(0,Math.min(1,firm.buildProgress||0));
+   ctx.fillStyle='#a78553ac';ctx.fillRect(p.x+s*.13,p.y+s*.12,s*.75,s*.72);
+   ctx.strokeStyle='#f7cf78';ctx.lineWidth=Math.max(2,t*.075);
+   ctx.strokeRect(p.x+s*.13,p.y+s*.12,s*.75,s*.72);
+   const bx=p.x+s*.13,by=p.y+s*.87,bw=s*.75,bh=Math.max(4,t*.18);
+   ctx.fillStyle='#372f24';ctx.fillRect(bx,by,bw,bh);
+   ctx.fillStyle='#e5c36c';ctx.fillRect(bx,by,bw*progress,bh);
+   this.label(ctx,'Lavori '+Math.floor(progress*100)+'%',p.x+s*.5,p.y+s*.51,t);
+  }
   this.label(ctx,FIRMS[firm.kind]?.label||firm.kind,p.x+s*.5,p.y+s+Math.max(7,t*.4),t);
   if(selection===firm.id){ctx.strokeStyle='#fff0a3';ctx.lineWidth=2;ctx.strokeRect(p.x-3,p.y-3,s+6,s+6);}
  }
