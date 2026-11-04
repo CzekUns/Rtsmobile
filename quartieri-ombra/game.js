@@ -66,8 +66,18 @@
  }
  function spawn(side,type,b){
   if(game.units.filter(u=>u.side===side).length>=26)return null;
+  // Spawn at a reachable exterior doorway, never inside an adjacent building.
+  // The 20px A* cell center must also be free or the unit could be trapped.
   const j=game.units.length%4;
-  const spots=[{x:b.x+b.w/2,y:b.y+b.h+22},{x:b.x-22,y:b.y+b.h/2},{x:b.x+b.w+22,y:b.y+b.h/2},{x:b.x+b.w/2,y:b.y-20}],s=spots[j];
+  const spots=[
+   {x:b.x+b.w/2,y:b.y+b.h+22},{x:b.x-22,y:b.y+b.h/2},
+   {x:b.x+b.w+22,y:b.y+b.h/2},{x:b.x+b.w/2,y:b.y-22}
+  ];
+  const valid=p=>p.x>=10&&p.y>=10&&p.x<W-10&&p.y<H-10
+   &&!blocked(p.x,p.y)
+   &&!blocked(Math.floor(p.x/CELL)*CELL+CELL/2,Math.floor(p.y/CELL)*CELL+CELL/2);
+  const s=[...spots.slice(j),...spots.slice(0,j)].find(valid);
+  if(!s)return null;
   const u={id:nextUnitId++,side,type,x:s.x,y:s.y,hp:type==="merc"?125:80,maxHp:type==="merc"?125:80,level:1,xp:0,path:[],mode:"guard",building:null,strike:0};
   game.units.push(u);return u;
  }
