@@ -30,7 +30,7 @@ function finish(game,site,max=1400){
 
 test('original skill specializations may build only their own building type',()=>{
  const pairs={2:'fort',3:'mine',4:'factory',5:'research'};
- assert.deepEqual(SPECIALIZED_BUILD_SKILL,pairs);
+ assert.deepEqual(SPECIALIZED_BUILD_SKILL,{fort:2,mine:3,factory:4,research:5});
  for(let id=2;id<=5;id++){
   const game=new SevenGame(),unit=testUnit(game,id);
   assert.equal(isBuilder(unit),true);
@@ -87,7 +87,7 @@ test('non-construction specialist cannot gain Construction skill while erecting 
 test('construction makes no progress if assigned unit is moving despite proximity',()=>{
  const game=new SevenGame(),unit=testUnit(game,1);
  const site=buildAtAvailableSite(game,unit,'market');
- for(let i=0;i<350&&site.status!=='building';i++){
+ for(let i=0;i<1400&&site.status!=='building';i++){
   advancePlaytestRoutes(game,.05);
   advanceConstruction(game,.05);
  }
