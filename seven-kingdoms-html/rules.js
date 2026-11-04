@@ -49,6 +49,7 @@ export class SevenGame{
   this.cash=1550;this.food=760;this.raw=0;this.goods=0;this.knowledge=0;
   this.speed=1;this.paused=false;this.unitTimer=0;this.dayTimer=0;
   this.events=[];this.towns=[];this.firms=[];this.units=[];
+  this.constructionSites=[];this.nextConstructionId=0;
   this.createSkirmish();
   for(const firm of this.firms)ensureFirmPersonnel(firm);
  }
@@ -59,6 +60,7 @@ export class SevenGame{
    const g=Object.create(SevenGame.prototype);
    Object.assign(g,data);g.events??=[];g.unitTimer??=0;g.dayTimer??=0;
    g.towns??=[];g.firms??=[];g.units??=[];g.paused=false;
+   g.constructionSites??=[];g.nextConstructionId??=0;
    for(const firm of g.firms)ensureFirmPersonnel(firm);
    for(const town of g.towns){town.taxPenalty??=0;town.rewardPenalty??=0;town.recruitPenalty??=0;}
    const all=[...g.towns,...g.firms,...g.units];
@@ -88,6 +90,10 @@ export class SevenGame{
    u.skillId=0;u.skillLevel=0;
    u.combatLevel=u.kind==='soldier'?Math.floor(u.training):0;
   }
+  // A single *demonstration* Construction Worker makes new games testable
+  // without waiting for the full original town training port.
+  const starter=this.units.find(u=>u.kind==='peasant'&&u.owner===1);
+  if(starter){starter.skillId=1;starter.skillLevel=20;}
   this.note('Un nuovo regno greco sorge presso Corinto.');
   this.note('I villaggi indipendenti sorvegliano i propri confini.');
  }
@@ -161,18 +167,20 @@ export class SevenGame{
   this.note(t.name+' è entrata nel tuo regno.');
   return {ok:true,msg:t.name+' ora appartiene al tuo regno.'};
  }
- build(kind,x,y){
+ build(kind,x,y,{prepaid=false,underConstruction=false}={}){
   const rule=FIRMS[kind];
   if(!rule)return {ok:false,msg:'Edificio inesistente.'};
   x=Math.floor(x);y=Math.floor(y);
-  if(this.cash<rule.cost)return {ok:false,msg:'Non hai abbastanza monete.'};
+  if(!prepaid&&this.cash<rule.cost)return {ok:false,msg:'Non hai abbastanza monete.'};
   if(this.occupied(x,y,rule.size))return {ok:false,msg:'La zona è occupata.'};
   if(!this.ownTowns().some(t=>range({x,y},t)<13))return {ok:false,msg:'Costruisci vicino a un villaggio del tuo regno.'};
   if(kind==='mine'&&!this.hasHills(x,y,rule.size))return {ok:false,msg:'Una miniera richiede colline o minerali.'};
-  const f=entity('f',{kind,owner:1,x,y,size:rule.size,workers:0,experience:0,progress:0,stock:0});
-  this.cash-=rule.cost;this.firms.push(f);
-  this.note(FIRMS[kind].label+' costruito. Assegna un lavoratore.');
-  return {ok:true,msg:'Costruito: '+rule.label+'.',firm:f};
+  const f=entity('f',{kind,owner:1,x,y,size:rule.size,workers:0,experience:0,progress:0,stock:0,
+   underConstruction,buildProgress:underConstruction?0:1,hp:underConstruction?1:100});
+  if(!prepaid)this.cash-=rule.cost;
+  this.firms.push(f);
+  this.note(FIRMS[kind].label+(underConstruction?' in costruzione.':' costruito. Assegna un lavoratore.'));
+  return {ok:true,msg:(underConstruction?'Cantiere avviato: ':'Costruito: ')+rule.label+'.',firm:f};
  }
  hasHills(x,y,s){
   for(let j=-2;j<s+2;j++)for(let i=-2;i<s+2;i++)if(terrain(this.seed,x+i,y+j)==='hill')return true;
@@ -225,7 +233,7 @@ export class SevenGame{
   // Legacy demo movement stays available outside the opt-in playtest.
   if(moveUnits)for(const u of this.units){
    // The work adapter owns walking to the building; never move twice in one frame.
-   if(u.workTargetId)continue;
+   if(u.workTargetId||u.buildSiteId)continue;
    if(!u.target)continue;
    const d=range(u,u.target);
    if(d<.05){u.target=null;continue;}
@@ -240,7 +248,7 @@ export class SevenGame{
  }
  produce(){
   for(const f of this.firms){
-   if(!f.workers)continue;
+   if(f.underConstruction||!f.workers)continue;
    if(f.owner!==1)continue;
    if(!this.linked(f,this.nearestTown(f)))continue;
    if(f.kind==='mine'){this.raw+=f.workers*.20;f.progress=(f.progress+1)%8;}
@@ -250,8 +258,43 @@ export class SevenGame{
    if(f.kind==='fort')f.experience=clamp(f.experience+f.workers*.02,0,100);
   }
  }
+ trainConstruction(townId){
+  const t=this.get(townId);
+  if(!t||!this.towns.includes(t)||t.owner!==1)
+   return {ok:false,msg:'Seleziona un tuo villaggio.'};
+  if(!this.ownFirms().some(f=>f.kind==='fort'&&this.linked(f,t)))
+   return {ok:false,msg:'Serve un forte collegato per addestrare.'};
+  if(t.pop<=4)return {ok:false,msg:'Abitanti disponibili insufficienti.'};
+  if(this.cash<30)return {ok:false,msg:'Servono 30 monete per l’addestramento.'};
+  t.trainingQueue??=[];
+  if(t.trainingQueue.length>=10)return {ok:false,msg:'Coda addestramento piena (10).'};
+  t.trainingQueue.push({skillId:1,skillLevel:20,readyDay:this.day+5,culture:t.culture});
+  this.cash-=30;
+  this.note('Addestramento Costruzione avviato a '+t.name+' (5 giorni).');
+  return {ok:true,msg:'Costruttore in addestramento: 5 giorni.'};
+ }
+ completeTraining(){
+  for(const town of this.towns){
+   if(!Array.isArray(town.trainingQueue))continue;
+   const ready=town.trainingQueue.filter(x=>x.readyDay<=this.day);
+   town.trainingQueue=town.trainingQueue.filter(x=>x.readyDay>this.day);
+   for(const item of ready){
+    if(town.pop<=4){this.cash+=30;this.note('Addestramento annullato a '+town.name+': popolazione insufficiente.');continue;}
+    town.pop--;
+    const u=entity('u',{
+     owner:town.owner,x:town.x+town.size+1,y:town.y+1,kind:'peasant',
+     hp:100,level:1,target:null,route:[],training:20,culture:item.culture,
+     raceId:null,skillId:1,skillLevel:20,combatLevel:0
+    });
+    u.personId=u.id;
+    this.units.push(u);
+    this.note('Costruttore addestrato a '+town.name+'.');
+   }
+  }
+ }
  advanceDay(){
   this.day++;
+  this.completeTraining();
   let people=this.towns.filter(t=>t.owner===1).reduce((sum,t)=>sum+t.pop,0);
   // 7KAA OTOWN.cpp Town::process_food: jobless peasants produce, all citizens eat.
   // In the current one-culture simplified model, linked workers approximate employment.
