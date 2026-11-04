@@ -7,6 +7,7 @@ import {issuePlaytestOrder,advancePlaytestRoutes} from './playtest/path-routes.j
 import {issueWorkOrder,completeWorkArrivals} from './playtest/work-assignments.js';
 import {WorldView} from './view.js';
 import {SKILLS,skillLabel,ensureFirmPersonnel} from './playtest/personnel.js';
+import {rosterRaceLabel} from './playtest/roster-race.js';
 const $=id=>document.getElementById(id);
 const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const playtest=new URLSearchParams(location.search).get('playtest')==='1';
@@ -102,7 +103,7 @@ function selectedContent(){
   const people=staff.map((person,i)=>{
    const who=person.name||('Lavoratore '+(i+1));
    const profile=person.legacyUnknown?'Dati precedenti non documentati':
-    (person.culture||'Etnia non registrata')+' · '+skillLabel(person.skillId,person.skillLevel);
+    rosterRaceLabel(person)+' · '+skillLabel(person.skillId,person.skillLevel);
    return '<div class="worker-row"><strong>'+esc(who)+'</strong>'+
     '<small>'+esc(profile)+'</small><small>HP '+Math.floor(person.hp??100)+
     ' · ID '+esc(person.personId??person.id)+'</small>'+
