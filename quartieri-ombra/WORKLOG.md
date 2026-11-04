@@ -33,3 +33,9 @@
 - Commit codice `a1b98b211262f6689e95314c914dbb4d67d811ab`: `game.js` vincola la riscossione al `building` effettivamente assegnato al gendarme; l'IA non considera più completato un incarico esattore presso un edificio diverso.
 - Acquisto mercenario IA: addebito 90 oro solo se `spawn` restituisce una nuova unità, evitando perdita di oro a limite popolazione.
 - Rilettura della `main` dopo commit; eseguiti 4 controlli statici mirati sul codice aggiornato, tutti superati. Non eseguito runtime browser, né simulazione completa o test touch. Prossimo obiettivo: harness di test dinamico e collaudo visuale desktop/mobile.
+
+## 2026-11-04 11:00 — Worker, ordini e reclutamento
+- Commit `da99eaf15e127250a991cfbdbc5b61d77648754c`: impedito assegnare esazione a mercenari, a edifici non produttivi o non alleati; impedito assalto a edificio proprio; messaggio di percorso impossibile; notifica recluta soltanto se spawn riuscito.
+- Riletto `game.js` da `main` dopo scrittura: parser V8 `new Function` riuscito, 5/5 controlli statici puntuali positivi.
+- Tentativo di recuperare il file nel container per test Node: impossibile risolvere `raw.githubusercontent.com` (DNS). Non dichiarati test dinamici, desktop/touch o screenshot.
+- Prossimo passo: test automatici eseguibili in browser e collaudo visivo isometrico.
