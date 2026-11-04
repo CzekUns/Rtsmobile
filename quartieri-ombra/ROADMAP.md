@@ -1,5 +1,20 @@
 # Roadmap operativa — aggiornare ad ogni worker
 
+## P0 ASSOLUTA — PLANCIA IMMAGINE APPROVATA E MAPPA ESTESA (2026-11-04)
+
+L'utente ha visto il movimento NPC e ha esplicitamente richiesto di **SOSPENDERE lo sviluppo NPC per il momento**. Concentrarsi esclusivamente su plancia, grafica ambientale, continuità mappa, zoom/camera/minimappa e visualizzazione landscape. **[BOARD_MASTER.md](BOARD_MASTER.md) è il riferimento operativo vincolante**: l'ultimo ImageGen approvato dall'utente è la golden reference prioritaria rispetto ai mockup precedenti. Non riprodurre il film.
+
+- [x] Promosso il riferimento visivo definitivo e conservata un'anteprima autentica, ridotta, nella cartella `assets/references/` (non è uno sprite).
+- [ ] Layout continuo **minimo 2×2** rispetto alla finestra rappresentata; preferenza 3×3 settori urbani senza evidenti ripetizioni.
+- [ ] Fronti stradali compatti, incrocio a cinque punte riconoscibile, palazzi e architettura densi come reference, atmosfera ambrata/fangosa, carrozze/props.
+- [ ] Preview separata o modalità mappa senza NPC, utilizzabile con camera drag/zoom e minimappa in smartphone landscape/fullscreen.
+- [ ] Renderer modulare con asset e layer originali, non immagine statica incollata nel campo di gioco.
+- [ ] Confronto screenshot della build reale desktop/mobile con golden reference 1672×941; non segnare pronti senza evidenza.
+- [ ] Alla soglia grafica, **richiedere valutazione della plancia da parte dell'utente** prima di riprendere NPC/pathfinding/IA.
+
+Fino a nuovo ordine, priorità estetica e urbanistica su gameplay; bugfix gameplay solo se blocca la visualizzazione della preview. I criteri DoD finali rimangono, ma sono rinviati al termine della fase di plancia.
+
+
 Stato: IN SVILUPPO. Priorità grafica/urbanistica richiesta dall'utente: ricostruzione Five Points > qualità renderer > collaudo > espansioni.
 
 ## CRITERIO DI SOLLECITO — alpha visivamente accettabile (2026-11-04)
