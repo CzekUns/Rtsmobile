@@ -28,3 +28,8 @@
 - Non eseguiti: smoke test browser desktop/mobile, test di bilanciamento, test visivi; non dichiarare questi elementi verificati.
 - Gli asset ImageGen prodotti nella conversazione non sono ancora stati integrati come sprite runtime; richiedono preparazione con trasparenza, normalizzazione e caricamento binario in repository. La grafica attuale resta provvisoria.
 - Prossima iterazione: test browser reali, bugfix del pathfinding e prima integrazione degli asset grafici approvati con caricamento/fallback.
+
+## 2026-11-04 10:00 — Worker, economia ed esazione
+- Commit codice `a1b98b211262f6689e95314c914dbb4d67d811ab`: `game.js` vincola la riscossione al `building` effettivamente assegnato al gendarme; l'IA non considera più completato un incarico esattore presso un edificio diverso.
+- Acquisto mercenario IA: addebito 90 oro solo se `spawn` restituisce una nuova unità, evitando perdita di oro a limite popolazione.
+- Rilettura della `main` dopo commit; eseguiti 4 controlli statici mirati sul codice aggiornato, tutti superati. Non eseguito runtime browser, né simulazione completa o test touch. Prossimo obiettivo: harness di test dinamico e collaudo visuale desktop/mobile.
