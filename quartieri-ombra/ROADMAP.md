@@ -142,3 +142,8 @@ Nota: la proiezione isometrica non deve essere confusa con la regolarità urbani
 - Gestiti `pointercancel` e `lostpointercapture` per evitare puntatori bloccati.
 - Commit codice `2f81d0c482a97a6e07f9d16682b35a4def169323`, test permanente `17f1c3d035cc9c072d2ef4ceb1f42e7d598a185a`.
 - Verifica dinamica V8 sugli handler REALI estratti da main: tap singolo, pan a due dita, assenza tap accidentale, pinch zoom e reset dei pointer: 5/5 PASS; sintassi JS PASS. Suite Node persistente non eseguita su checkout, browser mobile/desktop NON collaudati: nessuna casella DoD completata.
+
+## Verifica 2026-11-04 22:00 — Connettività integrale A*
+- Nuovo test persistente `tests/map-connectivity.test.cjs` legge i lotti direttamente dal `game.js` reale e verifica con BFS che tutte le celle libere appartengano alla stessa componente, e che ogni edificio abbia almeno un ingresso connesso.
+- Verifica dinamica indipendente sulla geometria corrente: 1479 celle percorribili, 1 sola componente; 15/15 edifici con accesso valido (3–4 accessi ciascuno). Commit test `b06b074fe4332c422f5ae7c41019313587ab9e17`.
+- Non eseguiti Node CLI della suite persistente, browser desktop/Android, fullscreen, screenshot golden reference. Non segnare DoD completata.
