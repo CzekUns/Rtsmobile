@@ -51,8 +51,12 @@ test('rejects occupied town target without corrupting old route',()=>{
 test('paused game does not move and legacy movement is available',()=>{
  const {g,soldier}=scenario();reach(g,soldier);
  const before={x:soldier.x,y:soldier.y};
+ const pending=soldier.route.map(tile=>({...tile}));
+ const target={...soldier.target};
  g.paused=true;advancePlaytestRoutes(g,1);
  assert.deepEqual({x:soldier.x,y:soldier.y},before);
+ assert.deepEqual(soldier.route,pending);
+ assert.deepEqual(soldier.target,target);
  const old=new SevenGame(73429),u=old.units.find(x=>x.owner===1);
  assert.equal(old.order(u.id,u.x+2,u.y).ok,true);
  const start={x:u.x,y:u.y};
