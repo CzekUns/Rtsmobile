@@ -16,6 +16,7 @@ export const SKILLS=Object.freeze([
 ]);
 const cap=v=>Math.max(0,Math.min(8,Number.isFinite(v)?Math.floor(v):0));
 const skillNumber=v=>Number.isInteger(v)&&v>=0&&v<SKILLS.length?v:0;
+export const workerRoleLabel=(person)=>person?.legacyUnknown?'Ruolo storico non verificato':person?.kind==='soldier'?'Soldato':person?.kind==='peasant'?'Abitante':'Ruolo non registrato';
 export const skillLabel=(id,level=0,unknown=false)=>
   unknown?'Non documentata (salvataggio precedente)':
   SKILLS[skillNumber(id)].label+(skillNumber(id)===0?'':' · '+Math.max(0,Math.floor(level||0)));
