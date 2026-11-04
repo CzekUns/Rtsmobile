@@ -1,5 +1,12 @@
 # Direzione artistica APPROVATA — Quartieri d'Ombra
 
+## SUPREMAZIA NUOVA REFERENCE PLANCIA — 2026-11-04
+
+**NUOVA APPROVAZIONE ESPLICITA E VINCOLANTE:** il concept ImageGen denominato *DISTRETTO FIVE POINTS — NEW YORK c.1860* (originale 1672×941 allegato nella chat) è stato dichiarato dall'utente «esattamente quello che volevo». **Per plancia/mappa/architettura questa immagine è ora la golden reference prioritaria, prevale su descrizioni precedenti in caso di conflitto**; resta valida l'intenzione RTS isometrico 1998–2003. Vedi [BOARD_MASTER.md](BOARD_MASTER.md) per target, scala, estensione 2×2 o meglio 3×3 settori, modalità di lavoro e test.
+
+La reference è **una finestra sulla mappa**, NON tutta la mappa: città più grande, strade e edifici proseguono senza bordi o ripetizioni. Non limitarsi a inserire l'immagine come fondale; costruire strutture originali modulari, vista camera drag/zoom, profondità, mini-mappa. In questa fase **sospendere l'evoluzione degli NPC**, il loro pathfinding e le nuove meccaniche: priorità esclusiva al mondo visivo e alla preview della plancia. Miniatura verificabile in repo: `assets/references/approved_five_points_board_preview.webp` (160×90, **non** originale HQ). Non dichiarare di aver caricato l'originale in repo.
+
+
 **Stato: APPROVATA dall'utente in chat ("Bingo") il 4 novembre 2026.**
 Questa specifica è VINCOLANTE per gli agenti e il worker orario. In caso di divergenza visiva tra una proposta illustrativa e questa scheda, prevale questa scheda.
 
