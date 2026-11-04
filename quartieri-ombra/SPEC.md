@@ -35,6 +35,14 @@ Schermata IN-GAME, non key art illustrativa. RTS classico 1998–2003: grafica 2
 - Comportamenti: difendere case instabili, presidiare confini, influenzare neutrali, esigere oro, assoldare mercenari, assaltare difese deboli.
 - Non usare teletrasporto, spawn gratuiti segreti né modifiche di fedeltà arbitrarie non disponibili al giocatore.
 
+## Viewport, orientamento e input (vincolanti, 2026-11-04)
+- Il gameplay mobile è SOLO ORIZZONTALE. In portrait su smartphone compare un overlay che richiede la rotazione; nessuna interazione con la partita e simulazione sospesa. I browser potrebbero non concedere il blocco hardware dell'orientamento: prevedere fallback visibile.
+- Pulsante sempre disponibile nell'HUD per attivare/disattivare fullscreen sul gesto dell'utente via Fullscreen API; richiesta facoltativa a `screen.orientation.lock("landscape")` soltanto se supportata e consentita.
+- Schermata occupata per intero da header compatto + campo di gioco ridimensionabile + HUD basso fisso. **Nessun pan/scroll/overscroll dell'intera pagina** attraverso touch; pinch/pan solo sulla MAPPA e senza trascinare HUD o pulsanti.
+- Il Canvas deve ridimensionare anche il backing store secondo i pixel effettivi della viewport; applicare scala uniforme, mai distorcere proporzioni sprite/isometria. La camera e il mapping touch devono seguire lo stesso fattore del rendering.
+- In landscape tutti i pulsanti comandi e le informazioni fondamentali devono restare accessibili, anche con display bassi/allungati (16:9, 19.5:9, 21:9); evitare che le barre sottraggano quasi tutto lo spazio al campo di gioco.
+- Test d'accettazione su smartphone reale e desktop responsive: nessuno spostamento della UI quando si trascina con un dito, minimappa fissa, pinch camera, fullscreen on/off, portrait gate, rotazione senza teletrasporto o distorsioni.
+
 ## Tecnica
 - HTML5 + JavaScript senza server, deploy GitHub Pages in sottocartella.
 - Nessuna modifica a file esterni al progetto. Preferire moduli locali e asset leggeri.
