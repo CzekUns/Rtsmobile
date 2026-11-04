@@ -209,7 +209,7 @@ function drawRoof(b,foot,roof){
 }
 // Each building has its own prerendered low-resolution Canvas sprite.
 // A bounded LRU cache avoids repainting hundreds of windows on every drag.
-const buildingCache=new Map(),MAX_BUILDING_SPRITES=128;
+const buildingCache=new Map(),MAX_BUILDING_SPRITES=320;
 function buildingGeometry(b){
  const ground=b.poly.map(q=>proj(q.x,q.y));
  const roof=ground.map(p=>({x:p.x,y:p.y-b.z}));
