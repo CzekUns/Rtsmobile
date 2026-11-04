@@ -101,3 +101,11 @@
 - Aggiunto `tests/spawn-access.test.cjs`, commit `57550f5271e1e375079ae2df6ab2db1398b327fc`.
 - Eseguiti 60 casi dinamici V8 sullo `spawn` e `route` reali estratti da main: 60 PASS, 0 fallimenti; testati tutti i 15 edifici con quattro turni di rotazione. Parser `game.js` PASS.
 - Non eseguiti suite Node sul checkout, browser desktop/mobile, fullscreen Android, confronto visivo golden reference. Prossimo passo: test completo connettività e correzione della camera che in landscape può tagliare parte della mappa.
+
+
+## 2026-11-04 20:00 — Correzione camera e minimappa in proiezione isometrica
+- Riletti AGENTS, SPEC, ART_DIRECTION, ROADMAP, WORKLOG, README e assets/README su main; isolati i file della cartella.
+- Corretto il mismatch della camera: i limiti usavano il mondo logico 1120×680, ma le entità sono disegnate in spazio proiettato 2:1. Nuovi limiti includono tetti e bordi; offset negativi permessi. Centratura quando il viewport è più ampio del quartiere.
+- Minimap ridisegnata con polilinee stradali, edifici e unità proiettati e cornice di viewport coerente. Nessun asset precedente modificato.
+- Commit `53d78723140e6025511cd9eea5646ade041082aa` e suite regressione `bb54e06d44ae9f14379ecbf9154d83c46412cddd`.
+- Eseguiti realmente nel runtime V8: parser completo game.js PASS; 6 configurazioni di dimensioni/zoom con estremi camera PASS; 306 roundtrip isoPoint/isoInverse PASS (errore massimo 2.28e-13). Test Node persistente e screenshot reali non eseguiti. Prossimo: smoke browser su mobile landscape, eliminare interferenze input/zoom e geometria urbana storica verificata.
