@@ -1,5 +1,15 @@
 # Diario avanzamento
 
+## 2026-11-04 — Reference fotografiche utente + facciate storiche originali
+- L'utente ha inviato tre screenshot di ricerca immagini «new york 1860» per dare una direzione concreta all'architettura. Sono riferimenti VISIVI generici, datazione/ubicazione/diritti non certificati; **nessun screenshot è stato caricato nella repository**.
+- Creato [VISUAL_RESEARCH.md](VISUAL_RESEARCH.md) con matrice delle fonti: Perris 1853 tavola 25, cartografia 1831, litografia Library of Congress 1859, studio archeologico NYC, OSM moderno come orientamento, clip Miramax solo come mood; estratti dettagli architettonici e requisiti di licenza.
+- Modificato **codice runtime reale** `game.js`: funzione `faceQuad` e `drawPeriodFacade` con marcapiani, finestre e oscuramenti, botteghe, tende e ingressi in coordinate proiettate isometriche. Sostituite finestre poco caratterizzate precedenti. Commit codice `7499077ae88edfc6c200a6e47c878431881b5245`.
+- Aggiunto `tests/period-facades.test.cjs` con verifiche di interpolazione, geometria dei 15 edifici e differenze botteghe/produttivi. Commit `7c27faf04bf486ecfee64db97991a5ef08c7cf5f`.
+- Eseguito **test V8 dinamico reale** delle due funzioni estratte dal codice pubblicato: 15 edifici, 846 poligoni generati, 0 vertici non finiti, 3 facciate bottega; parsing completo `game.js` PASS. Test persistente Node e screenshot browser non ancora eseguiti.
+- Aggiornati ART_DIRECTION, ROADMAP e README: qualità cartografica e grafica del quartiere è ora P0. Rimangono aperti tracciati GIS OSM+Perris verificati, sprite separati definitivi, densità edilizia accurata, confronti screenshot in-game/asset.
+- Per il worker: proseguire da `VISUAL_RESEARCH.md`, NON confondere le foto generiche di Manhattan con i Five Points; il renderer continua a essere una resa preliminare, **non** dichiarare completezza grafica.
+
+
 ## 2026-11-04 15:00 — Primo terreno isometrico 2:1
 - Riletti integralmente i sei documenti di progetto e assets/README.md; verificata main e stato del renderer: fondo ancora a strade cartesiane.
 - Commit `2ac8ab49cc8ea190ce0760fb0504adc96f33568b`: nuovo `drawIsometricGround()` in game.js, tile diamante 2:1 con fango/lastricato e usura deterministica, al posto del fondo rettangolare. Nessun asset precedente sovrascritto.
