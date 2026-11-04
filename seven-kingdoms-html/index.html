@@ -6,14 +6,14 @@
 <meta name="theme-color" content="#777668">
 <title>Seven Kingdoms · HTML Edition (JS nativo)</title>
 <meta name="description" content="Ricostruzione sperimentale del gioco Seven Kingdoms in JavaScript nativo.">
-<link rel="stylesheet" href="style.css?v=1">
+<link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
 <div id="stage" role="application" aria-label="Seven Kingdoms HTML Edition">
   <header class="topbar">
     <div class="reports" aria-label="Rapporti">
       <button data-report="kingdoms" title="Regni · F1">Regni</button>
-      <button data-report="towns" title="Villaggi · F2" class="active">Villaggi</button>
+      <button data-report="towns" title="Villaggi · F2">Villaggi</button>
       <button data-report="economy" title="Economia · F3">Economia</button>
       <button data-report="trade" title="Commercio · F4">Scambi</button>
       <button data-report="military" title="Militari · F5">Militari</button>
@@ -63,12 +63,17 @@
         <div id="selectionMeta" class="selection-meta">Villaggio greco</div>
         <div id="selectionInfo" class="selection-info"></div>
         <div id="selectionActions" class="selection-actions"></div>
-        <div class="report-header" id="reportTitle">VILLAGGI</div>
-        <div id="reportBody" class="report-body"></div>
       </div>
     </aside>
   </div>
 </div>
+<dialog id="reportDialog" class="report-dialog" aria-labelledby="reportTitle">
+  <div class="report-modal-head">
+    <h2 id="reportTitle">RAPPORTO</h2>
+    <button id="closeReport" type="button" aria-label="Chiudi rapporto">Chiudi ✕</button>
+  </div>
+  <div id="reportBody" class="report-body"></div>
+</dialog>
 <div id="rotate" aria-live="polite">
  <div class="phone-icon">⟲</div><h2>Ruota lo smartphone</h2><p>La ricostruzione di Seven Kingdoms usa l'interfaccia orizzontale 800×600.</p>
 </div>
@@ -77,10 +82,10 @@
 <p>Questa è la prima ricostruzione <strong>JavaScript nativa</strong>, ancora parziale, del gioco originale. Non è il gioco completo e non usa WebAssembly.</p>
 <p><strong>Comandi:</strong> tocca o clicca un villaggio, una struttura o un'unità. Con un'unità selezionata, tocca un punto vuoto per farla camminare. Tieni premuto e trascina per scorrere la mappa. Tocca la minimappa per cambiare zona.</p>
 <p><strong>Villaggi:</strong> recluta abitanti, riscuoti tasse e concedi sussidi. La fedeltà influenza il governo; per unire un villaggio indipendente serve un forte vicino e una resistenza bassa.</p>
-<p><strong>Strutture:</strong> dalla scheda Economia scegli un edificio, poi indica sulla mappa dove costruirlo. Recluta abitanti dal villaggio e assegnali agli edifici. Minerali → Fabbriche → Mercati è la prima filiera economica.</p>
+<p><strong>Strutture:</strong> dal pulsante Economia in alto scegli un edificio, poi indica sulla mappa dove costruirlo. Recluta abitanti dal villaggio e assegnali agli edifici. Minerali → Fabbriche → Mercati è la prima filiera economica.</p>
 <p><strong>PC:</strong> tasto destro su destinazione per spostare l'unità, F1–F9 per i rapporti, 0 / Spazio per pausa, 1–5 per velocità, S per salvare.</p>
 <form method="dialog"><button type="submit">Continua</button></form>
 </dialog>
-<script type="module" src="game.js?v=2"></script>
+<script type="module" src="game.js?v=3"></script>
 </body>
 </html>
