@@ -100,7 +100,7 @@
    if(old!==b.owner){b.recruit=rnd(12,25);if(b.owner===PLAYER)report("Conquistato: "+b.name+".");else if(old===PLAYER)report("Hai perso: "+b.name+".")}
    if(b.owner!==NEUTRAL&&b.type==="prod"){
     b.stock=clamp(b.stock+dt*(1.8-b.damage*.01),0,110);
-    for(const u of game.units)if(u.side===b.owner&&u.type==="g"&&u.mode==="tax"&&!u.path.length&&distance(u.x,u.y,b.x+b.w/2,b.y+b.h/2)<120){
+    for(const u of game.units)if(u.side===b.owner&&u.type==="g"&&u.mode==="tax"&&u.building===b.id&&!u.path.length&&distance(u.x,u.y,b.x+b.w/2,b.y+b.h/2)<120){
       let take=Math.min(b.stock,4*dt);b.stock-=take;game.gold[u.side]+=take;b.loyalty=clamp(b.loyalty-u.side*dt*.08,-100,100);
     }
    }
@@ -139,11 +139,11 @@
   let aiUnits=game.units.filter(u=>u.side===ENEMY);
   if(owned(ENEMY).length&&game.gold[ENEMY]>=COST&&game.aiPurchase<=0){
     let mercCount=aiUnits.filter(u=>u.type==="merc").length;
-    if(mercCount<Math.max(1,Math.floor(owned(ENEMY).length/2))){game.gold[ENEMY]-=COST;spawn(ENEMY,"merc",owned(ENEMY)[0]);game.aiPurchase=16}
+    if(mercCount<Math.max(1,Math.floor(owned(ENEMY).length/2))){const hired=spawn(ENEMY,"merc",owned(ENEMY)[0]);if(hired){game.gold[ENEMY]-=COST;game.aiPurchase=16}}
   }
   let productive=owned(ENEMY).filter(b=>b.type==="prod"&&b.stock>15);
   aiUnits.forEach((u,i)=>{
-   if(u.path.length||u.mode==="tax"&&productive.some(b=>distance(u.x,u.y,b.x+b.w/2,b.y+b.h/2)<120))return;
+   if(u.path.length||u.mode==="tax"&&productive.some(b=>b.id===u.building&&distance(u.x,u.y,b.x+b.w/2,b.y+b.h/2)<120))return;
    if(u.type==="g"&&productive.length&&i%4===0&&game.gold[ENEMY]<150){sendTo(u,productive[i%productive.length],"tax");return}
    let targets=game.buildings.filter(b=>b.owner!==ENEMY);
    if(!targets.length)return;
