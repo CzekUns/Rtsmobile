@@ -1,5 +1,9 @@
 # Quartieri d'Ombra — Asset Library
 
+## Reference della plancia approvata (NON asset runtime)
+- `references/approved_five_points_board_preview.webp`: **vera miniatura** 160×90 della plancia ImageGen approvata dall'utente (2026-11-04). **Non è un tile, fondale, sprite, atlante di gioco o originale ad alta risoluzione**; va usata esclusivamente per confronto compositivo con [BOARD_MASTER.md](../BOARD_MASTER.md). Originale 1672×941 presente nella conversazione ChatGPT come `distretto_five_points_new_york_1860.png`, non in questa repo. Non includere la miniatura nel manifest di asset runtime.
+
+
 **Direzione vincolante:** [ART_DIRECTION.md](../ART_DIRECTION.md). Il layout approvato dall'utente è IN-GAME, low-res, isometrico PC 1998–2003, non key art cinematografico.
 
 ## Sorgenti già integrate su GitHub
