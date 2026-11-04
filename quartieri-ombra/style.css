@@ -46,3 +46,11 @@ body{position:fixed;inset:0}
 @media (orientation:landscape) and (min-width:950px){
  .actions{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+
+/* Entry points to the isolated board-only preview. */
+.board-preview-link,.board-preview-entrance{color:#f6d595!important;text-decoration:none;font-weight:bold;letter-spacing:.05em;text-shadow:0 1px #110d08;background:linear-gradient(#55412d,#30251c);border:2px ridge #ad8550;border-radius:2px}
+.board-preview-link{white-space:nowrap;padding:6px 9px;font-size:11px}
+.board-preview-entrance{display:inline-block;padding:10px 14px;font-size:14px}
+.board-preview-link:focus-visible,.board-preview-entrance:focus-visible{outline:2px solid #ffcf72}
+@media (orientation:landscape) and (max-height:500px){.board-preview-link{padding:5px 4px;font-size:9px}}
