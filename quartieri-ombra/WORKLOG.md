@@ -1,5 +1,13 @@
 # Diario avanzamento
 
+## 2026-11-04 — Esecuzione sollecitata, upgrade grafico tetti e arredo
+- L'utente ha richiesto di sollecitare le esecuzioni fino a un livello visivamente accettabile. Creato `VISUAL_ACCEPTANCE.md` con criteri di ingresso, soglia intermedia e vincolo anti-report; aggiornato prompt del worker orario. L'automazione esistente rimane attiva.
+- **Modifica runtime** `game.js` commit `0efddc78c7a7d83332239493b2d6f6d55150cce2`: 5 silhouette classificate (`shop`, `tenement`, `dwelling`, `warehouse`, `mill`); tetti a falde e piani, lucernari, parapetti e dettagli. Aggiunti riferimenti immagine agli SVG originali già presenti: barili, casse, lampioni, steccati e lanterne; 15 props posizionati ai margini dei palazzi e ordinati in isometria assieme alle unità.
+- **Prove dinamiche eseguite su codice reale con V8**: parsing `game.js` valido, 5 tipologie diverse, 30 poligoni tetto validi e 0 valori non finiti; 15/15 posizioni decorative esterne ai footprint delle costruzioni. Eseguite verifiche di rendering dei 5 tipi di props su Canvas mock: senza coordinate errate.
+- **Test persistente** `tests/streetscape-render.test.cjs` commit `a25c5d8ece57ef96936a88b4d630908d3123d2ad`: verifica decorazioni, silhouette, generazione geometrica.
+- Limiti: nessuno screenshot reale, nessuna esecuzione Node persistente confermata, no collaudo touch/landscape su device; città NON ancora georeferenziata contro Perris 1853. Le caselle ALPHA VISIVAMENTE ACCETTABILE rimangono aperte. Prossime priorità: topografia storica e ricostruzione densa dei fronti, poi screenshot browser.
+
+
 ## 2026-11-04 — Reference fotografiche utente + facciate storiche originali
 - L'utente ha inviato tre screenshot di ricerca immagini «new york 1860» per dare una direzione concreta all'architettura. Sono riferimenti VISIVI generici, datazione/ubicazione/diritti non certificati; **nessun screenshot è stato caricato nella repository**.
 - Creato [VISUAL_RESEARCH.md](VISUAL_RESEARCH.md) con matrice delle fonti: Perris 1853 tavola 25, cartografia 1831, litografia Library of Congress 1859, studio archeologico NYC, OSM moderno come orientamento, clip Miramax solo come mood; estratti dettagli architettonici e requisiti di licenza.
