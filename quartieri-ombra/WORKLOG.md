@@ -1,5 +1,14 @@
 # Diario avanzamento
 
+## 2026-11-04 — Importazione asset v1
+- Generato un nuovo concept sheet con ulteriori edifici (taverna, mercato, magazzino, distilleria, abitazioni), terreni e UI in stile RTS 2000.
+- Creato pacchetto locale di asset derivati: 4 edifici, 2 sprite-sheet personaggio, 12 varianti terreno, foglio HUD, concept sheet; pacchetto ZIP offerto in conversazione.
+- CARICATI REALMENTE IN REPO: 3 WebP raster low-res (residenza, gendarme idle, mercenario idle); 4 tile isometrici SVG (mud, cobble, puddle, debris); 5 props SVG (barrel, crate, street lamp, wooden fence, lantern).
+- Creati assets/manifest.json, assets/README.md e assets/index.html per catalogo e anteprime.
+- Integrato game.js con caricamento delle 3 immagini raster e fallback procedurale. I fogli non caricati sono indicati come DA IMPORTARE, non dichiarati presenti.
+- Test attualmente disponibili: upload e tracciamento GitHub verificati; non è stato effettuato collaudo browser della resa visuale. La transizione a isometria completa resta pendente.
+
+
 ## 2026-11-04 — Inizializzazione + prima implementazione
 - Scelta repository: `CzekUns/Rtsmobile` (GitHub Pages distribuisce la root di main).
 - Scelta path riservato: `quartieri-ombra/`, inizialmente inesistente e verificato libero.
