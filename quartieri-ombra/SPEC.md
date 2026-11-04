@@ -1,5 +1,10 @@
 # Specifica — Quartieri d'Ombra (titolo provvisorio)
 
+## Priorità di fase — solo PLANCIA (2026-11-04)
+
+L'utente ha approvato definitivamente la plancia ImageGen *Five Points District — New York c.1860*, allegata nella conversazione (1672×941), e ha richiesto che il gioco si ispiri **esattamente a quella composizione visiva** e la estenda in una mappa **molto più grande**. Vedi [BOARD_MASTER.md](BOARD_MASTER.md). **Congelare NPC/pathfinding/IA/economia durante questa fase**, senza cancellare il codice precedente. Lavorare su mondo, edifici, terreno, illuminazione, props, panorama isometrico coerente, camera, landscape e fullscreen, non su unità. Una miniatura della reference è archiviata in `assets/references/approved_five_points_board_preview.webp`; l'originale HQ è ancora nella conversazione. Questa nuova golden reference ha precedenza per la plancia sulle definizioni precedenti, mantenendo lo stile RTS 2D isometrico e il requisito di asset modulari originali.
+
+
 ## Visione
 RTS semplice di influenza e conquista territoriale in un quartiere industriale americano ottocentesco immaginario. Toni cupi, sporchi, scenografia urbana claustrofobica. Le reference cinematografiche guidano il mood, NON si riproducono ambientazioni protette, personaggi, marchi o fotogrammi.
 
