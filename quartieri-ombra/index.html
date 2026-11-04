@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Quartieri d'Ombra — RTS</title>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<div class="shell">
+<header class="bar">
+  <div class="brand"><span>QUARTIERI</span> D'OMBRA <small>TACTICAL DISTRICT CONTROL · 1864</small></div>
+  <div class="score"><span>ORO <b id="gold">110</b></span><span>UOMINI <b id="men">1</b></span><span>EDIFICI <b id="land">1 / 15</b></span><span>CONSENSO <b id="consent">75%</b></span></div>
+  <button id="pause" title="Pausa">Ⅱ</button><button id="help" title="Istruzioni">?</button>
+</header>
+<section class="battle">
+ <canvas id="world" width="1120" height="680" aria-label="Campo di gioco strategico isometrico"></canvas>
+ <div class="message" id="msg">Seleziona un gendarme. I presidi cambiano la fedeltà degli edifici vicini.</div>
+</section>
+<footer class="hud">
+ <section class="minimap-box"><canvas id="minimap" width="180" height="108" aria-label="Minimappa"></canvas><div class="legend"><span>● Tuo clan</span><span>● Rivale</span><span>● Neutrale</span></div></section>
+ <section class="select-box"><div class="tag" id="sel-type">QUARTIERE</div><h2 id="sel-name">Il tuo territorio</h2><p id="sel-desc">Conquista edifici neutrali e rivali per controllare il quartiere.</p><div id="sel-detail" class="details"></div></section>
+ <section class="action-box"><div class="tag">ORDINI</div><div class="actions">
+  <button data-mode="guard" id="guard">♜ Presidia</button>
+  <button data-mode="tax" id="tax">◆ Esattore</button>
+  <button data-mode="assault" id="assault">⚔ Assalta</button>
+  <button id="hire">◎ Mercenario (90)</button>
+ </div><div class="key">Seleziona un uomo → ordine → edificio. Tocca la strada per muoverlo.</div></section>
+</footer>
+</div>
+<div class="modal" id="start">
+ <div class="paper"><h1>QUARTIERI D'OMBRA</h1><p>In una città di fango, mattoni e fumo, il potere si conquista con la fedeltà o con la forza.</p><p>Cominci con una casa e un gendarme. I gendarmi nascono spontaneamente dalle residenze fedeli; i mercenari si pagano con l'oro raccolto dagli esattori.</p>
+ <div class="levels">
+ <button data-difficulty="easy"><b>FACILE</b><small>Il rivale parte con 1 edificio</small></button>
+ <button data-difficulty="normal"><b>NORMALE</b><small>Il rivale parte con 2 edifici</small></button>
+ <button data-difficulty="hard"><b>DIFFICILE</b><small>Il rivale parte con 4 edifici</small></button>
+ </div><p class="footnote">Demo originale di sviluppo · Grafica procedurale temporanea · Ispirazione estetica RTS 1998–2003</p></div>
+</div>
+<div class="modal hidden" id="instructions"><div class="paper"><h1>REGOLA DELLA STRADA</h1><p><b>Presidia:</b> colloca il gendarme fuori da un edificio. L'influenza, potenziata dal livello, modifica la fedeltà degli edifici intorno.</p><p><b>Reclute:</b> nascono casualmente dalle case residenziali fedeli e sono gratuite. I mercenari combattono meglio ma non producono influenza.</p><p><b>Oro:</b> gli edifici produttivi accumulano scorte; un gendarme vicino e assegnato come esattore le trasferisce in cassa.</p><p><b>Assalto:</b> manda un uomo verso un edificio nemico per conquistarne il controllo con la forza.</p><button id="close-help">Chiudi</button></div></div>
+<script src="./game.js" defer></script>
+</body></html>
