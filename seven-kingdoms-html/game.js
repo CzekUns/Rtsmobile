@@ -146,7 +146,7 @@ function selectedContent(){
    title:rule.label,meta:'Edificio · '+nation.name,color,
    info:'Lavoratori <strong>'+staff.length+'</strong>/8'+
     (item.underConstruction?'<br><strong>IN COSTRUZIONE '+Math.floor((item.buildProgress||0)*100)+'%</strong>':'')+
-    '<br>Produttività '+game.firmProductivity(item).toFixed(1)+' (abilità/HP, scala originale; resa demo)'+'<br>Esperienza '+Math.floor(item.experience)+
+    '<br>Produttività '+game.firmProductivity(item).toFixed(1)+' (indice skill/HP; legacy stimati a 10)'+'<br>Resa demo '+(game.firmProductivity(item)*0.8).toFixed(1)+' operai equivalenti'+'<br>Esperienza '+Math.floor(item.experience)+
     (item.kind==='fort'?'<br>Il forte influenza i villaggi collegati.':
       item.kind==='mine'?'<br>Produce minerali grezzi.':
       item.kind==='factory'?'<br>Trasforma minerali in prodotti.':
