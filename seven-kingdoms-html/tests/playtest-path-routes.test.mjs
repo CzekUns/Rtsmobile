@@ -149,3 +149,27 @@ test('head-on occupied tiles never allow two units to overlap or discard orders'
  assert.deepEqual(rival.route,[origin]);
  assert.deepEqual(rival.target,origin);
 });
+
+test('head-on deadlock resumes the original route when the opposing unit clears',()=>{
+ const {g,soldier}=scenario();
+ const goal=reach(g,soldier);
+ const first={...soldier.route[0]};
+ const origin={x:Math.round(soldier.x),y:Math.round(soldier.y)};
+ const rival={id:999996,owner:2,kind:'soldier',x:first.x,y:first.y,
+  route:[origin],target:{...origin}};
+ g.units.push(rival);
+ const pending=soldier.route.map(tile=>({...tile}));
+ for(let i=0;i<8;i++)advancePlaytestRoutes(g,.25);
+ assert.deepEqual(soldier.route,pending);
+ assert.deepEqual(soldier.target,goal);
+ g.units.splice(g.units.indexOf(rival),1);
+ let moved=false;
+ for(let i=0;i<12;i++){
+  const before={x:soldier.x,y:soldier.y};
+  advancePlaytestRoutes(g,.25);
+  if(soldier.x!==before.x||soldier.y!==before.y)moved=true;
+ }
+ assert.equal(moved,true);
+ assert.notDeepEqual(soldier.route,pending);
+ assert.deepEqual(soldier.target,goal);
+});
