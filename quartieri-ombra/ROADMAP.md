@@ -116,3 +116,9 @@ Nota: la proiezione isometrica non deve essere confusa con la regolarità urbani
 - Test persistente `tests/irregular-map.test.cjs` (commit `6e0f5f67db81454eb8ad02332852026a98b6f33f`) per numero lotti, assenza sovrapposizioni, irregolarità e tracciati. Eseguiti controllo sintattico V8 e verifica geometrica diretta (PASS). Test Node/browser non ancora eseguiti.
 - ATTENZIONE: interpretazione ludica PRELIMINARE, non ricostruzione cartografica verificata. Necessaria georeferenziazione della pianta Perris 1853 e confronto con mappe/immagini originali prima di dichiarare fedeltà storica. I nomi stradali sono riferimenti storici, non attribuzioni di coordinate esatte.
 - Restano: percorso navigabile lungo le vie, allineamento dei fronti edificio, asset e test smartphone reali. Nessuna casella DoD completata.
+
+## Verifica 2026-11-04 18:00 — corridoi stradali sgombri
+- Corrette le interferenze fra strade ed edifici del primo layout irregolare: ricollocati 8 dei 15 lotti mantenendo cinque polilinee stradali, tutti i tipi e gli ID degli edifici, collisioni A* e logica di proprietà.
+- Aggiunto test persistente `tests/road-clearance.test.cjs`: distanza geometrica campionata ogni 2 unità fra ciascun segmento stradale e tutti i 15 footprint, comprensiva di metà larghezza strada e margine collisioni 10 unità. Eseguito lo stesso controllo dinamico V8 sulla geometria letta dalla main: **255 combinazioni strada/lotto PASS, zero interferenze, minimo margine residuo 0,66 unità**; 105 coppie di edifici senza sovrapposizioni; parsing JS PASS.
+- Commit codice `9c803021`, test `a0fc23ae`. Test Node persistente non eseguito nell'ambiente, né smoke browser desktop/Android o screenshot comparativo; nessuna casella DoD chiusa.
+- **Nota storica:** layout ancora artistico, non rilievo catastale verificato. Prossimo passo: percorribilità reale, maggiore separazione fisica nei punti stretti, allineamento dei fronti strada e confronto con Perris 1853.
