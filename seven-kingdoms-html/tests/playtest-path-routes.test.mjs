@@ -95,3 +95,22 @@ test('invalid movement orders preserve the current route and target',()=>{
   assert.deepEqual(soldier.target,goal);
  }
 });
+
+
+test('a temporarily occupied next tile pauses movement without losing the route',()=>{
+ const {g,soldier}=scenario();
+ const goal=reach(g,soldier);
+ const original=soldier.route.map(tile=>({...tile}));
+ const next=original[0];
+ const blocker={id:999999,owner:2,kind:'soldier',x:next.x,y:next.y};
+ g.units.push(blocker);
+ const start={x:soldier.x,y:soldier.y};
+ advancePlaytestRoutes(g,.2);
+ assert.deepEqual({x:soldier.x,y:soldier.y},start);
+ assert.deepEqual(soldier.route,original);
+ assert.deepEqual(soldier.target,goal);
+ g.units.pop();
+ advancePlaytestRoutes(g,.2);
+ assert.ok(Math.hypot(soldier.x-start.x,soldier.y-start.y)>0);
+ assert.deepEqual(soldier.target,goal);
+});
