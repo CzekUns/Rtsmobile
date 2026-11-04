@@ -66,12 +66,15 @@ export class SevenGame{
    for(const town of g.towns){
     town.taxPenalty??=0;town.rewardPenalty??=0;town.recruitPenalty??=0;
     ensureTownRaces(town);
+    town.nextTrainingId??=0;
     for(let i=0;i<town.trainingQueue.length;i++){
      const queue=town.trainingQueue[i];
      queue.raceId??=selectedTownRace(town,raceIdForCulture(queue.culture))?.raceId||town.selectedRaceId;
      queue.id??='legacy-training-'+i;
      queue.skillLevel??=20;
      queue.paidCost??=30;
+     const suffix=String(queue.id).match(/^training-[^-]+-(\d+)$/);
+     if(suffix)town.nextTrainingId=Math.max(town.nextTrainingId,Number(suffix[1]));
     }
    }
    const all=[...g.towns,...g.firms,...g.units];
@@ -366,7 +369,7 @@ export class SevenGame{
       combatLevel:0});
     unit.personId=unit.id;
     this.units.push(unit);
-    this.note(SKILLS[item.skillId]?.label||'Specialista'+' addestrato a '+town.name+'.');
+    this.note((SKILLS[item.skillId]?.label||'Specialista')+' addestrato a '+town.name+'.');
    }
   }
  }
