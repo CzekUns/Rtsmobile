@@ -84,10 +84,11 @@ function selectedContent(){
   const info='Popolazione <strong>'+item.pop+'</strong> · Cultura '+esc(item.culture)+
     '<br>'+(independent?'Resistenza <strong>'+Math.floor(item.resistance)+'</strong>/100':
                    'Fedeltà <strong>'+Math.floor(item.loyalty)+'</strong>/100')+
-    '<br>Regno: '+esc(nation.name);
+    '<br>Regno: '+esc(nation.name)+(item.constructionTraining?'<br>Costruttore in formazione: '+item.constructionTraining.daysRemaining+' giorni':'');
   const ownFortLinked=game.ownFirms().some(f=>f.kind==='fort'&&game.linked(f,item));
   const actions=item.owner===1?[
     btn('recruit','Recluta',item.pop<=4||item.loyalty<27),
+     ...(playtest?[btn('train-construction','Addestra costruttore (30)',!!item.constructionTraining||item.pop<=4||item.loyalty<30||game.cash<=30||!ownFortLinked)]:[]),
     btn('tax','Tasse',item.loyalty<=10||!ownFortLinked),
     btn('grant','Sussidio ('+(item.pop*10)+')',game.cash<item.pop*10||!ownFortLinked),
   ].join(''):independent?[
@@ -200,6 +201,7 @@ function runAction(action){
  const obj=selected();if(!obj)return;
  let r={ok:false,msg:'Ordine non valido.'};
  if(action==='recruit')r=game.recruit(obj.id);
+ if(action==='train-construction'&&playtest&&game.towns.includes(obj))r=game.trainConstruction(obj.id);
  if(action==='tax')r=game.tax(obj.id);
  if(action==='grant')r=game.grant(obj.id);
  if(action==='persuade')r=game.persuade(obj.id);
