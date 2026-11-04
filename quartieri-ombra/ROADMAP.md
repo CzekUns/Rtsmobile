@@ -2,6 +2,19 @@
 
 Stato: IN SVILUPPO. Priorità grafica/urbanistica richiesta dall'utente: ricostruzione Five Points > qualità renderer > collaudo > espansioni.
 
+## CRITERIO DI SOLLECITO — alpha visivamente accettabile (2026-11-04)
+
+**Richiesta esplicita:** proseguire le esecuzioni operative fino a un livello grafico e ludico accettabile, non compilare soltanto report o test. Soglia verificabile definita in [VISUAL_ACCEPTANCE.md](VISUAL_ACCEPTANCE.md), tutte le caselle inizialmente APERTE.
+
+Regola per i prossimi worker: **priorità a commit che cambiano tangibilmente il gioco visibile**, con test a supporto. Ogni iterazione deve produrre nuovi elementi di scena/asset, fedeltà dei tracciati stradali o correzione diretta di difetti grafici/UI, oppure documentare un blocco tecnico reale. Non spendere iterazioni solo su suite di test aggiuntive mentre la grafica è ancora prototipale, salvo bug bloccanti.
+
+- [ ] Tracciato Five Points coerente con almeno una mappa storica documentata (Perris 1853) e comparazione OSM attuale attribuita.
+- [ ] Quartiere densamente edificato con facciate orientate verso strade e vicoli, 4+ tipologie originali distinte, decorazioni contestualizzate.
+- [ ] Proiezione, livelli e sprite coerenti, HUD classico landscape fullscreen realmente utilizzabile.
+- [ ] Screenshot desktop e smartphone landscape di build reale confrontati con golden reference; criteri PASS documentati.
+- [ ] Partita completa senza regressioni delle meccaniche.
+- [ ] Dopo la soglia, mantenere worker attivo per la Definition of Done completa, salvo nuovo ordine esplicito.
+
 ## PRIORITÀ VISIVA P0 — città Five Points 1853–1860 (aggiornamento user screenshots)
 
 **Scopo dominante richiesto dall'utente: qualità grafica e coerenza urbanistica prima di espansioni di gameplay.** Consultare [VISUAL_RESEARCH.md](VISUAL_RESEARCH.md) e ART_DIRECTION.md. Non confondere una grafica 2D isometrica con un quartiere storicamente corretto.
