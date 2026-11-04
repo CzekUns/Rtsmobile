@@ -87,3 +87,9 @@
 - `tests/irregular-map.test.cjs` commit `6e0f5f67db81454eb8ad02332852026a98b6f33f`: test di geometria, footprint e tracciati, da eseguire con Node nel checkout. Parser V8 game.js e controllo di non sovrapposizione 15/15 PASS nell'ambiente connettore.
 - Base storica di ricerca: William Perris, Maps of the City of New-York, volume 3, plate 25 (1853); Library of Congress, incisione Five Points in 1859. NON sono state importate immagini storiche nel gioco. Le coordinate sono una prima interpretazione artistica, NON un rilievo fedele. Da verificare nomi, angoli e ingombri contro mappa primaria.
 - Da completare: esecuzione test Node, screenshot desktop/mobile, convalida strade reali e navigazione; il gioco non è completo.
+
+## 2026-11-04 18:00 — rimozione interferenze stradali
+- Dopo rilettura di specifiche, roadmap, art direction e stato `main`, risolte le intersezioni fra 5 strade e 15 lotti della mappa: 8 footprint ricollocati, conservati nomi/ID/tipi, asset, HUD e regole gameplay. Commit `9c803021b62323c9ca50f90ecf5df2a5faa3f7bb`.
+- Nuova suite `tests/road-clearance.test.cjs`, commit `a0fc23ae23e20628401bfd224201094fc6a7a06e`, per impedire regressioni su corridoi stradali, numero edifici e distanze di collisione.
+- Verifica geometrica eseguita sul codice letto da GitHub: 255 accoppiamenti segmento/lotto campionati a 2 unità, nessuna interferenza; minimo 0,66 unità oltre il limite strada + 10; nessuna coppia di edifici sovrapposta; parser JS PASS.
+- Non verificati: suite Node su checkout, percorso A* di ogni edificio, screenshot e interazioni browser, fullscreen/portrait su Android, corrispondenza cartografica storica. Mappa ancora semplificata e non validata su pianta Perris.
