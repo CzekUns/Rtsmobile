@@ -5,12 +5,19 @@
  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rnd=(a,b)=>a+Math.random()*(b-a),distance=(a,b,c,d)=>Math.hypot(a-c,b-d);
  const defs=Array.from({length:TOTAL},(_,i)=>({id:i,x:100+(i%5)*210,y:125+Math.floor(i/5)*174,w:115,h:76,type:i%3===1?"prod":"res",name:["Casa del Corvo","Officina del Ferro","Case dei Molini","Conceria Vecchia","Casa del Porto","Alloggi dei Carrettieri","Mercato del Sale","Casa dei Vetrai","Magazzino del Carbone","Dormitori Grigi","Casa delle Lanterne","Filanda del Ponte","Alloggi dell'Argine","Fonderia di Molo","Casa della Bruma"][i]}));
  let game=null,choice="guard",nextUnitId=1,last=performance.now(),fpsAccumulator=0,noticeTimer=0;
+ const camera={zoom:1,offsetX:0,offsetY:0};
+ const pointerPositions=new Map();let dragStart=null,pinchDistance=null;
+ function constrainCamera(){const visibleW=W/camera.zoom,visibleH=H/camera.zoom;camera.offsetX=clamp(camera.offsetX,0,Math.max(0,W-visibleW));camera.offsetY=clamp(camera.offsetY,0,Math.max(0,H-visibleH))}
+ function screenPoint(e){const r=canvas.getBoundingClientRect();const scale=Math.min(r.width/W,r.height/H);const dx=(r.width-W*scale)/2,dy=(r.height-H*scale)/2;return {x:(e.clientX-r.left-dx)/scale,y:(e.clientY-r.top-dy)/scale}}
+ function worldPoint(p){return {x:camera.offsetX+p.x/camera.zoom,y:camera.offsetY+p.y/camera.zoom}}
+ function zoomAt(factor,p){const before=worldPoint(p);camera.zoom=clamp(camera.zoom*factor,1,2.6);camera.offsetX=before.x-p.x/camera.zoom;camera.offsetY=before.y-p.y/camera.zoom;constrainCamera()}
  function owned(side){return game.buildings.filter(b=>b.owner===side)}
  function approval(side){let a=owned(side);return a.length?Math.round(a.reduce((s,b)=>s+(b.loyalty*side),0)/a.length):0}
  function report(t){$("msg").textContent=t;noticeTimer=5}
  function makeBuilding(d,side){return {...d,loyalty:side*75,owner:side,stock:0,recruit:rnd(12,24),damage:0}}
  function init(level){
    const n=level==="hard"?4:level==="normal"?2:1;
+   camera.zoom=1;camera.offsetX=0;camera.offsetY=0;
    game={level,buildings:defs.map((d,i)=>makeBuilding(d,i===0?1:i>=TOTAL-n?-1:0)),units:[],gold:{1:110,"-1":110},selected:null,order:"guard",time:0,paused:false,over:false,ai:1.2,aiPurchase:0};
    nextUnitId=1;spawn(PLAYER,"g",game.buildings[0]);
    owned(ENEMY).filter(b=>b.type==="res").forEach(b=>spawn(ENEMY,"g",b));
@@ -65,6 +72,7 @@
     if(d<=travel+0.1){u.x=p.x;u.y=p.y;u.path.shift()}else{u.x+=dx/d*travel;u.y+=dy/d*travel}
    }
   }
+  for(const u of game.units){if(u.type==="g"&&!u.path.length){u.xp+=dt*(u.mode==="guard"?.36:.12);if(u.xp>50*u.level&&u.level<4){u.level++;u.xp=0;if(u.side===PLAYER)report("Un gendarme sale al livello "+u.level+".")}}}
   for(const b of game.buildings){
    let pressure=0;
    for(const u of game.units){
@@ -73,8 +81,7 @@
     if(d>range)continue;
     let inf=(1.05+u.level*0.7)*Math.max(.15,1-d/(range+30));
     pressure+=u.side*inf*(u.mode==="tax"?.78:1);
-    u.xp+=dt*(u.side===b.owner?.16:.3);
-    if(u.xp>50*u.level&&u.level<4){u.level++;u.xp=0;if(u.side===PLAYER)report("Un gendarme sale al livello "+u.level+".")}
+
    }
    if(pressure!==0)b.loyalty=clamp(b.loyalty+pressure*dt,-100,100);
    else if(b.owner===NEUTRAL)b.loyalty*=Math.max(0,1-dt*.012);
@@ -142,7 +149,7 @@
  }
  function isIn(b,x,y){return x>=b.x-4&&x<=b.x+b.w+4&&y>=b.y-4&&y<=b.y+b.h+4}
  function tap(x,y){
-  if(!game||game.over)return;
+  if(!game||game.over||game.paused)return;
   const u=game.units.slice().reverse().find(t=>distance(t.x,t.y,x,y)<17);
   if(u&&u.side===PLAYER){game.selected={kind:"unit",id:u.id};refresh();return}
   const b=game.buildings.find(t=>isIn(t,x,y));
@@ -155,13 +162,15 @@
   }
   if(game.selected&&game.selected.kind==="unit"){
    let su=game.units.find(t=>t.id===game.selected.id);
-   if(su){moveTo(su,x,y);report("Gendarme in movimento.")}
+   if(su){if(moveTo(su,x,y))report("Unità in movimento.");else report("Destinazione non raggiungibile.")}
   }else game.selected=null;
   refresh();
  }
- let pointer=null;
- canvas.addEventListener("pointerdown",e=>{let r=canvas.getBoundingClientRect();pointer={x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height};});
- canvas.addEventListener("pointerup",e=>{if(!pointer)return;let r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*W/r.width,y=(e.clientY-r.top)*H/r.height;if(distance(pointer.x,pointer.y,x,y)<22)tap(x,y);pointer=null;});
+ canvas.addEventListener("pointerdown",e=>{e.preventDefault();canvas.setPointerCapture(e.pointerId);const p=screenPoint(e);pointerPositions.set(e.pointerId,p);if(pointerPositions.size===1)dragStart={id:e.pointerId,start:p,last:p,moved:false};else{dragStart=null;const points=[...pointerPositions.values()];pinchDistance=distance(points[0].x,points[0].y,points[1].x,points[1].y)}});
+ canvas.addEventListener("pointermove",e=>{if(!pointerPositions.has(e.pointerId))return;const p=screenPoint(e);pointerPositions.set(e.pointerId,p);if(pointerPositions.size>=2){const points=[...pointerPositions.values()],d=distance(points[0].x,points[0].y,points[1].x,points[1].y);if(pinchDistance&&d>0)zoomAt(d/pinchDistance,{x:(points[0].x+points[1].x)/2,y:(points[0].y+points[1].y)/2});pinchDistance=d;return}if(dragStart){const q=dragStart.last;if(distance(p.x,p.y,dragStart.start.x,dragStart.start.y)>9)dragStart.moved=true;if(dragStart.moved){camera.offsetX-=(p.x-q.x)/camera.zoom;camera.offsetY-=(p.y-q.y)/camera.zoom;constrainCamera()}dragStart.last=p}});
+ function endPointer(e){if(!pointerPositions.has(e.pointerId))return;const p=screenPoint(e);if(dragStart&&dragStart.id===e.pointerId&&!dragStart.moved&&e.type==="pointerup"){const w=worldPoint(p);tap(w.x,w.y)}pointerPositions.delete(e.pointerId);dragStart=null;pinchDistance=null}
+ canvas.addEventListener("pointerup",endPointer);canvas.addEventListener("pointercancel",endPointer);
+ canvas.addEventListener("wheel",e=>{e.preventDefault();zoomAt(e.deltaY<0?1.12:1/1.12,screenPoint(e))},{passive:false});
  document.querySelectorAll("[data-difficulty]").forEach(b=>b.onclick=()=>init(b.dataset.difficulty));
  document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{setMode(b.dataset.mode);report("Ordine "+b.textContent.trim()+": scegli un edificio.");});
  $("hire").onclick=()=>{
@@ -195,7 +204,8 @@
   $("sel-type").textContent=type;$("sel-name").textContent=name;$("sel-desc").textContent=desc;$("sel-detail").textContent=detail;
  }
  function drawScene(){
-  ctx.clearRect(0,0,W,H);
+  ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,W,H);
+  ctx.setTransform(camera.zoom,0,0,camera.zoom,-camera.offsetX*camera.zoom,-camera.offsetY*camera.zoom);
   ctx.fillStyle="#292725";ctx.fillRect(0,0,W,H);
   for(let y=0;y<H;y+=35)for(let x=0;x<W;x+=35){
    let v=Math.sin(x*.29+y*.19)*14;ctx.fillStyle="rgba(6,6,5,"+(.07+Math.abs(v)/250)+")";ctx.fillRect(x+2,y+2,32,32);
@@ -208,7 +218,7 @@
   for(const u of [...game.units].sort((a,b)=>a.y-b.y))drawUnit(u);
   if(game.selected&&game.selected.kind==="building"){const b=game.buildings[game.selected.id];ctx.strokeStyle="#e3c57b";ctx.lineWidth=3;ctx.strokeRect(b.x-5,b.y-5,b.w+10,b.h+10)}
   if(game.selected&&game.selected.kind==="unit"){let u=game.units.find(x=>x.id===game.selected.id);if(u){ctx.strokeStyle="#e3c57b";ctx.beginPath();ctx.ellipse(u.x,u.y+4,17,7,0,0,7);ctx.stroke();if(u.type==="g"){ctx.strokeStyle="#e3c57b55";ctx.lineWidth=1;ctx.beginPath();ctx.arc(u.x,u.y,137+u.level*16,0,7);ctx.stroke()}}}
-  drawMini();
+  drawMini();ctx.setTransform(1,0,0,1,0,0);
  }
  function drawBuilding(b){
   const x=b.x,y=b.y,w=b.w,h=b.h,col=b.owner===PLAYER?"#6992b6":b.owner===ENEMY?"#a45452":"#91877b";
@@ -244,6 +254,7 @@
   mx.fillStyle="#494137";for(let i=0;i<4;i++)mx.fillRect(0,15+i*27,180,6);
   for(const b of game.buildings){mx.fillStyle=b.owner===PLAYER?"#76a4c8":b.owner===ENEMY?"#c26b68":"#a0998f";mx.fillRect(b.x/W*180,b.y/H*108,Math.max(5,b.w/W*180),Math.max(4,b.h/H*108))}
   for(const u of game.units){mx.fillStyle=u.side===PLAYER?"#a9ddff":"#ff8f89";mx.fillRect(u.x/W*180,u.y/H*108,2,2)}
+  mx.strokeStyle="#e8cb83";mx.lineWidth=1;mx.strokeRect(camera.offsetX/W*180,camera.offsetY/H*108,180/camera.zoom,108/camera.zoom);
  }
  function loop(now){let dt=Math.min(.05,(now-last)/1000);last=now;if(game){update(dt);drawScene()}requestAnimationFrame(loop)}
  requestAnimationFrame(loop);
