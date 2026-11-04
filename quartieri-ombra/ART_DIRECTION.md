@@ -35,3 +35,12 @@ La reference approvata è il concept di interfaccia isometrica RTS 2D della conv
 7. Eseguire confronto screenshot reale/reference prima di marcare Fase 3 completata.
 
 **Nota di tracciabilità:** il PNG originale della schermata approvata è allegato nella conversazione ChatGPT; NON è ancora caricato come file binario nella repository. Non dichiarare che lo screenshot sia presente su GitHub. I dettagli sopra sono la trascrizione vincolante del riferimento visivo.
+
+## Reference fotografiche inviate dall'utente — 2026-11-04
+
+Sono state mostrate tre schermate di risultati Google Immagini per «new york 1860», tra cui una fotografia ripubblicata da History101.NYC. Usarle **soltanto come guida a forme urbane generali** (facciate 3–5 piani, negozi al pianterreno, cornicioni, tende, vetrine, tram/carrozze, densità). Non sono fotografie verificate del quartiere Five Points, né è dimostrata la datazione esatta di ciascun risultato. Scene di Broadway e arterie ordinate non devono diventare automaticamente il modello di Five Points.
+
+Questa raccolta integra ma NON sostituisce la golden reference RTS 1998–2003. La fonte topografica prioritaria resta William Perris (1853, vol. 3, plate 25), da confrontare anche con il materiale d'epoca locale. OSM attuale solo per l'orientamento geografico.
+
+**Documento operativo dettagliato:** [VISUAL_RESEARCH.md](VISUAL_RESEARCH.md): fonti, cosa estrarre, cosa NON copiare, priorità della ricostruzione e licenze. Non importare immagini da Google né fotogrammi cinematografici come sprite senza diritti; gli asset devono essere originali.
+
