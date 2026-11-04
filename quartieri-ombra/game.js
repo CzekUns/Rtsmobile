@@ -109,7 +109,8 @@
      b.recruit=rnd(13,26);
      let chance=clamp(.14+.004*(Math.abs(b.loyalty)+approval(b.owner)),.12,.8);
      if(Math.random()<chance&&game.units.filter(u=>u.side===b.owner&&u.type==="g").length<18){
-      spawn(b.owner,"g",b);if(b.owner===PLAYER)report("Nuovo gendarme spontaneo da "+b.name+".");
+      const recruit=spawn(b.owner,"g",b);
+      if(recruit&&b.owner===PLAYER)report("Nuovo gendarme spontaneo da "+b.name+".");
      }
     }
    }
@@ -166,7 +167,12 @@
   if(b){
    if(game.selected&&game.selected.kind==="unit"){
      let su=game.units.find(t=>t.id===game.selected.id);
-     if(su&&sendTo(su,b,choice)){report((choice==="tax"?"Riscuoti presso ":choice==="assault"?"Assalta ":"Presidia ")+b.name);refresh();return}
+     if(su){
+     if(choice==="tax"&&(su.type!=="g"||b.type!=="prod"||b.owner!==PLAYER)){report("Esazione: scegli un gendarme e un produttivo del tuo clan.");refresh();return}
+     if(choice==="assault"&&b.owner===PLAYER){report("Non puoi assaltare un edificio alleato.");refresh();return}
+     if(sendTo(su,b,choice)){report((choice==="tax"?"Riscuoti presso ":choice==="assault"?"Assalta ":"Presidia ")+b.name);refresh();return}
+     report("Nessun percorso disponibile verso "+b.name+".");refresh();return;
+   }
    }
    game.selected={kind:"building",id:b.id};refresh();return;
   }
