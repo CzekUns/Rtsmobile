@@ -6,9 +6,10 @@ Progetto isolato: `CzekUns/Rtsmobile/quartieri-ombra/`. Sviluppa soltanto qui.
 - NON modificare, cancellare o rinominare nessun file fuori da `quartieri-ombra/`.
 - NON modificare root `index.html`, README, asset globali, `.github/`, workflow Pages, `seven-kingdoms-html/`, `ver-sacrum-7k/` o qualsiasi altro gioco.
 - NON creare branch globali di deploy né alterare Pages. Il deploy esistente pubblica tutta la root di `main` e renderà disponibile `/Rtsmobile/quartieri-ombra/` senza cambi di configurazione.
+- La direzione estetica marcata APPROVATA in ART_DIRECTION.md è vincolante: il concept in-game 1998–2003 prevale sui precedenti artwork cinematografici; non marcare grafica finita prima del confronto con lo screenshot originale.
 - Non usare asset di film, fotogrammi protetti, nomi di personaggi di finzione, loghi e altri contenuti senza licenza. I mockup sono SOLO reference visive; non ritagliare porzioni come sprite finali senza verificare condizioni e qualità.
 - Conflitti con altre automazioni: recupera sempre ultima main prima di scrivere; fai modifiche file-specifiche; mai force push; mai sovrascrivere file di altri progetti.
-- Prima di ogni sessione leggi README.md, SPEC.md, ROADMAP.md, WORKLOG.md e questo file.
+- Prima di ogni sessione leggi README.md, SPEC.md, ART_DIRECTION.md, ROADMAP.md, WORKLOG.md e questo file.
 
 ## Metodo di ogni iterazione
 1. Esamina stato reale della cartella e ultime modifiche, scegli il primo obiettivo non completato della roadmap.
