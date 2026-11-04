@@ -16,6 +16,20 @@ export const SKILLS=Object.freeze([
 ]);
 const cap=v=>Math.max(0,Math.min(8,Number.isFinite(v)?Math.floor(v):0));
 const skillNumber=v=>Number.isInteger(v)&&v>=0&&v<SKILLS.length?v:0;
+export const workerRoleLabel=(person)=>{
+ if(person?.legacyUnknown)return 'Ruolo precedente non documentato';
+ if(person?.kind==='soldier')return 'Soldato';
+ if(person?.kind==='peasant')return 'Abitante';
+ return 'Ruolo sconosciuto';
+};
+export const workerRaceLabel=(person)=>{
+ const id=person?.raceId;
+ const culture=typeof person?.culture==='string'&&person.culture.trim()?person.culture.trim():null;
+ // String IDs belong to the HTML demo; do not claim they are 7KAA RACE.DBF IDs.
+ if(id==='greek'||id==='norman')return culture|| (id==='greek'?'Greci':'Normanni');
+ if(Number.isInteger(id)&&id>0)return 'Razza #'+id+(culture?' · '+culture:'');
+ return 'Etnia non verificata'+(culture?' · '+culture:'');
+};
 export const skillLabel=(id,level=0,unknown=false)=>
   unknown?'Non documentata (salvataggio precedente)':
   SKILLS[skillNumber(id)].label+(skillNumber(id)===0?'':' · '+Math.max(0,Math.floor(level||0)));
