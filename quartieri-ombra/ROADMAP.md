@@ -1,6 +1,21 @@
 # Roadmap operativa — aggiornare ad ogni worker
 
-Stato: IN SVILUPPO. Priorità: gameplay funzionante > art > polish > espansioni.
+Stato: IN SVILUPPO. Priorità grafica/urbanistica richiesta dall'utente: ricostruzione Five Points > qualità renderer > collaudo > espansioni.
+
+## PRIORITÀ VISIVA P0 — città Five Points 1853–1860 (aggiornamento user screenshots)
+
+**Scopo dominante richiesto dall'utente: qualità grafica e coerenza urbanistica prima di espansioni di gameplay.** Consultare [VISUAL_RESEARCH.md](VISUAL_RESEARCH.md) e ART_DIRECTION.md. Non confondere una grafica 2D isometrica con un quartiere storicamente corretto.
+
+- [x] Catalogazione iniziale di Perris 1853, incrocio storico, LoC 1859, OSM moderno e clip cinematografiche come reference **senza** includere materiale non autorizzato nella build.
+- [x] Prima variazione **originale e integrata nel renderer** dei fronti edificio: marcapiani, finestre in prospettiva, botteghe, tende, ingressi; geometria dei 15 edifici testata in V8 (846 poligoni, 0 invalidi). Aspetto definitivo da valutare.
+- [ ] Costruire base geografica attuale in OpenStreetMap come layer comparativo con attribuzione; evidenziare in documentazione **cosa è sopravvissuto e cosa è cambiato** dal 1853.
+- [ ] Leggere la pianta Perris ad alta risoluzione, fissare l'incrocio storico dei Five Points; estrarre e verificare polilinee e isolati con tracciabilità per tratto, niente falsa georeferenziazione.
+- [ ] Rifare lotti/fronti più fedeli alla pianta, conservando almeno 15 edifici, accessi, collisioni e unità percorribili.
+- [ ] Produrre **sprite originali separati**: almeno 2 residenziali, 1 fila di botteghe/taverna, 2 produttivi, tende, insegne, carri, props e suolo fangoso/lastricato; ciascuno con pivot/footprint e fonte descrittiva.
+- [ ] Illuminazione ambra, mattoni degradati, strade strette, densità più disordinata; differenza evidente fra vie commerciali e vicoli poveri.
+- [ ] Acquisire screenshot *della build reale* Android landscape e desktop e confrontare con golden reference in-game RTS 1998–2003 e materiali storici, prima di marcare la grafica completa.
+
+Non copiare screenshot della ricerca Google, immagini film o scansioni in app; non affermare autenticità storica dove è presente solo un'interpretazione. Tutte le modifiche restano dentro quartieri-ombra/.
 
 ## PRIORITÀ IMMEDIATE — interfaccia mobile landscape e isometria integrale (richiesta utente 2026-11-04)
 
