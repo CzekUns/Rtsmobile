@@ -1,5 +1,13 @@
 # Diario avanzamento
 
+## 2026-11-04 — Plancia ImageGen approvata, nuova priorità assoluta
+- Nuovo ordine diretto dell'utente: il lavoro su movimento e sistemi NPC è **sospeso per ora**. Prima la plancia. L'ultimo concept ImageGen `distretto_five_points_new_york_1860.png` (originale 1672×941) è il target grafico esatto: caseggiati densi, incrocio irregular Five Points, negozi, carri, fango, lampioni, palette bruna/ambra e vista isometrica. L'immagine è una finestra su una mappa più grande: almeno 2×2 area visibile equivalente, preferenza 3×3 settori.
+- Caricata in GitHub la **miniatura autentica**, 160×90 WebP, `assets/references/approved_five_points_board_preview.webp` con blob git `69124aacabeb275a5f2194043281a56687e0d05f`; commit `9edfb96c43111495fe5354bb9206e222e3a6c31c`. Il PNG HQ NON è stato caricato; resta allegato alla conversazione.
+- Creato il contratto grafico `BOARD_MASTER.md` (commit `dda7447c7081f8e27fcf24e7d693eee06a429daf`): composizione vincolante, estensione continua, layer/modularità, distinzione reference e runtime, preview isolata e criteri di accettazione. Aggiornati ART_DIRECTION, ROADMAP, SPEC, README, VISUAL_ACCEPTANCE e catalogo asset; il nuovo reference ha precedenza per la plancia.
+- Prompt del worker orario aggiornato con nuova priorità: produrre modifiche di grafica **visibili**, non toccare NPC/pathfinding/IA salvo blocchi della preview, non dichiarare mappa finita con solo un'immagine statica; attendere approvazione plancia prima di riprendere il gameplay.
+- Test disponibili: il contenuto della miniatura è stato validato dal suo SHA Git e la commit GitHub è stata confermata. Non è stata ancora realizzata la grande mappa modulare; nessun collaudo in browser di questa versione.
+
+
 ## 2026-11-04 — Esecuzione sollecitata, upgrade grafico tetti e arredo
 - L'utente ha richiesto di sollecitare le esecuzioni fino a un livello visivamente accettabile. Creato `VISUAL_ACCEPTANCE.md` con criteri di ingresso, soglia intermedia e vincolo anti-report; aggiornato prompt del worker orario. L'automazione esistente rimane attiva.
 - **Modifica runtime** `game.js` commit `0efddc78c7a7d83332239493b2d6f6d55150cce2`: 5 silhouette classificate (`shop`, `tenement`, `dwelling`, `warehouse`, `mill`); tetti a falde e piani, lucernari, parapetti e dettagli. Aggiunti riferimenti immagine agli SVG originali già presenti: barili, casse, lampioni, steccati e lanterne; 15 props posizionati ai margini dei palazzi e ordinati in isometria assieme alle unità.
