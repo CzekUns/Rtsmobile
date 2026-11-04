@@ -2,6 +2,9 @@
 
 **Titolo provvisorio.** Piccolo RTS HTML5 originale in una città industriale ottocentesca immaginaria. Estetica finale vincolante: strategico isometrico 2D, cupo, 1998–2003.
 
+## Ricerca storico-grafica
+La direzione grafica usa la New York dei Five Points attorno al 1853 come reference storica. Sono disponibili [VISUAL_RESEARCH.md](VISUAL_RESEARCH.md) (fonti, reference inviate dall'utente, architettura e licenze) e [ART_DIRECTION.md](ART_DIRECTION.md) (stile RTS 1998–2003 approvato). Gli edifici attuali sono ancora una semplificazione artistica e non una ricostruzione cartografica verificata.
+
 ## Gioco
 Avvio diretto da `index.html` senza compilazione o dipendenze esterne. Scegli difficoltà, controlla il clan con un edificio residenziale e un gendarme. Le case producono reclute spontanee se fedeli; i produttivi accumulano oro da riscuotere con esattori; i mercenari sono acquistabili. Gendarmi fermi influenzano edifici vicini, con efficacia legata al livello e distanza; gli assalti sono una via alternativa.
 
