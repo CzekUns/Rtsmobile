@@ -53,6 +53,13 @@ export class WorldView{
   ctx.setLineDash([]);
   for(const town of g.towns)this.townDraw(ctx,town,selection,t);
   for(const firm of g.firms)this.firmDraw(ctx,firm,selection,t);
+  for(const site of g.buildSites||[]){
+   const p=this.screen(site.x,site.y),w=site.size*t;
+   ctx.fillStyle='#8e744e99';ctx.fillRect(p.x,p.y,w,w);
+   ctx.strokeStyle='#f5d18a';ctx.lineWidth=2;ctx.strokeRect(p.x,p.y,w,w);
+   ctx.fillStyle='#e7bd5b';ctx.fillRect(p.x,p.y+w*.82,w*Math.min(1,site.progressDays/site.requiredDays),Math.max(3,w*.09));
+   this.label(ctx,'Cantiere '+site.progressDays+'/'+site.requiredDays,p.x+w*.5,p.y+w*.5,t);
+  }
   for(const unit of g.units)this.unitDraw(ctx,unit,selection,t);
   if(ghost){
    const cfg=FIRMS[ghost.kind],pos=this.screen(ghost.x,ghost.y);
