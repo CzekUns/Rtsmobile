@@ -39,3 +39,8 @@
 - Riletto `game.js` da `main` dopo scrittura: parser V8 `new Function` riuscito, 5/5 controlli statici puntuali positivi.
 - Tentativo di recuperare il file nel container per test Node: impossibile risolvere `raw.githubusercontent.com` (DNS). Non dichiarati test dinamici, desktop/touch o screenshot.
 - Prossimo passo: test automatici eseguibili in browser e collaudo visivo isometrico.
+
+## 2026-11-04 12:00 — Worker, collisioni del pathfinding
+- Commit `9b658db08c3a51766454957b4c0a7084d200ea8b`: corretto `route()` affinché non accetti una destinazione il cui centro di cella ricade nell'ingombro di un edificio, pur se il click è sul bordo libero. Preservato il comportamento di spawn su bordi collisione.
+- Test dinamici V8 sulla funzione `route()` estratta dal codice reale con mappa di prova: 5/5 PASS (libero, ostacolo, cella di arrivo, deviazione, coincidenza); parser JS completo PASS.
+- Non eseguito browser smoke desktop/touch né confronto screenshot/reference; prossima priorità harness di regressione persistente e rendering isometrico.
