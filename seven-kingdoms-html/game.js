@@ -6,6 +6,7 @@ import {createFrameAccumulator,accumulateFrame} from './core/clock.js';
 import {issuePlaytestOrder,advancePlaytestRoutes} from './playtest/path-routes.js';
 import {issueWorkOrder,completeWorkArrivals} from './playtest/work-assignments.js';
 import {WorldView} from './view.js';
+import {SKILLS,skillLabel,ensureFirmPersonnel} from './playtest/personnel.js';
 const $=id=>document.getElementById(id);
 const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const playtest=new URLSearchParams(location.search).get('playtest')==='1';
@@ -97,16 +98,27 @@ function selectedContent(){
  }
  if(game.firms.includes(item)){
   const rule=FIRMS[item.kind];
+  const staff=ensureFirmPersonnel(item);
+  const people=staff.map((person,i)=>{
+   const who=person.name||('Lavoratore '+(i+1));
+   const profile=person.legacyUnknown?'Dati precedenti non documentati':
+    (person.culture||'Etnia non registrata')+' · '+skillLabel(person.skillId,person.skillLevel);
+   return '<div class="worker-row"><strong>'+esc(who)+'</strong>'+
+    '<small>'+esc(profile)+'</small><small>HP '+Math.floor(person.hp??100)+
+    ' · ID '+esc(person.personId??person.id)+'</small>'+
+    (item.owner===1?'<button type="button" data-worker-exit="'+esc(person.id)+'">Fai uscire</button>':'')+
+    '</div>';
+  }).join('');
   return {
    title:rule.label,meta:'Edificio · '+nation.name,color,
-   info:'Lavoratori <strong>'+item.workers+'</strong>/8'+
+   info:'Lavoratori <strong>'+staff.length+'</strong>/8'+
     '<br>Esperienza '+Math.floor(item.experience)+
     (item.kind==='fort'?'<br>Il forte influenza i villaggi collegati.':
       item.kind==='mine'?'<br>Produce minerali grezzi.':
       item.kind==='factory'?'<br>Trasforma minerali in prodotti.':
       item.kind==='market'?'<br>Vende prodotti per denaro.':'')+
     '<br>'+(game.linked(item,game.nearestTown(item))?'Collegato a un villaggio':'Nessun villaggio collegato'),
-   actions:item.owner===1?btn('dismiss','Fai uscire lavoratore',item.workers===0):''
+   actions:people||'<div class="worker-empty">Nessun lavoratore in questo edificio.</div>'
   };
  }
  if(game.units.includes(item)){
@@ -118,7 +130,10 @@ function selectedContent(){
   return {
    title:item.kind==='soldier'?'Soldato':'Abitante',
    meta:nation.name+' · Livello '+item.level,color,
-   info:'Salute '+item.hp+'/100 · Addestramento '+Math.floor(item.training)+
+   info:'Salute '+item.hp+'/100 · '+esc(item.culture||'Etnia non registrata')+
+    '<br>Abilità '+esc(skillLabel(item.skillId,item.skillLevel,item.legacyUnknown))+
+    ' · Combattimento '+Math.floor(item.combatLevel||0)+
+    '<br>ID '+esc(item.personId??item.id)+
     '<br>'+(assignedTo?'In viaggio verso '+esc(FIRMS[assignedTo.kind]?.label||'edificio'):
            item.target?'In marcia':'Pronto per gli ordini')+
     '<br>Tocca il terreno per spostarti oppure scegli un edificio qui sotto. L\'abitante entrerà solo dopo aver raggiunto l\'ingresso.',
@@ -308,6 +323,7 @@ document.addEventListener('click',e=>{
  const build=e.target.closest('[data-build]');
  const action=e.target.closest('[data-action]');
  const work=e.target.closest('[data-work-firm]');
+ const workerExit=e.target.closest('[data-worker-exit]');
  if(r)setReport(r.dataset.report);
  if(selectedButton){
   const item=game.get(selectedButton.dataset.select);
@@ -315,6 +331,15 @@ document.addEventListener('click',e=>{
  }
  if(build){closeReport();buildMode(build.dataset.build);}
  if(action)runAction(action.dataset.action);
+ if(workerExit){
+  const item=selected();
+  if(item&&game.firms.includes(item)){
+   const result=game.dismiss(item.id,workerExit.dataset.workerExit);
+   status(result.msg);
+   if(result.ok&&result.unit){selection=result.unit.id;game.save(saveKey);}
+   renderPanel();renderHud();
+  }
+ }
  if(work){
   const u=selected();
   if(u&&game.units.includes(u)){

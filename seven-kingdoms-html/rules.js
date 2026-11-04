@@ -2,6 +2,7 @@
  * GPL-2.0-only. This is a partial reimplementation, not 7kaa.wasm.
  * Core simulation: edit here, no compiler or WebAssembly required.
  */
+import {ensureFirmPersonnel,staffFromUnit,releasedUnitAttributes} from './playtest/personnel.js';
 export const WORLD_W=76,WORLD_H=66;
 export const NATIONS=[
   {id:0,name:'Indipendenti',color:'#d3ba74'},
@@ -49,6 +50,7 @@ export class SevenGame{
   this.speed=1;this.paused=false;this.unitTimer=0;this.dayTimer=0;
   this.events=[];this.towns=[];this.firms=[];this.units=[];
   this.createSkirmish();
+  for(const firm of this.firms)ensureFirmPersonnel(firm);
  }
  static load(key=SAVE_KEY){
   try{
@@ -57,6 +59,7 @@ export class SevenGame{
    const g=Object.create(SevenGame.prototype);
    Object.assign(g,data);g.events??=[];g.unitTimer??=0;g.dayTimer??=0;
    g.towns??=[];g.firms??=[];g.units??=[];g.paused=false;
+   for(const firm of g.firms)ensureFirmPersonnel(firm);
    for(const town of g.towns){town.taxPenalty??=0;town.rewardPenalty??=0;town.recruitPenalty??=0;}
    const all=[...g.towns,...g.firms,...g.units];
    nextId=Math.max(1,...all.map(o=>Number(String(o.id).slice(1))||0))+1;
@@ -79,6 +82,12 @@ export class SevenGame{
   add('fort',2,49,35,4);add('factory',2,55,41,3);
   for(const [x,y,kind] of [[29,21,'soldier'],[29,23,'soldier'],[22,29,'peasant'],[23,29,'peasant']])
    this.units.push(entity('u',{owner:1,x,y,kind,hp:100,level:1,target:null,training:kind==='soldier'?45:5}));
+  for(const u of this.units){
+   u.personId=u.id;u.culture=u.owner===1?'Greci':'Normanni';
+   u.raceId=null; // Original 7KAA race IDs are not yet migrated into this demo.
+   u.skillId=0;u.skillLevel=0;
+   u.combatLevel=u.kind==='soldier'?Math.floor(u.training):0;
+  }
   this.note('Un nuovo regno greco sorge presso Corinto.');
   this.note('I villaggi indipendenti sorvegliano i propri confini.');
  }
@@ -103,6 +112,8 @@ export class SevenGame{
   t.recruitPenalty=(t.recruitPenalty||0)+5;
   t.pop--;t.loyalty=clamp(t.loyalty-loyaltyDec,0,100);
   const u=entity('u',{owner:1,x:t.x+t.size+1,y:t.y+1,kind:'peasant',hp:100,level:1,target:null,training:0});
+  u.personId=u.id;u.culture=t.culture;u.raceId=null;
+  u.skillId=0;u.skillLevel=0;u.combatLevel=0;
   this.units.push(u);this.note('Un abitante è stato reclutato a '+t.name+'.');
   return {ok:true,msg:'Abitante reclutato.',unit:u};
  }
@@ -179,19 +190,32 @@ export class SevenGame{
  }
  assign(unitId,firmId){
   const u=this.get(unitId),f=this.get(firmId);
-  if(!u||!f||!this.units.includes(u)||!this.firms.includes(f)||u.owner!==1||f.owner!==1)return {ok:false,msg:'Assegnazione non valida.'};
-  if(f.workers>=8)return {ok:false,msg:'Edificio già al massimo di 8 lavoratori.'};
-  f.workers++;this.units=this.units.filter(x=>x!==u);
+  if(!u||!f||!this.units.includes(u)||!this.firms.includes(f)||u.owner!==1||f.owner!==1)
+   return {ok:false,msg:'Assegnazione non valida.'};
+  ensureFirmPersonnel(f);
+  if(f.staff.length>=8)return {ok:false,msg:'Edificio già al massimo di 8 lavoratori.'};
+  const worker=staffFromUnit(f,u);
+  f.staff.push(worker);f.workers=f.staff.length;
+  this.units=this.units.filter(x=>x!==u);
   this.note('Un '+(u.kind==='soldier'?'soldato':'abitante')+' è stato assegnato a '+FIRMS[f.kind].label+'.');
-  return {ok:true,msg:'Unità assegnata all’edificio.'};
+  return {ok:true,msg:'Unità assegnata all’edificio.',worker};
  }
- dismiss(firmId){
+ dismiss(firmId,staffId=null){
   const f=this.get(firmId);
-  if(!f||!this.firms.includes(f)||f.owner!==1||f.workers<1)return {ok:false,msg:'Nessun lavoratore da far uscire.'};
-  f.workers--;
-  const u=entity('u',{owner:1,x:f.x+f.size+1,y:f.y+1,kind:f.kind==='fort'?'soldier':'peasant',hp:100,level:1,target:null,training:f.kind==='fort'?f.experience:8});
-  this.units.push(u);this.note('Un lavoratore è uscito da '+FIRMS[f.kind].label+'.');
-  return {ok:true,msg:'Lavoratore uscito.',unit:u};
+  if(!f||!this.firms.includes(f)||f.owner!==1)
+   return {ok:false,msg:'Edificio non valido.'};
+  ensureFirmPersonnel(f);
+  if(!f.staff.length)return {ok:false,msg:'Nessun lavoratore da far uscire.'};
+  const index=staffId===null?f.staff.length-1:f.staff.findIndex(p=>p.id===staffId);
+  if(index<0)return {ok:false,msg:'Lavoratore non trovato.'};
+  const [person]=f.staff.splice(index,1);
+  f.workers=f.staff.length;
+  const u=entity('u',{
+   ...releasedUnitAttributes(person,f),x:f.x+f.size+1,y:f.y+1
+  });
+  this.units.push(u);
+  this.note('Lavoratore '+person.id+' uscito da '+FIRMS[f.kind].label+'.');
+  return {ok:true,msg:'Lavoratore uscito.',unit:u,worker:person};
  }
  setSpeed(n){if([0,1,2,3,4,5].includes(n)){this.paused=n===0;this.speed=n||1}}
  update(dt,{moveUnits=true}={}){
