@@ -14,6 +14,10 @@
 - Questi sono stati organizzati in un pacchetto locale nel turno ChatGPT; per la compilazione in repo vanno caricati individualmente. **Non dichiararli presenti nella repo.** Il worker deve verificare sempre la disponibilità del file prima di referenziarlo.
 
 ## Criteri di uso
+## Integrazione grafica attuale
+Dal commit `0efddc78c7a7d83332239493b2d6f6d55150cce2`, `game.js` usa realmente anche i cinque SVG in `assets/props/`: barili, casse, lampioni, recinzioni e lanterne. Sono disegnati con anchor alla base, sorting isometrico comune e fallback procedurale. Sono decorazioni **non collidenti**, per non alterare pathfinding/unità; un collaudo visivo sulla mappa reale è ancora necessario.
+
+
 - Per Canvas: `new Image()`, path relativo `./assets/...`, draw solo dopo `onload`/ `complete && naturalWidth`; fallback se mancante.
 - NON usare il mockup singolo come fondale: edifici, unità e terreno sono pezzi separati per simulazione e collisioni.
 - Decidere pivot, zoom e footprint di ciascuno, mantenendo rapporto isometrico della camera.
