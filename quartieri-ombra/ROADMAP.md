@@ -198,3 +198,7 @@ Nota: la proiezione isometrica non deve essere confusa con la regolarità urbani
 - Nuovo test persistente `tests/map-connectivity.test.cjs` legge i lotti direttamente dal `game.js` reale e verifica con BFS che tutte le celle libere appartengano alla stessa componente, e che ogni edificio abbia almeno un ingresso connesso.
 - Verifica dinamica indipendente sulla geometria corrente: 1479 celle percorribili, 1 sola componente; 15/15 edifici con accesso valido (3–4 accessi ciascuno). Commit test `b06b074fe4332c422f5ae7c41019313587ab9e17`.
 - Non eseguiti Node CLI della suite persistente, browser desktop/Android, fullscreen, screenshot golden reference. Non segnare DoD completata.
+
+### 2026-11-04 — preview plancia modulare, prima iterazione
+- [x] Creata pagina isolata `board-preview.html` con renderer `board-preview.js`: nove settori di produzione contigui, cinque arterie ramificate, case decorative modulari con tetti/facciate/finestre e props, camera drag/pinch/zoom, minimappa e fullscreen opzionale. NPC e meccaniche non modificati.
+- [ ] **Non validato in browser**: la preview è una prima struttura procedurale e NON soddisfa ancora la densità/fedeltà del concept; servono screenshot desktop/landscape, ottimizzazione, asset più ricchi, verifica storica Perris e approvazione utente.
