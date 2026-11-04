@@ -6,6 +6,8 @@ const overlaps=(a,b)=>a.x<b.x+b.size&&a.x+a.size>b.x&&a.y<b.y+b.size&&a.y+a.size
 export function reserveBuildSite(game,unitId,kind,x,y){
  const u=game.get(unitId),rule=FIRMS[kind];
  if(!validBuilder(u)||!game.units.includes(u))return {ok:false,msg:'Serve un Construction Worker addestrato.'};
+ // A builder may own only one active site; reject before changing route or cash.
+ if(u.buildSiteId||game.buildSites?.some(s=>s.builderId===unitId))return {ok:false,msg:'Costruttore già assegnato a un cantiere.'};
  if(!rule)return {ok:false,msg:'Edificio sconosciuto.'};
  x=Math.floor(x);y=Math.floor(y);
  const site={x,y,size:rule.size};
