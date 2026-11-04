@@ -1,5 +1,52 @@
 <!doctype html>
-<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"><title>Quartieri d'Ombra — Plancia</title>
-<style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#171411;color:#d4bd92;font:12px Georgia,serif;touch-action:none}#app{position:fixed;inset:0;display:flex;flex-direction:column;overflow:hidden}header{height:37px;flex:none;background:linear-gradient(#373029,#1b1714);border-bottom:2px solid #746045;display:flex;align-items:center;gap:12px;padding:0 10px}header strong{font-size:15px;letter-spacing:1px}button{color:#e9d3a5;background:#423528;border:1px solid #a08a63;border-radius:2px;padding:6px 12px;cursor:pointer}header button{margin-left:auto}main{flex:1;position:relative;min-height:0;overflow:hidden}canvas{display:block;width:100%;height:100%;touch-action:none}footer{height:77px;flex:none;background:linear-gradient(#332c23,#171411);border-top:3px ridge #7e6948;display:flex;align-items:center;gap:12px;padding:7px 10px}#mini{width:148px;height:61px;border:2px ridge #9b7d50;flex:none;cursor:pointer}#status{flex:1;line-height:1.5;color:#c6ae86}#rotate{display:none;position:fixed;inset:0;z-index:9;background:#171411;align-items:center;justify-content:center;font-size:20px;text-align:center;padding:30px}@media(orientation:portrait) and (max-width:800px){#rotate{display:flex}}@media(max-height:420px){header{height:30px}footer{height:53px}#mini{height:43px;width:110px}button{padding:3px 8px}}
-</style></head><body><div id="app"><header><strong>QUARTIERI D'OMBRA</strong><span>FIVE POINTS · PLANCIA SPERIMENTALE</span><button id="full" aria-label="Schermo intero">⛶ Schermo intero</button></header><main><canvas id="view" aria-label="Plancia isometrica esplorabile"></canvas></main><footer><canvas id="mini" width="296" height="122" aria-label="Minimappa"></canvas><div id="status">SCENOGRAFIA · Nessun NPC<br>Trascina la mappa · Pinch o rotella per zoom · Tocca la minimappa per spostarti</div><button id="reset">Centro</button></footer></div><div id="rotate">Ruota il dispositivo in orizzontale per esplorare la plancia.</div><script src="./board-preview.js"></script></body></html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#181310">
+<title>Quartieri d'Ombra — Plancia Five Points 1860</title>
+<link rel="stylesheet" href="./board-preview.css">
+<script src="./board-world.js" defer></script>
+<script src="./board-preview.js" defer></script>
+</head>
+<body>
+<div class="board-shell" id="board-shell">
+ <header class="board-top">
+  <div class="board-brand"><strong>QUARTIERI D'OMBRA</strong><small>FIVE POINTS · NEW YORK · 1860</small></div>
+  <div class="board-state"><span>SETTORI <b>09</b></span><span>EDIFICI <b id="building-count">—</b></span><span id="sector-name">CROCEVIA DEI FIVE POINTS</span></div>
+  <nav class="top-controls" aria-label="Visualizzazione">
+   <a class="classic-link" href="./index.html" title="Gioco Alpha">ALPHA</a>
+   <button type="button" id="full-btn" title="Schermo intero" aria-label="Attiva schermo intero">⛶</button>
+  </nav>
+ </header>
+ <main class="board-stage" id="board-stage">
+   <canvas id="board-canvas" aria-label="Plancia isometrica interattiva di Five Points. Trascina per esplorare, pizzica per ingrandire."></canvas>
+   <div class="board-toast" id="board-toast">NUOVA PLANCIA · Scenario in costruzione · Trascina per esplorare</div>
+   <div class="board-zoom" aria-label="Controlli mappa">
+    <button type="button" id="zoom-in" aria-label="Ingrandisci">+</button>
+    <button type="button" id="zoom-out" aria-label="Riduci">−</button>
+    <button type="button" id="home-btn" aria-label="Torna a Five Points">⌖</button>
+   </div>
+ </main>
+ <footer class="board-hud">
+  <div class="map-panel">
+    <canvas id="board-minimap" width="220" height="140" aria-label="Minimappa, tocca per centrare la visuale"></canvas>
+  </div>
+  <div class="board-info">
+    <div class="info-tag">CARTA DEL DISTRETTO</div>
+    <strong id="selected-name">Il crocevia</strong>
+    <p id="selected-description">Una ricostruzione artistica in 9 settori. Le case, le strade e i lotti sono elementi separati, non un'immagine fissa.</p>
+  </div>
+  <div class="board-actions">
+    <div class="info-tag">ESPLORA</div>
+    <div class="board-hint">Trascina: sposta mappa</div>
+    <div class="board-hint">Due dita / rotella: zoom</div>
+    <div class="board-hint">Tocca un edificio per leggerne il tipo</div>
+  </div>
+ </footer>
+</div>
+<div class="rotate-gate" aria-live="polite">
+ <div class="gate-paper"><div class="rotation-icon">↻</div><strong>RUOTA IL TELEFONO</strong><p>La plancia di Quartieri d'Ombra si esplora in orizzontale.</p></div>
+</div>
+</body>
+</html>
