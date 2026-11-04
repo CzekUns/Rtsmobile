@@ -6,6 +6,7 @@ import {createFrameAccumulator,accumulateFrame} from './core/clock.js';
 import {issuePlaytestOrder,advancePlaytestRoutes} from './playtest/path-routes.js';
 import {issueWorkOrder,completeWorkArrivals} from './playtest/work-assignments.js';
 import {WorldView} from './view.js';
+import {reserveBuildSite,advanceBuildSites} from './playtest/build-sites.js';
 import {SKILLS,skillLabel,ensureFirmPersonnel} from './playtest/personnel.js';
 const $=id=>document.getElementById(id);
 const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -15,7 +16,7 @@ let fixedClock=createFrameAccumulator({tickUs:50000,maxFrameUs:250000});
 let game=SevenGame.load(saveKey)||new SevenGame();
 const view=new WorldView($('world'),$('minimap'));
 let selection=game.towns.find(t=>t.owner===1)?.id||null;
-let report=null,placing=null,ghost=null,newsUntil=0,last=0,lastPanel=0,lastSave=0;
+let report=null,placing=null,ghost=null,buildingUnitId=null,newsUntil=0,last=0,lastPanel=0,lastSave=0;
 let input=null,gesture=null;const pointers=new Map();
 const portrait=window.matchMedia('(orientation: portrait)');
 function resizeStage(){
@@ -139,6 +140,7 @@ function selectedContent(){
     '<br>Tocca il terreno per spostarti oppure scegli un edificio qui sotto. L\'abitante entrerà solo dopo aver raggiunto l\'ingresso.',
    actions:item.owner===1?[
     btn('move','Sposta: tocca il terreno'),
+    ...(playtest&&item.skillId===1&&item.skillLevel>=20?[btn('builder-build','Costruisci',!!item.buildSiteId)]:[]),
     btn('stop','Ferma / annulla ordine',!item.target&&!item.workTargetId),
     jobActions
    ].join(''):''
@@ -205,6 +207,10 @@ function runAction(action){
  if(action==='persuade')r=game.persuade(obj.id);
  if(action==='annex')r=game.annex(obj.id);
  if(action==='dismiss')r=game.dismiss(obj.id);
+ if(action==='builder-build'&&playtest&&game.units.includes(obj)&&obj.skillId===1&&obj.skillLevel>=20){
+  buildingUnitId=obj.id;setReport('economy');
+  r={ok:true,msg:'Scegli un edificio, poi indica il terreno per il cantiere.'};
+ }
  if(action==='move'&&game.units.includes(obj))r={ok:true,msg:'Tocca il terreno per ordinare uno spostamento.'};
  if(action==='stop'&&game.units.includes(obj)){
   obj.target=null;obj.route=[];obj.workTargetId=null;
@@ -222,7 +228,7 @@ function buildMode(kind){
  $('buildBar').hidden=false;
  status('Indica il luogo del nuovo edificio.');
 }
-function cancelBuild(){placing=null;ghost=null;$('buildBar').hidden=true}
+function cancelBuild(){placing=null;ghost=null;buildingUnitId=null;$('buildBar').hidden=true}
 function sendOrder(unitId,x,y){
  const firm=game.firms.find(f=>x>=f.x&&x<f.x+f.size&&y>=f.y&&y<f.y+f.size);
  if(firm)return issueWorkOrder(game,unitId,firm.id);
@@ -248,8 +254,8 @@ function finishWorkOrders(){
 function mapClick(sx,sy,right=false){
  const p=view.worldAt(sx,sy);let x=p.x,y=p.y;
  if(placing){
-  const result=game.build(placing,x,y);status(result.msg);
-  if(result.ok){selection=result.firm.id;cancelBuild();game.save(saveKey);renderPanel();}
+  const result=playtest&&buildingUnitId?reserveBuildSite(game,buildingUnitId,placing,x,y):game.build(placing,x,y);status(result.msg);
+  if(result.ok){selection=buildingUnitId||result.firm.id;cancelBuild();game.save(saveKey);renderPanel();}
   return;
  }
  const hit=view.pick(game,x,y),unit=selected();
@@ -411,7 +417,9 @@ function tick(t){
    const frame=accumulateFrame(fixedClock,Math.max(0,Math.round(rawDt*1e6)),game.paused);
    fixedClock=frame.accumulator;
    for(let i=0;i<frame.ticks;i++){
+    const previousDay=game.day;
     game.update(.05,{moveUnits:false});
+    if(game.day!==previousDay){advanceBuildSites(game);game.save(saveKey);}
     advancePlaytestRoutes(game,.05*game.speed);
     finishWorkOrders();
    }
