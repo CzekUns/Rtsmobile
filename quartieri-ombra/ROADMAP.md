@@ -136,3 +136,9 @@ Nota: la proiezione isometrica non deve essere confusa con la regolarità urbani
 - Inizializzazione della camera vincolata ai limiti del quartiere. Minimap disegna le stesse polilinee delle strade e gli edifici/unità proiettati in 2:1, con rettangolo di viewport in coordinate isometriche anziché cartesiane.
 - Commit codice `53d78723140e6025511cd9eea5646ade041082aa`, test `bb54e06d44ae9f14379ecbf9154d83c46412cddd`. Test dinamici V8 eseguiti: 6 viewport/zoom × 2 estremi di camera (PASS), 306 coppie iso forward/inverse (errore massimo 2.28e-13), parser integrale PASS. Suite Node persistente creata ma non eseguita in Node locale; test visivi Android/browser reali NON eseguiti.
 - Limite aperto: CAMERA_BOUNDS è un bounding box progettato per il layout attuale, da ricalcolare dinamicamente quando cambiano lotti/asset; la mappa storica resta artistica, non georeferenziata. Non completare caselle DoD.
+
+## Verifica 2026-11-04 21:00 — Gesture camera isometrica
+- Corretta la gestione multi-touch: due dita spostano la camera anche senza variare la distanza; pinch zoom centrato sulle dita; dopo pinch non viene emesso un tap spurio dal dito rimasto.
+- Gestiti `pointercancel` e `lostpointercapture` per evitare puntatori bloccati.
+- Commit codice `2f81d0c482a97a6e07f9d16682b35a4def169323`, test permanente `17f1c3d035cc9c072d2ef4ceb1f42e7d598a185a`.
+- Verifica dinamica V8 sugli handler REALI estratti da main: tap singolo, pan a due dita, assenza tap accidentale, pinch zoom e reset dei pointer: 5/5 PASS; sintassi JS PASS. Suite Node persistente non eseguita su checkout, browser mobile/desktop NON collaudati: nessuna casella DoD completata.
