@@ -36,3 +36,20 @@ test('unfinished site is JSON serializable without losing builder reference',()=
  assert.equal(saved.buildSites[0].builderId,'u1');
  assert.equal(saved.units[0].buildSiteId,saved.buildSites[0].id);
 });
+
+test('one builder cannot reserve two sites or spend twice, including stale restored unit state',()=>{
+ const {g,u}=setup();u.x=11;u.y=12;
+ const first=reserveBuildSite(g,u.id,'market',12,12);
+ assert.equal(first.ok,true,first.msg);
+ const afterFirst=g.cash;
+ const routeAfterFirst=JSON.stringify({route:u.route,target:u.target});
+ const second=reserveBuildSite(g,u.id,'market',18,12);
+ assert.equal(second.ok,false);
+ assert.equal(g.cash,afterFirst);
+ assert.equal(g.buildSites.length,1);
+ assert.equal(JSON.stringify({route:u.route,target:u.target}),routeAfterFirst);
+ u.buildSiteId=null; // Simulate a restored unit with a missing backlink.
+ assert.equal(reserveBuildSite(g,u.id,'market',18,12).ok,false);
+ assert.equal(g.cash,afterFirst);
+ assert.equal(g.buildSites.length,1);
+});
