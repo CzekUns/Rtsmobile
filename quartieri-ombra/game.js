@@ -13,7 +13,24 @@
    if(!image||!image.complete||!image.naturalWidth)return false;
    ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(image,x,y,w,h);ctx.restore();return true;
  }
- const defs=Array.from({length:TOTAL},(_,i)=>({id:i,x:100+(i%5)*210,y:125+Math.floor(i/5)*174,w:115,h:76,type:i%3===1?"prod":"res",name:["Casa del Corvo","Officina del Ferro","Case dei Molini","Conceria Vecchia","Casa del Porto","Alloggi dei Carrettieri","Mercato del Sale","Casa dei Vetrai","Magazzino del Carbone","Dormitori Grigi","Casa delle Lanterne","Filanda del Ponte","Alloggi dell'Argine","Fonderia di Molo","Casa della Bruma"][i]}));
+ // Gameplay abstraction inspired by Perris' 1853 Five Points map, not a cadastral tracing.
+ // Irregular parcels flank diagonal streets; coordinates remain in the logical A* world.
+ const parcels=[
+   [106,82,92,74],[244,92,109,70],[400,70,98,78],[554,105,116,70],[758,86,105,78],
+   [124,266,108,70],[290,252,96,76],[470,277,115,70],[654,247,104,75],[841,264,114,72],
+   [85,477,105,76],[271,464,116,73],[465,482,101,72],[672,456,110,80],[875,479,109,74]
+ ];
+ const names=["Casa del Corvo","Officina del Ferro","Case dei Molini","Conceria Vecchia","Casa del Porto","Alloggi dei Carrettieri","Mercato del Sale","Casa dei Vetrai","Magazzino del Carbone","Dormitori Grigi","Casa delle Lanterne","Filanda del Ponte","Alloggi dell'Argine","Fonderia di Molo","Casa della Bruma"];
+ const defs=parcels.map(([x,y,w,h],i)=>({id:i,x,y,w,h,type:i%3===1?"prod":"res",name:names[i]}));
+ // Named lanes are artistic simplifications of the pre-Civic-Center street network.
+ // Road geometry is independent from A* collision and is deliberately not a modern OSM import.
+ const streets=[
+   {name:"Orange Street",width:36,points:[[78,0],[160,160],[216,334],[258,680]]},
+   {name:"Cross Street",width:32,points:[[0,361],[209,349],[425,361],[620,348],[1120,385]]},
+   {name:"Anthony Street",width:37,points:[[0,208],[231,201],[437,180],[691,191],[1120,168]]},
+   {name:"Little Water Street",width:27,points:[[602,0],[594,179],[585,357],[608,680]]},
+   {name:"Mulberry Bend",width:30,points:[[946,0],[947,175],[1006,334],[1019,680]]}
+ ];
  let game=null,choice="guard",nextUnitId=1,last=performance.now(),fpsAccumulator=0,noticeTimer=0;
  const camera={zoom:1,offsetX:0,offsetY:0};
  const pointerPositions=new Map();let dragStart=null,pinchDistance=null;
@@ -279,10 +296,24 @@
    const size=40;
    for(let y=0;y<H;y+=size)for(let x=0;x<W;x+=size){
      const hash=((Math.floor(x/size)*73856093)^(Math.floor(y/size)*19349663))>>>0;
-     const road=Math.floor(x/size)%6===0||Math.floor(y/size)%5===0;
-     const shades=road?["#50493d","#484238","#575044","#4d463b"]:["#39352d","#3d382f","#342f29","#403a30"];
-     isoPoly(isoFootprint(x,y,size,size),shades[hash%4],road?"#373229":"#302d26");
-     if(hash%5===0){const p=isoPoint(x+size*.5,y+size*.5);ctx.fillStyle=road?"#2e2b27":"#292b24";ctx.beginPath();ctx.ellipse(p.x,p.y,7,2,0,0,Math.PI*2);ctx.fill()}
+     const shades=["#39352d","#3d382f","#342f29","#403a30"];
+     isoPoly(isoFootprint(x,y,size,size),shades[hash%4],"#302d26");
+     if(hash%5===0){const p=isoPoint(x+size*.5,y+size*.5);ctx.fillStyle="#292b24";ctx.beginPath();ctx.ellipse(p.x,p.y,7,2,0,0,Math.PI*2);ctx.fill()}
+   }
+   // Render tapered, skewed street strips in the same orthographic projection as the buildings.
+   for(const lane of streets){
+     const left=[],right=[];
+     lane.points.forEach(([x,y],i)=>{
+       const prev=lane.points[Math.max(0,i-1)],next=lane.points[Math.min(lane.points.length-1,i+1)];
+       const dx=next[0]-prev[0],dy=next[1]-prev[1],len=Math.hypot(dx,dy)||1;
+       const nx=-dy/len*lane.width/2,ny=dx/len*lane.width/2;
+       left.push(isoPoint(x+nx,y+ny));right.push(isoPoint(x-nx,y-ny));
+     });
+     isoPoly([...left,...right.reverse()],"#4a4439","#36312b");
+     // A narrow uneven center seam adds road texture without screen-space grid lines.
+     ctx.strokeStyle="#60564a";ctx.lineWidth=1;ctx.beginPath();
+     lane.points.forEach(([x,y],i)=>{const p=isoPoint(x,y);i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)});
+     ctx.stroke();
    }
  }
  function drawIsoBuilding(b){
