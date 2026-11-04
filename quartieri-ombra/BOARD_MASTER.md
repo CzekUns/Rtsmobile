@@ -1,5 +1,14 @@
 # PLANCIA DEFINITIVA — FIVE POINTS DISTRICT, NEW YORK circa 1860
 
+## Prima implementazione del mondo esteso — 2026-11-04
+
+**Artefatti pubblicati su main:** `board-world.js`, `board-preview.html`, `board-preview.css`, `board-preview.js`, `tests/board-world.test.cjs`. Modello mondo 2700×2100, nove settori popolati, 21 vie, 454 costruzioni su lotti separati, 212 decorazioni con sorgenti dati autonome. Visualizzazione tramite Canvas 2D e cache LRU di sprite per palazzo; controlli della camera, minimappa e UI dedicata. Il vecchio gameplay resta raggiungibile da `index.html`, con un pulsante verso l'anteprima.
+
+**Accettazione:** ancora NO. Le strade sono dati originali e coerenti ma non ripercorrono con precisione certificata la pianta di Perris; il rendering prerenderizzato è una versione iniziale vettoriale senza tutti i materiali della golden image. Non usare l'assenza di sovrapposizioni o i conteggi degli edifici come prova di fedeltà visiva. **Nessuno screenshot del browser è stato eseguito** in questo turno.
+
+**Prossimi lavori vincolanti:** 1) prima verifica reale desktop+Android della preview; 2) confronto cattura screenshot con la golden image e individuazione degli scarti; 3) produrre/prerenderizzare sprite originali di alta qualità e texture/luce coerente, integrandoli al posto dei vettori temporanei, preservando dati/camera/footprint; 4) allineare il crocevia e le strade alla cartografia storica, senza compromettere i 9 settori; 5) ottenere approvazione dell'utente prima di riaprire la fase NPC.
+
+
 **Stato: riferimento visivo esplicitamente APPROVATO dall'utente in chat il 2026-11-04. Priorità massima assoluta.**
 **Scope attuale: SOLO PLANCIA (scenario, mappa, resa visiva, navigazione visuale e asset ambientali).**
 **Non sviluppare né modificare logiche NPC/pathfinding/IA/combattimento in questa fase**, salvo correzione minima bloccante che impedisca di vedere/provare la plancia. Il gameplay precedente può restare congelato. Anche se occorre sostituire radicalmente il renderer, si deve arrivare alla plancia proposta; non tentare di imporre lo stile tecnico attuale all'immagine target.
