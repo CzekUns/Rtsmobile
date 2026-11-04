@@ -41,6 +41,11 @@ export function advanceBuildSites(game){
  for(const site of game.buildSites){
   const u=game.get(site.builderId);
   if(!validBuilder(u)||!game.units.includes(u))continue;
+  // A v1 save can contain a live site but omit the unit backlink. Restore it
+  // from the authoritative site record without changing identity or progress.
+  // A conflicting backlink must never be silently overwritten.
+  if(u.buildSiteId&&u.buildSiteId!==site.id)continue;
+  if(!u.buildSiteId)u.buildSiteId=site.id;
   if(site.phase==='travel'){
    if(u.route?.length||u.target)continue;
    const dx=Math.max(site.x-u.x,0,u.x-(site.x+site.size-1));
