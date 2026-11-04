@@ -89,3 +89,9 @@ Non marcare completate azioni non eseguite. L'worker orario resta attivo fino a 
 ## Verifica 2026-11-04 14:00
 - Aggiunta suite persistente `tests/pathfinding.test.cjs` che estrae ed esegue `route()` reale da `game.js` in VM isolata: 7 scenari (corridoio, ostacoli, centro cella, aggiramento, destinazione identica, limiti mappa, secondo ostacolo).
 - Commit test `b54525c6cb8ff262effbd3199da82259363055e3`. Quattro scenari dinamici della funzione effettiva eseguiti nel runtime V8 e superati. Esecuzione Node della suite persistente non verificata: container senza accesso DNS a raw.githubusercontent.com. Nessuna casella DoD marcata; mancano browser desktop/touch e screenshot.
+
+## Verifica 2026-11-04 15:00 — prima passata terreno isometrico
+- Implementato in `game.js` `drawIsometricGround()`: disegno a diamanti 2:1 di tile fangosi e lastricato, variazione cromatica deterministica e segni di usura; eliminato il precedente fondale a strade ortogonali rettangolari.
+- Aggiunto `tests/isometric-ground.test.cjs`: controlla rapporto 2:1, densità dei tile e determinismo. Esecuzione V8 diretta della funzione reale: 462 riempimenti, 459 contorni, vettore primo spigolo (+48,+24), PASS. Sintassi `game.js` PASS.
+- **Parziale, non completato:** edifici, collisioni, unità, selezione e minimappa mantengono coordinate cartesiane: non è ancora isometria 100%. Occorre introdurre una proiezione unificata con inversa per hit-test, pathfinding e camera, e profondità sprite; non marcare Fase 1/3 completata.
+- Non effettuati browser smoke, Android fullscreen/landscape, confronto screenshot reference. Nessun altro file fuori `quartieri-ombra/` toccato.
