@@ -2,7 +2,8 @@
  * GPL-2.0-only. This is a partial reimplementation, not 7kaa.wasm.
  * Core simulation: edit here, no compiler or WebAssembly required.
  */
-import {ensureFirmPersonnel,staffFromUnit,releasedUnitAttributes} from './playtest/personnel.js';
+import {ensureFirmPersonnel,staffFromUnit,releasedUnitAttributes,SKILLS} from './playtest/personnel.js';
+import {ensureTownRaces,selectedTownRace,summarizeTown,setTownLoyalty,removeTownPerson,addTownBirth,recruitableTownPeople,raceIdForCulture} from './playtest/town-races.js';
 export const WORLD_W=76,WORLD_H=66;
 export const NATIONS=[
   {id:0,name:'Indipendenti',color:'#d3ba74'},
@@ -62,7 +63,17 @@ export class SevenGame{
    g.towns??=[];g.firms??=[];g.units??=[];g.paused=false;
    g.constructionSites??=[];g.nextConstructionId??=0;
    for(const firm of g.firms)ensureFirmPersonnel(firm);
-   for(const town of g.towns){town.taxPenalty??=0;town.rewardPenalty??=0;town.recruitPenalty??=0;}
+   for(const town of g.towns){
+    town.taxPenalty??=0;town.rewardPenalty??=0;town.recruitPenalty??=0;
+    ensureTownRaces(town);
+    for(let i=0;i<town.trainingQueue.length;i++){
+     const queue=town.trainingQueue[i];
+     queue.raceId??=selectedTownRace(town,raceIdForCulture(queue.culture))?.raceId||town.selectedRaceId;
+     queue.id??='legacy-training-'+i;
+     queue.skillLevel??=20;
+     queue.paidCost??=30;
+    }
+   }
    const all=[...g.towns,...g.firms,...g.units];
    nextId=Math.max(1,...all.map(o=>Number(String(o.id).slice(1))||0))+1;
    return g;
@@ -72,13 +83,21 @@ export class SevenGame{
  note(message){this.events.unshift({day:this.day,text:message});this.events=this.events.slice(0,70);}
  createSkirmish(){
   const towns=[
-   {name:'Corinto',owner:1,x:24,y:24,pop:42,loyalty:78,resistance:0,culture:'Greci'},
+   {name:'Corinto',owner:1,x:24,y:24,pop:42,loyalty:78,resistance:0,culture:'Greci',
+    races:[
+     {raceId:'greek',culture:'Greci',population:34,jobless:34,loyalty:78,spyCount:0,legacyEstimated:true},
+     {raceId:'norman',culture:'Normanni',population:8,jobless:8,loyalty:78,spyCount:0,legacyEstimated:true}
+    ]},
    {name:'Eboracum',owner:2,x:53,y:36,pop:43,loyalty:83,resistance:0,culture:'Normanni'},
    {name:'Selene',owner:0,x:37,y:17,pop:30,loyalty:0,resistance:65,culture:'Greci'},
    {name:'Naxos',owner:0,x:14,y:45,pop:22,loyalty:0,resistance:52,culture:'Greci'},
    {name:'Thasos',owner:0,x:57,y:13,pop:26,loyalty:0,resistance:71,culture:'Normanni'}
   ];
-  towns.forEach(t=>this.towns.push(entity('t',{...t,size:4,growth:0,taxCounter:0,taxPenalty:0,rewardPenalty:0,recruitPenalty:0})));
+  towns.forEach(t=>{
+   const town=entity('t',{...t,size:4,growth:0,taxCounter:0,taxPenalty:0,rewardPenalty:0,recruitPenalty:0});
+   ensureTownRaces(town);
+   this.towns.push(town);
+  });
   const add=(kind,owner,x,y,workers=0)=>this.firms.push(entity('f',{kind,owner,x,y,size:3,workers,experience:0,progress:0,stock:0}));
   add('fort',1,30,24,3);add('market',1,25,30,2);add('mine',1,18,27,2);
   add('fort',2,49,35,4);add('factory',2,55,41,3);
@@ -108,20 +127,42 @@ export class SevenGame{
   return this.towns.filter(t=>t.owner===owner).sort((a,b)=>range(a,firm)-range(b,firm))[0]||null;
  }
  linked(firm,town){return !!town&&range({x:firm.x+1.5,y:firm.y+1.5},{x:town.x+2,y:town.y+2})<=11.8}
- recruit(townId){
+ findFreeTownExit(town){
+  // Avoid placing a newly recruited person inside an existing building or unit.
+  for(let d=1;d<=6;d++)for(let y=town.y-d;y<town.y+town.size+d;y++)
+   for(let x=town.x-d;x<town.x+town.size+d;x++){
+    const perimeter=x===town.x-d||x===town.x+town.size+d-1||
+      y===town.y-d||y===town.y+town.size+d-1;
+    if(!perimeter||x<0||y<0||x>=WORLD_W||y>=WORLD_H)continue;
+    if(this.occupied(x,y,1)||terrain(this.seed,x,y)==='water')continue;
+    if(this.units.some(u=>Math.round(u.x)===x&&Math.round(u.y)===y))continue;
+    if((this.constructionSites||[]).some(s=>x>=s.x&&x<s.x+s.size&&y>=s.y&&y<s.y+s.size))continue;
+    return {x,y};
+   }
+  return null;
+ }
+ recruit(townId,raceId=null){
   const t=this.get(townId);
-  if(!t||t.owner!==1)return {ok:false,msg:'Questo non è un tuo villaggio.'};
-  if(t.pop<=4)return {ok:false,msg:'Popolazione insufficiente.'};
-  if(t.loyalty<27)return {ok:false,msg:'La fedeltà del villaggio è troppo bassa.'};
-  // Upstream OTOWNIF.cpp Town::recruit_dec_loyalty, simplified to one ethnic group.
-  const loyaltyDec=Math.min(10,Math.min(5,RULE_CONSTANTS.MAX_TOWN_POPULATION/t.pop)+(t.recruitPenalty||0)/5);
+  if(!t||!this.towns.includes(t)||t.owner!==1)
+   return {ok:false,msg:'Questo non è un tuo villaggio.'};
+  ensureTownRaces(t);
+  const r=selectedTownRace(t,raceId);
+  if(!r)return {ok:false,msg:'Etnia non presente nel villaggio.'};
+  if(t.pop<=4||recruitableTownPeople(t,r.raceId)<=0)
+   return {ok:false,msg:'Nessun disoccupato disponibile di questa etnia.'};
+  if(r.loyalty<30)return {ok:false,msg:'Fedeltà insufficiente di '+r.culture+'.'};
+  const exit=this.findFreeTownExit(t);
+  if(!exit)return {ok:false,msg:'Nessuna casella libera per il reclutamento.'};
+  const loyaltyDec=Math.min(10,Math.min(5,RULE_CONSTANTS.MAX_TOWN_POPULATION/Math.max(1,r.population))+(r.recruitPenalty||0)/5);
+  r.recruitPenalty=(r.recruitPenalty||0)+5;
   t.recruitPenalty=(t.recruitPenalty||0)+5;
-  t.pop--;t.loyalty=clamp(t.loyalty-loyaltyDec,0,100);
-  const u=entity('u',{owner:1,x:t.x+t.size+1,y:t.y+1,kind:'peasant',hp:100,level:1,target:null,training:0});
-  u.personId=u.id;u.culture=t.culture;u.raceId=null;
-  u.skillId=0;u.skillLevel=0;u.combatLevel=0;
-  this.units.push(u);this.note('Un abitante è stato reclutato a '+t.name+'.');
-  return {ok:true,msg:'Abitante reclutato.',unit:u};
+  removeTownPerson(t,r.raceId,loyaltyDec);
+  const u=entity('u',{owner:1,...exit,kind:'peasant',hp:100,level:1,target:null,route:[],training:0,
+   culture:r.culture,raceId:r.raceId,skillId:0,skillLevel:0,combatLevel:0});
+  u.personId=u.id;
+  this.units.push(u);
+  this.note('Reclutato un abitante '+r.culture+' da '+t.name+'.');
+  return {ok:true,msg:'Abitante '+r.culture+' reclutato.',unit:u};
  }
  tax(townId){
   const t=this.get(townId);
@@ -131,7 +172,7 @@ export class SevenGame{
   // Port of OTOWN.cpp Town::collect_tax: escalating levy penalty, bounded to +10.
   const decrease=Math.min(20,RULE_CONSTANTS.COLLECT_TAX_LOYALTY_DECREASE+(t.taxPenalty||0)/5);
   const before=t.loyalty;
-  t.loyalty=clamp(before-decrease,0,100);
+  setTownLoyalty(t,clamp(before-decrease,0,100));
   const income=(before-t.loyalty)*t.pop*RULE_CONSTANTS.TAX_PER_PERSON/decrease;
   t.taxPenalty=(t.taxPenalty||0)+10;this.cash+=income;
   this.note(t.name+' ha versato '+Math.floor(income)+' monete di tasse.');
@@ -146,7 +187,7 @@ export class SevenGame{
   // Port of OTOWN.cpp Town::reward: repeated grants have diminishing effect.
   const bonus=Math.max(3,RULE_CONSTANTS.TOWN_REWARD_LOYALTY_INCREASE-(t.rewardPenalty||0)/5);
   t.rewardPenalty=(t.rewardPenalty||0)+10;
-  this.cash-=cost;t.loyalty=clamp(t.loyalty+bonus,0,100);
+  this.cash-=cost;setTownLoyalty(t,clamp(t.loyalty+bonus,0,100));
   this.note('Concessi sussidi al villaggio '+t.name+' per '+cost+' monete.');
   return {ok:true,msg:'Fedeltà +'+bonus+' (costo '+cost+').'};
  }
@@ -163,7 +204,7 @@ export class SevenGame{
   const t=this.get(townId);
   if(!t||t.owner!==0)return {ok:false,msg:'Villaggio non indipendente.'};
   if(t.resistance>15)return {ok:false,msg:'La resistenza deve scendere a 15 o meno.'};
-  t.owner=1;t.loyalty=50;t.resistance=0;
+  t.owner=1;ensureTownRaces(t);setTownLoyalty(t,50);t.resistance=0;
   this.note(t.name+' è entrata nel tuo regno.');
   return {ok:true,msg:t.name+' ora appartiene al tuo regno.'};
  }
@@ -258,37 +299,74 @@ export class SevenGame{
    if(f.kind==='fort')f.experience=clamp(f.experience+f.workers*.02,0,100);
   }
  }
- trainConstruction(townId){
+ trainConstruction(townId){return this.trainSkill(townId,null,1)}
+ trainSkill(townId,raceId=null,skillId=1){
   const t=this.get(townId);
   if(!t||!this.towns.includes(t)||t.owner!==1)
    return {ok:false,msg:'Seleziona un tuo villaggio.'};
+  ensureTownRaces(t);
+  const race=selectedTownRace(t,raceId);
+  if(!race)return {ok:false,msg:'Etnia non disponibile.'};
+  if(!Number.isInteger(skillId)||!SKILLS[skillId]?.trainable)
+   return {ok:false,msg:'Questa professione non è addestrabile.'};
   if(!this.ownFirms().some(f=>f.kind==='fort'&&this.linked(f,t)))
    return {ok:false,msg:'Serve un forte collegato per addestrare.'};
-  if(t.pop<=4)return {ok:false,msg:'Abitanti disponibili insufficienti.'};
+  if(t.pop<=4||recruitableTownPeople(t,race.raceId)<=0)
+   return {ok:false,msg:'Disoccupati insufficienti di '+race.culture+'.'};
+  if(race.loyalty<30)return {ok:false,msg:'Fedeltà insufficiente di '+race.culture+'.'};
   if(this.cash<30)return {ok:false,msg:'Servono 30 monete per l’addestramento.'};
-  t.trainingQueue??=[];
   if(t.trainingQueue.length>=10)return {ok:false,msg:'Coda addestramento piena (10).'};
-  t.trainingQueue.push({skillId:1,skillLevel:20,readyDay:this.day+5,culture:t.culture});
+  const last=t.trainingQueue.at(-1);
+  const readyDay=Math.max(this.day,last?.readyDay||this.day)+5;
+  t.nextTrainingId=(t.nextTrainingId||0)+1;
+  const q={id:'training-'+t.id+'-'+t.nextTrainingId,
+   raceId:race.raceId,culture:race.culture,skillId,skillLevel:20,
+   readyDay,paidCost:30};
+  t.trainingQueue.push(q);
   this.cash-=30;
-  this.note('Addestramento Costruzione avviato a '+t.name+' (5 giorni).');
-  return {ok:true,msg:'Costruttore in addestramento: 5 giorni.'};
+  this.note('In coda: '+SKILLS[skillId].label+' ('+race.culture+') a '+t.name+'.');
+  return {ok:true,msg:'Addestramento '+SKILLS[skillId].label+' avviato. Pronto al giorno '+readyDay+'.',queue:q};
+ }
+ cancelTraining(townId,queueId){
+  const t=this.get(townId);
+  if(!t||!this.towns.includes(t)||t.owner!==1)return {ok:false,msg:'Villaggio non valido.'};
+  ensureTownRaces(t);
+  const index=t.trainingQueue.findIndex(q=>q.id===queueId);
+  if(index<0)return {ok:false,msg:'Addestramento non trovato.'};
+  const [job]=t.trainingQueue.splice(index,1);
+  // Simplified demonstration policy: an interrupted queue returns its cost.
+  this.cash+=job.paidCost??30;
+  // Preserve serialized order for remaining entries.
+  let next=this.day;
+  for(const pending of t.trainingQueue){
+   next+=5;
+   pending.readyDay=Math.max(next,this.day);
+  }
+  this.note('Addestramento annullato a '+t.name+'.');
+  return {ok:true,msg:'Addestramento annullato; costo restituito.'};
  }
  completeTraining(){
   for(const town of this.towns){
-   if(!Array.isArray(town.trainingQueue))continue;
-   const ready=town.trainingQueue.filter(x=>x.readyDay<=this.day);
-   town.trainingQueue=town.trainingQueue.filter(x=>x.readyDay>this.day);
-   for(const item of ready){
-    if(town.pop<=4){this.cash+=30;this.note('Addestramento annullato a '+town.name+': popolazione insufficiente.');continue;}
-    town.pop--;
-    const u=entity('u',{
-     owner:town.owner,x:town.x+town.size+1,y:town.y+1,kind:'peasant',
-     hp:100,level:1,target:null,route:[],training:20,culture:item.culture,
-     raceId:null,skillId:1,skillLevel:20,combatLevel:0
-    });
-    u.personId=u.id;
-    this.units.push(u);
-    this.note('Costruttore addestrato a '+town.name+'.');
+   ensureTownRaces(town);
+   while(town.trainingQueue.length&&town.trainingQueue[0].readyDay<=this.day){
+    const item=town.trainingQueue[0],race=selectedTownRace(town,item.raceId);
+    if(!race||race.jobless<=race.spyCount||town.pop<=4){
+     town.trainingQueue.shift();
+     this.cash+=item.paidCost??30;
+     this.note('Addestramento annullato a '+town.name+': popolazione insufficiente.');
+     continue;
+    }
+    const exit=this.findFreeTownExit(town);
+    if(!exit)break; // Keep the trained person queued until there is room on the map.
+    town.trainingQueue.shift();
+    removeTownPerson(town,race.raceId,0);
+    const unit=entity('u',{owner:town.owner,...exit,kind:'peasant',
+      hp:100,level:1,target:null,route:[],training:20,culture:race.culture,
+      raceId:race.raceId,skillId:item.skillId,skillLevel:item.skillLevel??20,
+      combatLevel:0});
+    unit.personId=unit.id;
+    this.units.push(unit);
+    this.note(SKILLS[item.skillId]?.label||'Specialista'+' addestrato a '+town.name+'.');
    }
   }
  }
@@ -307,16 +385,16 @@ export class SevenGame{
   }
   this.food=Math.max(0,this.food+annualFoodBalance/365);
   if(this.food===0){
-   for(const t of this.ownTowns())t.loyalty=clamp(t.loyalty-2,0,100);
+   for(const t of this.ownTowns())setTownLoyalty(t,clamp(t.loyalty-2,0,100));
    this.note('Le scorte alimentari sono esaurite; cala la fedeltà.');
   }
   for(const t of this.towns){
    t.taxPenalty=Math.max(0,(t.taxPenalty||0)-1);
    t.rewardPenalty=Math.max(0,(t.rewardPenalty||0)-1);
    t.recruitPenalty=Math.max(0,(t.recruitPenalty||0)-1);
-   if(t.owner===1&&this.food>0&&t.loyalty>50){
+   if(t.owner===1&&this.food>0&&t.loyalty>50&&t.pop<RULE_CONSTANTS.MAX_TOWN_POPULATION){
     t.growth+=(.10+t.loyalty/100*.14);
-    if(t.growth>=1){t.pop++;t.growth--;}
+    if(t.growth>=1){addTownBirth(t);t.growth--;}
    }else if(t.owner===0)t.resistance=clamp(t.resistance+.1,0,100);
   }
   if(this.day%12===0)this.note('Giorno '+this.day+': '+people+' abitanti, '+Math.floor(this.cash)+' monete.');
