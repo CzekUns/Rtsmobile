@@ -200,6 +200,8 @@ export class SevenGame{
   this.elapsed+=step;
   // Legacy demo movement stays available outside the opt-in playtest.
   if(moveUnits)for(const u of this.units){
+   // The work adapter owns walking to the building; never move twice in one frame.
+   if(u.workTargetId)continue;
    if(!u.target)continue;
    const d=range(u,u.target);
    if(d<.05){u.target=null;continue;}

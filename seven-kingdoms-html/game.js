@@ -4,6 +4,7 @@
 import {SevenGame,NATIONS,FIRMS,WORLD_W,WORLD_H,SAVE_KEY} from './rules.js';
 import {createFrameAccumulator,accumulateFrame} from './core/clock.js';
 import {issuePlaytestOrder,advancePlaytestRoutes} from './playtest/path-routes.js';
+import {issueWorkOrder,completeWorkArrivals} from './playtest/work-assignments.js';
 import {WorldView} from './view.js';
 const $=id=>document.getElementById(id);
 const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -64,6 +65,15 @@ function renderHud(){
 function btn(action,text,disabled=false){
  return '<button type="button" data-action="'+action+'"'+(disabled?' disabled':'')+'>'+esc(text)+'</button>';
 }
+function workBtn(firm,unit){
+ const reserved=game.units.filter(u=>u!==unit&&u.workTargetId===firm.id).length;
+ const full=firm.workers+reserved>=8;
+ const near=game.nearestTown(firm);
+ const label=FIRMS[firm.kind].label+' · '+(near?near.name:'Mappa')+
+  ' ('+firm.workers+'/8'+(reserved?' +'+reserved+' in arrivo':'')+')';
+ return '<button type="button" data-work-firm="'+esc(firm.id)+'"'+(full?' disabled':'')+
+  '>'+esc(label)+'</button>';
+}
 function selectedContent(){
  const item=selected();
  if(!item)return {title:'Seven Kingdoms',meta:'HTML Edition',color:'#aaa',info:'Seleziona un elemento sulla mappa.',actions:''};
@@ -100,13 +110,23 @@ function selectedContent(){
   };
  }
  if(game.units.includes(item)){
+  const assignedTo=item.workTargetId&&game.get(item.workTargetId);
+  const eligible=game.ownFirms().filter(f=>item.kind==='peasant'||f.kind==='fort');
+  eligible.sort((a,b)=>Math.hypot(item.x-a.x,item.y-a.y)-
+    Math.hypot(item.x-b.x,item.y-b.y));
+  const jobActions=eligible.map(f=>workBtn(f,item)).join('');
   return {
    title:item.kind==='soldier'?'Soldato':'Abitante',
    meta:nation.name+' · Livello '+item.level,color,
    info:'Salute '+item.hp+'/100 · Addestramento '+Math.floor(item.training)+
-    '<br>'+(item.target?'In marcia':'Pronto per gli ordini')+
-    '<br>Tocca il terreno per spostare questa unità. Tocca una struttura per assegnarla.',
-   actions:item.owner===1?btn('stop','Ferma',!item.target):''
+    '<br>'+(assignedTo?'In viaggio verso '+esc(FIRMS[assignedTo.kind]?.label||'edificio'):
+           item.target?'In marcia':'Pronto per gli ordini')+
+    '<br>Tocca il terreno per spostarti oppure scegli un edificio qui sotto. L\'abitante entrerà solo dopo aver raggiunto l\'ingresso.',
+   actions:item.owner===1?[
+    btn('move','Sposta: tocca il terreno'),
+    btn('stop','Ferma / annulla ordine',!item.target&&!item.workTargetId),
+    jobActions
+   ].join(''):''
   };
  }
  return {title:'Selezione',meta:'',color,info:'',actions:''};
@@ -170,7 +190,11 @@ function runAction(action){
  if(action==='persuade')r=game.persuade(obj.id);
  if(action==='annex')r=game.annex(obj.id);
  if(action==='dismiss')r=game.dismiss(obj.id);
- if(action==='stop'&&game.units.includes(obj)){obj.target=null;obj.route=[];r={ok:true,msg:'Unità fermata.'}}
+ if(action==='move'&&game.units.includes(obj))r={ok:true,msg:'Tocca il terreno per ordinare uno spostamento.'};
+ if(action==='stop'&&game.units.includes(obj)){
+  obj.target=null;obj.route=[];obj.workTargetId=null;
+  r={ok:true,msg:'Ordine annullato. Unità fermata.'};
+ }
  status(r.msg);
  if(r.ok)game.save(saveKey);
  if(r.unit)selection=r.unit.id;
@@ -185,7 +209,26 @@ function buildMode(kind){
 }
 function cancelBuild(){placing=null;ghost=null;$('buildBar').hidden=true}
 function sendOrder(unitId,x,y){
- return playtest?issuePlaytestOrder(game,unitId,x,y):game.order(unitId,x,y);
+ const firm=game.firms.find(f=>x>=f.x&&x<f.x+f.size&&y>=f.y&&y<f.y+f.size);
+ if(firm)return issueWorkOrder(game,unitId,firm.id);
+ const result=playtest?issuePlaytestOrder(game,unitId,x,y):game.order(unitId,x,y);
+ if(result.ok){
+  const u=game.get(unitId);
+  if(u){
+   u.workTargetId=null;
+   if(!playtest)u.route=[];
+  }
+ }
+ return result;
+}
+function finishWorkOrders(){
+ if(game.paused)return;
+ const results=completeWorkArrivals(game);
+ for(const result of results){
+  if(result.ok&&selection===result.unitId)selection=result.firmId;
+  status(result.msg);
+ }
+ if(results.length){renderPanel();game.save(saveKey);}
 }
 function mapClick(sx,sy,right=false){
  const p=view.worldAt(sx,sy);let x=p.x,y=p.y;
@@ -264,6 +307,7 @@ document.addEventListener('click',e=>{
  const selectedButton=e.target.closest('[data-select]');
  const build=e.target.closest('[data-build]');
  const action=e.target.closest('[data-action]');
+ const work=e.target.closest('[data-work-firm]');
  if(r)setReport(r.dataset.report);
  if(selectedButton){
   const item=game.get(selectedButton.dataset.select);
@@ -271,6 +315,15 @@ document.addEventListener('click',e=>{
  }
  if(build){closeReport();buildMode(build.dataset.build);}
  if(action)runAction(action.dataset.action);
+ if(work){
+  const u=selected();
+  if(u&&game.units.includes(u)){
+   const result=issueWorkOrder(game,u.id,work.dataset.workFirm);
+   status(result.msg);
+   if(result.ok)game.save(saveKey);
+   renderPanel();renderHud();
+  }
+ }
  if(camera){
   if(camera.dataset.camera==='plus')view.scale(1.2);
   if(camera.dataset.camera==='minus')view.scale(1/1.2);
@@ -335,8 +388,16 @@ function tick(t){
    for(let i=0;i<frame.ticks;i++){
     game.update(.05,{moveUnits:false});
     advancePlaytestRoutes(game,.05*game.speed);
+    finishWorkOrders();
    }
-  }else game.update(Math.min(.15,rawDt));
+  }else{
+   const seconds=Math.min(.15,rawDt);
+   game.update(seconds);
+   const travel=seconds*game.speed;
+   const chunks=Math.max(1,Math.ceil(travel/.25));
+   for(let i=0;i<chunks;i++)advancePlaytestRoutes(game,travel/chunks);
+   finishWorkOrders();
+  }
   view.draw(game,selection,ghost);
  }
  if(t-lastPanel>400){renderPanel();renderHud();lastPanel=t}
