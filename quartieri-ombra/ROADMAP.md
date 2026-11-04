@@ -48,3 +48,8 @@ Stato: IN SVILUPPO. Priorità: gameplay funzionante > art > polish > espansioni.
 - [ ] Report finale con link Pages e commit, stato `COMPLETATO`.
 
 Non marcare completate azioni non eseguite. L'worker orario resta attivo fino a tutti i criteri sopra, salvo ordine esplicito dell'utente.
+
+## Verifica 2026-11-04 10:00
+- Corretto bug esazione: il gendarme ora ritira oro esclusivamente dal produttivo assegnato, non da ogni produttivo nel raggio. IA conserva incarico solo se il produttivo assegnato è ancora idoneo.
+- Corretto addebito IA mercenari: il costo viene sottratto soltanto dopo spawn riuscito.
+- Verifiche automatiche statiche su sorgente GitHub: 4/4 controlli di regressione puntuali superati. Nessun test browser/touch eseguito; nessuna casella DoD aggiuntiva marcata.
