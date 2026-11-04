@@ -136,7 +136,7 @@
   if(game.ai<=0){game.ai=rnd(3,5);aiTurn()}
   if(game.time>10){
    if(owned(PLAYER).length===TOTAL){finish(true);return}
-   if(owned(ENEMY).length===TOTAL||(!owned(PLAYER).length&&!game.units.some(u=>u.side===PLAYER)&&game.gold[PLAYER]<COST)){finish(false);return}
+   if(owned(ENEMY).length===TOTAL||(!owned(PLAYER).length&&!game.units.some(u=>u.side===PLAYER))){finish(false);return}
   }
   fpsAccumulator+=dt;if(fpsAccumulator>.35){refresh();fpsAccumulator=0}
  }
