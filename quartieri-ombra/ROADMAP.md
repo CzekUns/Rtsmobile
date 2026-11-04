@@ -95,3 +95,18 @@ Non marcare completate azioni non eseguite. L'worker orario resta attivo fino a 
 - Aggiunto `tests/isometric-ground.test.cjs`: controlla rapporto 2:1, densità dei tile e determinismo. Esecuzione V8 diretta della funzione reale: 462 riempimenti, 459 contorni, vettore primo spigolo (+48,+24), PASS. Sintassi `game.js` PASS.
 - **Parziale, non completato:** edifici, collisioni, unità, selezione e minimappa mantengono coordinate cartesiane: non è ancora isometria 100%. Occorre introdurre una proiezione unificata con inversa per hit-test, pathfinding e camera, e profondità sprite; non marcare Fase 1/3 completata.
 - Non effettuati browser smoke, Android fullscreen/landscape, confronto screenshot reference. Nessun altro file fuori `quartieri-ombra/` toccato.
+
+
+## Priorità cartografica storica — Five Points, circa 1853
+- [ ] Ricostruire il tracciato stradale reale da William Perris, *Maps of the City of New-York*, vol. 3, tavola 25 (1853), integrando la cartografia 1831 e viste d'epoca. OSM moderno soltanto come orientamento, non come sorgente della topografia ottocentesca.
+- [ ] Sostituire i 15 edifici in scacchiera con lotti irregolari lungo fronti strada, corti e vicoli, senza perdere giocabilità, collisioni e raggiungibilità.
+- [ ] Introdurre dati geometrici separati (polilinee stradali, lotti, footprint, punti di accesso) e documentare scala/semplificazioni rispetto alla mappa storica.
+- [ ] Confrontare il risultato con la fonte storica e verificare condizioni di licenza per ciascuna immagine di riferimento; NON importare scansioni come sprite di gioco.
+
+Fonte primaria: https://commons.wikimedia.org/wiki/File:Perris_Manhattan_V._3_Plate_25_publ._1853.jpg (William Perris, 1853, dominio pubblico USA); fonte iconografica: https://www.loc.gov/item/2006677419/ (incisione della zona, 1859).
+Nota: la proiezione isometrica non deve essere confusa con la regolarità urbanistica. Il renderer può avere una griglia tecnica invisibile, ma la città non deve essere una scacchiera.
+
+## Verifica 2026-11-04 16:00
+- Proiezione ortografica 2:1 unica per terreno, footprint edifici, sprite unità, selezione e profondità. Mappatura inversa touch e zoom nello stesso sistema; pathfinding e influenza restano in coordinate logiche invarianti.
+- Commit codice `75326e8`; test di proiezione `1aabeba`. Parsing JS verificato prima del commit. Test Node persistente creato, non eseguito in browser reale. Layout e collocazione storica ancora da rifinire.
+- La casella renderer INTEGRALE rimane aperta finché collaudo mobile, asset e screenshot golden reference non sono verificati.
