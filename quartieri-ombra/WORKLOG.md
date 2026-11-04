@@ -44,3 +44,9 @@
 - Commit `9b658db08c3a51766454957b4c0a7084d200ea8b`: corretto `route()` affinché non accetti una destinazione il cui centro di cella ricade nell'ingombro di un edificio, pur se il click è sul bordo libero. Preservato il comportamento di spawn su bordi collisione.
 - Test dinamici V8 sulla funzione `route()` estratta dal codice reale con mappa di prova: 5/5 PASS (libero, ostacolo, cella di arrivo, deviazione, coincidenza); parser JS completo PASS.
 - Non eseguito browser smoke desktop/touch né confronto screenshot/reference; prossima priorità harness di regressione persistente e rendering isometrico.
+
+## 2026-11-04 13:00 — Worker, condizione di sconfitta
+- Corretto `game.js` per rilevare la sconfitta quando non rimangono né edifici né unità, indipendentemente dall'oro inutilizzabile. Commit `27be1bcb7acf8fb4f79610daeccc8ae3d9a1e8d9`.
+- Creato test persistente `tests/defeat.test.cjs` (5 scenari) commit `3e179cf59da90069c1eea4081014560a7b487793`.
+- Verificato sul codice letto nuovamente da main: parsing JavaScript PASS, condizione aggiornata presente, 5 casi logici PASS in V8. Il test Node salvato non è stato eseguito nell'ambiente corrente; manca browser smoke e test touch.
+- Prossimo obiettivo: suite dinamica integrata per influenza/economia/IA e rendering isometrico reale.
