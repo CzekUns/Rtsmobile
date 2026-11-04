@@ -117,3 +117,10 @@
 - Commit `17f1c3d035cc9c072d2ef4ceb1f42e7d598a185a`: aggiunto `tests/touch-gestures.test.cjs` con 3 scenari di regressione.
 - Verifica realmente eseguita in V8 sugli handler originali estratti dal file pubblicato: tap, pan, pinch, assenza selezione accidentale, reset gesture: 5/5 PASS. Parser JS PASS.
 - Non disponibili collaudo hardware Android, screenshot e suite Node checkout; non si marca DoD. Prossimo: viewport landscape e confronti visuali, poi geografia Five Points storica.
+
+## 2026-11-04 22:00 — Audit rete percorribile della mappa
+- Letti integralmente AGENTS.md, SPEC.md, ART_DIRECTION.md, ROADMAP.md, WORKLOG.md, README.md e assets/README.md; esaminato game.js da main.
+- Creato `tests/map-connectivity.test.cjs` (commit `b06b074fe4332c422f5ae7c41019313587ab9e17`): flood-fill su griglia A* reale e verifica ingressi di tutti i 15 edifici.
+- Verifica V8 effettivamente eseguita sui lotti correnti: 1479 celle libere, una sola componente connessa; ingressi validi per edificio: 3,4,4,3,4,3,4,4,4,4,3,4,3,4,4.
+- Il test Node è stato scritto ma non eseguito nel checkout; browser e smartphone reali non disponibili in questo runtime. Nessuna modifica al renderer o ai progetti esterni.
+- Prossimo: collaudo browser landscape/fullscreen, poi confronto visivo con cartografia Perris e golden reference.
