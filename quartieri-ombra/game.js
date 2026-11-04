@@ -16,8 +16,8 @@
  // Gameplay abstraction inspired by Perris' 1853 Five Points map, not a cadastral tracing.
  // Irregular parcels flank diagonal streets; coordinates remain in the logical A* world.
  const parcels=[
-   [106,82,92,74],[244,92,109,70],[400,70,98,78],[554,105,116,70],[758,86,105,78],
-   [124,266,108,70],[290,252,96,76],[470,277,115,70],[654,247,104,75],[841,264,114,72],
+   [10,240,92,74],[245,85,109,70],[400,70,98,78],[445,390,116,70],[750,75,105,78],
+   [85,385,108,70],[290,250,96,76],[445,255,115,70],[654,247,104,75],[835,265,114,72],
    [85,477,105,76],[271,464,116,73],[465,482,101,72],[672,456,110,80],[875,479,109,74]
  ];
  const names=["Casa del Corvo","Officina del Ferro","Case dei Molini","Conceria Vecchia","Casa del Porto","Alloggi dei Carrettieri","Mercato del Sale","Casa dei Vetrai","Magazzino del Carbone","Dormitori Grigi","Casa delle Lanterne","Filanda del Ponte","Alloggi dell'Argine","Fonderia di Molo","Casa della Bruma"];
