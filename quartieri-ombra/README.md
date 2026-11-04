@@ -1,5 +1,14 @@
 # Quartieri d'Ombra — RTS di controllo territoriale
 
+## Plancia 3×3 — prima build realmente esplorabile
+
+**Nuova anteprima:** [board-preview.html](board-preview.html) · URL prevista su Pages: https://czekuns.github.io/Rtsmobile/quartieri-ombra/board-preview.html
+
+Il sistema disegna 9 settori continui (2700×2100), 21 strade e 454 edifici individuali con geometrie differenti, 212 props e cache di sprite Canvas separati. Non usa un unico fondale ImageGen. La camera si muove con il dito/mouse, due dita o rotella regolano lo zoom; minimappa cliccabile, selezione edificio, fullscreen e modalità orizzontale sono presenti. Il vecchio RTS è ancora apribile con il pulsante **ALPHA** senza modificare gli NPC.
+
+**Stato:** versione tecnica iniziale, non ancora all'altezza dell'immagine approvata. Non è un rilievo cartografico fedele dei Five Points storici; tracciati/asset da perfezionare. Test V8 mock passati, ma non verificata nel browser pubblico o su Android reale. Serve valutazione della plancia prima di tornare alle meccaniche.
+
+
 ## Direzione definitiva della plancia
 
 L'utente ha approvato il concept ImageGen *Five Points District — New York c.1860* come riferimento **esatto** della plancia. La mappa finale dovrà estendersi ben oltre la finestra mostrata (minimo 2×2, ambizione 3×3 settori continui), preservando scala, densità, case in mattoni, negozi, fango, lampioni, carrozze, tetti e incroci irregolari. Il lavoro NPC è **sospeso su richiesta dell'utente** fino all'approvazione della plancia, senza rimuovere il codice già prodotto. Specifica autoritativa: [BOARD_MASTER.md](BOARD_MASTER.md). Anteprima effettivamente conservata: [assets/references/approved_five_points_board_preview.webp](assets/references/approved_five_points_board_preview.webp). È una miniatura 160×90, non l'immagine originale.
