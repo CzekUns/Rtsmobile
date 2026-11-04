@@ -161,9 +161,9 @@ function reportContent(){
    }).join('')+'<div class="card"><b>Indipendenti</b><p>'+game.towns.filter(t=>t.owner===0).length+' villaggi neutrali.</p></div>'];
   case 'towns':return ['Villaggi',game.towns.map(toButton).join('')];
   case 'economy':return ['Economia',
-   '<div class="card"><b>Costruisci</b><p>Seleziona una struttura, quindi tocca il terreno vicino a un tuo villaggio.</p>'+
+   '<div class="card"><b>Costruisci</b><p>'+ (playtest?'Per costruire, seleziona un Construction Worker e premi Costruisci.':'Seleziona una struttura, quindi tocca il terreno vicino a un tuo villaggio.')+'</p>'+
    Object.entries(FIRMS).map(([id,v])=>'<button type="button" class="report-item" data-build="'+id+'"'+
-   (game.cash<v.cost?' disabled':'')+'>'+esc(v.label)+'<small>'+v.cost+' monete</small></button>').join('')+'</div>'+
+   (game.cash<v.cost||(playtest&&!buildingUnitId)?' disabled':'')+'>'+esc(v.label)+'<small>'+v.cost+' monete</small></button>').join('')+'</div>'+
    '<div class="card"><b>Produzione</b><p>Minerali '+Math.floor(game.raw)+' → Prodotti '+Math.floor(game.goods)+' → Denaro '+Math.floor(game.cash)+'</p></div>'+
    game.ownFirms().map(firmButton).join('')];
   case 'trade':return ['Commercio',
