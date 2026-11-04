@@ -264,19 +264,40 @@
   ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,canvas.width,canvas.height);
   const displayScale=coverScale()*camera.zoom;
   ctx.setTransform(displayScale,0,0,displayScale,-camera.offsetX*displayScale,-camera.offsetY*displayScale);
-  ctx.fillStyle="#292725";ctx.fillRect(0,0,W,H);
-  for(let y=0;y<H;y+=35)for(let x=0;x<W;x+=35){
-   let v=Math.sin(x*.29+y*.19)*14;ctx.fillStyle="rgba(6,6,5,"+(.07+Math.abs(v)/250)+")";ctx.fillRect(x+2,y+2,32,32);
-  }
-  ctx.fillStyle="#474037";for(let i=0;i<4;i++){ctx.fillRect(0,95+i*173,W,55);ctx.fillRect(40+i*211,0,58,H)}
-  ctx.strokeStyle="#5d5445";ctx.lineWidth=1;for(let x=0;x<W;x+=22){for(let y=0;y<H;y+=22){ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+12,y);ctx.stroke()}}
-  for(let i=0;i<50;i++){let x=(i*197+71)%W,y=(i*193+34)%H;ctx.fillStyle="#292f2d";ctx.beginPath();ctx.ellipse(x,y,9,3,-.2,0,Math.PI*2);ctx.fill()}
+  drawIsometricGround();
   let sorted=[...game.buildings].sort((a,b)=>a.y-b.y);
   for(const b of sorted)drawBuilding(b);
   for(const u of [...game.units].sort((a,b)=>a.y-b.y))drawUnit(u);
   if(game.selected&&game.selected.kind==="building"){const b=game.buildings[game.selected.id];ctx.strokeStyle="#e3c57b";ctx.lineWidth=3;ctx.strokeRect(b.x-5,b.y-5,b.w+10,b.h+10)}
   if(game.selected&&game.selected.kind==="unit"){let u=game.units.find(x=>x.id===game.selected.id);if(u){ctx.strokeStyle="#e3c57b";ctx.beginPath();ctx.ellipse(u.x,u.y+4,17,7,0,0,7);ctx.stroke();if(u.type==="g"){ctx.strokeStyle="#e3c57b55";ctx.lineWidth=1;ctx.beginPath();ctx.arc(u.x,u.y,137+u.level*16,0,7);ctx.stroke()}}}
   drawMini();ctx.setTransform(1,0,0,1,0,0);
+ }
+
+ // 2:1 diamond ground pass: deterministic, reusable tile geometry and muddy
+ // cobblestone roads. Building/selection projection is the NEXT renderer step.
+ function drawIsometricGround(){
+  ctx.fillStyle="#282723";ctx.fillRect(0,0,W,H);
+  const halfW=48,halfH=24,cols=22,rows=32;
+  for(let row=-8;row<rows;row++)for(let col=-8;col<cols;col++){
+   const x=530+(col-row)*halfW,y=-300+(col+row)*halfH;
+   if(x<-halfW*2||x>W+halfW*2||y<-halfH*2||y>H+halfH*2)continue;
+   const hash=((col*73856093)^(row*19349663))>>>0;
+   const street=col%5===0||row%5===0;
+   const mud=["#37332b","#3d382e","#423c31","#342f2a"];
+   const stone=["#51493c","#4a4439","#595044","#494137"];
+   ctx.beginPath();ctx.moveTo(x,y-halfH);ctx.lineTo(x+halfW,y);
+   ctx.lineTo(x,y+halfH);ctx.lineTo(x-halfW,y);ctx.closePath();
+   ctx.fillStyle=(street?stone:mud)[hash%4];ctx.fill();
+   ctx.strokeStyle=street?"#2b2925":"#282720";ctx.lineWidth=1;ctx.stroke();
+   if(hash%7===0){
+    ctx.fillStyle=street?"#302c26":"#252924";
+    ctx.beginPath();ctx.ellipse(x+(hash%17)-8,y+(hash%9)-4,9,3,-.3,0,Math.PI*2);ctx.fill();
+   }
+   if(street&&hash%3===0){
+    ctx.strokeStyle="#68604d";ctx.lineWidth=.6;ctx.beginPath();
+    ctx.moveTo(x-13,y-2);ctx.lineTo(x-3,y+3);ctx.stroke();
+   }
+  }
  }
  function drawBuilding(b){
   const x=b.x,y=b.y,w=b.w,h=b.h,col=b.owner===PLAYER?"#6992b6":b.owner===ENEMY?"#a45452":"#91877b";
