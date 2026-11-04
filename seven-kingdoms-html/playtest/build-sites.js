@@ -50,9 +50,11 @@ export function advanceBuildSites(game){
   site.progressDays++;
   if(site.progressDays<site.requiredDays)continue;
   // Reserve the same footprint until completion. Keep the builder alive outside the firm.
+  // Temporarily return escrow for the legacy build validator; its debit consumes it again.
+  const escrow=FIRMS[site.kind].cost;
+  game.cash+=escrow;
   const firm=game.build(site.kind,site.x,site.y);
-  if(!firm.ok){site.progressDays=site.requiredDays-1;continue;}
-  game.cash+=FIRMS[site.kind].cost; // build() charges again; reservation already paid.
+  if(!firm.ok){game.cash-=escrow;site.progressDays=site.requiredDays-1;continue;}
   u.buildSiteId=null;finished.push(site.id);
  }
  game.buildSites=game.buildSites.filter(s=>!finished.includes(s.id));
