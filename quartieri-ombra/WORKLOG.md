@@ -1,3 +1,9 @@
+
+## 2026-11-04 — Black screen reported on Android Chrome
+- User screenshot shows legacy "FIVE POINTS · PLANCIA SPERIMENTALE" shell and blank map/minimap; current main `board-preview.html` instead has "FIVE POINTS · NEW YORK · 1860", a different HUD, indicating Pages may be serving stale content. This is observed evidence, not proof of root cause.
+- Commit `f7cf7ed60d17af70911258cda12571f1c10beecf`: cache-bust board stylesheet and scripts; show an explicit JS/model-load error in the current preview instead of silently blanking.
+- No live Pages/browser verification possible here. Need confirm actual deployed HTML matches main before treating this as fixed. No NPC/gameplay edits.
+
 # Diario avanzamento
 
 ## 2026-11-04 — Plancia 3x3 navigabile (sviluppo diretto)
