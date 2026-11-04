@@ -109,3 +109,11 @@
 - Minimap ridisegnata con polilinee stradali, edifici e unità proiettati e cornice di viewport coerente. Nessun asset precedente modificato.
 - Commit `53d78723140e6025511cd9eea5646ade041082aa` e suite regressione `bb54e06d44ae9f14379ecbf9154d83c46412cddd`.
 - Eseguiti realmente nel runtime V8: parser completo game.js PASS; 6 configurazioni di dimensioni/zoom con estremi camera PASS; 306 roundtrip isoPoint/isoInverse PASS (errore massimo 2.28e-13). Test Node persistente e screenshot reali non eseguiti. Prossimo: smoke browser su mobile landscape, eliminare interferenze input/zoom e geometria urbana storica verificata.
+
+## 2026-11-04 21:00 — Pan multi-touch e cancellazione gesture
+- Riletti integralmente i documenti obbligatori, verificato stato `main` e ispezionati renderer e handler touch.
+- Individuato problema: pinch con due dita spostate in parallelo non spostava la camera; i puntatori potevano rimanere registrati dopo perdita di cattura, e una gesture poteva generare selezioni indesiderate.
+- Commit `2f81d0c482a97a6e07f9d16682b35a4def169323`: pan del centro delle due dita, pinch zoom centrato, tap soppresso dopo multi-touch, pulizia su `pointercancel`/`lostpointercapture`.
+- Commit `17f1c3d035cc9c072d2ef4ceb1f42e7d598a185a`: aggiunto `tests/touch-gestures.test.cjs` con 3 scenari di regressione.
+- Verifica realmente eseguita in V8 sugli handler originali estratti dal file pubblicato: tap, pan, pinch, assenza selezione accidentale, reset gesture: 5/5 PASS. Parser JS PASS.
+- Non disponibili collaudo hardware Android, screenshot e suite Node checkout; non si marca DoD. Prossimo: viewport landscape e confronti visuali, poi geografia Five Points storica.
