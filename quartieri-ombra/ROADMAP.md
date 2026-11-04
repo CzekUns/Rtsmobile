@@ -129,3 +129,10 @@ Nota: la proiezione isometrica non deve essere confusa con la regolarità urbani
 - Commit codice `0c87aed`; test permanente `tests/spawn-access.test.cjs` commit `57550f5`.
 - Verifica V8 dinamica della funzione originale estratta da `game.js`: 15 edifici × 4 rotazioni di accesso = **60/60 spawn validi** con rotta locale percorribile; parsing JavaScript PASS. La suite Node persistente non è stata eseguita; mancano ancora browser desktop/Android, test completo di connettività stradale e confronto con mappa Perris.
 - Nessun criterio Definition of Done aggiuntivo marcato: la geometria storica resta una reinterpretazione, e la scala/camera isometrica va verificata in browser reale.
+
+
+## Verifica 2026-11-04 20:00 — camera isometrica e minimappa
+- Corretto `game.js`: limiti camera calcolati in coordinate **proiettate** (inclusi tetti e margini), con possibilità di offset negativo; la camera precedente usava impropriamente W/H logici e poteva tagliare gli edifici periferici.
+- Inizializzazione della camera vincolata ai limiti del quartiere. Minimap disegna le stesse polilinee delle strade e gli edifici/unità proiettati in 2:1, con rettangolo di viewport in coordinate isometriche anziché cartesiane.
+- Commit codice `53d78723140e6025511cd9eea5646ade041082aa`, test `bb54e06d44ae9f14379ecbf9154d83c46412cddd`. Test dinamici V8 eseguiti: 6 viewport/zoom × 2 estremi di camera (PASS), 306 coppie iso forward/inverse (errore massimo 2.28e-13), parser integrale PASS. Suite Node persistente creata ma non eseguita in Node locale; test visivi Android/browser reali NON eseguiti.
+- Limite aperto: CAMERA_BOUNDS è un bounding box progettato per il layout attuale, da ricalcolare dinamicamente quando cambiano lotti/asset; la mappa storica resta artistica, non georeferenziata. Non completare caselle DoD.
