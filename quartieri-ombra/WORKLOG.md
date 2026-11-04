@@ -1,5 +1,14 @@
 # Diario avanzamento
 
+## 2026-11-04 — Plancia 3x3 navigabile (sviluppo diretto)
+- Creato `board-world.js` (commit `e5463e2`) con layout originale **2700×2100**, 9 settori con **38–66 palazzi ciascuno**, 21 strade e 212 props su geometrie indipendenti. Al centro cinque bracci; i dati NON sono georeferenziati alla carta Perris, ma conservano l'obiettivo urbanistico di isolati irregolari.
+- Creata `board-preview.html` e `board-preview.css` (commit `d1ee66b`, `7951c74`), HUD fisso, fullscreen, overlay portrait, minimappa, zoom. Creato `board-preview.js` (commit `70be029`) con scenario realmente renderizzato a layer/sprite indipendenti, strade, facciate di mattoni, tetti, negozi, tende, luci discrete e props SVG già presenti.
+- Migliorato il rendering con **cache LRU di 320 sprite preregistrati per palazzo** (`9b399be`, `dc1eaea`): test dinamico simulato su codice GitHub, 228 sprite preparati al primo frame e **nessuna nuova rasterizzazione** dopo zoom in/out; chiamate grafiche scese da circa 175.250 a circa 3.500 per zoom nel mock. Non sono benchmark di FPS hardware.
+- Aggiunto il collegamento `NUOVA PLANCIA` nella pagina del gioco senza modificare `game.js` (`8638768`, `7c06cdf`). La modalità tattica precedente rimane isolata e recuperabile.
+- Creato `tests/board-world.test.cjs` (commit `d697afb`) con verifiche su mappa, proiezione 2:1, ripetibilità, assenza intersezioni e UI. In V8 ho eseguito le prove dinamiche sul vero sorgente pubblicato: **0 coppie di lotti sovrapposte su 454**, tutti i 9 settori popolati, generazione deterministica, mini-mappa e zoom/camera inizializzati in mock. Non ho eseguito la suite Node su checkout.
+- **Non collaudato**: apertura pubblica su GitHub Pages (strumento web non riesce a caricare la URL), screenshot di browser desktop/mobile, somiglianza effettiva con ImageGen, navigazione hardware Android. Questa è una base funzionante in mock del renderer e una prima build del nuovo scenario, **non una plancia graficamente approvata**.
+
+
 ## 2026-11-04 — Plancia ImageGen approvata, nuova priorità assoluta
 - Nuovo ordine diretto dell'utente: il lavoro su movimento e sistemi NPC è **sospeso per ora**. Prima la plancia. L'ultimo concept ImageGen `distretto_five_points_new_york_1860.png` (originale 1672×941) è il target grafico esatto: caseggiati densi, incrocio irregular Five Points, negozi, carri, fango, lampioni, palette bruna/ambra e vista isometrica. L'immagine è una finestra su una mappa più grande: almeno 2×2 area visibile equivalente, preferenza 3×3 settori.
 - Caricata in GitHub la **miniatura autentica**, 160×90 WebP, `assets/references/approved_five_points_board_preview.webp` con blob git `69124aacabeb275a5f2194043281a56687e0d05f`; commit `9edfb96c43111495fe5354bb9206e222e3a6c31c`. Il PNG HQ NON è stato caricato; resta allegato alla conversazione.
