@@ -70,3 +70,16 @@ test('playtest save key does not overwrite normal demo key',()=>{
   assert.notEqual(items.get(SAVE_KEY),items.get('seven-kingdoms-html-quick-playtest-v1'));
  }finally{globalThis.localStorage=previous}
 });
+
+test('failed assignment to a full friendly firm preserves a marching order',()=>{
+ const {g,soldier}=scenario();
+ const goal=reach(g,soldier);
+ const route=soldier.route.map(tile=>({...tile}));
+ const firm=g.firms.find(f=>f.owner===1);
+ firm.workers=8;
+ const result=issuePlaytestOrder(g,soldier.id,firm.x+0.5,firm.y+0.5);
+ assert.equal(result.ok,false);
+ assert.ok(g.units.includes(soldier));
+ assert.deepEqual(soldier.route,route);
+ assert.deepEqual(soldier.target,goal);
+});
