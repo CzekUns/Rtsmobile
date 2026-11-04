@@ -1,5 +1,10 @@
 # Soglia minima visiva e funzionale — richiesta utente 2026-11-04
 
+## Cambiamento di priorità e accettazione plancia (2026-11-04)
+
+Da ora la soglia immediata è **PLANCIA ALPHA** come da [BOARD_MASTER.md](BOARD_MASTER.md), non la finitura del gameplay. L'ultima immagine ImageGen approvata («esattamente quello che volevo») prevale come GOLDEN REFERENCE per la mappa; estendere il quartiere almeno 2×2, preferenza 3×3 settori. Non migliorare AI/pathfinding/NPC fino ad approvazione esplicita della plancia. Test di gameplay restano requisiti della DoD finale e saranno eseguiti più avanti. La plancia potrà essere valutata separatamente tramite preview con camera e HUD senza NPC.
+
+
 Stato: **NON RAGGIUNTA**. Questo documento definisce un livello `ALPHA VISIVAMENTE ACCETTABILE`, NON equivale alla Definition of Done finale: l'automazione continua fino alla DoD completa.
 
 ## Priorità P0: una città credibile, non un prototipo Canvas
