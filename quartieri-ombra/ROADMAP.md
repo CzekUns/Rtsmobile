@@ -2,6 +2,22 @@
 
 Stato: IN SVILUPPO. Priorità: gameplay funzionante > art > polish > espansioni.
 
+## PRIORITÀ IMMEDIATE — interfaccia mobile landscape e isometria integrale (richiesta utente 2026-11-04)
+
+La grafica del gioco deve essere isometrica al 100% e coerente con il riferimento in-game RTS PC 1998–2003. Prima delle espansioni e del polish completare i seguenti task:
+
+- [x] Impostazione smartphone in landscape-only con schermata di rotazione se portrait; simulazione sospesa in portrait per view mobile.
+- [x] Pulsante fullscreen nell'HUD che usa Fullscreen API su gesto utente; tentativo di orientation.lock quando supportato, fallback rispettoso dei limiti browser.
+- [x] Shell a dimensioni viewport con scroll di pagina bloccato e input touch riservato al Canvas; HUD non deve trascinarsi con pan/pinch.
+- [x] Canvas con backing store in proporzione al contenitore e camera che usa scale cover uniforme senza stretch; vista minimappa derivata dalla dimensione effettivamente visibile.
+- [ ] Test browser reale Android landscape: nessun movimento/scroll di barra, minimappa o HUD al trascinamento; pinch solo sulla mappa, bottoni operativi e fullscreen.
+- [ ] Test desktop responsive su 16:9, 21:9 e viewport a bassa altezza: campo di gioco deve occupare tutto lo spazio restante, comandi mai tagliati, HUD leggibile, assenza overflow.
+- [ ] Renderer isometrico 2D INTEGRALE: griglia, terreno/strade, posizionamento e collisioni edifici, profondità/sorting, unità e interazioni in stessa proiezione; non basta la texture pseudo-isometrica.
+- [ ] Utilizzare sprite/props asset library con pivot e footprint appropriati, minimappa/indicatori selezione coerenti.
+- [ ] Confronto screenshot desktop e landscape mobile con la golden reference approvata e correzione discrepanze.
+
+Criterio di accettazione: durante una partita in smartphone orizzontale l'utente non può scorrere o spostare con il dito l'INTERA pagina/UI; soltanto la camera della mappa sotto l'HUD fisso. Fullscreen funziona quando consentito, senza promesse di blocco hardware negli altri browser.
+
 ## Fase 0 — Fondazioni
 - [x] Percorso isolato in repository esistente; niente modifiche ad altri progetti.
 - [x] Specifica, confini e roadmap persistente.
