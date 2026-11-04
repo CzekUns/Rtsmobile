@@ -114,3 +114,18 @@ test('a temporarily occupied next tile pauses movement without losing the route'
  assert.ok(Math.hypot(soldier.x-start.x,soldier.y-start.y)>0);
  assert.deepEqual(soldier.target,goal);
 });
+
+
+test('an occupied destination rejects a new order without replacing a valid march',()=>{
+ const {g,soldier}=scenario();
+ const goal=reach(g,soldier);
+ const route=soldier.route.map(tile=>({...tile}));
+ const occupied=route[route.length-1];
+ const blocker={id:999998,owner:2,kind:'soldier',x:occupied.x,y:occupied.y};
+ g.units.push(blocker);
+ const result=issuePlaytestOrder(g,soldier.id,occupied.x+.1,occupied.y+.1);
+ assert.equal(result.ok,false);
+ assert.deepEqual(soldier.route,route);
+ assert.deepEqual(soldier.target,goal);
+ assert.ok(g.units.includes(soldier));
+});
