@@ -7,7 +7,7 @@ import {issuePlaytestOrder,advancePlaytestRoutes} from './playtest/path-routes.j
 import {issueWorkOrder,completeWorkArrivals} from './playtest/work-assignments.js';
 import {issueBuildOrder,cancelBuildOrder,advanceConstruction,isBuilder,canBuildFirm} from './playtest/construction.js';
 import {WorldView} from './view.js';
-import {SKILLS,skillLabel,ensureFirmPersonnel} from './playtest/personnel.js';
+import {SKILLS,skillLabel,workerRoleLabel,workerRaceLabel,ensureFirmPersonnel} from './playtest/personnel.js';
 import {ensureTownRaces,selectedTownRace,recruitableTownPeople} from './playtest/town-races.js';
 const $=id=>document.getElementById(id);
 const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -131,9 +131,12 @@ function selectedContent(){
   const staff=ensureFirmPersonnel(item);
   const people=staff.map((person,i)=>{
    const who=person.name||('Lavoratore '+(i+1));
-   const profile=person.legacyUnknown?'Dati precedenti non documentati':
-    (person.culture||'Etnia non registrata')+' · '+skillLabel(person.skillId,person.skillLevel);
+   const role=workerRoleLabel(person);
+   const profile=person.legacyUnknown?'Abilità precedenti non documentate':
+    skillLabel(person.skillId,person.skillLevel);
+   const ethnicity=workerRaceLabel(person);
    return '<div class="worker-row"><strong>'+esc(who)+'</strong>'+
+    '<small>'+esc(role)+' · '+esc(ethnicity)+'</small>'+
     '<small>'+esc(profile)+'</small><small>HP '+Math.floor(person.hp??100)+
     ' · ID '+esc(person.personId??person.id)+'</small>'+
     (item.owner===1?'<button type="button" data-worker-exit="'+esc(person.id)+'">Fai uscire</button>':'')+
