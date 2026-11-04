@@ -117,6 +117,18 @@ export class SevenGame{
   this.units.push(u);this.note('Un abitante è stato reclutato a '+t.name+'.');
   return {ok:true,msg:'Abitante reclutato.',unit:u};
  }
+ trainConstruction(townId){
+  const t=this.get(townId);
+  if(!t||t.owner!==1)return {ok:false,msg:'Villaggio non controllato.'};
+  if(t.constructionTraining)return {ok:false,msg:'Addestramento già in corso.'};
+  if(t.pop<=4||t.loyalty<30)return {ok:false,msg:'Popolazione o fedeltà insufficiente.'};
+  if(this.cash<=30)return {ok:false,msg:'Servono più di 30 monete.'};
+  if(!this.ownFirms().some(f=>f.kind==='fort'&&this.linked(f,t)))return {ok:false,msg:'Serve un forte collegato.'};
+  this.cash-=30;t.pop--;
+  t.constructionTraining={skillId:1,daysRemaining:5,raceId:t.raceId??null,culture:t.culture??null};
+  this.note('Addestramento Construction avviato a '+t.name+'.');
+  return {ok:true,msg:'Costruttore in addestramento: 5 giorni.'};
+ }
  tax(townId){
   const t=this.get(townId);
   if(!t||t.owner!==1)return {ok:false,msg:'Non puoi riscuotere tasse qui.'};
@@ -268,6 +280,27 @@ export class SevenGame{
    this.note('Le scorte alimentari sono esaurite; cala la fedeltà.');
   }
   for(const t of this.towns){
+   const training=t.constructionTraining;
+   if(training){
+    if(training.daysRemaining>0)training.daysRemaining--;
+    if(training.daysRemaining===0){
+     let spot=null;
+     for(let d=1;d<=5&&!spot;d++)for(let dy=-d;dy<=t.size+d&&!spot;dy++)for(let dx=-d;dx<=t.size+d;dx++){
+      if(dx!==-d&&dx!==t.size+d&&dy!==-d&&dy!==t.size+d)continue;
+      const x=t.x+dx,y=t.y+dy;
+      if(x<0||y<0||x>=WORLD_W||y>=WORLD_H||terrain(this.seed,x,y)==='water'||this.occupied(x,y,1))continue;
+      if(this.units.some(u=>Math.hypot(u.x-x,u.y-y)<0.8))continue;
+      spot={x,y};break;
+     }
+     if(spot){
+      const u=entity('u',{owner:t.owner,...spot,kind:'peasant',hp:100,level:1,target:null,training:20});
+      u.personId=u.id;u.raceId=training.raceId;u.culture=training.culture;
+      u.skillId=1;u.skillLevel=20;u.combatLevel=0;
+      this.units.push(u);t.constructionTraining=null;
+      this.note('Construction Worker pronto a '+t.name+'.');
+     }
+    }
+   }
    t.taxPenalty=Math.max(0,(t.taxPenalty||0)-1);
    t.rewardPenalty=Math.max(0,(t.rewardPenalty||0)-1);
    t.recruitPenalty=Math.max(0,(t.recruitPenalty||0)-1);
