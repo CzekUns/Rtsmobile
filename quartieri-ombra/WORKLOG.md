@@ -183,3 +183,7 @@
 - Creati `board-preview.html` (commit `ee421dbbf6a1440c42254d085777c21e69b084af`) e `board-preview.js` (commit `3d732aba8fa0a3220a6e6b72a7e9900bd892a0c2`); ottimizzazione culling/render terreno (commit `7fb231b8788ab2bb70500a8b4c8c15b7d707a5e8`).
 - Nuova plancia solo scenografica, isolata dal gameplay: 3×3 settori di 900 unità, cinque assi stradali non ortogonali, arterie secondarie connesse, generazione deterministica di caseggiati modulari e props, minimappa, camera drag, pinch e fullscreen. Nessuna modifica agli NPC o al pathfinding.
 - **Limiti:** layout artistico NON tracciato da Perris 1853, silhouette ancora procedurali e insufficienti rispetto al golden concept. Nessuna prova browser reale, screenshot o test Android effettuati in questa esecuzione; verifiche di codice e commit GitHub, non di resa visiva. Non segnare alpha completata.
+
+### 2026-11-04 23:58 CET — Board visual pass
+- Commit `c2a3957a8966a2f053a21e0f32f86bc2ab4d8f09`: board-preview.js adds deterministic road-aligned broken cobbles on all road segments and layered slate repairs plus raised roof hatches on tall buildings. These are per-object modular Canvas details; no NPC/gameplay edits.
+- V8 JavaScript parse of fetched updated file: PASS. Browser screenshots, Android touch and golden side-by-side: NOT performed (browser automation unavailable in this runtime). Container raw GitHub fetch failed DNS (curl code 6); no claim of rendering validation. Await visual comparison.
