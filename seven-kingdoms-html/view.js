@@ -155,6 +155,12 @@ export class WorldView{
    ctx.fillStyle='#e5c36c';ctx.fillRect(bx,by,bw*progress,bh);
    this.label(ctx,'Lavori '+Math.floor(progress*100)+'%',p.x+s*.5,p.y+s*.51,t);
   }
+  if(!firm.underConstruction&&(firm.hp??100)<(firm.maxHp??100)){
+   const hp=Math.max(0,Math.min(1,(firm.hp??100)/(firm.maxHp??100)));
+   const barX=p.x+s*.15,barY=p.y-s*.12,barW=s*.7,barH=Math.max(3,t*.15);
+   ctx.fillStyle='#55291e';ctx.fillRect(barX,barY,barW,barH);
+   ctx.fillStyle='#a6ce73';ctx.fillRect(barX,barY,barW*hp,barH);
+  }
   this.label(ctx,FIRMS[firm.kind]?.label||firm.kind,p.x+s*.5,p.y+s+Math.max(7,t*.4),t);
   if(selection===firm.id){ctx.strokeStyle='#fff0a3';ctx.lineWidth=2;ctx.strokeRect(p.x-3,p.y-3,s+6,s+6);}
  }
