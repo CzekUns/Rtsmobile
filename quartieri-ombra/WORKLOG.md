@@ -1,3 +1,9 @@
+## 2026-11-04 — Deploy Pages B2 riuscito e regressione ripristinata
+- Il run Actions `41926287816` su commit `b23d4b04` ha superato effettivamente **Deploy to GitHub Pages**, non solo il checkout/test.
+- Artefatto distribuito scaricato e verificato in locale: contiene `board-1860.html`, collegamento aggiornato e script versionati. Prima suite completa Node: 40 PASS / 3 FAIL; i 3 FAIL erano test preesistenti con harness non più allineati: `W/H` non definiti nell'estrazione di `game.js` e ancoraggio di nome funzione obsoleto nella prova terreno isometrico.
+- Riparati soltanto i tre **test harness**, senza modificare il codice del gioco o degli NPC; rieseguita suite Node completa su artefatto Pages con le 3 modifiche: **49/49 PASS**.
+- Chromium/Playwright nel runtime rifiuta localhost e file:/// con `ERR_BLOCKED_BY_ADMINISTRATOR`: nessuno screenshot browser dichiarato superato. Prossimo passo: verifica in Chrome Android da utente e confronto reference.
+
 ## 2026-11-04 — Fix del blocco preview Android / deploy concorrenti
 - Evidenza: due screenshot Chrome Android (23:20 e 23:22 CET) mostrano una vecchia versione con area mappa e minimappa nere, mentre `main` ospita già una pagina HTML diversa.
 - Analisi Actions: run `41924861810` ha fallito *Deploy to GitHub Pages* con errore `in progress deployment` (conflitto deploy); run `41924847763` era verde ma il passaggio Deploy risultava `skipped`. Un check verde non prova la pubblicazione.

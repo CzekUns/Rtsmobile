@@ -3,7 +3,7 @@ const test=require("node:test"),assert=require("node:assert/strict"),fs=require(
 const src=fs.readFileSync(path.join(__dirname,"..","game.js"),"utf8");
 const start=src.indexOf(" const parcels="),end=src.indexOf("\n let game=null",start);
 assert(start>=0&&end>start,"source map block");
-const context={};vm.runInNewContext(src.slice(start,end)+"\nthis.geometry={parcels,streets,defs};",context);
+const context={};vm.runInNewContext("const W=1120,H=680;\n"+src.slice(start,end)+"\nthis.geometry={parcels,streets,defs};",context);
 const {parcels,streets,defs}=context.geometry;
 function pointRectDistance(px,py,p){
  const [x,y,w,h]=p;return Math.hypot(Math.max(x-px,0,px-(x+w)),Math.max(y-py,0,py-(y+h)));

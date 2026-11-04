@@ -3,7 +3,7 @@ const test=require("node:test"),assert=require("node:assert/strict"),fs=require(
 const src=fs.readFileSync(path.join(__dirname,"..","game.js"),"utf8");
 const begin=src.indexOf(" const parcels="),end=src.indexOf("\n let game=null",begin);
 assert(begin>=0&&end>begin,"historical map source segment found");
-const sandbox={};vm.runInNewContext(src.slice(begin,end)+"\nthis.map={parcels,streets,defs};",sandbox);
+const sandbox={};vm.runInNewContext("const W=1120,H=680;\n"+src.slice(begin,end)+"\nthis.map={parcels,streets,defs};",sandbox);
 const {parcels,streets,defs}=sandbox.map;
 test("15 unique parcels, valid dimensions, no overlaps or boundary clipping",()=>{
  assert.equal(parcels.length,15);assert.equal(defs.length,15);

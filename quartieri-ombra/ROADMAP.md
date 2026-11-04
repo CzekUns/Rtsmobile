@@ -1,3 +1,8 @@
+### Rilascio B2 verificato — 2026-11-04
+- [x] Workflow [41926287816](https://github.com/CzekUns/Rtsmobile/actions/runs/41926287816): step **Deploy to GitHub Pages = success** (non skipped); prima pubblicazione comprovata del nuovo link `board-1860.html`.
+- [x] Test in Node sull'artefatto Pages B2: 49/49 dopo riparazione di tre harness obsoleti; nessuna modifica a NPC, IA, gameplay.
+- [ ] Verifica visiva sullo smartphone reale e screenshot del sito pubblico: ancora necessaria; ambiente Chromium disponibile qui nega l'apertura delle pagine (`ERR_BLOCKED_BY_ADMINISTRATOR`).
+
 ## Emergenza visibilità plancia — 2026-11-04
 - [x] Individuato conflitto nel deploy `41924861810`: `actions/deploy-pages` rifiuta un nuovo deploy mentre uno è in corso; verde dei run precedenti non equivale a deploy perché step `skipped`.
 - [x] Aggiunta URL nuova `board-1860.html`, caricamento versionato e watchdog di avvio per evitare la schermata nera senza diagnosi.
