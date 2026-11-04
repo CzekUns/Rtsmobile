@@ -3,6 +3,14 @@
 Stato: IN SVILUPPO. Priorità grafica/urbanistica richiesta dall'utente: ricostruzione Five Points > qualità renderer > collaudo > espansioni.
 
 ## CRITERIO DI SOLLECITO — alpha visivamente accettabile (2026-11-04)
+## Esecuzione immediata sollecitata — miglioramenti grafici (2026-11-04)
+
+- Implementate 5 variazioni originali dell'edilizia (`shop`, `tenement`, `dwelling`, `mill`, `warehouse`) con forme di tetto differenti, falde, cornicioni, comignoli e lucernari disegnati nella proiezione isometrica; commit `0efddc78c7a7d83332239493b2d6f6d55150cce2`.
+- Integrati nella build **5 SVG originali già presenti** (barrel, crate, street lamp, fence, lantern) in 15 posizioni prospettiche, con depth sort comune a edifici/unità e fallback procedurale; non sono nuove risorse esterne.
+- Nuovo test persistente `tests/streetscape-render.test.cjs`, commit `a25c5d8ece57ef96936a88b4d630908d3123d2ad`; verifiche dinamiche in V8: 5 categorie distinte, 30 poligoni tetto validi, 0 poligoni non finiti, 15/15 props fuori dai footprint di edifici; parsing JS PASS.
+- **NON è ancora alpha accettabile**: mancano screenshot veri, confronto storico accurato, asset ricchi individuali, test browser Android e controllo completo della giocabilità.
+
+
 
 **Richiesta esplicita:** proseguire le esecuzioni operative fino a un livello grafico e ludico accettabile, non compilare soltanto report o test. Soglia verificabile definita in [VISUAL_ACCEPTANCE.md](VISUAL_ACCEPTANCE.md), tutte le caselle inizialmente APERTE.
 
