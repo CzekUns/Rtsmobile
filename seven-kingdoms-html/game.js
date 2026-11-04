@@ -6,6 +6,7 @@ import {createFrameAccumulator,accumulateFrame} from './core/clock.js';
 import {issuePlaytestOrder,advancePlaytestRoutes} from './playtest/path-routes.js';
 import {issueWorkOrder,completeWorkArrivals} from './playtest/work-assignments.js';
 import {issueBuildOrder,cancelBuildOrder,advanceConstruction,isBuilder,canBuildFirm} from './playtest/construction.js';
+import {issueRepairOrder,cancelRepairOrder,advanceRepairs,canRepair} from './playtest/repairs.js';
 import {WorldView} from './view.js';
 import {SKILLS,skillLabel,workerRoleLabel,workerRaceLabel,ensureFirmPersonnel} from './playtest/personnel.js';
 import {ensureTownRaces,selectedTownRace,recruitableTownPeople} from './playtest/town-races.js';
@@ -129,6 +130,13 @@ function selectedContent(){
  if(game.firms.includes(item)){
   const rule=FIRMS[item.kind];
   const staff=ensureFirmPersonnel(item);
+  const needsRepair=item.owner===1&&!item.underConstruction&&(item.hp??100)<(item.maxHp??100);
+  const hasRepairer=game.units.some(u=>u.repairTargetId===item.id);
+  const availableBuilder=game.units.some(u=>canRepair(u,item)&&!u.buildSiteId&&!u.workTargetId&&!u.repairTargetId);
+  const repairAction=needsRepair?
+   '<button type="button" data-repair-firm="'+esc(item.id)+'"'+
+    (!availableBuilder||hasRepairer?' disabled':'')+'>'+
+    (hasRepairer?'Riparazione in corso':'Manda un costruttore a riparare')+'</button>':'';
   const people=staff.map((person,i)=>{
    const who=person.name||('Lavoratore '+(i+1));
    const role=workerRoleLabel(person);
@@ -145,6 +153,7 @@ function selectedContent(){
   return {
    title:rule.label,meta:'Edificio · '+nation.name,color,
    info:'Lavoratori <strong>'+staff.length+'</strong>/8'+
+    '<br>Integrità edificio <strong>'+Math.floor(item.hp??100)+'</strong>/'+(item.maxHp??100)+' HP'+
     (item.underConstruction?'<br><strong>IN COSTRUZIONE '+Math.floor((item.buildProgress||0)*100)+'%</strong>':'')+
     '<br>Esperienza '+Math.floor(item.experience)+
     (item.kind==='fort'?'<br>Il forte influenza i villaggi collegati.':
@@ -152,7 +161,7 @@ function selectedContent(){
       item.kind==='factory'?'<br>Trasforma minerali in prodotti.':
       item.kind==='market'?'<br>Vende prodotti per denaro.':'')+
     '<br>'+(game.linked(item,game.nearestTown(item))?'Collegato a un villaggio':'Nessun villaggio collegato'),
-   actions:people||'<div class="worker-empty">Nessun lavoratore in questo edificio.</div>'
+   actions:repairAction+(people||'<div class="worker-empty">Nessun lavoratore in questo edificio.</div>')
   };
  }
  if(game.units.includes(item)){
@@ -168,6 +177,12 @@ function selectedContent(){
     (game.cash<config.cost?' disabled':'')+'>'+esc(config.label)+' · '+config.cost+' monete</button>'
    ).join(''):'';
   const activeSite=(game.constructionSites||[]).find(s=>s.builderId===item.id);
+  const activeRepair=item.repairTargetId&&game.get(item.repairTargetId);
+  const repairOptions=item.skillId===1?
+   game.ownFirms().filter(f=>canRepair(item,f)).map(f=>
+    '<button type="button" data-repair-firm="'+esc(f.id)+'">'+
+     'Ripara '+esc(FIRMS[f.kind].label)+' ('+Math.floor(f.hp??100)+'/'+(f.maxHp??100)+' HP)</button>'
+   ).join(''):'';
   return {
    title:item.kind==='soldier'?'Soldato':'Abitante',
    meta:nation.name+' · Livello '+item.level,color,
@@ -175,16 +190,19 @@ function selectedContent(){
     '<br>Abilità '+esc(skillLabel(item.skillId,item.skillLevel,item.legacyUnknown))+
     ' · Combattimento '+Math.floor(item.combatLevel||0)+
     '<br>ID '+esc(item.personId??item.id)+
-    '<br>'+(activeSite?'Cantiere '+esc(FIRMS[activeSite.kind]?.label||activeSite.kind)+
+    '<br>'+(activeRepair?'Riparazione '+esc(FIRMS[activeRepair.kind]?.label||activeRepair.kind)+
+      ' · '+Math.floor(activeRepair.hp??100)+'/'+(activeRepair.maxHp??100)+' HP':
+     activeSite?'Cantiere '+esc(FIRMS[activeSite.kind]?.label||activeSite.kind)+
       ' · '+(activeSite.status==='walking'?'In marcia':'Lavori '+Math.floor(activeSite.progress*100)+'%'):
      assignedTo?'In viaggio verso '+esc(FIRMS[assignedTo.kind]?.label||'edificio'):
            item.target?'In marcia':'Pronto per gli ordini')+
     '<br>Tocca il terreno per spostarti oppure scegli un edificio qui sotto. L\'abitante entrerà solo dopo aver raggiunto l\'ingresso.',
    actions:item.owner===1?[
     btn('move','Sposta: tocca il terreno'),
-    btn('stop','Ferma / annulla ordine',!item.target&&!item.workTargetId&&!item.buildSiteId),
+    btn('stop','Ferma / annulla ordine',!item.target&&!item.workTargetId&&!item.buildSiteId&&!item.repairTargetId),
     isBuilder(item)?btn('builder-menu','Costruisci · scegli edificio'):null,
     buildButtons,
+    repairOptions,
     jobActions
    ].filter(Boolean).join(''):''
   };
@@ -263,8 +281,9 @@ function runAction(action){
  if(action==='move'&&game.units.includes(obj))r={ok:true,msg:'Tocca il terreno per ordinare uno spostamento.'};
  if(action==='stop'&&game.units.includes(obj)){
   const cancelled=cancelBuildOrder(game,obj.id);
+  const cancelledRepair=cancelRepairOrder(game,obj.id);
   obj.target=null;obj.route=[];obj.workTargetId=null;
-  r=cancelled.ok?cancelled:{ok:true,msg:'Ordine annullato. Unità fermata.'};
+  r=cancelled.ok?cancelled:cancelledRepair.ok?cancelledRepair:{ok:true,msg:'Ordine annullato. Unità fermata.'};
  }
  status(r.msg);
  if(r.ok)game.save(saveKey);
@@ -295,7 +314,7 @@ function buildMode(kind){
 function cancelBuild(){placing=null;placingBuilderId=null;ghost=null;$('buildBar').hidden=true}
 function sendOrder(unitId,x,y){
  const unit=game.get(unitId);
- if(unit?.buildSiteId)return {ok:false,msg:'Cantiere attivo. Ferma il costruttore prima di cambiare ordine.'};
+ if(unit?.buildSiteId||unit?.repairTargetId)return {ok:false,msg:'Costruzione o riparazione attiva. Usa Ferma prima di cambiare ordine.'};
  const firm=game.firms.find(f=>x>=f.x&&x<f.x+f.size&&y>=f.y&&y<f.y+f.size);
  if(firm)return issueWorkOrder(game,unitId,firm.id);
  const result=playtest?issuePlaytestOrder(game,unitId,x,y):game.order(unitId,x,y);
@@ -404,6 +423,7 @@ document.addEventListener('click',e=>{
  const action=e.target.closest('[data-action]');
  const work=e.target.closest('[data-work-firm]');
  const workerExit=e.target.closest('[data-worker-exit]');
+ const repairFirm=e.target.closest('[data-repair-firm]');
  const builderChoice=e.target.closest('[data-builder-kind]');
  const townRace=e.target.closest('[data-town-race]');
  const trainSkill=e.target.closest('[data-train-skill]');
@@ -444,6 +464,21 @@ document.addEventListener('click',e=>{
   }
  }
  if(action)runAction(action.dataset.action);
+ if(repairFirm){
+  const firm=game.get(repairFirm.dataset.repairFirm),current=selected();
+  if(firm&&game.firms.includes(firm)){
+   const choices=game.units.filter(u=>canRepair(u,firm)&&
+    !u.buildSiteId&&!u.workTargetId&&!u.repairTargetId);
+   choices.sort((a,b)=>Math.hypot(a.x-firm.x,a.y-firm.y)-
+    Math.hypot(b.x-firm.x,b.y-firm.y));
+   const builder=game.units.includes(current)&&canRepair(current,firm)?current:choices[0];
+   const result=builder?issueRepairOrder(game,builder.id,firm.id):
+    {ok:false,msg:'Nessun costruttore libero: reclutane uno dal villaggio.'};
+   status(result.msg);
+   if(result.ok){selection=builder.id;game.save(saveKey);}
+   renderPanel();renderHud();
+  }
+ }
  if(workerExit){
   const item=selected();
   if(item&&game.firms.includes(item)){
@@ -528,6 +563,7 @@ function tick(t){
     advancePlaytestRoutes(game,.05*game.speed);
     finishWorkOrders();
     handleConstructionEvents(advanceConstruction(game,.05*game.speed));
+    handleConstructionEvents(advanceRepairs(game));
    }
   }else{
    const seconds=Math.min(.15,rawDt);
@@ -537,6 +573,7 @@ function tick(t){
    for(let i=0;i<chunks;i++)advancePlaytestRoutes(game,travel/chunks);
    finishWorkOrders();
    handleConstructionEvents(advanceConstruction(game,travel));
+   handleConstructionEvents(advanceRepairs(game));
   }
   view.draw(game,selection,ghost);
  }
