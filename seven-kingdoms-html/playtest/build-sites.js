@@ -49,6 +49,11 @@ export function advanceBuildSites(game){
    site.phase='building';
   }
   if(site.phase!=='building')continue;
+  // Work requires the same living builder to remain at the site. A saved
+  // construction phase must not progress while the builder walks elsewhere.
+  const dx=Math.max(site.x-u.x,0,u.x-(site.x+site.size-1));
+  const dy=Math.max(site.y-u.y,0,u.y-(site.y+site.size-1));
+  if(u.route?.length||u.target||Math.max(dx,dy)>1.5)continue;
   site.progressDays++;
   if(site.progressDays<site.requiredDays)continue;
   // Reserve the same footprint until completion. Keep the builder alive outside the firm.
