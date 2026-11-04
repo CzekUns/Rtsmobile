@@ -389,6 +389,53 @@
      ctx.stroke();
    }
  }
+
+ // Original, small-scale nineteenth-century brick-front details. The shared
+ // face interpolation keeps windows, awnings and doors in true 2:1 isometry.
+ function faceQuad(tl,tr,bl,br,u0,u1,v0,v1){
+   const mix=(a,b,t)=>({x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t});
+   const point=(u,v)=>mix(mix(tl,bl,v),mix(tr,br,v),u);
+   return [point(u0,v0),point(u1,v0),point(u1,v1),point(u0,v1)];
+ }
+ function drawPeriodFacade(b,p,roof){
+   const isShop=b.type==="res"&&(b.id%5===0||b.id===6);
+   const main=[roof[3],roof[2],p[3],p[2]],side=[roof[1],roof[2],p[1],p[2]];
+   for(const [faceIndex,face] of [main,side].entries()){
+     const [tl,tr,bl,br]=face,columns=faceIndex===0?3:2;
+     // Aged masonry and cornice bands, intentionally asymmetric across lots.
+     for(const height of [.05,.37,.68]){
+       isoPoly(faceQuad(tl,tr,bl,br,0,1,height,height+.045),height===.05?"#76604b":"#463b32");
+     }
+     const rows=b.type==="prod"?[.16,.46]:[.17,.45,.73];
+     for(let r=0;r<rows.length;r++){
+       if(isShop&&faceIndex===0&&r===rows.length-1)continue;
+       for(let c=0;c<columns;c++){
+         if((b.id+r+c+faceIndex)%13===0)continue; // a shuttered/blocked window
+         const u=(c+.5)/columns,lo=u-.105,hi=u+.105,v=rows[r];
+         isoPoly(faceQuad(tl,tr,bl,br,lo-.018,hi+.018,v-.035,v+.22),"#312722");
+         isoPoly(faceQuad(tl,tr,bl,br,lo,hi,v,v+.18),(b.id+c+r)%4===0?"#332f2c":"#97734d");
+         isoPoly(faceQuad(tl,tr,bl,br,lo+.092,lo+.108,v,v+.18),"#342b26");
+         isoPoly(faceQuad(tl,tr,bl,br,lo,hi,v+.087,v+.102),"#342b26");
+       }
+     }
+     // Shop fronts extend only across the street-facing facade, not the entire building.
+     if(isShop&&faceIndex===0){
+       isoPoly(faceQuad(tl,tr,bl,br,.09,.91,.72,.97),"#241c19","#7c6143");
+       isoPoly(faceQuad(tl,tr,bl,br,.13,.42,.76,.91),"#b18c58");
+       isoPoly(faceQuad(tl,tr,bl,br,.46,.67,.77,.97),"#493226");
+       isoPoly(faceQuad(tl,tr,bl,br,.7,.87,.76,.91),"#8b6947");
+       isoPoly(faceQuad(tl,tr,bl,br,.07,.93,.65,.75),"#665343","#2c241d");
+       for(let k=0;k<6;k++){
+         const a=.08+k*.14;
+         isoPoly(faceQuad(tl,tr,bl,br,a,a+.07,.65,.75),k%2?"#7e6550":"#bd9a73");
+       }
+       isoPoly(faceQuad(tl,tr,bl,br,.2,.8,.56,.63),"#302620","#8c7350");
+     }else if(faceIndex===0){
+       // Workshop access or narrow rear-tenement entrance.
+       isoPoly(faceQuad(tl,tr,bl,br,.42,.58,.74,.98),"#251e1c","#7a5e45");
+     }
+   }
+ }
  function drawIsoBuilding(b){
    const p=isoFootprint(b.x,b.y,b.w,b.h),roof=isoTop(p,b.type==="prod"?56:48);
    const wall=b.type==="prod"?"#54443a":"#5c4538",edge="#29231f";
@@ -398,11 +445,7 @@
    isoPoly(roof,b.type==="prod"?"#34312f":"#473833","#211f1e");
    const ridge=isoPoint(b.x+b.w*.5,b.y+b.h*.5);ctx.strokeStyle="#665249";ctx.lineWidth=1;
    ctx.beginPath();ctx.moveTo(roof[0].x,roof[0].y);ctx.lineTo(ridge.x,ridge.y-61);ctx.lineTo(roof[2].x,roof[2].y);ctx.stroke();
-   // Small windows follow both visible faces rather than screen-aligned rectangles.
-   for(const t of [.28,.68]){
-     const a={x:roof[2].x+(roof[3].x-roof[2].x)*t,y:roof[2].y+(roof[3].y-roof[2].y)*t+19};
-     ctx.fillStyle="#b08a52";ctx.fillRect(a.x-2,a.y,4,7);
-   }
+   drawPeriodFacade(b,p,roof);
    if(b.type==="prod"){
      const chimney=isoPoint(b.x+b.w*.72,b.y+b.h*.3);
      ctx.fillStyle="#39312e";ctx.fillRect(chimney.x-4,chimney.y-75,8,29);
