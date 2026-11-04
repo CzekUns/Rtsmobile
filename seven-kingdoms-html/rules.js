@@ -314,7 +314,7 @@ export class SevenGame{
    if(f.owner!==1)continue;
    if(!this.linked(f,this.nearestTown(f)))continue;
    // Original skill-weighted productivity; demo throughput coefficients remain provisional.
-   const productivity=this.firmProductivity(f);
+   const productivity=f.staff.every(p=>p.legacyUnknown)?f.workers:this.firmProductivity(f);
    if(f.kind==='mine'){this.raw+=productivity*.20;f.progress=(f.progress+1)%8;}
    if(f.kind==='factory'&&this.raw>=.5){const qty=Math.min(this.raw,productivity*.15);this.raw-=qty;this.goods+=qty;f.progress=(f.progress+1)%8;}
    if(f.kind==='market'&&this.goods>=.1){const qty=Math.min(this.goods,productivity*.18);this.goods-=qty;this.cash+=qty*10;f.progress=(f.progress+1)%8;}
