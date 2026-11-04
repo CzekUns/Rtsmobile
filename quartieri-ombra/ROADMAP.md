@@ -24,7 +24,7 @@ Stato: IN SVILUPPO. Priorità: gameplay funzionante > art > polish > espansioni.
 - [ ] Test automatici deterministici per fedeltà, reclute, economia, acquisti, IA, vittoria/sconfitta.
 - [ ] Partita facile e difficile terminabili; tuning durata/ritmo.
 - [ ] Salvataggio/caricamento e versione dello stato.
-- [ ] UI touch: pannello selezione, movimento, azioni, zoom e drag senza conflitti.
+- [ ] UI touch: pannello selezione, movimento, azioni, zoom e drag senza conflitti. (Pan e pinch implementati; smoke touch ancora da verificare.)
 
 ## Fase 3 — Grafica approvata
 - [ ] Asset originali, individuali e sostituibili: tile terra, strade, resid, prod, gendarme, mercenario.
