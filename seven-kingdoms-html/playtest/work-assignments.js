@@ -46,8 +46,8 @@ export function issueWorkOrder(game,unitId,firmId){
  if(!unit||!game.units.includes(unit)||unit.owner!==1 ||
     !['peasant','soldier'].includes(unit.kind))
    return {ok:false,msg:'Seleziona un abitante o soldato del tuo regno.'};
- if(unit.buildSiteId)
-   return {ok:false,msg:'Costruttore occupato in un cantiere: annulla prima di assegnarlo.'};
+ if(unit.buildSiteId||unit.repairTargetId)
+   return {ok:false,msg:'Unità impegnata in costruzione o riparazione: annulla prima di assegnarla.'};
  if(!firm||!game.firms.includes(firm)||firm.owner!==1)
    return {ok:false,msg:'Puoi assegnare lavoratori solo ai tuoi edifici.'};
  if(firm.underConstruction)

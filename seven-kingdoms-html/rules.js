@@ -104,6 +104,9 @@ export class SevenGame{
   });
   const add=(kind,owner,x,y,workers=0)=>this.firms.push(entity('f',{kind,owner,x,y,size:3,workers,experience:0,progress:0,stock:0}));
   add('fort',1,30,24,3);add('market',1,25,30,2);add('mine',1,18,27,2);
+  // The starting market is slightly damaged to make the repair skill testable
+  // before battles have been implemented. Only affects NEW demo skirmishes.
+  this.firms.find(f=>f.owner===1&&f.kind==='market').hp=98;
   add('fort',2,49,35,4);add('factory',2,55,41,3);
   for(const [x,y,kind] of [[29,21,'soldier'],[29,23,'soldier'],[22,29,'peasant'],[23,29,'peasant']])
    this.units.push(entity('u',{owner:1,x,y,kind,hp:100,level:1,target:null,training:kind==='soldier'?45:5}));

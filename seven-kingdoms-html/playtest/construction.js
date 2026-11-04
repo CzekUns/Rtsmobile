@@ -32,7 +32,7 @@ export function issueBuildOrder(game,unitId,kind,x,y){
  if(!rule)return {ok:false,msg:'Tipo di edificio sconosciuto.'};
  if(!canBuildFirm(u,kind))
   return {ok:false,msg:'Questa professione non può costruire '+rule.label+'.'};
- if(u.buildSiteId)return {ok:false,msg:'Questa unità ha già un cantiere. Usa Ferma per annullare.'};
+ if(u.buildSiteId||u.repairTargetId)return {ok:false,msg:'Unità impegnata in un cantiere o riparazione. Usa Ferma per annullare.'};
  if(!Number.isFinite(x)||!Number.isFinite(y))return {ok:false,msg:'Coordinate non valide.'};
  x=Math.floor(x);y=Math.floor(y);
  const site={x,y,size:rule.size};
