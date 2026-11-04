@@ -33,7 +33,7 @@
  ];
  let game=null,choice="guard",nextUnitId=1,last=performance.now(),fpsAccumulator=0,noticeTimer=0;
  const camera={zoom:1,offsetX:0,offsetY:0};
- const pointerPositions=new Map();let dragStart=null,pinchDistance=null;
+ const pointerPositions=new Map();let dragStart=null,pinchDistance=null,pinchCenter=null,gestureConsumed=false;
  // Resize the Canvas backing store to its physical viewport, then draw with a
  // uniform cover scale. The world never stretches when the phone rotates.
  function coverScale(){return Math.max(canvas.width/W,canvas.height/H)}
@@ -236,10 +236,61 @@
   }else game.selected=null;
   refresh();
  }
- canvas.addEventListener("pointerdown",e=>{e.preventDefault();canvas.setPointerCapture(e.pointerId);const p=screenPoint(e);pointerPositions.set(e.pointerId,p);if(pointerPositions.size===1)dragStart={id:e.pointerId,start:p,last:p,moved:false};else{dragStart=null;const points=[...pointerPositions.values()];pinchDistance=distance(points[0].x,points[0].y,points[1].x,points[1].y)}});
- canvas.addEventListener("pointermove",e=>{if(!pointerPositions.has(e.pointerId))return;const p=screenPoint(e);pointerPositions.set(e.pointerId,p);if(pointerPositions.size>=2){const points=[...pointerPositions.values()],d=distance(points[0].x,points[0].y,points[1].x,points[1].y);if(pinchDistance&&d>0)zoomAt(d/pinchDistance,{x:(points[0].x+points[1].x)/2,y:(points[0].y+points[1].y)/2});pinchDistance=d;return}if(dragStart){const q=dragStart.last;if(distance(p.x,p.y,dragStart.start.x,dragStart.start.y)>9)dragStart.moved=true;if(dragStart.moved){camera.offsetX-=(p.x-q.x)/camera.zoom;camera.offsetY-=(p.y-q.y)/camera.zoom;constrainCamera()}dragStart.last=p}});
- function endPointer(e){if(!pointerPositions.has(e.pointerId))return;const p=screenPoint(e);if(dragStart&&dragStart.id===e.pointerId&&!dragStart.moved&&e.type==="pointerup"){const w=worldPoint(p);tap(w.x,w.y)}pointerPositions.delete(e.pointerId);dragStart=null;pinchDistance=null}
- canvas.addEventListener("pointerup",endPointer);canvas.addEventListener("pointercancel",endPointer);
+ // Pointer coordinates are expressed in projected-world pixels before camera zoom.
+ // Multi-touch pans at constant separation and zooms around the fingers' midpoint.
+ function pointerMidpoint(points){return {x:(points[0].x+points[1].x)/2,y:(points[0].y+points[1].y)/2}}
+ function resetGesture(){dragStart=null;pinchDistance=null;pinchCenter=null}
+ canvas.addEventListener("pointerdown",e=>{
+   e.preventDefault();canvas.setPointerCapture(e.pointerId);
+   const p=screenPoint(e);pointerPositions.set(e.pointerId,p);
+   if(pointerPositions.size===1){
+     gestureConsumed=false;dragStart={id:e.pointerId,start:p,last:p,moved:false};
+   }else{
+     gestureConsumed=true;dragStart=null;
+     const points=[...pointerPositions.values()];
+     pinchDistance=distance(points[0].x,points[0].y,points[1].x,points[1].y);
+     pinchCenter=pointerMidpoint(points);
+   }
+ });
+ canvas.addEventListener("pointermove",e=>{
+   if(!pointerPositions.has(e.pointerId))return;
+   const p=screenPoint(e);pointerPositions.set(e.pointerId,p);
+   if(pointerPositions.size>=2){
+     const points=[...pointerPositions.values()];
+     const center=pointerMidpoint(points),d=distance(points[0].x,points[0].y,points[1].x,points[1].y);
+     if(pinchCenter){
+       camera.offsetX-=(center.x-pinchCenter.x)/camera.zoom;
+       camera.offsetY-=(center.y-pinchCenter.y)/camera.zoom;
+       constrainCamera();
+     }
+     if(pinchDistance&&d>0)zoomAt(d/pinchDistance,center);
+     pinchDistance=d;pinchCenter=center;return;
+   }
+   if(dragStart){
+     const q=dragStart.last;
+     if(distance(p.x,p.y,dragStart.start.x,dragStart.start.y)>9)dragStart.moved=true;
+     if(dragStart.moved){
+       camera.offsetX-=(p.x-q.x)/camera.zoom;
+       camera.offsetY-=(p.y-q.y)/camera.zoom;
+       constrainCamera();
+     }
+     dragStart.last=p;
+   }
+ });
+ function endPointer(e){
+   if(!pointerPositions.has(e.pointerId))return;
+   const p=screenPoint(e);
+   if(dragStart&&dragStart.id===e.pointerId&&!dragStart.moved&&!gestureConsumed&&e.type==="pointerup"){
+     const w=worldPoint(p);tap(w.x,w.y);
+   }
+   pointerPositions.delete(e.pointerId);
+   resetGesture();
+   // The remaining finger after a pinch must be lifted before a new tap can occur.
+   if(!pointerPositions.size)gestureConsumed=false;
+ }
+ canvas.addEventListener("pointerup",endPointer);
+ canvas.addEventListener("pointercancel",endPointer);
+ canvas.addEventListener("lostpointercapture",endPointer);
  canvas.addEventListener("wheel",e=>{e.preventDefault();zoomAt(e.deltaY<0?1.12:1/1.12,screenPoint(e))},{passive:false});
  document.querySelectorAll("[data-difficulty]").forEach(b=>b.onclick=()=>init(b.dataset.difficulty));
  document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{setMode(b.dataset.mode);report("Ordine "+b.textContent.trim()+": scegli un edificio.");});
