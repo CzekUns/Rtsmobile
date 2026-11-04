@@ -52,6 +52,10 @@
  function route(x,y,tx,ty){
   tx=clamp(tx,10,W-10);ty=clamp(ty,10,H-10);
   if(blocked(tx,ty))return null;
+  // Le posizioni di spawn possono trovarsi sul bordo della collisione: il primo nodo resta percorribile.
+  // Se la cella di arrivo è ostruita, il percorso non deve attraversare l’edificio.
+  const endCellX=Math.floor(tx/CELL)*CELL+CELL/2,endCellY=Math.floor(ty/CELL)*CELL+CELL/2;
+  if(blocked(endCellX,endCellY))return null;
   let start=Math.floor(y/CELL)*COLS+Math.floor(x/CELL),end=Math.floor(ty/CELL)*COLS+Math.floor(tx/CELL);
   const ox=i=>(i%COLS)*CELL+CELL/2,oy=i=>Math.floor(i/COLS)*CELL+CELL/2;
   const heuristic=i=>Math.abs(i%COLS-end%COLS)+Math.abs(Math.floor(i/COLS)-Math.floor(end/COLS));
@@ -64,7 +68,7 @@
    let cx=c%COLS,cy=Math.floor(c/COLS);
    for(let [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
     const nx=cx+dx,ny=cy+dy;if(nx<0||ny<0||nx>=COLS||ny>=ROWS)continue;
-    const z=ny*COLS+nx;if(done.has(z)||blocked(ox(z),oy(z)))continue;
+    const z=ny*COLS+nx;if(done.has(z)||(z!==start&&blocked(ox(z),oy(z))))continue;
     if(cost[c]+1<cost[z]){cost[z]=cost[c]+1;prev[z]=c;if(!q.includes(z))q.push(z)}
    }
   }
