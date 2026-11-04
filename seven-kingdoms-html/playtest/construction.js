@@ -15,15 +15,24 @@ const touches=(u,s)=>{
   (x<s.x||x>=s.x+s.size||y<s.y||y>=s.y+s.size);
 };
 const other=(game,id,x,y)=>game.units.some(u=>u.id!==id&&tile(u.x)===x&&tile(u.y)===y);
-export const isBuilder=u=>u&&u.owner===1&&(u.skillId===1||u.rank==='king');
+// From OFIRMRES.cpp FirmInfo::can_build: Construction and Kings can erect all
+// generic buildings; specialized professions erect their own work premises.
+// The base/tech/ethnic gates are outside the current demo and remain P0 gaps.
+export const SPECIALIZED_BUILD_SKILL=Object.freeze({fort:2,mine:3,factory:4,research:5});
+export const isBuilder=u=>!!u&&u.owner===1&&
+ (u.rank==='king'||[1,2,3,4,5].includes(u.skillId));
+export const canBuildFirm=(u,kind)=>!!u&&u.owner===1&&!!FIRMS[kind]&&
+ (u.rank==='king'||u.skillId===1||SPECIALIZED_BUILD_SKILL[kind]===u.skillId);
 
 /** Validate the entire footprint and reserve a reachable perimeter tile. */
 export function issueBuildOrder(game,unitId,kind,x,y){
  const u=game.get(unitId),rule=FIRMS[kind];
  if(!u||!game.units.includes(u)||!isBuilder(u))
-  return {ok:false,msg:'Occorre selezionare un costruttore addestrato.'};
- if(u.buildSiteId)return {ok:false,msg:'Questo costruttore ha già un cantiere. Usa Ferma per annullare.'};
+  return {ok:false,msg:'Occorre selezionare un’unità qualificata per costruire.'};
  if(!rule)return {ok:false,msg:'Tipo di edificio sconosciuto.'};
+ if(!canBuildFirm(u,kind))
+  return {ok:false,msg:'Questa professione non può costruire '+rule.label+'.'};
+ if(u.buildSiteId)return {ok:false,msg:'Questa unità ha già un cantiere. Usa Ferma per annullare.'};
  if(!Number.isFinite(x)||!Number.isFinite(y))return {ok:false,msg:'Coordinate non valide.'};
  x=Math.floor(x);y=Math.floor(y);
  const site={x,y,size:rule.size};
@@ -113,21 +122,33 @@ export function advanceConstruction(game,seconds){
   if(site.status!=='building')continue;
   const f=game.get(site.firmId);
   if(!f||!game.firms.includes(f)||!touches(unit,site))continue;
+  // Work cannot advance while the builder is walking to another destination.
+  if(unit.route?.length||unit.target)continue;
   const skill=Math.max(0,Math.floor(unit.skillLevel||0));
   // Shorter for this experimental vertical slice; not original C++ frame formula.
-  site.progress=Math.min(1,site.progress+seconds*(1+skill/30)/20);
+  site.progress=Math.min(1,site.progress+seconds*(unit.skillId===1?1+skill/30:1)/20);
   f.buildProgress=site.progress;
   f.hp=Math.max(1,Math.floor(100*site.progress));
-  unit.skillProgress=(unit.skillProgress||0)+seconds;
-  if(unit.skillProgress>=45&&skill<100){
-   unit.skillLevel=skill+1;unit.skillProgress-=45;
+  if(unit.skillId===1){
+   unit.skillProgress=(unit.skillProgress||0)+seconds;
+   if(unit.skillProgress>=45&&skill<100){
+    unit.skillLevel=skill+1;unit.skillProgress-=45;
+   }
   }
   if(site.progress>=1){
    f.underConstruction=false;f.buildProgress=1;f.hp=100;f.builderId=null;
    unit.buildSiteId=null;unit.route=[];unit.target=null;
    game.constructionSites=game.constructionSites.filter(s=>s!==site);
+   // Original behavior: a Mining/Manufacturing/Research/Leadership specialist
+   // becomes staff of the workplace they are qualified to erect.
+   // The demo stores that role in the existing personnel roster.
+   const autoAssign=SPECIALIZED_BUILD_SKILL[site.kind]===unit.skillId;
+   const assigned=autoAssign?game.assign(unit.id,f.id):null;
    game.note('Costruzione completata: '+FIRMS[site.kind].label+'.');
-   events.push({type:'completed',siteId:site.id,firmId:f.id,msg:'Costruzione completata: '+FIRMS[site.kind].label+'.'});
+   events.push({type:'completed',siteId:site.id,firmId:f.id,builderId:unit.id,
+     autoAssigned:!!assigned?.ok,
+     msg:'Costruzione completata: '+FIRMS[site.kind].label+
+       (assigned?.ok?' · specialista assegnato.':'.')});
   }
  }
  return events;

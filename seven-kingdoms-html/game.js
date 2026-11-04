@@ -5,7 +5,7 @@ import {SevenGame,NATIONS,FIRMS,WORLD_W,WORLD_H,SAVE_KEY} from './rules.js';
 import {createFrameAccumulator,accumulateFrame} from './core/clock.js';
 import {issuePlaytestOrder,advancePlaytestRoutes} from './playtest/path-routes.js';
 import {issueWorkOrder,completeWorkArrivals} from './playtest/work-assignments.js';
-import {issueBuildOrder,cancelBuildOrder,advanceConstruction,isBuilder} from './playtest/construction.js';
+import {issueBuildOrder,cancelBuildOrder,advanceConstruction,isBuilder,canBuildFirm} from './playtest/construction.js';
 import {WorldView} from './view.js';
 import {SKILLS,skillLabel,ensureFirmPersonnel} from './playtest/personnel.js';
 import {ensureTownRaces,selectedTownRace,recruitableTownPeople} from './playtest/town-races.js';
@@ -160,7 +160,7 @@ function selectedContent(){
   const jobActions=eligible.map(f=>workBtn(f,item)).join('');
   const buildButtons=builderMenuId===item.id&&isBuilder(item)?
    '<div class="worker-empty">Scegli il tipo da costruire:</div>'+
-   Object.entries(FIRMS).map(([kind,config])=>
+   Object.entries(FIRMS).filter(([kind])=>canBuildFirm(item,kind)).map(([kind,config])=>
     '<button type="button" data-builder-kind="'+esc(kind)+'"'+
     (game.cash<config.cost?' disabled':'')+'>'+esc(config.label)+' · '+config.cost+' monete</button>'
    ).join(''):'';
@@ -201,9 +201,9 @@ function reportContent(){
    }).join('')+'<div class="card"><b>Indipendenti</b><p>'+game.towns.filter(t=>t.owner===0).length+' villaggi neutrali.</p></div>'];
   case 'towns':return ['Villaggi',game.towns.map(toButton).join('')];
   case 'economy':return ['Economia',
-   '<div class="card"><b>Costruisci</b><p>Seleziona una struttura, quindi tocca il terreno vicino a un tuo villaggio.</p>'+
+   '<div class="card"><b>Costruisci</b><p>Seleziona prima un costruttore o uno specialista: ogni professione può erigere solo strutture compatibili.</p>'+
    Object.entries(FIRMS).map(([id,v])=>'<button type="button" class="report-item" data-build="'+id+'"'+
-   (game.cash<v.cost?' disabled':'')+'>'+esc(v.label)+'<small>'+v.cost+' monete</small></button>').join('')+'</div>'+
+   (game.cash<v.cost||!canBuildFirm(selected(),id)?' disabled':'')+'>'+esc(v.label)+'<small>'+v.cost+' monete</small></button>').join('')+'</div>'+
    '<div class="card"><b>Produzione</b><p>Minerali '+Math.floor(game.raw)+' → Prodotti '+Math.floor(game.goods)+' → Denaro '+Math.floor(game.cash)+'</p></div>'+
    game.ownFirms().map(firmButton).join('')];
   case 'trade':return ['Commercio',
@@ -272,7 +272,11 @@ function buildMode(kind){
  if(!FIRMS[kind])return;
  const builder=selected();
  if(!builder||!game.units.includes(builder)||!isBuilder(builder)){
-  status('Seleziona prima un abitante con abilità Costruzione.');
+  status('Seleziona un Costruttore o uno specialista che sappia costruire.');
+  return;
+ }
+ if(!canBuildFirm(builder,kind)){
+  status('Questa professione non può costruire '+FIRMS[kind].label+'.');
   return;
  }
  if(builder.buildSiteId){
@@ -300,6 +304,13 @@ function sendOrder(unitId,x,y){
   }
  }
  return result;
+}
+function handleConstructionEvents(events){
+ for(const event of events){
+  status(event.msg);
+  if(event.type==='completed'&&event.autoAssigned&&selection===event.builderId)
+   selection=event.firmId;
+ }
 }
 function finishWorkOrders(){
  if(game.paused)return;
@@ -513,7 +524,7 @@ function tick(t){
     game.update(.05,{moveUnits:false});
     advancePlaytestRoutes(game,.05*game.speed);
     finishWorkOrders();
-    for(const event of advanceConstruction(game,.05*game.speed))status(event.msg);
+    handleConstructionEvents(advanceConstruction(game,.05*game.speed));
    }
   }else{
    const seconds=Math.min(.15,rawDt);
@@ -522,7 +533,7 @@ function tick(t){
    const chunks=Math.max(1,Math.ceil(travel/.25));
    for(let i=0;i<chunks;i++)advancePlaytestRoutes(game,travel/chunks);
    finishWorkOrders();
-   for(const event of advanceConstruction(game,travel))status(event.msg);
+   handleConstructionEvents(advanceConstruction(game,travel));
   }
   view.draw(game,selection,ghost);
  }
