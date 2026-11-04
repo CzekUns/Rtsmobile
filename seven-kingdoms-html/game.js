@@ -13,7 +13,7 @@ let fixedClock=createFrameAccumulator({tickUs:50000,maxFrameUs:250000});
 let game=SevenGame.load(saveKey)||new SevenGame();
 const view=new WorldView($('world'),$('minimap'));
 let selection=game.towns.find(t=>t.owner===1)?.id||null;
-let report='towns',placing=null,ghost=null,newsUntil=0,last=0,lastPanel=0,lastSave=0;
+let report=null,placing=null,ghost=null,newsUntil=0,last=0,lastPanel=0,lastSave=0;
 let input=null,gesture=null;const pointers=new Map();
 const portrait=window.matchMedia('(orientation: portrait)');
 function resizeStage(){
@@ -29,12 +29,25 @@ function selected(){return game.get(selection);}
 function select(id){
  if(id&&!game.get(id))return;
  selection=id;
+ closeReport();
  renderPanel();
+}
+function closeReport(){
+ if($('reportDialog').open)$('reportDialog').close();
+ report=null;
+ document.querySelectorAll('[data-report]').forEach(b=>b.classList.remove('active'));
+}
+function renderReport(){
+ if(!report||!$('reportDialog').open)return;
+ const [title,html]=reportContent();
+ $('reportTitle').textContent=title.toUpperCase();
+ if($('reportBody').innerHTML!==html)$('reportBody').innerHTML=html;
 }
 function setReport(name){
  report=name;
  document.querySelectorAll('[data-report]').forEach(b=>b.classList.toggle('active',b.dataset.report===name));
- renderPanel();
+ if(!$('reportDialog').open)$('reportDialog').showModal();
+ renderReport();
 }
 function cash(n){return Math.floor(n).toLocaleString('it-IT');}
 function season(){return ['Primavera','Estate','Autunno','Inverno'][Math.floor((game.day-1)/30)%4];}
@@ -145,10 +158,8 @@ function renderPanel(){
  $('selectionMeta').textContent=summary.meta;
  $('flag').style.background=summary.color;
  $('selectionInfo').innerHTML=summary.info;
- $('selectionActions').innerHTML=summary.actions;
- const [title,html]=reportContent();
- $('reportTitle').textContent=title.toUpperCase();
- if($('reportBody').innerHTML!==html)$('reportBody').innerHTML=html;
+ if($('selectionActions').innerHTML!==summary.actions)$('selectionActions').innerHTML=summary.actions;
+ renderReport();
 }
 function runAction(action){
  const obj=selected();if(!obj)return;
@@ -258,7 +269,7 @@ document.addEventListener('click',e=>{
   const item=game.get(selectedButton.dataset.select);
   if(item){select(item.id);view.center(item.x+1.5,item.y+1.5);}
  }
- if(build)buildMode(build.dataset.build);
+ if(build){closeReport();buildMode(build.dataset.build);}
  if(action)runAction(action.dataset.action);
  if(camera){
   if(camera.dataset.camera==='plus')view.scale(1.2);
@@ -268,7 +279,7 @@ document.addEventListener('click',e=>{
  if(menu){
   if(menu.dataset.menu==='save')status(game.save(saveKey)?'Partita salvata nel browser.':'Salvataggio non disponibile.');
   if(menu.dataset.menu==='new'&&confirm('Cominciare una nuova partita? Il salvataggio attuale verrà sostituito.')){
-   game=new SevenGame(Math.floor(Math.random()*1000000));selection=game.ownTowns()[0]?.id||null;cancelBuild();view.center(27,27);game.save(saveKey);setReport('towns');status('Nuova partita avviata.');
+   game=new SevenGame(Math.floor(Math.random()*1000000));selection=game.ownTowns()[0]?.id||null;cancelBuild();view.center(27,27);game.save(saveKey);closeReport();renderPanel();status('Nuova partita avviata.');
   }
   if(menu.dataset.menu==='help')$('helpDialog').showModal();
   if(menu.dataset.menu==='speed'){game.setSpeed(game.paused?1:game.speed===5?0:game.speed+1);renderHud();}
@@ -279,6 +290,11 @@ document.addEventListener('click',e=>{
   $('gameMenu').hidden=true;$('menuBtn').setAttribute('aria-expanded','false');
  }
 });
+$('reportDialog').addEventListener('close',()=>{
+ report=null;
+ document.querySelectorAll('[data-report]').forEach(b=>b.classList.remove('active'));
+});
+$('closeReport').addEventListener('click',closeReport);
 $('menuBtn').addEventListener('click',()=>{
  $('gameMenu').hidden=!$('gameMenu').hidden;
  $('menuBtn').setAttribute('aria-expanded',String(!$('gameMenu').hidden));
@@ -299,7 +315,7 @@ document.addEventListener('fullscreenchange',()=>{
 });
 document.addEventListener('keydown',e=>{
  if(e.target instanceof HTMLInputElement)return;
- if(e.key==='Escape'){cancelBuild();$('gameMenu').hidden=true;return;}
+ if(e.key==='Escape'){closeReport();cancelBuild();$('gameMenu').hidden=true;return;}
  if(e.key===' '||e.key==='0'){e.preventDefault();game.paused=!game.paused;renderHud();return;}
  if(/^[1-5]$/.test(e.key)){game.setSpeed(Number(e.key));renderHud();return;}
  if(e.key.toLowerCase()==='s'&&!e.ctrlKey){e.preventDefault();status(game.save(saveKey)?'Partita salvata.':'Errore di salvataggio.');return;}

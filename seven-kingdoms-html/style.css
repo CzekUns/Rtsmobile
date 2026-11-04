@@ -41,13 +41,17 @@ button:focus-visible{outline:2px solid #e9bc60}
 .selection-header h1{margin:0;font:bold 13px Georgia,serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #flag{display:inline-block;width:14px;height:14px;background:#c94741;border:2px ridge #faf0d4;flex:0 0 14px}
 .selection-meta{flex:0 0 18px;text-align:center;font:bold 10px Georgia,serif;color:#4c4738;padding:3px;border-bottom:1px solid #95998b}
-.selection-info{flex:0 0 auto;max-height:78px;min-height:40px;overflow:auto;font:11px/1.35 Georgia,serif;padding:6px 6px 4px;border-bottom:1px solid #878c80}
+.selection-info{flex:0 0 auto;max-height:145px;min-height:54px;overflow:auto;font:12px/1.4 Georgia,serif;padding:8px 7px 6px;border-bottom:1px solid #878c80}
 .selection-info strong{color:#513f22}
-.selection-actions{flex:0 0 auto;max-height:102px;min-height:34px;overflow:auto;display:flex;align-items:flex-start;align-content:flex-start;gap:3px;flex-wrap:wrap;padding:5px;border-bottom:3px ridge #969c8c}
-.selection-actions button{font-size:10px;padding:5px 4px;min-height:26px;max-width:100%}
-.report-header{flex:0 0 21px;padding:3px;text-align:center;letter-spacing:.07em;font:bold 11px Georgia,serif;background:#bbbdb0;border-bottom:1px solid #7b8173}
+.selection-actions{flex:1 1 auto;min-height:0;overflow-y:auto;display:flex;flex-direction:column;align-items:stretch;gap:6px;padding:8px 6px;overscroll-behavior:contain}
+.selection-actions button{font-size:12px;padding:8px 6px;min-height:34px;width:100%;max-width:100%;text-align:center}
+.report-dialog{width:min(520px,calc(100vw - 24px));height:min(460px,calc(100dvh - 20px));max-height:calc(100dvh - 20px);padding:9px}
+.report-dialog[open]{display:flex;flex-direction:column;gap:8px}
+.report-modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:none;padding:4px;border-bottom:2px ridge #a6a696}
+.report-modal-head h2{margin:0;font:bold 16px Georgia,serif;letter-spacing:.07em}
+.report-modal-head button{min-height:34px;white-space:nowrap}
 .report-body{flex:1;min-height:0;overflow:auto;padding:4px 5px 7px;overscroll-behavior:contain}
-.report-body .report-item{display:block;width:100%;text-align:left;padding:5px 4px;margin:0 0 4px;font:11px/1.25 Georgia,serif}
+.report-body .report-item{display:block;width:100%;text-align:left;padding:8px 7px;margin:0 0 5px;min-height:34px;font:12px/1.3 Georgia,serif}
 .report-body small{display:block;color:#666454;font-size:10px}
 .report-body p{font:11px/1.25 Georgia,serif;margin:3px 0 6px}
 .report-body .card{border:1px ridge #969b8c;background:#d1d0c280;padding:5px;margin-bottom:5px}
