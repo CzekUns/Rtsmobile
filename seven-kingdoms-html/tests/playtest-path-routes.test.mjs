@@ -83,3 +83,15 @@ test('failed assignment to a full friendly firm preserves a marching order',()=>
  assert.deepEqual(soldier.route,route);
  assert.deepEqual(soldier.target,goal);
 });
+
+test('invalid movement orders preserve the current route and target',()=>{
+ const {g,soldier}=scenario();
+ const goal=reach(g,soldier);
+ const route=soldier.route.map(tile=>({...tile}));
+ for(const [x,y] of [[-1,0],[WORLD_W,0],[NaN,3],[Infinity,3],[0,Infinity]]){
+  const result=issuePlaytestOrder(g,soldier.id,x,y);
+  assert.equal(result.ok,false);
+  assert.deepEqual(soldier.route,route);
+  assert.deepEqual(soldier.target,goal);
+ }
+});
