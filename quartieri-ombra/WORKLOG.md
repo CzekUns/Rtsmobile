@@ -93,3 +93,11 @@
 - Nuova suite `tests/road-clearance.test.cjs`, commit `a0fc23ae23e20628401bfd224201094fc6a7a06e`, per impedire regressioni su corridoi stradali, numero edifici e distanze di collisione.
 - Verifica geometrica eseguita sul codice letto da GitHub: 255 accoppiamenti segmento/lotto campionati a 2 unità, nessuna interferenza; minimo 0,66 unità oltre il limite strada + 10; nessuna coppia di edifici sovrapposta; parser JS PASS.
 - Non verificati: suite Node su checkout, percorso A* di ogni edificio, screenshot e interazioni browser, fullscreen/portrait su Android, corrispondenza cartografica storica. Mappa ancora semplificata e non validata su pianta Perris.
+
+
+## 2026-11-04 19:00 — accessi edifici e spawn sicuri
+- Dopo lettura completa dei documenti obbligatori e verifica main, rilevato che la mappa irregolare conteneva accessi esterni non percorribili (porte bloccate da edifici vicini o fuori mappa). Gli spawn spontanei e mercenari potevano materializzarsi in celle A* non navigabili.
+- Modificato `game.js`: `spawn` prova i quattro ingressi in ordine rotativo e usa il primo con posizione e centro cella liberi; nessuna nuova unità se nessun ingresso è praticabile. Commit `0c87aedce5441757aeb706fa2af7edfe99102c1e`.
+- Aggiunto `tests/spawn-access.test.cjs`, commit `57550f5271e1e375079ae2df6ab2db1398b327fc`.
+- Eseguiti 60 casi dinamici V8 sullo `spawn` e `route` reali estratti da main: 60 PASS, 0 fallimenti; testati tutti i 15 edifici con quattro turni di rotazione. Parser `game.js` PASS.
+- Non eseguiti suite Node sul checkout, browser desktop/mobile, fullscreen Android, confronto visivo golden reference. Prossimo passo: test completo connettività e correzione della camera che in landscape può tagliare parte della mappa.
