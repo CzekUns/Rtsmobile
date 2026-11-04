@@ -7,7 +7,7 @@ const model=window.QOBoardWorld;
 if(!model)throw new Error("board-world.js is required before board-preview.js");
 const world=model.generate(1860),proj=model.project,unproj=model.inverse;
 const $=id=>document.getElementById(id);
-const canvas=$("board-canvas"),ctx=canvas.getContext("2d",{alpha:false});
+const canvas=$("board-canvas");let ctx=canvas.getContext("2d",{alpha:false});
 const mini=$("board-minimap"),mc=mini.getContext("2d");
 const stage=$("board-stage");
 const worldCenter=proj(world.hub.x,world.hub.y);
@@ -207,30 +207,63 @@ function drawRoof(b,foot,roof){
   }
  }
 }
-function drawBuilding(b){
+// Each building has its own prerendered low-resolution Canvas sprite.
+// A bounded LRU cache avoids repainting hundreds of windows on every drag.
+const buildingCache=new Map(),MAX_BUILDING_SPRITES=128;
+function buildingGeometry(b){
  const ground=b.poly.map(q=>proj(q.x,q.y));
  const roof=ground.map(p=>({x:p.x,y:p.y-b.z}));
+ const coords=[...ground,...roof],margin=35;
+ const left=Math.floor(Math.min(...coords.map(p=>p.x))-margin);
+ const top=Math.floor(Math.min(...coords.map(p=>p.y))-margin);
+ const right=Math.ceil(Math.max(...coords.map(p=>p.x))+margin);
+ const bottom=Math.ceil(Math.max(...coords.map(p=>p.y))+margin);
+ return {ground,roof,left,top,width:right-left,height:bottom-top};
+}
+function bakeBuilding(b,geometry){
+ const tile=document.createElement("canvas");
+ tile.width=geometry.width;tile.height=geometry.height;
+ const original=ctx;ctx=tile.getContext("2d");
+ try{
+  ctx.translate(-geometry.left,-geometry.top);
+  const {ground,roof}=geometry;
+  polygon(ground.map(p=>({x:p.x+7,y:p.y+6})),"#16131099");
+  const indices=[0,1,2,3].sort((i,j)=>{
+   const q=k=>(ground[k].y+ground[(k+1)%4].y)/2;
+   return q(i)-q(j);
+  });
+  for(const i of indices)drawFace(b,roof,ground,i);
+  drawRoof(b,ground,roof);
+  if(b.controlled){
+   const top=lerp(roof[1],roof[2],.5);
+   line({x:top.x,y:top.y-24},{x:top.x,y:top.y+4},"#b6a27b",1);
+   polygon([{x:top.x,y:top.y-24},{x:top.x+10,y:top.y-20},{x:top.x,y:top.y-15}],
+    b.id%2?"#9b5550":"#6c86a1");
+  }
+ }finally{ctx=original}
+ return {tile,left:geometry.left,top:geometry.top};
+}
+function drawBuilding(b){
  const center=proj(b.x,b.y);
  if(!pointInViewport(center,210))return;
- polygon(ground.map(p=>({x:p.x+7,y:p.y+6})),"#16131099");
- // Draw the less visible faces first to keep building depth consistent.
- const indices=[0,1,2,3].sort((i,j)=>{
-  const q=k=>(ground[k].y+ground[(k+1)%4].y)/2;
-  return q(i)-q(j);
- });
- for(const i of indices)drawFace(b,roof,ground,i);
- drawRoof(b,ground,roof);
- if(b.controlled){
-  const top=lerp(roof[1],roof[2],.5);
-  line({x:top.x,y:top.y-24},{x:top.x,y:top.y+4},"#b6a27b",1);
-  polygon([{x:top.x,y:top.y-24},{x:top.x+10,y:top.y-20},{x:top.x,y:top.y-15}],
-   b.id%2?"#9b5550":"#6c86a1");
+ const geometry=buildingGeometry(b);
+ let cached=buildingCache.get(b.id);
+ if(!cached){
+  cached=bakeBuilding(b,geometry);
+  buildingCache.set(b.id,cached);
+  if(buildingCache.size>MAX_BUILDING_SPRITES)
+   buildingCache.delete(buildingCache.keys().next().value);
+ }else{
+  // Refresh LRU position without re-baking the sprite.
+  buildingCache.delete(b.id);buildingCache.set(b.id,cached);
  }
+ ctx.save();ctx.imageSmoothingEnabled=false;
+ ctx.drawImage(cached.tile,cached.left,cached.top);ctx.restore();
  if(selected&&selected.id===b.id){
-  polygon(roof,null,"#efc981",2.1);
+  polygon(geometry.roof,null,"#efc981",2.1);
   ellipse(center.x,center.y,13,5,"#d5b36b55");
  }
- clickRegions.push({b,ground,roof});
+ clickRegions.push({b,ground:geometry.ground,roof:geometry.roof});
 }
 function drawCart(p){
  const c=proj(p.x,p.y);
