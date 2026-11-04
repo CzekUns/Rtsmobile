@@ -1,7 +1,11 @@
 # Diario avanzamento
 
-## 2026-11-04 — Inizializzazione
-- Scelta repository: `CzekUns/Rtsmobile` (GitHub Pages già presente, pubblica root main).
-- Scelta path nuovo: `quartieri-ombra/`, senza collisioni con altri progetti.
-- Stabilite regole di separazione e milestone MVP → bilanciamento → grafica 1998–2003 → QA.
-- Prossimo obiettivo: implementare e testare build locale in index.html senza dipendenze esterne, poi deploy automatico della sottocartella.
+## 2026-11-04 — Inizializzazione + prima implementazione
+- Scelta repository: `CzekUns/Rtsmobile` (GitHub Pages distribuisce la root di main).
+- Scelta path riservato: `quartieri-ombra/`, inizialmente inesistente e verificato libero.
+- Creazione di README.md, SPEC.md, AGENTS.md e ROADMAP.md con criteri di completamento e istruzioni di isolamento.
+- Prima implementazione: `index.html`, `style.css`, `game.js` indipendenti, avvio per 3 difficoltà, disegno tattico su Canvas, mappa con 15 edifici, fedeltà, influenza, selezione, ordini, pathfinding a griglia, esazione, reclutamento casuale, mercenari, IA, combattimento, HUD inferiore e minimappa.
+- Controllo statico con parser JS: sintassi di `game.js` valida; riferimenti relativi a CSS/JS verificati.
+- Attivata automazione oraria `Worker orario Quartieri d'Ombra`, ID `6aeae2b713b0819184a4bc340c5a0ae6`, dalle 09:00 Europe/Rome con ricorrenza ogni ora.
+- NON ancora verificato: deployment effettivo della nuova sottopagina Pages, smoke browser, mobile/touch e correttezza dinamica completa. Non considerare gameplay completo né asset approvati.
+- Attività della prima esecuzione worker: verificare link Pages e render in browser, bugfix critici, comandi e loop; scrivere test meccanici ripetibili.
