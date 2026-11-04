@@ -3,6 +3,7 @@
  * Core simulation: edit here, no compiler or WebAssembly required.
  */
 import {ensureFirmPersonnel,staffFromUnit,releasedUnitAttributes,SKILLS} from './playtest/personnel.js';
+import {findWorkerExitTile} from './playtest/worker-exit-tile.js';
 import {ensureTownRaces,selectedTownRace,summarizeTown,setTownLoyalty,removeTownPerson,addTownBirth,recruitableTownPeople,raceIdForCulture} from './playtest/town-races.js';
 export const WORLD_W=76,WORLD_H=66;
 export const NATIONS=[
@@ -260,10 +261,21 @@ export class SevenGame{
   if(!f.staff.length)return {ok:false,msg:'Nessun lavoratore da far uscire.'};
   const index=staffId===null?f.staff.length-1:f.staff.findIndex(p=>p.id===staffId);
   if(index<0)return {ok:false,msg:'Lavoratore non trovato.'};
+  // Validation MUST happen before removing the person from their building.
+  // In particular, a blocker or a saved half-built site must not consume staff.
+  const exit=findWorkerExitTile(f,{
+   width:WORLD_W,height:WORLD_H,
+   isBlocked:(x,y)=>this.occupied(x,y,1)||
+    terrain(this.seed,x,y)==='water'||
+    this.units.some(unit=>Math.round(unit.x)===x&&Math.round(unit.y)===y)||
+    (this.constructionSites||[]).some(site=>x>=site.x&&x<site.x+site.size&&
+     y>=site.y&&y<site.y+site.size)
+  });
+  if(!exit)return {ok:false,msg:'Non c’è una casella libera per far uscire il lavoratore.'};
   const [person]=f.staff.splice(index,1);
   f.workers=f.staff.length;
   const u=entity('u',{
-   ...releasedUnitAttributes(person,f),x:f.x+f.size+1,y:f.y+1
+   ...releasedUnitAttributes(person,f),x:exit.x,y:exit.y
   });
   this.units.push(u);
   this.note('Lavoratore '+person.id+' uscito da '+FIRMS[f.kind].label+'.');
