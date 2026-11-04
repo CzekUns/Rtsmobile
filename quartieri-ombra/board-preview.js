@@ -102,6 +102,20 @@ function drawRoads(){
     const off=r.width*side,nx=-dy/len*off,ny=dx/len*off;
     line(proj(a.x+nx,a.y+ny),proj(b.x+nx,b.y+ny),"#302d28a6",1.7);
    }
+   // Individual broken cobbles, embedded in road coordinates so bends retain perspective.
+   // Seeded per segment: stable during camera movement and independent of zoom.
+   const stones=seeded(70001+r.id*193+i*911);
+   const length=Math.hypot(dx,dy),normal={x:-dy/len,y:dx/len};
+   const count=Math.floor(length/(r.kind==="main"?5.5:7));
+   for(let k=0;k<count;k++){
+    const t=(k+.3+stones()*.4)/count;
+    const lateral=(stones()-.5)*(r.width-8);
+    const x=a.x+dx*t+normal.x*lateral,y=a.y+dy*t+normal.y*lateral;
+    const p=proj(x,y);if(!pointInViewport(p,5))continue;
+    const shade=stones();
+    ctx.fillStyle=shade>.82?"#8b7961":shade>.42?"#74634f":"#40372e";
+    ctx.fillRect(p.x,p.y,1.1+stones()*2.8,.55+stones()*.95);
+   }
    const rng=seeded(r.id*1009+i*311);
    for(let t=0;t<1;t+=.095){
     const x=a.x+dx*t,y=a.y+dy*t,p=proj(x,y),v=rng();
@@ -188,6 +202,24 @@ function drawRoof(b,foot,roof){
   polygon(roof,b.roof,"#211d1a",1.3);
   const parapet=[roof[2],roof[3]];
   line(parapet[0],parapet[1],"#7d6551",3.3);
+ }
+ // Slate strips and repair patches are aligned to the roof plane.
+ const roofRand=seeded(b.seed+918);
+ for(let row=0;row<5;row++){
+  const v=(row+.45)/6;
+  const a=lerp(roof[0],roof[3],v),c=lerp(roof[1],roof[2],v);
+  for(let col=0;col<7;col++){
+   const u=(col+(row%2)*.5+.2)/8;
+   const q=lerp(a,c,u);
+   ctx.fillStyle=roofRand()>.7?"#a18b6b6b":"#1e1d1b8c";
+   ctx.fillRect(q.x,q.y,2+roofRand()*4,.8);
+  }
+ }
+ // Raised roof hatch: a distinct silhouette for taller tenements.
+ if(b.floors>=4&&b.seed%4===1){
+  const q=lerp(roof[0],roof[2],.62);
+  polygon([{x:q.x-7,y:q.y},{x:q.x+5,y:q.y-3},{x:q.x+5,y:q.y-10},{x:q.x-7,y:q.y-7}],"#302a25","#9b8060",.7);
+  polygon([{x:q.x-8,y:q.y-8},{x:q.x+5,y:q.y-11},{x:q.x+1,y:q.y-15},{x:q.x-11,y:q.y-12}],"#51473c","#211c19",.7);
  }
  // Deterministic roof seams and uneven patches.
  const count=b.type==="stable"?4:7;
