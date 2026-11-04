@@ -1,5 +1,17 @@
 # Roadmap operativa — aggiornare ad ogni worker
 
+## Avanzamento reale della nuova plancia — 2026-11-04
+
+- [x] **Nuovo mondo modulare 3×3**: `board-world.js`, 2700×2100 unità logiche, 9 settori popolati, 21 polilinee stradali, **454 edifici** su lotti non sovrapposti, **212 props**. Questi sono dati editabili e ripetibili, NON una singola immagine di sfondo e NON una mappa catastale verificata.
+- [x] **Anteprima navigabile**: `board-preview.html`, `board-preview.css`, `board-preview.js` con rendering 2D isometrico, facciate, tetti, insegne/tende, strade e solchi, props separati, camera drag/pinch/rotella, minimappa cliccabile, tap selezione, fullscreen e landscape-only CSS.
+- [x] Collegamento `NUOVA PLANCIA` nella pagina del gioco esistente, senza toccare `game.js` o NPC.
+- [x] Cache LRU di 320 sprite prerenderizzati per edificio. Verifica V8: 228 sprite creati al primo frame in viewport simulata, nessuna ricostruzione dopo zoom in/out, comandi di disegno successivi ridotti.
+- [x] Test di geometria eseguiti direttamente sul sorgente pubblicato: tutti e nove i settori abitati, 454 edifici senza sovrapposizioni, 21 strade e 212 props; parser V8 PASS. Test Node permanente `tests/board-world.test.cjs` pubblicato (non eseguito da Node).
+- [ ] **Non raggiunta la qualità visiva finale.** Servono sprite originali dettagliati, inquadratura più fedele al concept approvato, reali screenshot browser desktop/Android landscape e confronto puntuale.
+- [ ] Tracciati ispirati storicamente ma non ancora georeferenziati/validati contro Perris 1853. La preview non dimostra fedeltà topografica.
+- [ ] Riprendere gli NPC solo dopo approvazione esplicita della plancia. Mantenere l'automazione attiva.
+
+
 ## P0 ASSOLUTA — PLANCIA IMMAGINE APPROVATA E MAPPA ESTESA (2026-11-04)
 
 L'utente ha visto il movimento NPC e ha esplicitamente richiesto di **SOSPENDERE lo sviluppo NPC per il momento**. Concentrarsi esclusivamente su plancia, grafica ambientale, continuità mappa, zoom/camera/minimappa e visualizzazione landscape. **[BOARD_MASTER.md](BOARD_MASTER.md) è il riferimento operativo vincolante**: l'ultimo ImageGen approvato dall'utente è la golden reference prioritaria rispetto ai mockup precedenti. Non riprodurre il film.
