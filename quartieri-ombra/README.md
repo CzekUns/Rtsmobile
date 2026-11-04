@@ -1,5 +1,10 @@
 # Quartieri d'Ombra — RTS di controllo territoriale
 
+## Direzione definitiva della plancia
+
+L'utente ha approvato il concept ImageGen *Five Points District — New York c.1860* come riferimento **esatto** della plancia. La mappa finale dovrà estendersi ben oltre la finestra mostrata (minimo 2×2, ambizione 3×3 settori continui), preservando scala, densità, case in mattoni, negozi, fango, lampioni, carrozze, tetti e incroci irregolari. Il lavoro NPC è **sospeso su richiesta dell'utente** fino all'approvazione della plancia, senza rimuovere il codice già prodotto. Specifica autoritativa: [BOARD_MASTER.md](BOARD_MASTER.md). Anteprima effettivamente conservata: [assets/references/approved_five_points_board_preview.webp](assets/references/approved_five_points_board_preview.webp). È una miniatura 160×90, non l'immagine originale.
+
+
 **Titolo provvisorio.** Piccolo RTS HTML5 originale in una città industriale ottocentesca immaginaria. Estetica finale vincolante: strategico isometrico 2D, cupo, 1998–2003.
 
 ## Ricerca storico-grafica
