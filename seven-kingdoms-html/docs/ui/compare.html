@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>7KAA classic UI reference comparison · SKH-109</title>
+<style>
+:root{color-scheme:dark;font:15px system-ui,sans-serif}body{margin:0;padding:16px;background:#171a1d;color:#f1ece1}
+main{max-width:1700px;margin:auto}h1{font-size:1.35rem}label{display:inline-block;margin:10px 14px 10px 0}
+input,select,button{font:inherit;padding:7px;border:1px solid #999;border-radius:4px;background:#282e33;color:white}
+button:focus-visible,input:focus-visible{outline:3px solid gold}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,520px),1fr));gap:16px}
+figure{margin:0}figure img,figure canvas{width:100%;max-width:800px;aspect-ratio:4/3;image-rendering:pixelated;background:#435447;border:1px solid #666}
+figcaption{padding:6px 0}p{max-width:85ch;line-height:1.5}.warning{color:#ffd984}
+</style></head><body><main>
+<h1>SKH-109 · Original versus HTML UI — repeatable comparison</h1>
+<p>This is a comparison workbench, not an original screenshot. Supply your own 800×600 PNG exported from the original 7KAA/WASM. The HTML canvas intentionally contains <strong>only</strong> the isolated HUD, not the game-world renderer. Pixel differences of the full image therefore include the absent terrain and sprites.</p>
+<label>Original 7KAA 800×600 screenshot <input id="file" type="file" accept="image/png,image/jpeg,image/webp"></label>
+<label>Context <select id="context"><option value="town">Town</option><option value="fort">Fort</option><option value="market">Market</option><option value="unit">Unit</option></select></label>
+<button id="render" type="button">Render current context</button>
+<button id="download" type="button">Save HTML HUD PNG</button>
+<p id="status" class="warning" role="status">No reference image loaded. A reference cannot be validated until a genuine 800×600 capture is supplied.</p>
+<section class="grid">
+<figure><figcaption>Reference (user-selected file, not bundled)</figcaption><canvas id="original" width="800" height="600" aria-label="Original screenshot"></canvas></figure>
+<figure><figcaption>Native JavaScript HUD (world intentionally transparent)</figcaption><canvas id="ours" width="800" height="600" aria-label="Reconstruction"></canvas></figure>
+<figure><figcaption>Absolute RGB difference (unmasked; world region will differ)</figcaption><canvas id="diff" width="800" height="600" aria-label="Per-pixel RGB comparison"></canvas></figure>
+</section>
+<p>Comparison protocol: original game screenshot should be captured at 800×600 at the same selection and calendar date as the ViewModel; take a reconstruction screenshot with the same world render and evaluate the difference. Measure the HUD separately (top strip and sidebar) first. Do not resize a 640×480 source and claim pixel-level agreement.</p>
+</main>
+<script type="module">
+import {createClassicHud,CLASSIC_RECTS} from '../../ui/classic/classic-hud.js';
+const el=id=>document.getElementById(id),ours=el('ours'),original=el('original'),diff=el('diff');
+const hud=createClassicHud(ours);
+const examples={
+ town:{type:'town',name:'Akita',health:100,healthMax:100,stats:[{label:'Population',value:100},{label:'Loyalty',value:80}],actions:[{id:'recruit',label:'Recruit'},{id:'tax',label:'Tax'}]},
+ fort:{type:'fort',name:'Fort',health:200,healthMax:200,stats:[{label:'Leadership',value:100},{label:'Combat',value:100}],actions:[{id:'soldiers',label:'Soldiers'},{id:'train',label:'Train'}]},
+ market:{type:'market',name:'Rouen Market',health:200,healthMax:200,stats:[{label:'Clay Stock',value:'14/500'},{label:'Iron Stock',value:'0/500'},{label:'Year Income',value:2123}],actions:[{id:'caravan',label:'Trade'}]},
+ unit:{type:'unit',name:'King',health:100,healthMax:100,stats:[{label:'Leadership',value:80},{label:'Combat',value:100}],actions:[{id:'move',label:'Move'},{id:'stop',label:'Stop'}]}
+};
+let referenceLoaded=false;
+function status(v){el('status').textContent=v}
+function model(){return {date:'Mar 17, 1004',day:14,resources:{cash:9505,cashRate:36,food:8781,foodRate:-1},selection:examples[el('context').value]}}
+function refresh(){hud.render(model());computeDiff()}
+function computeDiff(){
+ if(!referenceLoaded)return;
+ const a=original.getContext('2d').getImageData(0,0,800,600),b=ours.getContext('2d').getImageData(0,0,800,600);
+ const output=diff.getContext('2d').createImageData(800,600);
+ let sum=0,pixels=0;const r=CLASSIC_RECTS;
+ for(let y=0;y<600;y++)for(let x=0;x<800;x++){
+  const i=(y*800+x)*4,isHud=y<r.world.y||x>=r.minimap.x;
+  const d=[0,1,2].map(k=>Math.abs(a.data[i+k]-b.data[i+k]));
+  output.data[i]=d[0];output.data[i+1]=d[1];output.data[i+2]=d[2];output.data[i+3]=255;
+  if(isHud){sum+=d[0]+d[1]+d[2];pixels++}
+ }
+ diff.getContext('2d').putImageData(output,0,0);
+ status('HUD-region mean absolute RGB delta (0..255): '+(sum/(pixels*3)).toFixed(2)+'. Not a parity score unless context and textures match.');
+}
+el('file').addEventListener('change',e=>{
+ const file=e.target.files?.[0];if(!file)return;
+ const objectURL=URL.createObjectURL(file);const image=new Image;
+ image.onload=()=>{
+  URL.revokeObjectURL(objectURL);
+  if(image.naturalWidth!==800||image.naturalHeight!==600){
+   referenceLoaded=false;status('Rejected: reference is '+image.naturalWidth+'×'+image.naturalHeight+', not native 800×600. Do not rescale the reference.');return;
+  }
+  original.getContext('2d').drawImage(image,0,0);referenceLoaded=true;refresh();
+ };
+ image.onerror=()=>{URL.revokeObjectURL(objectURL);status('Unable to read image')};
+ image.src=objectURL;
+});
+el('render').addEventListener('click',refresh);
+el('context').addEventListener('change',refresh);
+el('download').addEventListener('click',()=>{const a=document.createElement('a');a.href=ours.toDataURL('image/png');a.download='skh109-classic-hud.png';a.click()});
+refresh();
+</script></body></html>
