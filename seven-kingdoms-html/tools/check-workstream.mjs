@@ -23,12 +23,14 @@ if(!stream){
 const base=process.env.BASE_SHA||'origin/main';
 let names;
 try{
- names=execFileSync('git',['diff','--name-only','--diff-filter=ACMR',base,'HEAD'],{encoding:'utf8'})
+ names=execFileSync('git',['diff','--no-renames','--name-only','--diff-filter=ACMRD',base,'HEAD'],{encoding:'utf8'})
    .split(/\r?\n/).filter(Boolean);
 }catch(error){
  console.error('Cannot read changed files. Fetch the base branch / supply BASE_SHA.');
  process.exit(1);
 }
+// --no-renames reports both sides of cross-boundary moves as delete + add.
+// D also covers deletions; neither action is exempt from stream ownership.
 const permitted=path=>stream.allowedPaths.some(prefix=>path===prefix||path.startsWith(prefix));
 const violations=names.filter(path=>!permitted(path));
 console.log('Stream: '+stream.id+' ('+branch+'), compared with '+base);
