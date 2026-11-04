@@ -28,7 +28,7 @@ body{position:fixed;inset:0}
 .rotate-symbol{font-size:60px;color:#d6ac6c;line-height:1}
 @media (orientation:portrait) and (max-width:900px){.rotate-overlay{display:flex}}
 @media (orientation:landscape) and (max-height:500px){
- .bar{height:42px}
+ .bar{height:42px;flex-wrap:nowrap}
  .brand{font-size:clamp(11px,1.6vw,16px)}
  .brand small{display:none}
  .score{order:0;width:auto;justify-content:space-evenly;font-size:9px}
