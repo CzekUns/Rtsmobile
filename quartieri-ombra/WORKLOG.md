@@ -1,5 +1,13 @@
 # Diario avanzamento
 
+## 2026-11-04 15:00 — Primo terreno isometrico 2:1
+- Riletti integralmente i sei documenti di progetto e assets/README.md; verificata main e stato del renderer: fondo ancora a strade cartesiane.
+- Commit `2ac8ab49cc8ea190ce0760fb0504adc96f33568b`: nuovo `drawIsometricGround()` in game.js, tile diamante 2:1 con fango/lastricato e usura deterministica, al posto del fondo rettangolare. Nessun asset precedente sovrascritto.
+- Commit `278957119454fc134edffafda8f1dffbe8e9d7d0`: aggiunto test persistente `tests/isometric-ground.test.cjs` per tile ratio, numero tile e determinismo.
+- Verifica dinamica V8 sulla funzione reale: 462 fill, 459 stroke, delta del primo spigolo (+48,+24), PASS. Sintassi JS integrale PASS. Test Node persistente non eseguito; nessuna prova browser desktop/Android.
+- **Non dichiarare isometria 100%:** il mondo di gioco (building/unit positions, picking, pathfinding, camera, minimappa) è ancora cartesiano. Prossimo step prioritario è la proiezione isometrica condivisa e inversa, senza rompere collisioni/ordini; poi layering e sprite/footprint.
+
+
 ## 2026-11-04 — Priorità landscape/fullscreen/UI bloccata allo schermo
 - Richiesta utente: grafica isometrica 100%, gioco solo orizzontale, pulsante fullscreen e ottimizzazione viewport. Evitare completamente che il gesto touch trascini l'intera UI.
 - Aggiornati `index.html`: pulsante fullscreen nella barra alta e overlay "Ruota il dispositivo" per smartphone portrait.
