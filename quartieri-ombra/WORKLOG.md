@@ -73,3 +73,11 @@
 - Creato `tests/pathfinding.test.cjs`, commit `b54525c6cb8ff262effbd3199da82259363055e3`. La suite usa `node:vm` per eseguire la funzione `route()` estratta da `game.js`, anziché ricopiare l'algoritmo, e verifica 7 condizioni.
 - Verificati 4 casi dinamici direttamente in V8 sulla funzione originale (4/4 PASS). Tentato download del sorgente nel container per eseguire Node: DNS `raw.githubusercontent.com` non risolto; NON dichiarata esecuzione della suite Node né smoke browser.
 - Prossimo obiettivo: eseguire suite Node in ambiente con accesso al repository, integrare regressione su economia/influenza e proseguire isometria.
+
+
+## 2026-11-04 16:00 — Proiezione unificata e cartografia storica
+- Implementato in `game.js` un sistema isometrico ortografico 2:1: `isoPoint/isoInverse`, terreno a diamanti, pareti/tetti edifici in prospettiva, unità in posizione coerente, ordinamento per profondità comune e selezione in coordinate proiettate.
+- Coordinate logiche originali mantenute per A*, influenza, assalto e spawn: riduce rischio di regressione, ma richiede test integrali. Zoom usa punto proiettato; tap usa trasformazione inversa.
+- Commit `75326e8ddd014257ff9f525aac3ad0430a5445ea`. Test persistente `tests/isometric-projection.test.cjs`, commit `1aabebaf599e04d5738e6cb5c53c624c95c8a119`.
+- Controllo sintattico JS superato prima della pubblicazione. Test Node/browser e screenshot golden reference NON eseguiti. Non dichiarare completata l'isometria finale.
+- Nuova priorità storica dell'utente: geometria dei Five Points nel 1853, strade/isolati irregolari da mappa Perris; evitare OSM moderno come topografia ottocentesca. Attuale `defs` ancora a scacchiera: resta da sostituire.
