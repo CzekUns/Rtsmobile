@@ -302,15 +302,23 @@ export class SevenGame{
   this.dayTimer+=step;
   while(this.dayTimer>=18){this.dayTimer-=18;this.advanceDay();}
  }
+ // 7KAA OFIRM.cpp Firm::calc_productivity; demo maxHP=100 adapter.
+ firmProductivity(f){
+  ensureFirmPersonnel(f);
+  const total=f.staff.reduce((sum,p)=>sum+(p.legacyUnknown?0:Math.max(0,Math.min(100,p.skillLevel||0))*Math.max(0,Math.min(100,p.hp??100))/100),0);
+  return Math.max(0,total/8-Math.max(0,f.sabotageLevel||0));
+ }
  produce(){
   for(const f of this.firms){
    if(f.underConstruction||!f.workers)continue;
    if(f.owner!==1)continue;
    if(!this.linked(f,this.nearestTown(f)))continue;
-   if(f.kind==='mine'){this.raw+=f.workers*.20;f.progress=(f.progress+1)%8;}
-   if(f.kind==='factory'&&this.raw>=.5){const qty=Math.min(this.raw,f.workers*.15);this.raw-=qty;this.goods+=qty;f.progress=(f.progress+1)%8;}
-   if(f.kind==='market'&&this.goods>=.1){const qty=Math.min(this.goods,f.workers*.18);this.goods-=qty;this.cash+=qty*10;f.progress=(f.progress+1)%8;}
-   if(f.kind==='research'){this.knowledge+=f.workers*.08;f.progress=(f.progress+1)%8;}
+   // Original skill-weighted productivity; demo throughput coefficients remain provisional.
+   const productivity=this.firmProductivity(f);
+   if(f.kind==='mine'){this.raw+=productivity*.20;f.progress=(f.progress+1)%8;}
+   if(f.kind==='factory'&&this.raw>=.5){const qty=Math.min(this.raw,productivity*.15);this.raw-=qty;this.goods+=qty;f.progress=(f.progress+1)%8;}
+   if(f.kind==='market'&&this.goods>=.1){const qty=Math.min(this.goods,productivity*.18);this.goods-=qty;this.cash+=qty*10;f.progress=(f.progress+1)%8;}
+   if(f.kind==='research'){this.knowledge+=productivity*.08;f.progress=(f.progress+1)%8;}
    if(f.kind==='fort')f.experience=clamp(f.experience+f.workers*.02,0,100);
   }
  }
