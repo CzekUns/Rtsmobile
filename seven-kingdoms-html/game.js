@@ -5,6 +5,7 @@ import {SevenGame,NATIONS,FIRMS,WORLD_W,WORLD_H,SAVE_KEY} from './rules.js';
 import {createFrameAccumulator,accumulateFrame} from './core/clock.js';
 import {issuePlaytestOrder,advancePlaytestRoutes} from './playtest/path-routes.js';
 import {issueWorkOrder,completeWorkArrivals} from './playtest/work-assignments.js';
+import {issueBuildOrder,cancelBuildOrder,advanceConstruction,isBuilder} from './playtest/construction.js';
 import {WorldView} from './view.js';
 import {SKILLS,skillLabel,ensureFirmPersonnel} from './playtest/personnel.js';
 const $=id=>document.getElementById(id);
@@ -15,7 +16,7 @@ let fixedClock=createFrameAccumulator({tickUs:50000,maxFrameUs:250000});
 let game=SevenGame.load(saveKey)||new SevenGame();
 const view=new WorldView($('world'),$('minimap'));
 let selection=game.towns.find(t=>t.owner===1)?.id||null;
-let report=null,placing=null,ghost=null,newsUntil=0,last=0,lastPanel=0,lastSave=0;
+let report=null,placing=null,placingBuilderId=null,builderMenuId=null,ghost=null,newsUntil=0,last=0,lastPanel=0,lastSave=0;
 let input=null,gesture=null;const pointers=new Map();
 const portrait=window.matchMedia('(orientation: portrait)');
 function resizeStage(){
@@ -84,10 +85,13 @@ function selectedContent(){
   const info='Popolazione <strong>'+item.pop+'</strong> · Cultura '+esc(item.culture)+
     '<br>'+(independent?'Resistenza <strong>'+Math.floor(item.resistance)+'</strong>/100':
                    'Fedeltà <strong>'+Math.floor(item.loyalty)+'</strong>/100')+
-    '<br>Regno: '+esc(nation.name);
+    '<br>Regno: '+esc(nation.name)+
+    (item.trainingQueue?.length?'<br>Costruttori in addestramento: '+item.trainingQueue.length+
+     ' · prossima uscita giorno '+item.trainingQueue[0].readyDay:'');
   const ownFortLinked=game.ownFirms().some(f=>f.kind==='fort'&&game.linked(f,item));
   const actions=item.owner===1?[
     btn('recruit','Recluta',item.pop<=4||item.loyalty<27),
+    btn('train-builder','Addestra costruttore (30)',item.pop<=4||game.cash<30||!ownFortLinked||(item.trainingQueue||[]).length>=10),
     btn('tax','Tasse',item.loyalty<=10||!ownFortLinked),
     btn('grant','Sussidio ('+(item.pop*10)+')',game.cash<item.pop*10||!ownFortLinked),
   ].join(''):independent?[
@@ -112,6 +116,7 @@ function selectedContent(){
   return {
    title:rule.label,meta:'Edificio · '+nation.name,color,
    info:'Lavoratori <strong>'+staff.length+'</strong>/8'+
+    (item.underConstruction?'<br><strong>IN COSTRUZIONE '+Math.floor((item.buildProgress||0)*100)+'%</strong>':'')+
     '<br>Esperienza '+Math.floor(item.experience)+
     (item.kind==='fort'?'<br>Il forte influenza i villaggi collegati.':
       item.kind==='mine'?'<br>Produce minerali grezzi.':
@@ -127,6 +132,13 @@ function selectedContent(){
   eligible.sort((a,b)=>Math.hypot(item.x-a.x,item.y-a.y)-
     Math.hypot(item.x-b.x,item.y-b.y));
   const jobActions=eligible.map(f=>workBtn(f,item)).join('');
+  const buildButtons=builderMenuId===item.id&&isBuilder(item)?
+   '<div class="worker-empty">Scegli il tipo da costruire:</div>'+
+   Object.entries(FIRMS).map(([kind,config])=>
+    '<button type="button" data-builder-kind="'+esc(kind)+'"'+
+    (game.cash<config.cost?' disabled':'')+'>'+esc(config.label)+' · '+config.cost+' monete</button>'
+   ).join(''):'';
+  const activeSite=(game.constructionSites||[]).find(s=>s.builderId===item.id);
   return {
    title:item.kind==='soldier'?'Soldato':'Abitante',
    meta:nation.name+' · Livello '+item.level,color,
@@ -134,14 +146,18 @@ function selectedContent(){
     '<br>Abilità '+esc(skillLabel(item.skillId,item.skillLevel,item.legacyUnknown))+
     ' · Combattimento '+Math.floor(item.combatLevel||0)+
     '<br>ID '+esc(item.personId??item.id)+
-    '<br>'+(assignedTo?'In viaggio verso '+esc(FIRMS[assignedTo.kind]?.label||'edificio'):
+    '<br>'+(activeSite?'Cantiere '+esc(FIRMS[activeSite.kind]?.label||activeSite.kind)+
+      ' · '+(activeSite.status==='walking'?'In marcia':'Lavori '+Math.floor(activeSite.progress*100)+'%'):
+     assignedTo?'In viaggio verso '+esc(FIRMS[assignedTo.kind]?.label||'edificio'):
            item.target?'In marcia':'Pronto per gli ordini')+
     '<br>Tocca il terreno per spostarti oppure scegli un edificio qui sotto. L\'abitante entrerà solo dopo aver raggiunto l\'ingresso.',
    actions:item.owner===1?[
     btn('move','Sposta: tocca il terreno'),
-    btn('stop','Ferma / annulla ordine',!item.target&&!item.workTargetId),
+    btn('stop','Ferma / annulla ordine',!item.target&&!item.workTargetId&&!item.buildSiteId),
+    isBuilder(item)?btn('builder-menu','Costruisci · scegli edificio'):null,
+    buildButtons,
     jobActions
-   ].join(''):''
+   ].filter(Boolean).join(''):''
   };
  }
  return {title:'Selezione',meta:'',color,info:'',actions:''};
@@ -200,6 +216,12 @@ function runAction(action){
  const obj=selected();if(!obj)return;
  let r={ok:false,msg:'Ordine non valido.'};
  if(action==='recruit')r=game.recruit(obj.id);
+ if(action==='train-builder')r=game.trainConstruction(obj.id);
+ if(action==='builder-menu'&&game.units.includes(obj)&&isBuilder(obj)){
+  builderMenuId=builderMenuId===obj.id?null:obj.id;
+  status('Seleziona un edificio da costruire.');
+  renderPanel();return;
+ }
  if(action==='tax')r=game.tax(obj.id);
  if(action==='grant')r=game.grant(obj.id);
  if(action==='persuade')r=game.persuade(obj.id);
@@ -207,8 +229,9 @@ function runAction(action){
  if(action==='dismiss')r=game.dismiss(obj.id);
  if(action==='move'&&game.units.includes(obj))r={ok:true,msg:'Tocca il terreno per ordinare uno spostamento.'};
  if(action==='stop'&&game.units.includes(obj)){
+  const cancelled=cancelBuildOrder(game,obj.id);
   obj.target=null;obj.route=[];obj.workTargetId=null;
-  r={ok:true,msg:'Ordine annullato. Unità fermata.'};
+  r=cancelled.ok?cancelled:{ok:true,msg:'Ordine annullato. Unità fermata.'};
  }
  status(r.msg);
  if(r.ok)game.save(saveKey);
@@ -217,13 +240,25 @@ function runAction(action){
 }
 function buildMode(kind){
  if(!FIRMS[kind])return;
- placing=kind;ghost={kind,x:24,y:23};
- $('buildLabel').textContent='Costruisci: '+FIRMS[kind].label+' · tocca la mappa';
+ const builder=selected();
+ if(!builder||!game.units.includes(builder)||!isBuilder(builder)){
+  status('Seleziona prima un abitante con abilità Costruzione.');
+  return;
+ }
+ if(builder.buildSiteId){
+  status('Questo costruttore ha già un ordine. Usa Ferma per annullare.');
+  return;
+ }
+ placing=kind;placingBuilderId=builder.id;builderMenuId=null;
+ ghost={kind,x:Math.floor(builder.x+2),y:Math.floor(builder.y+2)};
+ $('buildLabel').textContent=FIRMS[kind].label+' · tocca una posizione valida';
  $('buildBar').hidden=false;
- status('Indica il luogo del nuovo edificio.');
+ status('Indica il luogo del cantiere sulla mappa.');
 }
-function cancelBuild(){placing=null;ghost=null;$('buildBar').hidden=true}
+function cancelBuild(){placing=null;placingBuilderId=null;ghost=null;$('buildBar').hidden=true}
 function sendOrder(unitId,x,y){
+ const unit=game.get(unitId);
+ if(unit?.buildSiteId)return {ok:false,msg:'Cantiere attivo. Ferma il costruttore prima di cambiare ordine.'};
  const firm=game.firms.find(f=>x>=f.x&&x<f.x+f.size&&y>=f.y&&y<f.y+f.size);
  if(firm)return issueWorkOrder(game,unitId,firm.id);
  const result=playtest?issuePlaytestOrder(game,unitId,x,y):game.order(unitId,x,y);
@@ -248,8 +283,9 @@ function finishWorkOrders(){
 function mapClick(sx,sy,right=false){
  const p=view.worldAt(sx,sy);let x=p.x,y=p.y;
  if(placing){
-  const result=game.build(placing,x,y);status(result.msg);
-  if(result.ok){selection=result.firm.id;cancelBuild();game.save(saveKey);renderPanel();}
+  const result=issueBuildOrder(game,placingBuilderId,placing,x,y);
+  status(result.msg);
+  if(result.ok){cancelBuild();game.save(saveKey);renderPanel();renderHud();}
   return;
  }
  const hit=view.pick(game,x,y),unit=selected();
@@ -324,12 +360,14 @@ document.addEventListener('click',e=>{
  const action=e.target.closest('[data-action]');
  const work=e.target.closest('[data-work-firm]');
  const workerExit=e.target.closest('[data-worker-exit]');
+ const builderChoice=e.target.closest('[data-builder-kind]');
  if(r)setReport(r.dataset.report);
  if(selectedButton){
   const item=game.get(selectedButton.dataset.select);
   if(item){select(item.id);view.center(item.x+1.5,item.y+1.5);}
  }
  if(build){closeReport();buildMode(build.dataset.build);}
+ if(builderChoice)buildMode(builderChoice.dataset.builderKind);
  if(action)runAction(action.dataset.action);
  if(workerExit){
   const item=selected();
@@ -414,6 +452,7 @@ function tick(t){
     game.update(.05,{moveUnits:false});
     advancePlaytestRoutes(game,.05*game.speed);
     finishWorkOrders();
+    for(const event of advanceConstruction(game,.05*game.speed))status(event.msg);
    }
   }else{
    const seconds=Math.min(.15,rawDt);
@@ -422,6 +461,7 @@ function tick(t){
    const chunks=Math.max(1,Math.ceil(travel/.25));
    for(let i=0;i<chunks;i++)advancePlaytestRoutes(game,travel/chunks);
    finishWorkOrders();
+   for(const event of advanceConstruction(game,travel))status(event.msg);
   }
   view.draw(game,selection,ghost);
  }
