@@ -129,3 +129,23 @@ test('an occupied destination rejects a new order without replacing a valid marc
  assert.deepEqual(soldier.target,goal);
  assert.ok(g.units.includes(soldier));
 });
+
+test('head-on occupied tiles never allow two units to overlap or discard orders',()=>{
+ const {g,soldier}=scenario();
+ const goal=reach(g,soldier);
+ const first=soldier.route[0];
+ const origin={x:Math.round(soldier.x),y:Math.round(soldier.y)};
+ const rival={id:999997,owner:2,kind:'soldier',x:first.x,y:first.y,
+  route:[origin],target:{...origin}};
+ g.units.push(rival);
+ const original=soldier.route.map(tile=>({...tile}));
+ for(let tick=0;tick<12;tick++){
+  advancePlaytestRoutes(g,.25);
+  assert.notDeepEqual({x:Math.round(soldier.x),y:Math.round(soldier.y)},
+   {x:Math.round(rival.x),y:Math.round(rival.y)});
+ }
+ assert.deepEqual(soldier.route,original);
+ assert.deepEqual(soldier.target,goal);
+ assert.deepEqual(rival.route,[origin]);
+ assert.deepEqual(rival.target,origin);
+});
