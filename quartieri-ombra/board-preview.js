@@ -43,12 +43,12 @@ poly(up,'#343330','#1c1b1a');poly([up[0],up[1],{x:(up[1].x+up[2].x)/2,y:(up[1].y
 let ch=up[0];ctx.fillStyle='#352c28';ctx.fillRect(ch.x+12,ch.y-14,7,17);ctx.fillStyle='#201d1a';ctx.fillRect(ch.x+11,ch.y-15,9,3);
 }
 function prop(p){let a=at(p.x,p.y);if(p.kind==='lamp'){ctx.strokeStyle='#302a24';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(a.x,a.y-27);ctx.stroke();ctx.fillStyle='#d4a45c';ctx.fillRect(a.x-3,a.y-32,6,7)}else{ctx.fillStyle='#403027';ctx.fillRect(a.x-4,a.y-7,8,7);ctx.strokeStyle='#92724e';ctx.strokeRect(a.x-4,a.y-7,8,7)}}
-function terrain(){poly(diamond(0,0,WORLD,WORLD),'#38332d');for(let x=0;x<WORLD;x+=32)for(let y=0;y<WORLD;y+=32){let v=hash(x,y);if(v>.48){poly(diamond(x+v*5,y,29,29),v>.84?'#403a32':'#39342e')}}}
+function terrain(){poly(diamond(0,0,WORLD,WORLD),'#38332d');for(let x=0;x<WORLD;x+=64)for(let y=0;y<WORLD;y+=64){let v=hash(x,y);if(v>.48){poly(diamond(x+v*5,y,57,57),v>.84?'#403a32':'#39342e')}}}
 function street(r){let pts=r.points.map(p=>at(p.x,p.y));path(pts,'#272722',r.width*.64);path(pts,'#615748',r.width*.54);path(pts,'#706352',r.width*.39);path(pts,'#4c453a',1.2)}
 function render(){const box=canvas.getBoundingClientRect();if(box.width!==vw||box.height!==vh){vw=box.width;vh=box.height;dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(vw*dpr);canvas.height=Math.round(vh*dpr)}ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#171411';ctx.fillRect(0,0,vw,vh);
 let c=iso(cam.x,cam.y);ctx.translate(vw/2-c.x*cam.zoom,vh/2-c.y*cam.zoom);ctx.scale(cam.zoom,cam.zoom);
 terrain();roads.forEach(street);
-const scene=[...houses.map(b=>({z:b.x+b.y+b.w+b.d,fn:()=>building(b)})),...props.map(p=>({z:p.x+p.y,fn:()=>prop(p)}))].sort((a,b)=>a.z-b.z);for(const item of scene)item.fn();
+const scene=[...houses.map(b=>({z:b.x+b.y+b.w+b.d,b,fn:()=>building(b)})),...props.map(p=>({z:p.x+p.y,p,fn:()=>prop(p)}))].sort((a,b)=>a.z-b.z);for(const item of scene){let q=item.b?at(item.b.x,item.b.y):item.p?at(item.p.x,item.p.y):null;if(q){let sx=(q.x-c.x)*cam.zoom+vw/2,sy=(q.y-c.y)*cam.zoom+vh/2;if(sx < -240||sx>vw+240||sy < -260||sy>vh+260)continue}item.fn();}
 ctx.setTransform(dpr,0,0,dpr,0,0);drawMini();}
 function drawMini(){mc.fillStyle='#25231e';mc.fillRect(0,0,296,122);const s=.041;mc.save();mc.translate(148,61);mc.scale(s,s*.5);mc.translate(-CENTER,-CENTER);mc.strokeStyle='#87745c';for(const r of roads){mc.beginPath();r.points.forEach((p,i)=>i?mc.lineTo(p.x,p.y):mc.moveTo(p.x,p.y));mc.lineWidth=r.width;mc.stroke()}mc.fillStyle='#574438';for(const b of houses)mc.fillRect(b.x,b.y,b.w,b.d);mc.restore();mc.strokeStyle='#e1ba77';mc.lineWidth=2;mc.strokeRect(148+(cam.x-CENTER)*s-vw/(cam.zoom*20),61+(cam.y-CENTER)*s*.5-vh/(cam.zoom*20),vw/(cam.zoom*10),vh/(cam.zoom*10))}
 function screenWorld(x,y){let c=iso(cam.x,cam.y),p=uniso((x-vw/2)/cam.zoom+c.x,(y-vh/2)/cam.zoom+c.y);return p}
