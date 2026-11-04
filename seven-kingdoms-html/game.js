@@ -8,6 +8,7 @@ import {issueWorkOrder,completeWorkArrivals} from './playtest/work-assignments.j
 import {issueBuildOrder,cancelBuildOrder,advanceConstruction,isBuilder} from './playtest/construction.js';
 import {WorldView} from './view.js';
 import {SKILLS,skillLabel,ensureFirmPersonnel} from './playtest/personnel.js';
+import {ensureTownRaces,selectedTownRace,recruitableTownPeople} from './playtest/town-races.js';
 const $=id=>document.getElementById(id);
 const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const playtest=new URLSearchParams(location.search).get('playtest')==='1';
@@ -16,7 +17,7 @@ let fixedClock=createFrameAccumulator({tickUs:50000,maxFrameUs:250000});
 let game=SevenGame.load(saveKey)||new SevenGame();
 const view=new WorldView($('world'),$('minimap'));
 let selection=game.towns.find(t=>t.owner===1)?.id||null;
-let report=null,placing=null,placingBuilderId=null,builderMenuId=null,ghost=null,newsUntil=0,last=0,lastPanel=0,lastSave=0;
+let report=null,placing=null,placingBuilderId=null,builderMenuId=null,trainingMenuTownId=null,ghost=null,newsUntil=0,last=0,lastPanel=0,lastSave=0;
 let input=null,gesture=null;const pointers=new Map();
 const portrait=window.matchMedia('(orientation: portrait)');
 function resizeStage(){
@@ -82,22 +83,47 @@ function selectedContent(){
  const nation=NATIONS[item.owner]||NATIONS[0],color=nation.color;
  if(game.towns.includes(item)){
   const independent=item.owner===0;
-  const info='Popolazione <strong>'+item.pop+'</strong> · Cultura '+esc(item.culture)+
+  const races=ensureTownRaces(item);
+  const selectedRace=selectedTownRace(item);
+  const available=selectedRace?recruitableTownPeople(item,selectedRace.raceId):0;
+  const info='Popolazione <strong>'+item.pop+'</strong> · '+races.length+' etnie'+
     '<br>'+(independent?'Resistenza <strong>'+Math.floor(item.resistance)+'</strong>/100':
-                   'Fedeltà <strong>'+Math.floor(item.loyalty)+'</strong>/100')+
+                   'Fedeltà media <strong>'+Math.floor(item.loyalty)+'</strong>/100')+
     '<br>Regno: '+esc(nation.name)+
-    (item.trainingQueue?.length?'<br>Costruttori in addestramento: '+item.trainingQueue.length+
-     ' · prossima uscita giorno '+item.trainingQueue[0].readyDay:'');
+    (selectedRace?'<br>Selezionata: <strong>'+esc(selectedRace.culture)+'</strong> · liberi '+available:'')+
+    (item.trainingQueue?.length?'<br>In addestramento: '+item.trainingQueue.length+'/10':'');
   const ownFortLinked=game.ownFirms().some(f=>f.kind==='fort'&&game.linked(f,item));
+  const raceButtons=races.filter(r=>r.population>0).map(r=>{
+   const active=r.raceId===item.selectedRaceId;
+   return '<button type="button" class="town-race-choice'+(active?' active':'')+'" data-town-race="'+esc(r.raceId)+'" aria-pressed="'+active+'">'+
+    esc(r.culture)+' · '+r.population+' abitanti'+
+    '<small>Disoccupati '+r.jobless+' · Fedeltà '+Math.floor(r.loyalty)+'</small></button>';
+  }).join('');
+  const canRecruit=item.owner===1&&item.pop>4&&available>0&&selectedRace?.loyalty>=30;
+  const canTrain=canRecruit&&ownFortLinked&&game.cash>=30&&(item.trainingQueue?.length||0)<10;
+  const skillButtons=trainingMenuTownId===item.id?
+   '<div class="worker-empty">Addestra '+esc(selectedRace?.culture||'')+' · 30 monete / 5 giorni ciascuno:</div>'+
+   SKILLS.filter(s=>s.trainable).map(s=>
+    '<button type="button" data-train-skill="'+s.id+'"'+(canTrain?'':' disabled')+'>'+
+     esc(s.label)+' · 30</button>').join(''):'';
+  const queueButtons=(item.trainingQueue||[]).map(q=>
+   '<div class="train-queue-row"><small>G '+q.readyDay+' · '+esc(q.culture||'')+' · '+
+   esc(SKILLS[q.skillId]?.label||'Specialista')+'</small>'+
+   (item.owner===1?'<button type="button" data-cancel-training="'+esc(q.id)+'">Annulla</button>':'')+'</div>'
+  ).join('');
   const actions=item.owner===1?[
-    btn('recruit','Recluta',item.pop<=4||item.loyalty<27),
-    btn('train-builder','Addestra costruttore (30)',item.pop<=4||game.cash<30||!ownFortLinked||(item.trainingQueue||[]).length>=10),
-    btn('tax','Tasse',item.loyalty<=10||!ownFortLinked),
-    btn('grant','Sussidio ('+(item.pop*10)+')',game.cash<item.pop*10||!ownFortLinked),
+   '<div class="worker-empty">Scegli la popolazione:</div>',raceButtons,
+   btn('recruit','Recluta '+(selectedRace?.culture||''),!canRecruit),
+   btn('train-menu',trainingMenuTownId===item.id?'Chiudi addestramento':'Addestra una professione',!canRecruit||!ownFortLinked),
+   skillButtons,
+   queueButtons?'<div class="worker-empty">Coda di formazione (massimo 10):</div>'+queueButtons:'',
+   btn('tax','Tasse',item.loyalty<=10||!ownFortLinked),
+   btn('grant','Sussidio ('+(item.pop*10)+')',game.cash<item.pop*10||!ownFortLinked)
   ].join(''):independent?[
-    btn('persuade','Influenza (100)',game.cash<100||!game.ownFirms().some(f=>f.kind==='fort'&&game.linked(f,item))),
-    btn('annex','Unisci al regno',item.resistance>15)
-  ].join(''):'';
+   '<div class="worker-empty">Popolazioni:</div>',raceButtons,
+   btn('persuade','Influenza (100)',game.cash<100||!game.ownFirms().some(f=>f.kind==='fort'&&game.linked(f,item))),
+   btn('annex','Unisci al regno',item.resistance>15)
+  ].join(''):'<div class="worker-empty">Popolazioni:</div>'+raceButtons;
   return {title:item.name,meta:'Villaggio · '+nation.name,color,info,actions};
  }
  if(game.firms.includes(item)){
@@ -215,8 +241,12 @@ function renderPanel(){
 function runAction(action){
  const obj=selected();if(!obj)return;
  let r={ok:false,msg:'Ordine non valido.'};
- if(action==='recruit')r=game.recruit(obj.id);
- if(action==='train-builder')r=game.trainConstruction(obj.id);
+ if(action==='recruit')r=game.recruit(obj.id,obj.selectedRaceId);
+ if(action==='train-menu'&&game.towns.includes(obj)){
+  trainingMenuTownId=trainingMenuTownId===obj.id?null:obj.id;
+  status('Scegli una professione e poi osserva la coda.');
+  renderPanel();return;
+ }
  if(action==='builder-menu'&&game.units.includes(obj)&&isBuilder(obj)){
   builderMenuId=builderMenuId===obj.id?null:obj.id;
   status('Seleziona un edificio da costruire.');
@@ -361,6 +391,9 @@ document.addEventListener('click',e=>{
  const work=e.target.closest('[data-work-firm]');
  const workerExit=e.target.closest('[data-worker-exit]');
  const builderChoice=e.target.closest('[data-builder-kind]');
+ const townRace=e.target.closest('[data-town-race]');
+ const trainSkill=e.target.closest('[data-train-skill]');
+ const cancelTraining=e.target.closest('[data-cancel-training]');
  if(r)setReport(r.dataset.report);
  if(selectedButton){
   const item=game.get(selectedButton.dataset.select);
@@ -368,6 +401,34 @@ document.addEventListener('click',e=>{
  }
  if(build){closeReport();buildMode(build.dataset.build);}
  if(builderChoice)buildMode(builderChoice.dataset.builderKind);
+ if(townRace){
+  const town=selected();
+  if(town&&game.towns.includes(town)){
+   ensureTownRaces(town);
+   if(town.races.some(r=>r.raceId===townRace.dataset.townRace)){
+    town.selectedRaceId=townRace.dataset.townRace;
+    game.save(saveKey);renderPanel();
+   }
+  }
+ }
+ if(trainSkill){
+  const town=selected();
+  if(town&&game.towns.includes(town)){
+   const result=game.trainSkill(town.id,town.selectedRaceId,Number(trainSkill.dataset.trainSkill));
+   status(result.msg);
+   if(result.ok)game.save(saveKey);
+   renderPanel();renderHud();
+  }
+ }
+ if(cancelTraining){
+  const town=selected();
+  if(town&&game.towns.includes(town)){
+   const result=game.cancelTraining(town.id,cancelTraining.dataset.cancelTraining);
+   status(result.msg);
+   if(result.ok)game.save(saveKey);
+   renderPanel();renderHud();
+  }
+ }
  if(action)runAction(action.dataset.action);
  if(workerExit){
   const item=selected();
@@ -395,7 +456,7 @@ document.addEventListener('click',e=>{
  if(menu){
   if(menu.dataset.menu==='save')status(game.save(saveKey)?'Partita salvata nel browser.':'Salvataggio non disponibile.');
   if(menu.dataset.menu==='new'&&confirm('Cominciare una nuova partita? Il salvataggio attuale verrà sostituito.')){
-   game=new SevenGame(Math.floor(Math.random()*1000000));selection=game.ownTowns()[0]?.id||null;cancelBuild();view.center(27,27);game.save(saveKey);closeReport();renderPanel();status('Nuova partita avviata.');
+   game=new SevenGame(Math.floor(Math.random()*1000000));selection=game.ownTowns()[0]?.id||null;trainingMenuTownId=null;cancelBuild();view.center(27,27);game.save(saveKey);closeReport();renderPanel();status('Nuova partita avviata.');
   }
   if(menu.dataset.menu==='help')$('helpDialog').showModal();
   if(menu.dataset.menu==='speed'){game.setSpeed(game.paused?1:game.speed===5?0:game.speed+1);renderHud();}
