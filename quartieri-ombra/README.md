@@ -5,6 +5,13 @@
 ## Gioco
 Avvio diretto da `index.html` senza compilazione o dipendenze esterne. Scegli difficoltà, controlla il clan con un edificio residenziale e un gendarme. Le case producono reclute spontanee se fedeli; i produttivi accumulano oro da riscuotere con esattori; i mercenari sono acquistabili. Gendarmi fermi influenzano edifici vicini, con efficacia legata al livello e distanza; gli assalti sono una via alternativa.
 
+## Controlli di visualizzazione
+- **Smartphone:** ruota il dispositivo in orizzontale prima di iniziare; in verticale compare una schermata che blocca la partita.
+- **Schermo intero:** tocca il pulsante `⛶` nella barra in alto. Il blocco hardware in orizzontale è richiesto quando consentito dal browser; su alcuni dispositivi non è disponibile.
+- **Mappa:** trascina direttamente il campo di gioco per spostare la visuale, usa due dita per zoom. Il resto della UI (comandi, punteggio, minimappa) non deve più seguire il trascinamento.
+- **Fisso nel display:** il gioco evita lo scorrimento del documento; la mappa occupa lo spazio che rimane tra barra alta e pannello comandi.
+- **In attesa di collaudo:** compatibilità fullscreen/orientamento e overflow responsive su dispositivi Android reali.
+
 ## Pubblicazione prevista
 https://czekuns.github.io/Rtsmobile/quartieri-ombra/
 
