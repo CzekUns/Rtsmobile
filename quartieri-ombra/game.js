@@ -38,7 +38,19 @@
  // uniform cover scale. The world never stretches when the phone rotates.
  function coverScale(){return Math.max(canvas.width/W,canvas.height/H)}
  function visibleWorld(){const scale=coverScale()*camera.zoom;return {w:canvas.width/scale,h:canvas.height/scale}}
- function constrainCamera(){const view=visibleWorld();camera.offsetX=clamp(camera.offsetX,0,Math.max(0,W-view.w));camera.offsetY=clamp(camera.offsetY,0,Math.max(0,H-view.h))}
+ // Camera bounds are in PROJECTED pixels, not logical A* coordinates.
+ // Include roofs and a small margin so the outermost buildings stay visible.
+ const CAMERA_BOUNDS={left:170,top:-110,right:960,bottom:545};
+ function clampAxis(value,lo,hi,span){
+   const length=hi-lo;
+   if(span>=length)return (lo+hi-span)/2;
+   return clamp(value,lo,hi-span);
+ }
+ function constrainCamera(){
+   const view=visibleWorld();
+   camera.offsetX=clampAxis(camera.offsetX,CAMERA_BOUNDS.left,CAMERA_BOUNDS.right,view.w);
+   camera.offsetY=clampAxis(camera.offsetY,CAMERA_BOUNDS.top,CAMERA_BOUNDS.bottom,view.h);
+ }
  function resizeWorld(){
    const r=canvas.getBoundingClientRect();
    if(!r.width||!r.height)return;
@@ -55,7 +67,7 @@
  function makeBuilding(d,side){return {...d,loyalty:side*75,owner:side,stock:0,recruit:rnd(12,24),damage:0}}
  function init(level){
    const n=level==="hard"?4:level==="normal"?2:1;
-   camera.zoom=1;camera.offsetX=0;camera.offsetY=0;
+   camera.zoom=1;camera.offsetX=0;camera.offsetY=0;constrainCamera();
    game={level,buildings:defs.map((d,i)=>makeBuilding(d,i===0?1:i>=TOTAL-n?-1:0)),units:[],gold:{1:110,"-1":110},selected:null,order:"guard",time:0,paused:false,over:false,ai:1.2,aiPurchase:0};
    nextUnitId=1;spawn(PLAYER,"g",game.buildings[0]);
    owned(ENEMY).filter(b=>b.type==="res").forEach(b=>spawn(ENEMY,"g",b));
@@ -390,11 +402,26 @@
    drawMini();ctx.setTransform(1,0,0,1,0,0);
  }
  function drawMini(){
-  mx.fillStyle="#161613";mx.fillRect(0,0,180,108);
-  mx.fillStyle="#494137";for(let i=0;i<4;i++)mx.fillRect(0,15+i*27,180,6);
-  for(const b of game.buildings){mx.fillStyle=b.owner===PLAYER?"#76a4c8":b.owner===ENEMY?"#c26b68":"#a0998f";mx.fillRect(b.x/W*180,b.y/H*108,Math.max(5,b.w/W*180),Math.max(4,b.h/H*108))}
-  for(const u of game.units){mx.fillStyle=u.side===PLAYER?"#a9ddff":"#ff8f89";mx.fillRect(u.x/W*180,u.y/H*108,2,2)}
-  mx.strokeStyle="#e8cb83";mx.lineWidth=1;const view=visibleWorld();mx.strokeRect(camera.offsetX/W*180,camera.offsetY/H*108,view.w/W*180,view.h/H*108);
+  const bounds=CAMERA_BOUNDS,scaleX=180/(bounds.right-bounds.left),scaleY=108/(bounds.bottom-bounds.top);
+  const miniPoint=(x,y)=>({x:(x-bounds.left)*scaleX,y:(y-bounds.top)*scaleY});
+  mx.fillStyle="#171713";mx.fillRect(0,0,180,108);
+  // Draw the same historical street polylines as the battlefield, in projected space.
+  for(const street of streets){
+    mx.strokeStyle="#655c4b";mx.lineWidth=Math.max(1,street.width*.32*scaleX);
+    mx.beginPath();street.points.forEach(([x,y],i)=>{const p=isoPoint(x,y),q=miniPoint(p.x,p.y);i?mx.lineTo(q.x,q.y):mx.moveTo(q.x,q.y)});mx.stroke();
+  }
+  for(const b of game.buildings){
+    const center=isoPoint(b.x+b.w/2,b.y+b.h/2),p=miniPoint(center.x,center.y);
+    mx.fillStyle=b.owner===PLAYER?"#76a4c8":b.owner===ENEMY?"#c26b68":"#a0998f";
+    mx.fillRect(p.x-2.5,p.y-2,5,4);
+  }
+  for(const u of game.units){
+    const p=isoPoint(u.x,u.y),q=miniPoint(p.x,p.y);
+    mx.fillStyle=u.side===PLAYER?"#a9ddff":"#ff8f89";mx.fillRect(q.x-1,q.y-1,2,2);
+  }
+  const view=visibleWorld(),corner=miniPoint(camera.offsetX,camera.offsetY);
+  mx.strokeStyle="#e8cb83";mx.lineWidth=1;
+  mx.strokeRect(corner.x,corner.y,view.w*scaleX,view.h*scaleY);
  }
  function loop(now){let dt=Math.min(.05,(now-last)/1000);last=now;if(game){update(dt);drawScene()}requestAnimationFrame(loop)}
  requestAnimationFrame(loop);
