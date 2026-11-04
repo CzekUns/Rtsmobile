@@ -81,3 +81,9 @@
 - Commit `75326e8ddd014257ff9f525aac3ad0430a5445ea`. Test persistente `tests/isometric-projection.test.cjs`, commit `1aabebaf599e04d5738e6cb5c53c624c95c8a119`.
 - Controllo sintattico JS superato prima della pubblicazione. Test Node/browser e screenshot golden reference NON eseguiti. Non dichiarare completata l'isometria finale.
 - Nuova priorità storica dell'utente: geometria dei Five Points nel 1853, strade/isolati irregolari da mappa Perris; evitare OSM moderno come topografia ottocentesca. Attuale `defs` ancora a scacchiera: resta da sostituire.
+
+## 2026-11-04 17:00 — Primo passo topografia Five Points
+- `game.js` commit `d06ca32973a169ae181f84bf890aff2ae028838a`: rimpiazzata la disposizione 5×3 a griglia con quindici lotti irregolari non sovrapposti; cinque strade spezzate disegnate nel renderer isometrico, con prospettiva comune; eliminata la ripetizione di strade ortogonali sul terreno. Mantenuti i dati logici e A* per ridurre regressioni.
+- `tests/irregular-map.test.cjs` commit `6e0f5f67db81454eb8ad02332852026a98b6f33f`: test di geometria, footprint e tracciati, da eseguire con Node nel checkout. Parser V8 game.js e controllo di non sovrapposizione 15/15 PASS nell'ambiente connettore.
+- Base storica di ricerca: William Perris, Maps of the City of New-York, volume 3, plate 25 (1853); Library of Congress, incisione Five Points in 1859. NON sono state importate immagini storiche nel gioco. Le coordinate sono una prima interpretazione artistica, NON un rilievo fedele. Da verificare nomi, angoli e ingombri contro mappa primaria.
+- Da completare: esecuzione test Node, screenshot desktop/mobile, convalida strade reali e navigazione; il gioco non è completo.
