@@ -225,3 +225,7 @@ Nota: la proiezione isometrica non deve essere confusa con la regolarità urbani
 ### 2026-11-04 — preview plancia modulare, prima iterazione
 - [x] Creata pagina isolata `board-preview.html` con renderer `board-preview.js`: nove settori di produzione contigui, cinque arterie ramificate, case decorative modulari con tetti/facciate/finestre e props, camera drag/pinch/zoom, minimappa e fullscreen opzionale. NPC e meccaniche non modificati.
 - [ ] **Non validato in browser**: la preview è una prima struttura procedurale e NON soddisfa ancora la densità/fedeltà del concept; servono screenshot desktop/landscape, ottimizzazione, asset più ricchi, verifica storica Perris e approvazione utente.
+
+### Plancia — iterazione visiva 2026-11-04 23:58 CET
+- [x] Nuova passata grafica effettiva: ciottoli irregolari per tratto stradale, riparazioni in ardesia e abbaini/sopralzi sui tetti alti (`c2a3957`). Parsing V8 PASS.
+- [ ] Browser reale desktop/mobile landscape, screenshot comparato con reference approvata, controllo prestazioni e fedeltà visiva: ancora da verificare. Non equivale ad approvazione.
