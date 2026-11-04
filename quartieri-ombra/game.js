@@ -3,6 +3,16 @@
  const $=id=>document.getElementById(id),canvas=$("world"),ctx=canvas.getContext("2d"),mini=$("minimap"),mx=mini.getContext("2d");
  const W=1120,H=680,PLAYER=1,ENEMY=-1,NEUTRAL=0,COST=90,TOTAL=15;
  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rnd=(a,b)=>a+Math.random()*(b-a),distance=(a,b,c,d)=>Math.hypot(a-c,b-d);
+ const imageAssets={};
+ for(const [key,src] of Object.entries({
+   residence:"./assets/buildings/residential_tenement_lowres.webp",
+   gendarme:"./assets/units/gendarme_idle_lowres.webp",
+   mercenary:"./assets/units/mercenary_idle_lowres.webp"
+ })){const picture=new Image();picture.src=src;imageAssets[key]=picture}
+ function paintAsset(image,x,y,w,h){
+   if(!image||!image.complete||!image.naturalWidth)return false;
+   ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(image,x,y,w,h);ctx.restore();return true;
+ }
  const defs=Array.from({length:TOTAL},(_,i)=>({id:i,x:100+(i%5)*210,y:125+Math.floor(i/5)*174,w:115,h:76,type:i%3===1?"prod":"res",name:["Casa del Corvo","Officina del Ferro","Case dei Molini","Conceria Vecchia","Casa del Porto","Alloggi dei Carrettieri","Mercato del Sale","Casa dei Vetrai","Magazzino del Carbone","Dormitori Grigi","Casa delle Lanterne","Filanda del Ponte","Alloggi dell'Argine","Fonderia di Molo","Casa della Bruma"][i]}));
  let game=null,choice="guard",nextUnitId=1,last=performance.now(),fpsAccumulator=0,noticeTimer=0;
  const camera={zoom:1,offsetX:0,offsetY:0};
@@ -232,6 +242,7 @@
   for(let j=0;j<3;j++){let xx=x+14+j*35;ctx.fillStyle="#1a1818";ctx.fillRect(xx,y+29,16,21);ctx.fillStyle="#b78a4c";ctx.fillRect(xx+3,y+32,10,15);ctx.strokeStyle="#2a2725";ctx.strokeRect(xx+3,y+32,10,15)}
   ctx.fillStyle="#19191a";ctx.fillRect(x+w/2-10,y+h-28,20,26);
   if(b.type==="prod"){ctx.fillStyle="#36302d";ctx.fillRect(x+w-23,y-37,13,26);ctx.fillStyle="#77706d50";ctx.beginPath();ctx.ellipse(x+w-18,y-42,8,5,0,0,7);ctx.fill()}
+  if(b.type==="res")paintAsset(imageAssets.residence,x-5,y-54,w+10,h+55);
   ctx.fillStyle="#171616de";ctx.fillRect(x-7,y-53,w+14,32);
   ctx.fillStyle=col;ctx.font="bold 11px Georgia";ctx.textAlign="center";ctx.fillText((b.owner===PLAYER?"◆ ":b.owner===ENEMY?"✕ ":"◇ ")+b.name,x+w/2,y-39);
   ctx.fillStyle="#60534b";ctx.fillRect(x+3,y-29,w-6,6);
@@ -246,6 +257,7 @@
   ctx.fillStyle="#c2a185";ctx.fillRect(u.x-3,u.y-22,6,7);
   ctx.fillStyle="#202022";ctx.fillRect(u.x-7,u.y-25,14,4);ctx.fillRect(u.x-4,u.y-29,8,6);
   ctx.strokeStyle=u.type==="merc"?"#bbb7ad":"#433329";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(u.x+5,u.y-15);ctx.lineTo(u.x+11,u.y+6);ctx.stroke();
+  paintAsset(u.type==="merc"?imageAssets.mercenary:imageAssets.gendarme,u.x-13,u.y-45,26,53);
   ctx.fillStyle="#120d0d";ctx.fillRect(u.x-11,u.y-33,22,3);ctx.fillStyle="#7fa970";ctx.fillRect(u.x-11,u.y-33,22*clamp(u.hp/u.maxHp,0,1),3);
   if(u.level>1){ctx.fillStyle="#e4c88d";ctx.textAlign="center";ctx.font="10px Georgia";ctx.fillText(u.level,u.x,u.y-37)}
  }
