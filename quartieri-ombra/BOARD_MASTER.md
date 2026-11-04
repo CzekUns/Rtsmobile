@@ -47,3 +47,6 @@ L'utente ha approvato con «Ok perfetto ... questo imagegen rispecchia esattamen
 - [ ] Screenshot reali della plancia confrontati con originale ChatGPT; esiti e differenze nel WORKLOG.
 
 **Non segnare “COMPLETATO” né “PLANCIA APPROVATA” per un mockup generato o un file HTML che si apre:** la preview può essere temporaneamente una resa di riferimento, ma la plancia di gioco finale dev'essere modulare e utilizzabile. L'automazione oraria resta attiva fino ai criteri finali, salvo richiesta esplicita diversa.
+
+## Nota su ulteriori proposte ImageGen
+Dopo l'approvazione della reference originale, la conversazione può contenere altre immagini generated che mostrano espansioni o UI differenti. **Sono studi non approvati finché l'utente non li conferma espressamente**: non sostituiscono automaticamente il target identificato dal file originale `distretto_five_points_new_york_1860.png`. In particolare la miniatura caricata in `assets/references/` resta l'ancora compositiva della plancia approvata.
