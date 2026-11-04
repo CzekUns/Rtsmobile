@@ -122,3 +122,10 @@ Nota: la proiezione isometrica non deve essere confusa con la regolarità urbani
 - Aggiunto test persistente `tests/road-clearance.test.cjs`: distanza geometrica campionata ogni 2 unità fra ciascun segmento stradale e tutti i 15 footprint, comprensiva di metà larghezza strada e margine collisioni 10 unità. Eseguito lo stesso controllo dinamico V8 sulla geometria letta dalla main: **255 combinazioni strada/lotto PASS, zero interferenze, minimo margine residuo 0,66 unità**; 105 coppie di edifici senza sovrapposizioni; parsing JS PASS.
 - Commit codice `9c803021`, test `a0fc23ae`. Test Node persistente non eseguito nell'ambiente, né smoke browser desktop/Android o screenshot comparativo; nessuna casella DoD chiusa.
 - **Nota storica:** layout ancora artistico, non rilievo catastale verificato. Prossimo passo: percorribilità reale, maggiore separazione fisica nei punti stretti, allineamento dei fronti strada e confronto con Perris 1853.
+
+
+## Verifica 2026-11-04 19:00 — spawn navigabili su lotti irregolari
+- Corretto `spawn()`: ora controlla confini mappa, collisione puntuale e centro cella A* per tutti e quattro gli accessi esterni, scegliendo soltanto un ingresso libero. Se nessun accesso è disponibile lo spawn fallisce senza aggiungere unità e senza consumare ID.
+- Commit codice `0c87aed`; test permanente `tests/spawn-access.test.cjs` commit `57550f5`.
+- Verifica V8 dinamica della funzione originale estratta da `game.js`: 15 edifici × 4 rotazioni di accesso = **60/60 spawn validi** con rotta locale percorribile; parsing JavaScript PASS. La suite Node persistente non è stata eseguita; mancano ancora browser desktop/Android, test completo di connettività stradale e confronto con mappa Perris.
+- Nessun criterio Definition of Done aggiuntivo marcato: la geometria storica resta una reinterpretazione, e la scala/camera isometrica va verificata in browser reale.
