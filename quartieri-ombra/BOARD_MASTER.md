@@ -1,5 +1,11 @@
 # PLANCIA DEFINITIVA — FIVE POINTS DISTRICT, NEW YORK circa 1860
 
+## DECISIONE VINCOLANTE PIÙ RECENTE — 5 novembre 2026: macro-immagini + hitbox individuali
+
+L'utente ha scelto di **non produrre più un palazzo ImageGen isolato per ogni lotto**. Da ora la plancia segue **tre layer**: (1) scheletro/hitbox/facciate/strade vettoriali precisi di tutta la città; (2) **un artwork coerente per GRUPPO di palazzi** generato a partire da porzioni dello scheletro, con versione ravvicinata; (3) overlay cliccabili, illuminazione del singolo edificio, informazioni residenziale/attività, e distinzione lato strada / muro / tetto. Lo zoom deve arrivare molto vicino e richiede art LOD, non semplice ingrandimento PNG. Il nuovo [THREE_LAYER_MAP.md](THREE_LAYER_MAP.md) **PREVALE sulla precedente produzione di sprite individuali**, mentre la golden reference Five Points rimane invariata. Prima guida reale: `assets/guides/cross-street-block-2-skeleton.svg`. I PNG originali per macro-gruppi **non sono ancora stati generati**.
+
+
+
 ## Prima implementazione del mondo esteso — 2026-11-04
 
 **Artefatti pubblicati su main:** `board-world.js`, `board-preview.html`, `board-preview.css`, `board-preview.js`, `tests/board-world.test.cjs`. Modello mondo 2700×2100, nove settori popolati, 21 vie, 454 costruzioni su lotti separati, 212 decorazioni con sorgenti dati autonome. Visualizzazione tramite Canvas 2D e cache LRU di sprite per palazzo; controlli della camera, minimappa e UI dedicata. Il vecchio gameplay resta raggiungibile da `index.html`, con un pulsante verso l'anteprima.
