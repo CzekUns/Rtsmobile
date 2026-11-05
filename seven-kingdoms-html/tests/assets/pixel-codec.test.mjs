@@ -34,7 +34,8 @@ test('mirror is horizontal within bitmap bounds only for source-engine direction
  assert.equal(mirrorForDirection(4,8),false);
  assert.equal(mirrorForDirection(5,8),true);
  assert.equal(mirrorForDirection(7,8),true);
- assert.equal(mirrorForDirection(4,16),true);
+ assert.equal(mirrorForDirection(4,16),false);
+ assert.equal(mirrorForDirection(12,16),true);
  assert.equal(mirrorForDirection(3,24),false);
  const pal=Buffer.alloc(768);pal[12*3]=120;pal[34*3]=200;
  const bmp=decodeImportedBitmap(original([12,0xfd,34,0xf8,3]));
