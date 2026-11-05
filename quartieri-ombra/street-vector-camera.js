@@ -59,8 +59,15 @@ function render(){
  // by camera depth. This fixes the fixed-lot order bug of the earlier 255° demo.
  const drawable=[];
  for(const face of faces){
-  const p=face.pts,normal=cross(sub(p[1],p[0]),sub(p[2],p[0]));
-  if(!face.ground&&face.type!=="window"&&dot(normal,sub(eye,p[0]))<=0)continue;
+  const p=face.pts;
+  // Use real outward direction, not vertex winding (which differs across
+  // lot polygons). Hide the far facade, but never hide the roof by mistake.
+  if(face.type==="wall"||face.type==="window"){
+   const b=data.buildings[face.id],mid=p.reduce((q,v)=>plus(q,v),{x:0,y:0,z:0});
+   const outward={x:mid.x/p.length-b.x,y:mid.y/p.length-b.y,z:0};
+   const toward={x:eye.x-b.x,y:eye.y-b.y,z:0};
+   if(dot(outward,toward)<=0)continue;
+  }
   const points=p.map(project);if(points.some(x=>!x))continue;
   drawable.push({...face,points,depth:points.reduce((s,q)=>s+q.depth,0)/points.length});
  }
