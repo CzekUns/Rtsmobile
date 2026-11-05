@@ -1,3 +1,6 @@
+### 2026-11-05 20:00 — Primo fronte pilota Cross Street
+Commit `e0f7c37`: aggiunto `cross-street-kit.js` con sei sprite trasparenti prerenderizzati su Canvas offscreen, uno per i lotti 2/3/4/9/10/11, basati su vertici e altezze reali. Commit `f11192d`: integrazione nel renderer prima dei PNG isolati; `db0ab55` e `b8872b8`: import nelle due anteprime. La cucitura condivisa esistente resta attiva. Verificato parsing V8 dei due script: PASS. **Non** eseguito browser reale, screenshot o Android. Questi sono moduli rasterizzati al runtime e NON sei WebP ImageGen né cinque raccordi raster finali: la produzione del kit definitivo e il QA visivo restano P0. Nessuna modifica NPC/pathfinding/IA/economia.
+
 ### 2026-11-05 — Correzione effetto figurine: isolati continui
 L'utente ha segnalato che la prima integrazione PNG sembrava «palazzi appiccicati come figurine». È stato avviato un restyling **geometrico e di asset** anziché produrre ulteriori palazzi isolati. Non sono state modificate logiche NPC/IA/economia.
 
