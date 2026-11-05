@@ -25,6 +25,29 @@ const rasterBuildingFiles={
  workshop:["building_workshop.png"],
  stable:["building_stable.png"]
 };
+// ImageGen street surfaces are independent raster layers. Their alpha is
+// clipped to existing world-space geometry, preserving roads and hit testing.
+const surfaceFiles={mud:"terrain_mud.png",cobbles:"terrain_cobbles.png"};
+const surfaces={};
+for(const [kind,file] of Object.entries(surfaceFiles)){
+ const img=new Image();surfaces[kind]=img;
+ img.onload=()=>requestDraw();img.onerror=()=>requestDraw();
+ img.src="./assets/source/imagegen-2026-11-05/"+file;
+}
+function surfacePattern(kind){
+ const img=surfaces[kind];
+ if(!img||!img.complete||!img.naturalWidth)return null;
+ // Cached per canvas context; pattern coordinates remain in projected world space.
+ if(!img._qoPattern)img._qoPattern=ctx.createPattern(img,"repeat");
+ return img._qoPattern;
+}
+function rasterSurface(poly,kind,opacity){
+ const pattern=surfacePattern(kind);if(!pattern)return;
+ ctx.save();ctx.beginPath();ctx.moveTo(poly[0].x,poly[0].y);
+ for(let i=1;i<poly.length;i++)ctx.lineTo(poly[i].x,poly[i].y);
+ ctx.closePath();ctx.clip();ctx.globalAlpha=opacity;
+ ctx.fillStyle=pattern;ctx.fill();ctx.restore();
+}
 const rasterBuildings={};
 for(const filename of new Set(Object.values(rasterBuildingFiles).flat())){
  const sprite=new Image();
@@ -120,6 +143,7 @@ function face(roofA,roofB,footA,footB,u0,u1,v0,v1){
 function drawGround(){
  const corners=[proj(0,0),proj(world.width,0),proj(world.width,world.height),proj(0,world.height)];
  polygon(corners,"#3b342a","#211d1a",5);
+ rasterSurface(corners,"mud",.42);
  for(const q of flecks){
   const p=proj(q.x,q.y);if(!pointInViewport(p,4))continue;
   ctx.fillStyle=q.light>.63?"#5a4c3b":q.light>.35?"#2c2924":"#494032";
@@ -145,6 +169,7 @@ function drawRoads(){
    }
    polygon(roadQuad(a,b,r.width+6),"#665d4e","#4d453a");
    polygon(roadQuad(a,b,r.width-2),r.kind==="main"?"#594b3c":"#4d4235");
+   rasterSurface(roadQuad(a,b,r.width-2),"cobbles",r.kind==="main"?.56:.32);
    // Broken stone shoulders interrupt the long straight vector road edges.
    // Small world-anchored cobbles create an uneven nineteenth-century street silhouette.
    const edgeRng=seeded(320617+r.id*3079+i*613);
