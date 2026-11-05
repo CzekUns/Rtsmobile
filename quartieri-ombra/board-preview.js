@@ -170,6 +170,30 @@ function drawFace(b,roof,ground,i){
    ctx.fillStyle="#86695775";ctx.fillRect(q.x,q.y,1.3,1.1);
   }
  }
+ // Uneven masonry pilasters, string courses and a weathered cornice add
+ // recognisable 19th-century tenement massing without changing footprints.
+ const courses=seeded(b.seed*37+i*251+9);
+ for(let floor=1;floor<b.floors;floor++){
+  const v=floor/b.floors;
+  const a=lerp(ra,fa,v),z=lerp(rb,fb,v);
+  line(a,z,courses()>.5?"#9b80618a":"#30251fb0",1.4);
+  if(courses()>.55){
+   const underA=lerp(ra,fa,v+.013),underB=lerp(rb,fb,v+.013);
+   line(underA,underB,"#201c19b0",.8);
+  }
+ }
+ for(const u of [.025,.975]){
+  const top=lerp(ra,rb,u),bottom=lerp(fa,fb,u);
+  line(top,bottom,b.seed%3===0?"#9a795b":"#3b2b24",2.2);
+  for(let k=0;k<5;k++){
+   const q=lerp(top,bottom,(k+.35)/5);
+   ctx.fillStyle="#c0a17a70";ctx.fillRect(q.x-1,q.y-1,2,1);
+  }
+ }
+ // Roof-edge cornices cast a thin shadow across the upper storey.
+ const e0=lerp(ra,fa,.035),e1=lerp(rb,fb,.035);
+ line(e0,e1,"#b49b78",3);
+ line(lerp(ra,fa,.057),lerp(rb,fb,.057),"#201a17",2);
  // Weathered limewash, soot and mortar scars are clipped to the actual wall plane.
  // Different deterministic wear on each elevation avoids identical repeated facades.
  ctx.save();
