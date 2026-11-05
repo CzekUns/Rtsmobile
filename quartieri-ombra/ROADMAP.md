@@ -1,3 +1,7 @@
+### 2026-11-05 — Stenditoi sui tetti dei caseggiati
+- [x] Nuovi stenditoi originali con pali, corda incurvata e panni individuali su una parte dei tetti residenziali alti; integrati nello sprite cache di ogni edificio (`c0827073`).
+- [ ] Test automatici, screenshot reali desktop/mobile e confronto golden ancora mancanti: non dichiarare approvazione visiva.
+
 ### 2026-11-05 — Silhouette produttive differenziate
 - [x] Tetto magazzino con castelletto di sollevamento, puleggia e fune; tetto stalla con lanterna di aerazione a lamelle. Disegno originale modulare integrato nel prerender degli edifici (`ea3a9158`).
 - [x] Parsing V8 della nuova `board-preview.js` riuscito; [ ] screenshot browser/Android, confronto golden e suite Node restano da eseguire. NPC invariati.
