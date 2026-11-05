@@ -1,3 +1,9 @@
+## Esperimento SVG 3D a quota lampione (6 novembre 2026)
+
+Gli asset ImageGen e la plancia precedente sono **parcheggiati, non cancellati**. Il nuovo [laboratorio vettoriale](street-vector-lab.html) usa i lotti reali di `board-world.js` con camera prospettica a quota lampione (39 unità iniziali), rotazione a 360°, zoom, spostamento, selezione degli edifici e pulsante di prova **255°**. I palazzi e i dettagli delle facciate sono costruiti tramite geometria e SVG, non da raster. Nessun file del gioco esistente viene sostituito.
+
+Questa pagina è **sperimentale**, non un risultato artistico approvato: il backface culling e il depth sorting limitano le sovrapposizioni errate, ma il solo ordinamento SVG per profondità non garantisce ogni possibile occlusione complessa. Restano verifiche browser/mobile e qualità dei dettagli architettonici.
+
 ## Correzione geometrica V2: margine della guida SVG
 
 La guida di ImageGen `cross-street-block-2-skeleton.svg` esporta i vertici con **24 unità di margine extra** intorno a `chunk.frame`. Il primo tentativo posizionava il gruppo usando gli offset dell'SVG senza rimuovere quel margine, causando uno spostamento sistematico dell'asset. Nel nuovo `?artAudit=v2align` la posizione viene normalizzata correttamente al frame `block-2` e si applica soltanto una lieve correzione residua di prospettiva. `v2fit` resta invariata per il confronto e le hitbox del motore restano originali. È ancora una preview da approvare, non il sostituto definitivo degli edifici.

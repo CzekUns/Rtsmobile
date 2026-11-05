@@ -1,3 +1,13 @@
+### 2026-11-06 — Prototipo separato SVG 3D a quota lampione
+- [x] Pagina autonoma `street-vector-lab.html` con geometria `street-vector-geometry.js`, renderer `street-vector-lab.js` e stylesheet dedicato.
+- [x] Camera prospettica bassa, slider quota 24–120, yaw 0–360°, zoom .55–3.6, pan/touch, selezione lotti, prova diretta 255°.
+- [x] Utilizzati i veri lotti e le altezze di `board-world.js`; facciate, cornici e infissi come SVG geometrico parametrico, senza asset ImageGen.
+- [x] Asset ImageGen e plancia principale preservati. Worker orario asset messo in pausa per il confronto richiesto.
+- [x] Smoke simulato del renderer sulle viste 86° e 255°: scena generata, coordinate finite, zoom/rotazione modificano l'output; test unitari aggiunti.
+- [ ] Verifica screenshot su browser reali desktop e Android, prospettive complesse e prestazioni.
+- [ ] Raffinamento stile 1860 e soluzione occlusione robusta per tutte le angolazioni.
+- [ ] Nessuna approvazione definitiva degli SVG/pattern fino a revisione utente.
+
 ### 2026-11-05 — Correzione origine SVG del confronto V2 (causa dello scostamento)
 - [x] Confermato con `QOBoardSkeleton.create`: il chunk `block-2` ha frame reale `(-51,608,285×242)`, mentre `svgGuide` esporta `333×290`, con ulteriore padding di **24 unità per lato**.
 - [x] La versione `v2align` ora sottrae quel padding: ancoraggio `[18.5,18.5]` rispetto al frame reale (invece di `[42.5,42.5]`). Lo shear residuo è ridotto da 0.10 a 0.05. Il vecchio `v2fit` resta come confronto prima/dopo.

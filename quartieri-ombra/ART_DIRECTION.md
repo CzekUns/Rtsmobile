@@ -1,3 +1,7 @@
+## Esperimento non ancora approvato (6 novembre 2026)
+
+La reference isometrica rimane vincolante per il gioco pubblicato; su richiesta dell'utente si sperimenta in una pagina autonoma una camera a quota lampione con geometria vettoriale 3D proiettata in SVG e zoom. Validare in particolare la rotazione a 255°, le facciate e il mobile prima di valutare la sostituzione della plancia. Evitare pattern generici ripetuti; costruire dettagli architettonici deterministici per facciata.
+
 # Direzione artistica APPROVATA — Quartieri d'Ombra
 
 ## SUPREMAZIA NUOVA REFERENCE PLANCIA — 2026-11-04
