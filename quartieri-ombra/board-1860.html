@@ -8,8 +8,10 @@
 <link rel="stylesheet" href="./board-preview.css?v=20261104-b2">
 <script src="./board-world.js?v=20261105-row1" defer></script>
 <script src="./block-continuity.js?v=20261105-row1" defer></script>
+<script src="./board-skeleton.js?v=20261105-layers1" defer></script>
+<script src="./board-chunks.js?v=20261105-layers1" defer></script>
 <script src="./cross-street-kit.js?v=20261105-pilot1" defer></script>
-<script src="./board-preview.js?v=20261105-pilot1" defer></script>
+<script src="./board-preview.js?v=20261105-layers1" defer></script>
 <script>
 /* Board boot watchdog: errors are visible rather than a silent black canvas. */
 window.__qoBoardPainted=false;
@@ -31,6 +33,9 @@ window.addEventListener("load",function(){
   <div class="board-brand"><strong>QUARTIERI D'OMBRA</strong><small>FIVE POINTS · NEW YORK · 1860 · B2</small></div>
   <div class="board-state"><span>SETTORI <b>09</b></span><span>EDIFICI <b id="building-count">—</b></span><span id="sector-name">CROCEVIA DEI FIVE POINTS</span></div>
   <nav class="top-controls" aria-label="Visualizzazione">
+   <button class="board-view-toggle" id="blueprint-btn" type="button" aria-pressed="false" title="Mostra o nascondi scheletro e hitbox">SCHELETRO</button>
+   <button class="board-view-toggle" id="markers-btn" type="button" aria-pressed="true" title="Mostra segnalini residenziali e attività">SEGNALINI ●</button>
+   <button class="board-view-toggle" id="guide-btn" type="button" title="Esporta lo scheletro SVG del gruppo selezionato">GUIDA SVG</button>
    <a class="classic-link" href="./index.html" title="Gioco Alpha">ALPHA</a>
    <button type="button" id="full-btn" title="Schermo intero" aria-label="Attiva schermo intero">⛶</button>
   </nav>
@@ -57,7 +62,7 @@ window.addEventListener("load",function(){
   <div class="board-actions">
     <div class="info-tag">ESPLORA</div>
     <div class="board-hint">Trascina: sposta mappa</div>
-    <div class="board-hint">Due dita / rotella: zoom</div>
+    <div class="board-hint">Due dita / rotella: zoom ravvicinato 7,5×</div>
     <div class="board-hint">Tocca un edificio per leggerne il tipo</div>
   </div>
  </footer>
