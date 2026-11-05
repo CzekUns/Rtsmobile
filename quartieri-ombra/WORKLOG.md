@@ -224,3 +224,6 @@ Commit `ceee77bcec11945fc46d68263febe9c7bf1d5f07`: aggiunti `drawStreetAtmospher
 ### 2026-11-05 — Carri e cavalli originali (commit `4dac14cf`)
 - `board-preview.js`: sostituita la sagoma piatta dei carri con un carro a cassa isometrica, assi di legno, carico, ruote a raggi, stanghe, cavallo con finimenti e zampe. Orientamento variabile per ID, senza asset esterni e senza toccare NPC.
 - Verifica: modifica sorgente pubblicata; screenshot browser/Android e test automatici **non eseguiti** in questo turno. Rendering visivo e confronto GOLDEN ancora aperti.
+
+### 2026-11-05 — Scenografia mercato (worker)
+Commit `f90db4885619453d777356dd8c20543433ecf973`: introdotti banchi mercatali originali, tettoie e merci in Canvas, generati da botteghe selezionate e ordinati per profondità nel renderer. Nessuna modifica NPC/IA/economia. Verifica statica dei punti di integrazione effettuata; test Node, browser reale, screenshot desktop/mobile e confronto golden NON eseguiti (nessun browser di automazione disponibile in questo turno). Possibili compenetrazioni con facciate da verificare in screenshot. Stato NON approvato.
