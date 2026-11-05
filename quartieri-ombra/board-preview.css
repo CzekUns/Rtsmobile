@@ -59,3 +59,28 @@ button,a{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
 }
 @media(max-width:640px){.board-state span:last-child{display:none}.board-hud{grid-template-columns:30% minmax(0,1fr)}.board-actions{display:none}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+
+/* Visual blueprint, marker and guide tools for multi-lot 2D chunks. */
+.top-controls{flex-shrink:0}
+.top-controls .board-view-toggle{
+ height:32px;padding:0 7px;flex:0 0 auto;min-width:0;
+ border:2px outset #82623f;border-radius:2px;
+ background:linear-gradient(#433428,#201912);
+ color:#e3c18c;font:bold clamp(8px,.72vw,11px) Georgia,serif;
+ letter-spacing:.025em;white-space:nowrap;
+ box-shadow:inset 0 1px #a98a59;
+}
+.top-controls .board-view-toggle[aria-pressed="true"]{
+ background:linear-gradient(#5c4730,#33251a);
+ border-color:#c39752;color:#ffe0a1;
+}
+@media(orientation:landscape) and (max-height:510px){
+ .top-controls .board-view-toggle{height:28px;padding:0 5px;font-size:8px}
+ .top-controls{gap:3px}
+}
+@media(max-width:740px){
+ .board-state span:first-child,.board-state span:nth-child(2){display:none}
+ .top-controls .board-view-toggle{padding:0 4px;font-size:8px}
+ .board-brand strong{font-size:11px}
+}
