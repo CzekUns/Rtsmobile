@@ -46,8 +46,8 @@ const mini=$("board-minimap"),mc=mini.getContext("2d");
 const stage=$("board-stage");
 const worldCenter=proj(world.hub.x,world.hub.y);
 const camera={x:worldCenter.x,y:worldCenter.y,zoom:1.15};
-const artAudit=/(?:^|[?&])artAudit=(1|fixed|study|draft|clean)(?:&|$)/.exec(window.location?.search||"");
-const auditGuides=!!artAudit&&artAudit[1]!=="clean";
+const artAudit=/(?:^|[?&])artAudit=(1|fixed|study|draft|clean|v2|v2fit|v2clip|v2clean)(?:&|$)/.exec(window.location?.search||"");
+const auditGuides=!!artAudit&&!["clean","v2clean"].includes(artAudit[1]);
 const imageNames={barrel:"barrel.svg",crate:"crate.svg",streetLamp:"street_lamp.svg",lantern:"lantern.svg",woodenFence:"wooden_fence.svg"};
 const images={};
 // First raster integration pass: original ImageGen sources are immutable.
@@ -1021,7 +1021,7 @@ function scene(){
    // its perspective cannot be repaired merely by cutting it into geometry
    // masks. Runtime and the geometry-locked SVG still use per-lot depth masks.
    ...artworkChunks.flatMap(c=>
-    artAudit&&["1","draft","clean"].includes(artAudit[1])&&c.id==="block-2"
+    artAudit&&["1","draft","clean","v2","v2fit","v2clean"].includes(artAudit[1])&&c.id==="block-2"
     ?[{kind:"chunk-audit",obj:c,depth:Math.max(...c.lotIds.map(id=>selectionOverlay.depth(skeleton.byId.get(id))))}]
     :c.lotIds.map(id=>{
       const lot=skeleton.byId.get(id);
@@ -1259,21 +1259,34 @@ if(artAudit&&chunkArt){
   camera.x=candidate.frame.left+candidate.frame.width/2;
   camera.y=candidate.frame.top+candidate.frame.height/2;
   camera.zoom=1.65;
-  // Preserve the original shared ART screenshot at its original audit URL.
-  // The geometry-correct SVG remains a separate comparison, never a silent
-  // replacement for the asset the user was inspecting.
-  const study=["study","fixed"].includes(artAudit[1]);
-  chunkArt.register(candidate.id,{src:study
-    ?"./assets/guides/cross-street-block-2-geometry-locked-art-study.svg"
-    :"./assets/runtime/chunks/block-2-draft-audit.webp"},requestDraw);
+  const mode=artAudit[1],study=["study","fixed"].includes(mode);
+  const v2=["v2","v2fit","v2clip","v2clean"].includes(mode);
+  if(v2){
+   // Unmodified original ImageGen preserved as a source. The 16-alpha
+   // bounding box and target come from the real six-lot guide (333x290).
+   // No claim of perfect registration: compare contain vs fitted/volume clip.
+   chunkArt.register(candidate.id,{
+    src:"./assets/source/imagegen-2026-11-05/group_tenements_v2_corrected.png",
+    sourceRect:[144,68,1006,1016],
+    targetRect:[42.5,42.5,248.25,205.75],
+    mappingMode:mode==="v2"?"contain":"stretch"
+   },requestDraw);
+  }else{
+   chunkArt.register(candidate.id,{src:study
+     ?"./assets/guides/cross-street-block-2-geometry-locked-art-study.svg"
+     :"./assets/runtime/chunks/block-2-draft-audit.webp"},requestDraw);
+  }
   markersVisible=false;
   $("markers-btn").setAttribute("aria-pressed","false");
   $("markers-btn").textContent="SEGNALINI ○";
-  $("board-toast").textContent=study
-    ?"STUDIO GEOMETRICO SVG — confronto per singolo palazzo; non è l'asset grafico finale"
-    :artAudit[1]==="clean"
-    ?"ASSET IMAGEGEN ORIGINALE — vista completa senza contorni; ancora disallineato"
-    :"ASSET IMAGEGEN RIPRISTINATO — prova raster originale con hitbox, allineamento ancora da correggere";
+  $("board-toast").textContent=v2
+    ?mode==="v2"?"NUOVO IMAGEGEN — PROPORZIONI CONSERVATE: confronta con hitbox ciano"
+    :mode==="v2clip"?"NUOVO IMAGEGEN — RITAGLIO PER LOTTO: controllo dei bordi visivi"
+    :mode==="v2clean"?"NUOVO IMAGEGEN — INCASTRO GEOMETRICO SENZA CONTORNI"
+    :"NUOVO IMAGEGEN — INCASTRO GEOMETRICO: confronta i confini ciano"
+    :study?"STUDIO GEOMETRICO SVG — confronto per singolo palazzo; non è l'asset grafico finale"
+    :mode==="clean"?"ASSET IMAGEGEN ORIGINALE — vista completa senza contorni; ancora disallineato"
+    :"ASSET IMAGEGEN PRECEDENTE — confronto con hitbox, ancora disallineato";
  }
 }
 fit();
