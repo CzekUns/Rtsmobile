@@ -245,3 +245,6 @@ Commit `d5f9b7e`: aggiunta in `board-preview.js` una fascia di ciottoli e spigol
 
 ### 2026-11-05 — Asset restyling iteration
 Commit `108a1175`: normalized six ImageGen building sprites at runtime by scanning alpha bounds once per image and anchoring cropped silhouettes at the ground, with a separate contact shadow. Sources untouched, fallback retained, no NPC changes. GitHub code write confirmed; browser screenshot, Android and Node tests NOT executed. Next: real render comparison and WebP production.
+
+### 2026-11-05 — passata raster su suolo e strade
+Commit `f7de871c`: `board-preview.js` carica `terrain_mud.png` e `terrain_cobbles.png` come texture raster, applica pattern con clipping sui poligoni della plancia e delle carreggiate. Fallback vettoriale preservato se caricamento fallisce. Nessun file gameplay modificato. **Non eseguiti** screenshot browser/Android né suite Node in questa esecuzione; resta da verificare continuità e prestazioni, e da convertire in WebP runtime.
