@@ -551,6 +551,38 @@ function drawProp(p){
   ctx.fillStyle="#e7b36a55";ellipse(q.x,gy,4,3,"#dfb36e70");
  }
 }
+// Distinct street-market canopies are scenery only. They are projected from
+// individual shop lots and baked neither into the ground nor into gameplay.
+const marketStalls=world.buildings.filter(b=>b.shopfront&&b.seed%4===0).map(b=>{
+ const p=b.poly,front=p.reduce((best,q)=>proj(q.x,q.y).y>proj(best.x,best.y).y?q:best,p[0]);
+ return {x:front.x+8,y:front.y+8,seed:b.seed};
+});
+function drawMarketStall(stall){
+ const q=proj(stall.x,stall.y);
+ if(!pointInViewport(q,70))return;
+ const dark="#29211b",cloth=stall.seed%3===0?"#725342":"#9a805e";
+ ellipse(q.x,q.y+2,22,5,"#18151191");
+ // Four legs and an open timber counter make the canopy read as a separate
+ // street object at RTS scale, not as a decal glued to a building facade.
+ for(const dx of[-15,15]){
+  line({x:q.x+dx,y:q.y-24},{x:q.x+dx,y:q.y+2},"#5e4430",1.8);
+ }
+ polygon([{x:q.x-18,y:q.y-9},{x:q.x+15,y:q.y-9},
+  {x:q.x+19,y:q.y-5},{x:q.x-15,y:q.y-5}],"#705036",dark,.9);
+ for(let i=0;i<5;i++){
+  const x=q.x-13+i*7;
+  ellipse(x,q.y-10,2.4,1.6,i%2?"#8e7046":"#514a2d");
+ }
+ polygon([{x:q.x-23,y:q.y-26},{x:q.x+5,y:q.y-36},
+  {x:q.x+25,y:q.y-27},{x:q.x-3,y:q.y-17}],cloth,dark,1);
+ polygon([{x:q.x-23,y:q.y-26},{x:q.x-3,y:q.y-17},
+  {x:q.x-3,y:q.y-12},{x:q.x-23,y:q.y-21}],"#584435",dark,.8);
+ for(let i=0;i<5;i++){
+  const x=q.x-20+i*5;
+  line({x,y:q.y-24+i*.6},{x:x+3,y:q.y-18+i*.6},
+   i%2?"#c0a27c":"#5a3d32",2.1);
+ }
+}
 // Street lighting is a separate world-space atmosphere pass, not part of building sprites.
 // Fixed coordinates prevent halos drifting when the camera pans or zooms.
 const lightSources=world.props.filter(p=>p.type==="streetLamp"||p.type==="lantern");
@@ -636,9 +668,10 @@ function scene(){
  const layers=[
   ...world.buildings.map(b=>({kind:"building",obj:b,
    depth:Math.max(...b.poly.map(p=>proj(p.x,p.y).y))})),
-  ...world.props.map(p=>({kind:"prop",obj:p,depth:proj(p.x,p.y).y}))
+  ...world.props.map(p=>({kind:"prop",obj:p,depth:proj(p.x,p.y).y})),
+  ...marketStalls.map(p=>({kind:"stall",obj:p,depth:proj(p.x,p.y).y}))
  ].sort((a,b)=>a.depth-b.depth||a.obj.id-b.obj.id);
- for(const layer of layers){if(layer.kind==="building")drawBuilding(layer.obj);else drawProp(layer.obj)}
+ for(const layer of layers){if(layer.kind==="building")drawBuilding(layer.obj);else if(layer.kind==="stall")drawMarketStall(layer.obj);else drawProp(layer.obj)}
  drawStreetAtmosphere();drawDistrictHaze();
  ctx.restore();
  const position=unproj(camera.x,camera.y),region=model.sector(position);
