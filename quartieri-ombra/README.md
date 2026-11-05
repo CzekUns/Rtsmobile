@@ -1,3 +1,9 @@
+## ImageGen: input vincolato alla vera geometria (2026-11-05)
+
+Lo screenshot con linee azzurre sovrapposte a una bozza NON è una reference affidabile: l'asset nasce con angolo e fronti diversi. Prima di rigenerare il blocco Cross Street, **allegare materialmente a ImageGen** la [reference dei sei volumi](assets/guides/cross-street-block-2-imagegen-input.svg) (1332×1160, trasparente), e mantenere separata la [maschera alpha deterministica](assets/guides/cross-street-block-2-alpha-master.svg). Il motore decide ingombri, tetti, pareti, hitbox e strade; ImageGen si occupa solo dei materiali e dei dettagli. Procedura esatta: [workflow ImageGen](assets/guides/CROSS_STREET_IMAGEGEN_WORKFLOW.md).
+
+Questa è una guida di produzione, **non** un nuovo asset art approvato. Nessun cambio al `chunk-index.json` finché non passa il confronto in browser.
+
 # Quartieri d'Ombra — RTS di controllo territoriale
 
 ## Ripristino asset Cross Street nel test (?artAudit=1)
