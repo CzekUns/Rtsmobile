@@ -482,7 +482,7 @@ function drawBuilding(b){
 function drawCart(p){
  // Independent period wagon sprite: angled wooden bed, raised sides, spoke wheels,
  // harness and a compact draught horse. All details stay in projected world space.
- const c=proj(p.x,p.y),flip=p.id%2?-1:1;
+ const c=proj(p.x,p.y),flip=(p.seed%2)?-1:1;
  ctx.save();ctx.translate(c.x,c.y);ctx.scale(flip,1);
  ellipse(5,4,39,8,"#100f0d99");
  // Cart chassis and plank bed in an isometric 2:1 silhouette.
@@ -566,6 +566,19 @@ function drawMarketStall(stall){
  if(!pointInViewport(q,70))return;
  const dark="#29211b",cloth=stall.seed%3===0?"#725342":"#9a805e";
  ellipse(q.x,q.y+2,22,5,"#18151191");
+ // A hanging trade sign and striped canvas valance add street-level identity.
+ // They belong to this individual stall and do not affect building footprints.
+ const signX=q.x+17,signY=q.y-35;
+ line({x:signX-3,y:signY-4},{x:signX+4,y:signY-4},"#b69a73",1);
+ line({x:signX+4,y:signY-4},{x:signX+4,y:signY+1},"#b69a73",.8);
+ polygon([{x:signX-3,y:signY},{x:signX+10,y:signY-2},
+  {x:signX+10,y:signY+6},{x:signX-3,y:signY+8}],
+  stall.seed%2?"#60402d":"#3d4b45","#c4a67a",.8);
+ const emblem=stall.seed%3;
+ if(emblem===0)ellipse(signX+3,signY+3,2.4,1.4,"#d7ba81");
+ else if(emblem===1)line({x:signX+1,y:signY+4},{x:signX+7,y:signY+2},"#d7ba81",1.2);
+ else polygon([{x:signX+1,y:signY+1},{x:signX+6,y:signY},
+  {x:signX+4,y:signY+5}],"#d7ba81");
  // Four legs and an open timber counter make the canopy read as a separate
  // street object at RTS scale, not as a decal glued to a building facade.
  for(const dx of[-15,15]){
