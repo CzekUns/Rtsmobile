@@ -273,3 +273,5 @@ Nota: la proiezione isometrica non deve essere confusa con la regolarità urbani
 ### Aggiornamento plancia 2026-11-05
 - [x] Carri con sagoma isometrica dettagliata, cavallo e finimenti originali nel renderer (`4dac14cf`).
 - [ ] Collaudo browser reale desktop/mobile landscape, screenshot e confronto GOLDEN; non dichiarare approvata la plancia.
+
+- 2026-11-05: plancia, nuovi banchi di mercato con tettoie e merci come layer depth-sorted indipendente (commit f90db488). Verifica visiva browser/mobile e confronto GOLDEN ancora NON eseguiti; non segnare alpha approvata.
