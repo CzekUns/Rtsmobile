@@ -12,6 +12,30 @@ const rowLayout=window.QOBlockContinuity
 const skeleton=window.QOBoardSkeleton&&window.QOBoardSkeleton.create(world,proj,rowLayout,unproj);
 if(!skeleton)throw new Error("board-skeleton.js is required before board-preview.js");
 const chunkArt=window.QOChunkArt;
+// This index is an explicit, auditable bridge from newly uploaded ImageGen
+// group illustrations to the fixed logical lot geometry. Null slots load nothing.
+function loadVerifiedChunks(){
+ if(!chunkArt||typeof fetch!=="function")return;
+ fetch("./assets/chunk-index.json?v=20261105-skeleton2",{cache:"no-store"})
+  .then(response=>response.ok?response.json():null)
+  .then(payload=>{
+   if(!payload||!Array.isArray(payload.chunks))return;
+   const byId=new Map(skeleton.chunks.map(c=>[c.id,c]));
+   const validPath=path=>typeof path==="string"&&
+    path.startsWith("./assets/runtime/chunks/")&&path.endsWith(".webp")&&!path.includes("..");
+   for(const entry of payload.chunks){
+    const c=byId.get(entry.id),art=entry.art;
+    if(!c||!art||!Array.isArray(entry.lot_ids)||
+       entry.lot_ids.length!==c.lotIds.length||
+       entry.lot_ids.some((id,i)=>id!==c.lotIds[i]))continue;
+    const src=validPath(art.base)?art.base:null;
+    const detail=validPath(art.detail)?art.detail:null;
+    const ultra=validPath(art.ultra)?art.ultra:null;
+    if(src||detail||ultra)chunkArt.register(c.id,{src,detail,ultra},requestDraw);
+   }
+  }).catch(()=>{/* An unfilled/unavailable index preserves vector fallback. */});
+}
+loadVerifiedChunks();
 let blueprintMode=false,markersVisible=true,selectedStreet=null,selectedSide="roof";
 
 const $=id=>document.getElementById(id);
