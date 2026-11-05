@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="it"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1b1916">
+<title>Quartieri d'Ombra — laboratorio SVG 3D</title>
+<link rel="stylesheet" href="./street-vector-lab.css?v=1">
+<script src="./board-world.js?v=20261105-row1" defer></script>
+<script src="./street-vector-geometry.js?v=1" defer></script>
+<script src="./street-vector-lab.js?v=1" defer></script>
+</head><body><div id="shell">
+<header>
+ <div class="brand"><b>QUARTIERI D'OMBRA</b><small>NEW YORK · 1860 · LABORATORIO SVG 3D</small></div>
+ <div class="status"><span id="camera-mode">CAMERA A QUOTA LAMPIONE</span><span>GEOMETRIA <strong>LIVE</strong></span><a href="./board-preview.html">PLANCIA CLASSICA</a></div>
+</header>
+<div id="layout">
+ <div id="stage">
+  <svg id="street-scene" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Strada Five Points con telecamera vettoriale 3D rotabile" preserveAspectRatio="xMidYMid slice">
+   <rect width="100%" height="100%" fill="#302b26"/>
+   <text x="50%" y="50%" text-anchor="middle" fill="#c7a47c" font-size="18">Caricamento dei lotti reali…</text>
+  </svg>
+  <div class="location"><b>FIVE POINTS · CROSS STREET</b><small>Prova SVG con camera bassa · non è il gameplay finale</small></div>
+  <div class="mini-pad" aria-label="Muovi la camera">
+   <button class="up" data-pan="forward" aria-label="Avanti">↑</button>
+   <button class="left" data-pan="left" aria-label="Sinistra">←</button>
+   <button class="right" data-pan="right" aria-label="Destra">→</button>
+   <button class="down" data-pan="back" aria-label="Indietro">↓</button>
+  </div>
+  <div id="stats">LOTTO <span id="stat-parcels">—</span> · VICINI <span id="stat-near">—</span> · FACCE <span id="stat-faces">—</span></div>
+ </div>
+ <aside>
+  <h2>VISUALE STRADALE</h2>
+  <p class="intro">Camera quasi in terza persona, a quota lampione. Le pareti e le finestre vengono proiettate dai lotti del gioco quando ruoti.</p>
+  <div class="selection"><strong id="selected-title">Seleziona un edificio</strong><small id="selected-sub">Tocca una facciata</small></div>
+  <section>
+   <div class="control">
+    <div class="head"><label for="yaw-control">ROTAZIONE</label><output id="yaw-val">86°</output></div>
+    <input id="yaw-control" type="range" min="0" max="360" step="1" value="86">
+    <div class="quick"><button data-yaw="45">45°</button><button data-yaw="135">135°</button><button data-yaw="255">255°</button><button data-yaw="315">315°</button></div>
+   </div>
+   <div class="control">
+    <div class="head"><label for="height-control">ALTEZZA</label><output id="eye-val">39 u</output></div>
+    <input id="height-control" type="range" min="24" max="120" step="1" value="39">
+   </div>
+   <div class="control">
+    <div class="head"><label for="zoom-control">ZOOM</label><output id="zoom-val">1.00×</output></div>
+    <input id="zoom-control" type="range" min=".55" max="3.6" step=".05" value="1">
+   </div>
+  </section>
+  <section>
+   <div class="buttons"><button id="cam-street">LAMPIONE</button><button id="cam-top">RIALZATA</button></div>
+   <div class="buttons"><button id="btn-wire" aria-pressed="false">SAGOME</button><button id="cam-reset">RESET</button></div>
+  </section>
+  <section>
+   <h2>COMANDI</h2>
+   <p class="note"><kbd>Trascina</kbd> per ruotare, <kbd>rotella</kbd> o due dita per lo zoom, <kbd>Shift+trascina</kbd> per spostarti. <kbd>W A S D</kbd> per percorrere le strade, <kbd>Q E</kbd> per ruotare di 15°. Prova il pulsante <b>255°</b>.</p>
+  </section>
+  <section><p class="note">Nessun ImageGen: modelli vettoriali derivati dalle impronte reali, con facciate generative e ordinamento per profondità. I vecchi asset e la plancia esistente restano intatti. Grafica sperimentale, da perfezionare.</p></section>
+ </aside>
+</div>
+<footer><span>SVG 3D · CAMERA BASSA · ZERO PNG</span><span>LABORATORIO SEPARATO · NON È ANCORA LA NUOVA PLANCIA</span></footer>
+</div></body></html>
