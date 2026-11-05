@@ -1,3 +1,7 @@
+### 2026-11-05 — Cornicioni e marcapiani originali
+- [x] Facciate della preview arricchite con lesene laterali, marcapiani irregolari, ombre sotto cornice e giunti di pietra (`d4c18b10`), senza alterare lotti o gameplay.
+- [ ] Collaudo browser e screenshot golden ancora necessari; non dichiarare approvata la plancia.
+
 ### 2026-11-05 — Usura delle facciate
 - [x] Inseriti intonaci scrostati, macchie di fuliggine e sporco alla base dei muri, ritagliati sulle facciate e variati per edificio (`5514e872`).
 - [ ] Screenshot della build reale e confronto con golden reference ancora mancanti; nessuna approvazione visiva.
