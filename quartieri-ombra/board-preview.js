@@ -168,6 +168,13 @@ function drawFace(b,roof,ground,i){
     const u=.06+j*.12;
     polygon(face(ra,rb,fa,fb,u,u+.055,v0-.12,v0+.06),j%2?"#ac8a67":"#584235");
    }
+   // Projecting signs and a timber shop cornice distinguish commercial streets.
+   const sign=face(ra,rb,fa,fb,.25,.73,v0-.20,v0-.105);
+   polygon(sign,"#33251d","#b18a57",.9);
+   const signMid=lerp(sign[0],sign[2],.5);
+   ctx.fillStyle="#d9b989";ctx.fillRect(signMid.x-4,signMid.y-1,8,1);
+   const cornice=face(ra,rb,fa,fb,.04,.96,v0-.23,v0-.205);
+   polygon(cornice,"#a1845e");
    continue;
   }
   for(let c=0;c<n;c++){
@@ -183,6 +190,15 @@ function drawFace(b,roof,ground,i){
    line(crossA,crossB,"#30251f",.9);
    const middle=(v0+v1)/2;
    line(lerp(ra,fa,middle+(c*.0001)),lerp(rb,fb,middle),"#40342d",.55);
+   // Stone lintels, narrow sills and occasional wrought-iron balcony rails.
+   const sill=face(ra,rb,fa,fb,u-span*1.12,u+span*1.12,v1+.028,v1+.052);
+   polygon(sill,"#a08b70","#42372c",.35);
+   if(floor>0&&(b.seed+floor+c+i)%9===0){
+    const railA=lerp(ra,fa,v1+.065),railB=lerp(rb,fb,v1+.065);
+    const q1=lerp(railA,railB,u-span*1.2),q2=lerp(railA,railB,u+span*1.2);
+    line(q1,q2,"#211f1c",1.1);
+    for(let t=0;t<=4;t++){const q=lerp(q1,q2,t/4);line(q,{x:q.x,y:q.y-4},"#29241f",.7)}
+   }
   }
  }
  if(!b.shopfront){
