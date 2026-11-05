@@ -1,3 +1,7 @@
+### 2026-11-05 — Correzione collocazione banchi di mercato
+- [x] I banchi mercatali della preview ora sono ancorati alle porte rivolte verso strada, con offset esterno, invece che a un angolo arbitrario del lotto (commit `be52cb08`). Questo riduce il rischio di tettoie incastrate negli edifici.
+- [ ] Screenshot browser desktop/Android, verifica collisioni visuali e confronto golden ancora da effettuare. Nessuna approvazione visiva; gameplay congelato.
+
 ### 2026-11-05 — Scale antincendio sulle facciate
 - [x] Inserite passerelle e scale esterne in ferro su un sottoinsieme deterministico di caseggiati alti, con geometria agganciata alla parete (`e223ab3a`).
 - [ ] Rendering browser, suite Node e confronto visivo golden non verificati in questa iterazione: rete locale DNS indisponibile. Non considerare approvata la plancia.
