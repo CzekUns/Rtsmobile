@@ -38,6 +38,23 @@ const QOChunkArt=(function(){
   // Pixel placement equals the SVG blueprint's padded viewport exactly.
   // The image itself must have a transparent exterior and use that same viewBox.
   const f=chunk.frame,pad=24;
+  // Candidate-only explicit image->chunk mapping. Its source crop was measured
+  // from ImageGen alpha; the target is measured from the authoritative SVG.
+  // This makes visual mismatch testable WITHOUT modifying a single hitbox.
+  // Production chunks keep their existing viewBox contract.
+  const src=entry.source.sourceRect,dst=entry.source.targetRect;
+  if(Array.isArray(src)&&src.length===4&&Array.isArray(dst)&&dst.length===4){
+   const [sx,sy,sw,sh]=src,[dx,dy,dw,dh]=dst;
+   if(![...src,...dst].every(Number.isFinite)||sw<=0||sh<=0||dw<=0||dh<=0)return false;
+   let ox=f.left+dx,oy=f.top+dy,ow=dw,oh=dh;
+   if(entry.source.mappingMode==="contain"){
+    const ratio=Math.min(dw/sw,dh/sh);
+    ow=sw*ratio;oh=sh*ratio;
+    ox+=(dw-ow)/2;oy+=(dh-oh)/2;
+   }
+   ctx.drawImage(image,sx,sy,sw,sh,ox,oy,ow,oh);
+   return true;
+  }
   if(entry.source.src?.endsWith("cross-street-block-2-geometry-locked-art-study.svg")){
    // The study SVG uses the *unpadded* 333×290 authoritative chunk viewBox.
    // Applying the raster draft padding would visibly misregister every roof.
