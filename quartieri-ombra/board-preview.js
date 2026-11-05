@@ -170,6 +170,22 @@ function drawFace(b,roof,ground,i){
    ctx.fillStyle="#86695775";ctx.fillRect(q.x,q.y,1.3,1.1);
   }
  }
+ // Weathered limewash, soot and mortar scars are clipped to the actual wall plane.
+ // Different deterministic wear on each elevation avoids identical repeated facades.
+ ctx.save();
+ ctx.beginPath();ctx.moveTo(fa.x,fa.y);ctx.lineTo(fb.x,fb.y);
+ ctx.lineTo(rb.x,rb.y);ctx.lineTo(ra.x,ra.y);ctx.closePath();ctx.clip();
+ const wear=seeded(b.seed*13+i*1907+71);
+ for(let patch=0;patch<12+b.floors*3;patch++){
+  const u=.05+wear()*.9,v=.07+wear()*.86;
+  const q=lerp(lerp(ra,rb,u),lerp(fa,fb,u),v);
+  const w=1.2+wear()*6,h=.6+wear()*3;
+  ctx.fillStyle=wear()>.55?"#b49a7760":"#1c1b196b";
+  ctx.fillRect(q.x-w/2,q.y-h/2,w,h);
+ }
+ // Ground-level grime follows the lower masonry, never the roof.
+ polygon(face(ra,rb,fa,fb,0,1,.87,1),"#201e1a3d");
+ ctx.restore();
  const n=Math.max(1,Math.min(5,Math.floor(b.w/15)));
  for(let floor=0;floor<b.floors;floor++){
   const v0=(floor+.20)/b.floors,v1=(floor+.63)/b.floors;
