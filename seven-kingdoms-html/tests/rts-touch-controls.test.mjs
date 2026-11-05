@@ -98,3 +98,20 @@ test('mobile controls are wired to original HTML HUD without adding permanent ri
  assert.ok(sidebar.includes('id="selectionActions"'));
  assert.ok(!sidebar.includes('id="reportBody"'));
 });
+
+test('joystick and MOD share the left edge with vertical spacing and no right-side overlay',()=>{
+ const html=source('index.html'),css=source('style.css');
+ assert.ok(html.includes('style.css?v=5'));
+ const joy=css.split('#touchJoystick{')[1]?.split('}')[0];
+ const mod=css.slice(css.lastIndexOf('#touchModifier{')).split('{')[1]?.split('}')[0];
+ assert.ok(joy&&mod);
+ assert.ok(joy.includes('left:max(8px,env(safe-area-inset-left))'));
+ assert.ok(joy.includes('bottom:max(15px,env(safe-area-inset-bottom))'));
+ assert.ok(mod.includes('left:max(24px,calc(env(safe-area-inset-left) + 16px))'));
+ assert.ok(mod.includes('right:auto'));
+ assert.ok(mod.includes('bottom:calc(max(15px,env(safe-area-inset-bottom)) + 114px)'));
+ // The 100px joystick and 62px MOD have a 14px vertical gap.
+ assert.ok(joy.includes('width:100px;height:100px'));
+ assert.ok(mod.includes('height:62px'));
+ assert.ok(!mod.includes('top:50%'));
+});

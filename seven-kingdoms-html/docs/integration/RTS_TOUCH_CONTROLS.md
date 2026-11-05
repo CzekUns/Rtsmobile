@@ -24,7 +24,7 @@ This module is reusable **without copying Seven Kingdoms gameplay code**. It is 
 | Mouse left-drag / right-drag | Box selection / camera pan | same control grammar |
 | Mouse right-click | Order selected unit or group | same dispatch path |
 
-The joystick and MOD button are **outside** the scaled 800×600 HUD, at viewport edges. They are hidden for fine-pointer desktop environments and for portrait mode.
+The joystick and MOD button are **outside** the scaled 800×600 HUD, stacked on the **lower-left** edge (MOD above joystick), leaving the right side of the map free for selection and orders. They are hidden for fine-pointer desktop environments and for portrait mode.
 
 ## Host app integration
 For another RTS such as Ver Sacrum or Quartieri d'Ombra, import the pure helpers and independently implement:
