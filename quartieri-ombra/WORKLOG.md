@@ -1,3 +1,6 @@
+### 2026-11-05 10:00 — Iterazione visiva: stenditoi
+Commit `c0827073`: aggiunti stenditoi sui tetti residenziali alti, con geometrie e colori deterministici per edificio; nessuna modifica a NPC/pathfinding/economia. Verifica: scrittura GitHub riuscita; nessun browser screenshot né test Node eseguito in questa esecuzione. Necessari controllo visivo e confronto con golden reference.
+
 ### 2026-11-05 — Differenziazione silhouette magazzini e stalle
 Commit `ea3a9158a43a62f4fe0c6840bcf37f45121e9e85`: aggiornato `board-preview.js` con castelletto, puleggia, fune per magazzini e lanterna ventilata sul colmo delle stalle; componenti disegnati nel roof pass e memorizzati negli sprite prerenderizzati. Parsing del sorgente completo con `new Function` in V8: PASS (33.440 caratteri). Tentativo di clone GitHub nell'ambiente locale bloccato da DNS (`Could not resolve host: github.com`), quindi nessuna suite Node o screenshot reale; non certificare qualità visiva. Solo plancia, nessuna logica NPC/IA/economia toccata.
 
