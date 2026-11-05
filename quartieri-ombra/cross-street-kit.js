@@ -12,9 +12,9 @@ function make(b,project){
  const pts=[...ground,...roof];
  const minX=Math.floor(Math.min(...pts.map(p=>p.x))-8),minY=Math.floor(Math.min(...pts.map(p=>p.y))-13);
  const maxX=Math.ceil(Math.max(...pts.map(p=>p.x))+8),maxY=Math.ceil(Math.max(...pts.map(p=>p.y))+8);
- // 4x source-density sprite survives close street-level zoom, without
+ // 8x source-density pilot survives maximal 7.5x street-level zoom, without
  // stretching the projected geometry or asking the GPU to invent missing pixels.
- const density=4,worldWidth=maxX-minX,worldHeight=maxY-minY;
+ const density=8,worldWidth=maxX-minX,worldHeight=maxY-minY;
  const c=document.createElement("canvas");c.width=worldWidth*density;c.height=worldHeight*density;
  const g=c.getContext("2d");g.setTransform(density,0,0,density,-minX*density,-minY*density);
  const pick=(a,b,t)=>({x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t});
