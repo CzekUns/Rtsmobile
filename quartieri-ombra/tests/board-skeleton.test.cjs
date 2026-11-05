@@ -68,7 +68,7 @@ test("real board pages and runtime expose blueprint, markers and close zoom",()=
  const files=["board-preview.html","board-1860.html"];
  for(const file of files){
   const html=fs.readFileSync(path.join(root,file),"utf8");
-  for(const required of ["board-world.js","block-continuity.js","board-skeleton.js","board-chunks.js","board-preview.js","blueprint-btn","markers-btn","guide-btn"])
+  for(const required of ["board-world.js","block-continuity.js","board-skeleton.js","board-chunks.js","board-selection-overlay.js","board-preview.js","blueprint-btn","markers-btn","guide-btn"])
    assert(html.includes(required),file+": missing "+required);
   assert(html.indexOf("board-skeleton.js")<html.indexOf("board-preview.js"));
  }
@@ -77,6 +77,13 @@ test("real board pages and runtime expose blueprint, markers and close zoom",()=
  assert(js.includes("highlightSelected()"));
  assert(js.includes("QOBoardSkeleton.pick(skeleton"));
  assert(js.includes("skeleton.chunks.filter"));
+ assert(js.includes('kind:"chunk-lot"'));
+ assert(js.includes("selectionOverlay.clipLot(ctx,layer.lot)"));
+ assert(js.includes("selectionOverlay.clipVisible(ctx,skeleton,lot)"));
+ assert(js.includes('const study=["study","fixed"].includes'));
+ assert(js.includes('kind:"chunk-audit"'),"raster audit should show full grouped image");
+ assert(js.includes('else if(layer.kind==="chunk-audit")chunkArt.draw'));
+ assert(js.includes('./assets/runtime/chunks/block-2-draft-audit.webp'));
  assert(js.includes("blueprintMode"));
  assert(js.includes("ctx.drawImage(pilot.tile,pilot.left,pilot.top,pilot.width,pilot.height)"));
  new Function(js);
