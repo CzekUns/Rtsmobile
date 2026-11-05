@@ -512,12 +512,45 @@ function drawDistrictHaze(){
  }
  ctx.restore();
 }
+// Original district-scale drainage details: broken curb stones and iron grates.
+// Drawn in world space; no gameplay collision or navigation changes.
+function drawStreetDrainage(){
+ for(const road of world.roads){
+  const rng=seeded(970031+road.id*1607);
+  for(let i=1;i<road.points.length;i++){
+   const a=road.points[i-1],b=road.points[i],dx=b.x-a.x,dy=b.y-a.y;
+   const len=Math.hypot(dx,dy)||1,nx=-dy/len,ny=dx/len;
+   const count=Math.floor(len/90);
+   for(let j=0;j<count;j++){
+    const t=(j+.25+rng()*.5)/count,side=(rng()>.5?1:-1)*(road.width*.46);
+    const q=proj(a.x+dx*t+nx*side,a.y+dy*t+ny*side);
+    if(!pointInViewport(q,18))continue;
+    // Drainage frame, dark opening, three slotted iron bars.
+    ctx.save();ctx.translate(q.x,q.y);
+    ctx.rotate(Math.atan2(dy-dx,dx+dy)*.22);
+    ctx.fillStyle="#9a866a";ctx.fillRect(-6,-3,12,6);
+    ctx.fillStyle="#211f1c";ctx.fillRect(-5,-2,10,4);
+    ctx.strokeStyle="#746750";ctx.lineWidth=.8;
+    for(let k=-3;k<=3;k+=3){ctx.beginPath();ctx.moveTo(k,-1.8);ctx.lineTo(k,1.8);ctx.stroke()}
+    ctx.restore();
+    // Broken kerb stones interrupt the otherwise smooth roadside edge.
+    for(let k=0;k<3;k++){
+     const off=(k-1)*10,edge=proj(a.x+dx*t+dx/len*off+nx*side,
+      a.y+dy*t+dy/len*off+ny*side);
+     if(!pointInViewport(edge,8))continue;
+     ctx.fillStyle=k===1?"#342e28":"#91806b";
+     ctx.fillRect(edge.x-3,edge.y-1.2,5+rng()*2,1.8);
+    }
+   }
+  }
+ }
+}
 function scene(){
  ctx.setTransform(pixelRatio,0,0,pixelRatio,0,0);
  ctx.fillStyle="#211c18";ctx.fillRect(0,0,width,height);
  ctx.save();ctx.translate(width/2,height/2);
  ctx.scale(camera.zoom,camera.zoom);ctx.translate(-camera.x,-camera.y);
- drawGround();drawRoads();clickRegions=[];
+ drawGround();drawRoads();drawStreetDrainage();clickRegions=[];
  const layers=[
   ...world.buildings.map(b=>({kind:"building",obj:b,
    depth:Math.max(...b.poly.map(p=>proj(p.x,p.y).y))})),
