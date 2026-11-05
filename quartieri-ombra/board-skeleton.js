@@ -21,7 +21,7 @@ function segmentDistance(p,a,b){
  const x=b.x-a.x,y=b.y-a.y,t=Math.max(0,Math.min(1,((p.x-a.x)*x+(p.y-a.y)*y)/(x*x+y*y||1)));
  return dist(p,point(a.x+x*t,a.y+y*t));
 }
-function create(world,project,rows){
+function create(world,project,rows,inverse){
  const lots=world.buildings.map(b=>{
   const ground=b.poly.map(p=>project(p.x,p.y));
   const roof=ground.map(p=>point(p.x,p.y-b.z));
@@ -56,7 +56,7 @@ function create(world,project,rows){
    level:"source",art:null};
  });
  const chunkByLot=new Map(chunks.flatMap(c=>c.lotIds.map(id=>[id,c])));
- return{lots,byId,ordered,chunks,chunkByLot,world,project};
+ return{lots,byId,ordered,chunks,chunkByLot,world,project,inverse};
 }
 function pick(skeleton,p){
  // Hit the topmost *actual shape* instead of a rectangle around a sprite.
@@ -72,7 +72,7 @@ function pick(skeleton,p){
     return{kind:"building",lot,side:f.side};
   }
  }
- const g=(function(){const s=skeleton.world;const unproject=s.inverse;return unproject?unproject(p.x,p.y):null})();
+ const g=skeleton.inverse?skeleton.inverse(p.x,p.y):null;
  // Unlike building collision, street identification must never select a
  // building just because a transparent image overlaps its bounding box.
  if(g){
