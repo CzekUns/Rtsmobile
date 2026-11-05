@@ -1270,7 +1270,7 @@ if(artAudit&&chunkArt){
     sourceRect:[144,68,1006,1016],
     targetRect:[42.5,42.5,248.25,205.75],
     mappingMode:mode==="v2"?"contain":mode.startsWith("v2align")?"shear":"stretch",
-     shear:mode.startsWith("v2align")?.10:undefined
+     shear:mode.startsWith("v2align")?0.10:undefined
    },requestDraw);
   }else{
    chunkArt.register(candidate.id,{src:study
