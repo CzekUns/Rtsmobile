@@ -4,6 +4,9 @@
 import {SevenGame,NATIONS,FIRMS,WORLD_W,WORLD_H,SAVE_KEY} from './rules.js';
 import {createFrameAccumulator,accumulateFrame} from './core/clock.js';
 import {issuePlaytestOrder,advancePlaytestRoutes} from './playtest/path-routes.js';
+import {issueGroupMove} from './playtest/group-orders.js';
+import {selectUnitsInBox,dragMode} from './playtest/rts-touch-core.js';
+import {installMobileRtsControls} from './playtest/mobile-rts-controls.js';
 import {issueWorkOrder,completeWorkArrivals} from './playtest/work-assignments.js';
 import {issueBuildOrder,cancelBuildOrder,advanceConstruction,isBuilder,canBuildFirm} from './playtest/construction.js';
 import {issueRepairOrder,cancelRepairOrder,advanceRepairs,canRepair} from './playtest/repairs.js';
@@ -19,8 +22,12 @@ let game=SevenGame.load(saveKey)||new SevenGame();
 const view=new WorldView($('world'),$('minimap'));
 let selection=game.towns.find(t=>t.owner===1)?.id||null;
 let report=null,placing=null,placingBuilderId=null,builderMenuId=null,trainingMenuTownId=null,ghost=null,newsUntil=0,last=0,lastPanel=0,lastSave=0;
-let input=null,gesture=null;const pointers=new Map();
+let input=null,gesture=null,selectionBox=null,groupUnitIds=[];const pointers=new Map();
 const portrait=window.matchMedia('(orientation: portrait)');
+const touchController=installMobileRtsControls({
+ joystick:$('touchJoystick'),thumb:$('touchJoyThumb'),modifier:$('touchModifier'),
+ onPan:(dx,dy)=>view.moveCamera(dx,dy)
+});
 function resizeStage(){
  const scale=Math.min(window.innerWidth/800,window.innerHeight/600);
  $('stage').style.transform='translate(-50%,-50%) scale('+Math.max(.1,scale)+')';
@@ -33,9 +40,27 @@ function status(message){
 function selected(){return game.get(selection);}
 function select(id){
  if(id&&!game.get(id))return;
+ groupUnitIds=[];
  selection=id;
  closeReport();
  renderPanel();
+}
+function activeGroup(){
+ groupUnitIds=groupUnitIds.filter(id=>{
+  const u=game.get(id);
+  return u&&game.units.includes(u)&&u.owner===1;
+ });
+ return groupUnitIds;
+}
+function selectGroup(ids){
+ const units=[...new Set(ids)].filter(id=>{
+  const u=game.get(id);
+  return u&&game.units.includes(u)&&u.owner===1;
+ });
+ if(units.length<=1){select(units[0]||null);return;}
+ groupUnitIds=units;selection=units[0];
+ closeReport();renderPanel();
+ status(units.length+' unità selezionate · tieni premuto MOD e tocca per spostarle.');
 }
 function closeReport(){
  if($('reportDialog').open)$('reportDialog').close();
