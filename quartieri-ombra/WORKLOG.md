@@ -1,3 +1,7 @@
+
+### 2026-11-05 21:00 — Geometric visual study, no draft promotion
+Created six-parcel geometry-locked illustrated SVG at `assets/guides/cross-street-block-2-geometry-locked-art-study.svg` (`0b49b6b`), derived from the authoritative roof/wall polygons with positive-slope street fronts. It is a separate **vector art study**, not the requested ImageGen PNG, and is not registered in runtime. Original unaligned draft, padded WebP and null chunk index untouched. No real browser/Android screenshots or test suite in this run; visual acceptance still blocked pending corrected macro-image and audit comparison. NPC/IA/pathfinding/economy untouched.
+
 ### 2026-11-05 20:48 — Dove applicare il gruppo di case ImageGen
 Target tecnico: **Cross Street, chunk `block-2`, sei lotti cliccabili [2,3,4,9,10,11]**. L'immagine ImageGen appena generata rappresenta un fronte edilizio coerente, ma **l'orientamento del suo fronte non corrisponde alla pendenza delle sagome e dei tetti reali** in `assets/guides/cross-street-block-2-skeleton.svg`. Applicarla come texture di produzione ora causerebbe disallineamento con selezione e facciate. L'approccio corretto è conservarla come reference e pubblicare una prova isolata di sovrapposizione.
 
