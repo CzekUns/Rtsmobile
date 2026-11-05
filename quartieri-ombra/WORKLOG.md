@@ -197,3 +197,7 @@ Commit `77e3b5d8`: nella preview della plancia aggiunti insegne sporgenti, corni
 
 ### 2026-11-05 03:00 — Iterazione atmosfera plancia
 Commit `ceee77bcec11945fc46d68263febe9c7bf1d5f07`: aggiunti `drawStreetAtmosphere` e `drawDistrictHaze` in `board-preview.js`. Aloni radiali ambra dei lampioni, piccole pozze di luce e banchi di foschia originali generati deterministicamente in coordinate mondo; pass separato dai palazzi e dalla logica di gioco. Revisione statica del sorgente eseguita; non eseguiti browser screenshot, Node regression o prova Android in questa esecuzione. La plancia resta da confrontare con l'immagine golden e non è approvata.
+
+### 2026-11-05 — Plancia, profili dei tetti
+- Commit `677cf5d`: nuovi abbaini con finestra e tetto aggettante, coppie di comignoli in muratura su palazzi 3+ piani; elementi originali deterministici disegnati nel singolo sprite cache, senza modifiche a NPC/IA/economia.
+- Verifica effettuata: parsing JavaScript V8 (`new Function`) prima della pubblicazione. **Non eseguiti** browser screenshot, test Android o test Node: fedeltà visiva alla golden reference ancora da dimostrare.
