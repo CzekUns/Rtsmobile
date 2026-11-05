@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {canvasMetrics,syncFullscreenCanvas} from '../playtest/fullscreen-layout.js';
 import {WorldView} from '../view.js';
+import {installMobileRtsControls} from '../playtest/mobile-rts-controls.js';
 const source=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 
 test('full viewport canvas metrics keep world geometry sharp on a high-DPI phone',()=>{
@@ -60,4 +61,45 @@ test('classic pop-out is accessible and starts collapsed, with controls on the l
  assert.ok(js.includes("root.classList.toggle('is-open',on)"));
  assert.ok(js.includes("toggle.addEventListener('click',()=>setMenuOpen"));
  assert.ok(js.includes("if(!on)reset()"));
+});
+
+test('touch control menu toggles on tap and releases held MOD before closing',()=>{
+ const oldWindow=globalThis.window,oldDocument=globalThis.document;
+ const oldRaf=globalThis.requestAnimationFrame,oldCaf=globalThis.cancelAnimationFrame;
+ function fakeElement(){
+  const listeners=new Map(),classes=new Set(),attributes=new Map();
+  return {
+   listeners,classes,attributes,
+   classList:{toggle:(n,on)=>{if(on)classes.add(n);else classes.delete(n)},contains:n=>classes.has(n),remove:n=>classes.delete(n),add:n=>classes.add(n)},
+   style:{},addEventListener:(n,fn)=>listeners.set(n,fn),
+   setAttribute:(n,v)=>attributes.set(n,String(v)),
+   getBoundingClientRect:()=>({left:0,top:0,width:100,height:100}),
+   setPointerCapture(){},
+   trigger:(name,event={})=>listeners.get(name)?.(event)
+  };
+ }
+ const root=fakeElement(),joystick=fakeElement(),modifier=fakeElement(),
+  thumb=fakeElement(),toggle=fakeElement();
+ joystick.parentElement=root;
+ globalThis.window={addEventListener(){}};
+ globalThis.document={addEventListener(){},hidden:false};
+ globalThis.requestAnimationFrame=()=>1;
+ globalThis.cancelAnimationFrame=()=>{};
+ try{
+  const controls=installMobileRtsControls({joystick,thumb,modifier,toggle,onPan:()=>{}});
+  assert.equal(toggle.attributes.get('aria-expanded'),'false');
+  assert.equal(root.classes.has('is-open'),false);
+  toggle.trigger('click');
+  assert.equal(root.classes.has('is-open'),true);
+  assert.equal(toggle.attributes.get('aria-expanded'),'true');
+  modifier.trigger('pointerdown',{pointerId:8,preventDefault(){}});
+  assert.equal(controls.modifierHeld(),true);
+  toggle.trigger('click');
+  assert.equal(root.classes.has('is-open'),false);
+  assert.equal(toggle.attributes.get('aria-expanded'),'false');
+  assert.equal(controls.modifierHeld(),false);
+ }finally{
+  globalThis.window=oldWindow;globalThis.document=oldDocument;
+  globalThis.requestAnimationFrame=oldRaf;globalThis.cancelAnimationFrame=oldCaf;
+ }
 });
