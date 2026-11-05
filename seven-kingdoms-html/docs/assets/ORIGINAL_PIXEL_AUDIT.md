@@ -58,7 +58,7 @@ With a checked-out upstream `7kaa` source folder containing `data/RESOURCE` and 
 node seven-kingdoms-html/tools/assets/decode.mjs --source /local/7kaa/data --out /tmp/skh-metadata
 node seven-kingdoms-html/tools/assets/render-unit.mjs --source /local/7kaa --unit NORMAN --out /tmp/skh-norman
 node seven-kingdoms-html/tools/assets/render-firm.mjs --source /local/7kaa --firm BASE --race NORMAN --scheme 1 --out /tmp/skh-base
-SKH_7KAA_SOURCE=/local/7kaa node --test seven-kingdoms-html/tests/assets
+SKH_7KAA_SOURCE=/local/7kaa node --test seven-kingdoms-html/tests/assets/*.test.mjs
 ```
 
 Generated `unit.json` / `firm.json` contain record IDs, source files and SHA-256, source bitmap offsets, sequence, orientation, dimensions, transparent counts, nation remap policy, offset/anchor and `visuallyVerified:false`. The tools explicitly reject unsupported sprite remap modes or malformed source.
