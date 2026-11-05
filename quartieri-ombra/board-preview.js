@@ -254,6 +254,33 @@ function drawRoof(b,foot,roof){
   polygon([{x:q.x-7,y:q.y},{x:q.x+5,y:q.y-3},{x:q.x+5,y:q.y-10},{x:q.x-7,y:q.y-7}],"#302a25","#9b8060",.7);
   polygon([{x:q.x-8,y:q.y-8},{x:q.x+5,y:q.y-11},{x:q.x+1,y:q.y-15},{x:q.x-11,y:q.y-12}],"#51473c","#211c19",.7);
  }
+ // Period roof furniture is baked into each independently cached building sprite.
+ // Dormers, lead flashing and brick chimney pairs break the repeated roof silhouette.
+ if(b.floors>=3 && b.seed%5!==0){
+  const n=b.w>52?2:1;
+  for(let k=0;k<n;k++){
+   const u=(k+1)/(n+1),q=lerp(lerp(roof[0],roof[1],u),lerp(roof[3],roof[2],u),.44);
+   const height=7+(b.seed+k)%5,span=5+(b.seed%3);
+   polygon([{x:q.x-span,y:q.y+2},{x:q.x+span,y:q.y+2},
+    {x:q.x+span,y:q.y-height},{x:q.x-span,y:q.y-height}],
+    "#433b33","#1d1b1a",.65);
+   polygon([{x:q.x-span-2,y:q.y-height},{x:q.x+span+2,y:q.y-height},
+    {x:q.x+span-1,y:q.y-height-5},{x:q.x-span+1,y:q.y-height-5}],
+    "#726250","#282522",.7);
+   polygon([{x:q.x-2,y:q.y-2},{x:q.x+2,y:q.y-2},
+    {x:q.x+2,y:q.y-height+2},{x:q.x-2,y:q.y-height+2}],"#211f1e");
+   line({x:q.x-2,y:q.y-height+5},{x:q.x+2,y:q.y-height+5},"#9b8566",.7);
+  }
+ }
+ if(b.floors>=3 && b.seed%4===0){
+  const q=lerp(roof[1],roof[3],.24),h=13+b.seed%9;
+  for(let k=0;k<2;k++){
+   const x=q.x+k*7,y=q.y+k*2;
+   polygon([{x:x-3,y},{x:x+3,y},{x:x+3,y:y-h},{x:x-3,y:y-h}],
+    k?"#4c3329":"#674637","#261e1b",.7);
+   line({x:x-4,y:y-h},{x:x+4,y:y-h},"#a18a70",2);
+  }
+ }
  // Deterministic roof seams and uneven patches.
  const count=b.type==="stable"?4:7;
  for(let k=1;k<count;k++){
