@@ -3,7 +3,7 @@
  * Does not synthesize SDL mouse events; each game supplies onPan.
  * GPL-2.0-only.
  */
-export function installMobileRtsControls({joystick,thumb,modifier,onPan,onModChange=()=>{}}){
+export function installMobileRtsControls({joystick,thumb,modifier,toggle=null,onPan,onModChange=()=>{}}){
  let stickId=null,modId=null,modActive=false,vector={x:0,y:0,power:0},raf=0,last=0;
  const setMod=on=>{
   modActive=on;modifier.classList.toggle('active',on);
@@ -55,7 +55,19 @@ export function installMobileRtsControls({joystick,thumb,modifier,onPan,onModCha
   modifier.addEventListener(type,release);
  for(const el of [joystick,modifier])el.addEventListener('contextmenu',e=>e.preventDefault());
  const reset=()=>{stopStick();modId=null;setMod(false)};
+ const root=joystick.parentElement;
+ const setMenuOpen=on=>{
+  if(!toggle)return;
+  if(!on)reset(); // Closing a pop-out can never leave MOD pressed.
+  root.classList.toggle('is-open',on);
+  toggle.setAttribute('aria-expanded',String(on));
+  toggle.setAttribute('aria-label',on?'Nascondi levetta e MOD':'Apri levetta e MOD');
+ };
+ if(toggle){
+  toggle.addEventListener('click',()=>setMenuOpen(!root.classList.contains('is-open')));
+  setMenuOpen(false);
+ }
  window.addEventListener('blur',reset);
  document.addEventListener('visibilitychange',()=>{if(document.hidden)reset()});
- return {modifierHeld:()=>modActive,reset};
+ return {modifierHeld:()=>modActive,reset,closeMenu:()=>setMenuOpen(false)};
 }
