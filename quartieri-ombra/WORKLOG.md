@@ -1,3 +1,6 @@
+### 2026-11-05 — Iterazione plancia: scale esterne
+Implementazione effettiva `e223ab3a`: scale e pianerottoli in ferro su facciate di alcuni edifici residenziali di almeno quattro piani; nessuna modifica a logiche NPC o economia. Il container dispone di Node v22.16.0, ma `curl` della preview GitHub Pages è fallito con `Could not resolve host`; nessuna cattura browser, test Android o suite Node effettuata. Verificare geometria e possibili occlusioni nella prossima prova visiva.
+
 ### 2026-11-05 10:00 — Iterazione visiva: stenditoi
 Commit `c0827073`: aggiunti stenditoi sui tetti residenziali alti, con geometrie e colori deterministici per edificio; nessuna modifica a NPC/pathfinding/economia. Verifica: scrittura GitHub riuscita; nessun browser screenshot né test Node eseguito in questa esecuzione. Necessari controllo visivo e confronto con golden reference.
 
