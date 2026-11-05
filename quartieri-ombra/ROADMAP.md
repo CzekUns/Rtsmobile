@@ -1,3 +1,8 @@
+### 2026-11-05 — Segnaletica mercatale e carri deterministici
+- [x] Aggiunte insegne pendenti individuali ai banchi (tavole, simboli e colori deterministici), correzione orientamento carri: `p.seed` anziché `p.id` assente nei props (`e5f9fff5`).
+- [x] Parsing V8 `new Function` del sorgente aggiornato: PASS (38203 caratteri).
+- [ ] Screenshot browser desktop/mobile, verifica collisioni insegne e confronto con golden ancora aperti. Nessun lavoro NPC.
+
 ### 2026-11-05 — Correzione collocazione banchi di mercato
 - [x] I banchi mercatali della preview ora sono ancorati alle porte rivolte verso strada, con offset esterno, invece che a un angolo arbitrario del lotto (commit `be52cb08`). Questo riduce il rischio di tettoie incastrate negli edifici.
 - [ ] Screenshot browser desktop/Android, verifica collisioni visuali e confronto golden ancora da effettuare. Nessuna approvazione visiva; gameplay congelato.
