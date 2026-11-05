@@ -1,5 +1,11 @@
 # Specifica — Quartieri d'Ombra (titolo provvisorio)
 
+## Ultima istruzione di produzione grafica — macro-chunk + hitbox (5 novembre 2026)
+
+La produzione di PNG indipendenti per ogni palazzo è **superata**: la resa approvata verrà disegnata in macro-immagini di più palazzi continui, generate con ImageGen seguendo reference SVG ricavate dalla geometria esatta. Gli edifici rimangono lotti individuali nell'engine: tetto, facciate, fronte strada, porte e strade con hitbox vettoriali, selezione/illuminazione indipendente, indicatori residenziale/attività. Zoom fino a **7,5×** nella preview; asset source/detail/ultra per visione ravvicinata. [THREE_LAYER_MAP.md](THREE_LAYER_MAP.md) è ora il contratto operativo, più recente delle direttive su sprite singoli. Ancora nessun PNG macro-blocco ImageGen caricato, non presentare finita la grafica.
+
+
+
 ## Priorità di fase — solo PLANCIA (2026-11-04)
 
 L'utente ha approvato definitivamente la plancia ImageGen *Five Points District — New York c.1860*, allegata nella conversazione (1672×941), e ha richiesto che il gioco si ispiri **esattamente a quella composizione visiva** e la estenda in una mappa **molto più grande**. Vedi [BOARD_MASTER.md](BOARD_MASTER.md). **Congelare NPC/pathfinding/IA/economia durante questa fase**, senza cancellare il codice precedente. Lavorare su mondo, edifici, terreno, illuminazione, props, panorama isometrico coerente, camera, landscape e fullscreen, non su unità. Una miniatura della reference è archiviata in `assets/references/approved_five_points_board_preview.webp`; l'originale HQ è ancora nella conversazione. Questa nuova golden reference ha precedenza per la plancia sulle definizioni precedenti, mantenendo lo stile RTS 2D isometrico e il requisito di asset modulari originali.
