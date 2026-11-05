@@ -1268,9 +1268,14 @@ if(artAudit&&chunkArt){
    chunkArt.register(candidate.id,{
     src:"./assets/source/imagegen-2026-11-05/group_tenements_v2_corrected.png",
     sourceRect:[144,68,1006,1016],
-    targetRect:[42.5,42.5,248.25,205.75],
+    // The official SVG export adds 24 world-units beyond chunk.frame.
+    // Compensate that exact margin in the corrected mode only.
+    targetRect:mode.startsWith("v2align")
+      ?[18.5,18.5,248.25,205.75]
+      :[42.5,42.5,248.25,205.75],
     mappingMode:mode==="v2"?"contain":mode.startsWith("v2align")?"shear":"stretch",
-     shear:mode.startsWith("v2align")?0.10:undefined
+    // Smaller residual painted drift once the 24-unit offset is removed.
+    shear:mode.startsWith("v2align")?0.05:undefined
    },requestDraw);
   }else{
    chunkArt.register(candidate.id,{src:study
