@@ -5,7 +5,7 @@ import {readFile,mkdir,writeFile} from 'node:fs/promises';
 import {join,resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {parseRes,decodeTable,sha256} from './decode.mjs';
-import {decodeImportedBitmap,decodeStandardPalette,indexedToRgba,encodePng,mirrorForDirection} from './pixel-codec.mjs';
+import {decodeImportedBitmap,decodeStandardPalette,indexedToRgba,encodePng,mirrorForDirection,nationRemapTable} from './pixel-codec.mjs';
 
 const check=(v,m)=>{if(!v)throw Error(m)};
 const dirs=['N','NE','E','SE','S','SW','W','NW'];
@@ -45,7 +45,7 @@ function sheet(frames,columns=8,rows=6){
  }
  return {width,height,rgba:canvas};
 }
-export async function renderUnit(root,out,unitCode='NORMAN'){
+export async function renderUnit(root,out,unitCode='NORMAN',{colorSchemeId=1,selected=false}={}){
  check(/^[A-Z0-9_]{1,8}$/.test(unitCode),'Invalid 7KAA unit sprite ID');
  const [setFile,sprFile,paletteFile]=await Promise.all([
   readAsset(root,'RESOURCE','STD.SET'),readAsset(root,'SPRITE',unitCode+'.SPR'),
@@ -62,17 +62,20 @@ export async function renderUnit(root,out,unitCode='NORMAN'){
  const palette=decodeStandardPalette(paletteFile.bytes);
  const resolution=Number(spr.turnResolution);
  check([1,8,16,24].includes(resolution),'Unrecognized original turn resolution');
- // sprite remap_bitmap_flag selects the C++ brightness remapper, not a generic
- // paint-every-pixel nation tint. Fail closed until that algorithm is ported.
- check(!spr.remap||spr.remap==='0','C++ remap_bitmap_flag requires an original table implementation');
+ // OUNITDRW.cpp::Unit::draw always uses Game::get_color_remap_table(nation_recno,0).
+ // sprite_info->remap_bitmap_flag controls Sprite::draw, NOT Unit::draw;
+ // do not accidentally suppress the unit's nation-colour mapping.
+ const nationTable=nationRemapTable(colorSchemeId,{selected});
  const manifest={schemaVersion:2,id:unitCode,category:'unit',status:'pixel-decoded-not-visual-reviewed',
   decoded:true,visuallyVerified:false,license:{status:'upstream-gpl-release',notice:'7kaa README and COPYING; exclude separate music'},
   source:{repository:'the3dfxdude/7kaa',originalFilePaths:{
    metadata:'data/RESOURCE/STD.SET',bitmap:'data/SPRITE/'+unitCode+'.SPR',palette:'data/RESOURCE/PAL_STD.RES'},
    sha256:{metadata:sha256(setFile.bytes),bitmap:sha256(sprFile.bytes),palette:sha256(paletteFile.bytes)}},
-  turnResolution:resolution,locWidth:spr.locWidth,locHeight:spr.locHeight,frames:[],actions:[],previews:[],
+  turnResolution:resolution,locWidth:spr.locWidth,locHeight:spr.locHeight,colorSchemeId,selected,
+  nationRemap:'OGAME.cpp::get_color_remap_table on E0-E7, F2 and F3',spriteRemapFlag:spr.remap,
+  frames:[],actions:[],previews:[],
   notes:['Direction 0 = north, increasing clockwise (OSPRITE.cpp); 5..7 use C++ mirror for resolution 8',
-   'Ground-contact point and nation overlays not visually reviewed; no arbitrary tint applied']};
+   'Ground-contact point and nation overlays not visually reviewed; only source-reserved palette codes are remapped']};
  const outDir=resolve(out),frameDir=join(outDir,'frames');await mkdir(frameDir,{recursive:true});
  const previewFrames=[];
  for(const action of movement){
@@ -85,7 +88,7 @@ export async function renderUnit(root,out,unitCode='NORMAN'){
    const decoded=decodeImportedBitmap(sprFile.bytes,frame.bitmapOffset);
    check(decoded.width===frame.width&&decoded.height===frame.height,'Original SFRAME dimensions disagree with bitmap header '+frame.recordNo);
    const mirrored=mirrorForDirection(action.direction,resolution);
-   const rgba=indexedToRgba(decoded,palette,{mirror:mirrored});
+   const rgba=indexedToRgba(decoded,palette,{mirror:mirrored,remap:nationTable});
    const filename=unitCode+'-M-'+String(action.direction).padStart(2,'0')+'-'+String(k).padStart(2,'0')+'.png';
    const output=join(frameDir,filename);await writeFile(output,encodePng(decoded.width,decoded.height,rgba));
    const pixelHash=sha256(decoded.pixels);
@@ -98,7 +101,7 @@ export async function renderUnit(root,out,unitCode='NORMAN'){
     offsetX:frame.offsetX,offsetY:frame.offsetY,pivotX:-frame.offsetX,pivotY:-frame.offsetY,
     pivotStatus:'local-image-origin-not-ground-verified',mirror:mirrored,
     opaquePixels:decoded.opaque,transparentPixels:decoded.transparent,
-    palette:'PAL_STD.RES',remap:'none-original-sprite-flag-disabled',
+    palette:'PAL_STD.RES',remap:'nation-remap-OGAME-E0-E7',
     path:'frames/'+filename,decoded:true,visuallyVerified:false};
    if(seen.has(pixelHash))f.duplicateOf=seen.get(pixelHash);else seen.set(pixelHash,k);
    group.push(f);manifest.frames.push(f);previewFrames.push({...f,rgba});
@@ -119,7 +122,7 @@ export async function renderUnit(root,out,unitCode='NORMAN'){
     check(f?.sprite===unitCode,'Missing original stop frame');
     const b=decodeImportedBitmap(sprFile.bytes,f.bitmapOffset),mirrored=mirrorForDirection(action.direction,resolution);
     check(b.width===f.width&&b.height===f.height,'Stop frame size mismatch');
-    const rgba=indexedToRgba(b,palette,{mirror:mirrored}),filename=unitCode+'-S-'+String(action.direction).padStart(2,'0')+'-'+String(k).padStart(2,'0')+'.png';
+    const rgba=indexedToRgba(b,palette,{mirror:mirrored,remap:nationTable}),filename=unitCode+'-S-'+String(action.direction).padStart(2,'0')+'-'+String(k).padStart(2,'0')+'.png';
     await writeFile(join(frameDir,filename),encodePng(b.width,b.height,rgba));
     const hash=sha256(b.pixels);stopSeen.set(hash,true);
     manifest.frames.push({id:unitCode,category:'unit',action:'S',originalAction:'S',
@@ -128,7 +131,7 @@ export async function renderUnit(root,out,unitCode='NORMAN'){
      bitmapFile:unitCode+'.SPR',sourceBitmapName:f.file,bitmapOffset:f.bitmapOffset,
      bitmapPixelSha256:hash,width:b.width,height:b.height,offsetX:f.offsetX,offsetY:f.offsetY,
      pivotX:-f.offsetX,pivotY:-f.offsetY,mirror:mirrored,palette:'PAL_STD.RES',
-     remap:'none-original-sprite-flag-disabled',path:'frames/'+filename,decoded:true,visuallyVerified:false});
+     remap:'nation-remap-OGAME-E0-E7',path:'frames/'+filename,decoded:true,visuallyVerified:false});
    }
    manifest.actions.push({action:'S',direction:action.direction,declaredFrames:explicitStop.frameCount,
     distinctPixelFrames:stopSeen.size,sourceAction:explicitStop.recordNo});
