@@ -258,6 +258,35 @@ function drawFace(b,roof,ground,i){
    }
   }
  }
+ // External iron escape ladders and narrow landings on a minority of tall
+ // tenements. Kept within the wall plane so they share its iso perspective.
+ if((b.type==="tenement"||b.type==="residence")&&b.floors>=4&&(b.seed+i)%5===0){
+  const u=.79,span=.13;
+  for(let floor=1;floor<b.floors;floor++){
+   const v=(floor+.75)/b.floors;
+   const left=lerp(lerp(ra,rb,u-span),lerp(fa,fb,u-span),v);
+   const right=lerp(lerp(ra,rb,u+span),lerp(fa,fb,u+span),v);
+   const drop=4.5;
+   polygon([left,right,{x:right.x+1,y:right.y+drop},{x:left.x+1,y:left.y+drop}],
+    "#292825","#a39377",.55);
+   const railLeft={x:left.x,y:left.y-5},railRight={x:right.x,y:right.y-5};
+   line(railLeft,railRight,"#393a35",1.2);
+   for(let k=0;k<=4;k++){
+    const q=lerp(left,right,k/4);
+    line(q,{x:q.x,y:q.y-5},"#343530",.8);
+   }
+   if(floor<b.floors-1){
+    const nextV=(floor+1+.75)/b.floors;
+    const next=lerp(lerp(ra,rb,u-span),lerp(fa,fb,u-span),nextV);
+    line(right,next,"#282a27",1.5);
+    line({x:right.x+3,y:right.y}, {x:next.x+3,y:next.y},"#282a27",1.2);
+    for(let step=1;step<6;step++){
+     const a=lerp(right,next,step/6);
+     line(a,{x:a.x+3,y:a.y},"#827d6c",.75);
+    }
+   }
+  }
+ }
  if(!b.shopfront){
   polygon(face(ra,rb,fa,fb,.45,.55,.79,.99),"#211b19","#98775c",.7);
  }
