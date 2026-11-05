@@ -398,14 +398,57 @@ function drawBuilding(b){
  clickRegions.push({b,ground:geometry.ground,roof:geometry.roof});
 }
 function drawCart(p){
- const c=proj(p.x,p.y);
- ellipse(c.x,c.y+1,21,6,"#15121191");
- polygon([{x:c.x-19,y:c.y-4},{x:c.x+7,y:c.y-10},
-  {x:c.x+17,y:c.y-3},{x:c.x-10,y:c.y+3}],"#513b29","#af855d");
- for(const x of[-11,12])ellipse(c.x+x,c.y+5,4,4,"#191715");
- ellipse(c.x+26,c.y-7,8,4,"#43372d");
- ellipse(c.x+31,c.y-11,3,3,"#322b25");
- line({x:c.x+13,y:c.y-5},{x:c.x+26,y:c.y-8},"#a48660",1);
+ // Independent period wagon sprite: angled wooden bed, raised sides, spoke wheels,
+ // harness and a compact draught horse. All details stay in projected world space.
+ const c=proj(p.x,p.y),flip=p.id%2?-1:1;
+ ctx.save();ctx.translate(c.x,c.y);ctx.scale(flip,1);
+ ellipse(5,4,39,8,"#100f0d99");
+ // Cart chassis and plank bed in an isometric 2:1 silhouette.
+ polygon([{x:-23,y:-10},{x:3,y:-17},{x:22,y:-8},{x:-5,y:0}],
+  "#67452f","#211915",1.1);
+ polygon([{x:-23,y:-17},{x:3,y:-24},{x:22,y:-15},{x:-5,y:-7}],
+  "#95704a","#34251b",1);
+ for(let i=0;i<5;i++){
+  const t=i/5;
+  line({x:-21+25*t,y:-16-7*t},{x:-4+25*t,y:-7-7*t},"#4d3526",.8);
+ }
+ polygon([{x:-23,y:-17},{x:-23,y:-9},{x:-5,y:0},{x:-5,y:-7}],
+  "#4a3023","#241a16",.8);
+ polygon([{x:-5,y:-7},{x:22,y:-15},{x:22,y:-8},{x:-5,y:0}],
+  "#765236","#261b16",.9);
+ // Cargo silhouettes: rolled canvas and stacked crates.
+ polygon([{x:-14,y:-19},{x:-3,y:-22},{x:6,y:-17},{x:-5,y:-14}],
+  "#81735a","#352b23",.7);
+ polygon([{x:-11,y:-21},{x:-2,y:-24},{x:4,y:-21},{x:-5,y:-18}],
+  "#a08a64","#4e3a29",.7);
+ for(const wx of[-14,13]){
+  ellipse(wx,2,6.2,7.5,"#201a17");
+  ellipse(wx,2,4.6,5.9,"#6b4a2e");
+  ellipse(wx,2,2.9,3.9,"#221c17");
+  for(let k=0;k<6;k++){
+   const a=k*Math.PI/3;
+   line({x:wx,y:2},{x:wx+3.6*Math.cos(a),y:2+4.7*Math.sin(a)},"#b18c5e",.7);
+  }
+  ellipse(wx,2,1.2,1.3,"#c0a17a");
+ }
+ // Two shafts visibly connect the wagon to the draught horse.
+ line({x:17,y:-12},{x:39,y:-15},"#96754f",1.5);
+ line({x:17,y:-5},{x:39,y:-8},"#96754f",1.5);
+ // Horse at RTS scale: four legs, barrel, neck, ears and leather harness.
+ for(const x of[37,48]){
+  line({x,y:-5},{x:x-2,y:6},"#33271f",3);
+  line({x:x+4,y:-5},{x:x+6,y:5},"#3b2d23",2.5);
+ }
+ ellipse(44,-13,12,6.5,"#514035");
+ polygon([{x:49,y:-15},{x:55,y:-28},{x:59,y:-27},{x:56,y:-12}],
+  "#574337","#30251f",.7);
+ ellipse(59,-28,5,3.5,"#5a4537");
+ polygon([{x:57,y:-30},{x:57,y:-36},{x:60,y:-33}],
+  "#3b2d26");
+ line({x:33,y:-15},{x:27,y:-20},"#2b211c",1.6);
+ line({x:49,y:-16},{x:53,y:-10},"#aa8155",1);
+ ellipse(61,-28,1,1,"#211a17");
+ ctx.restore();
 }
 function drawProp(p){
  const q=proj(p.x,p.y);
