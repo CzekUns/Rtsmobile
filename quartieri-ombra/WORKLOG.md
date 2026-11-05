@@ -1,3 +1,7 @@
+
+## 2026-11-05 02:00 — Materiali stradali
+- Commit `274b40495162b3d5b451a57767ebcde2ec02a4cb`: nuove chiazze d'acqua scure e sottili riflessi sulle strade, ancorati alle coordinate dei segmenti, senza cambiare topografia, camera, NPC o economia.
+- Controllo statico della posizione di inserimento rispetto alle variabili `dx/dy/len` effettuato; NON eseguiti test Node, screenshot o Android in questo ambiente. Da collaudare sulla build Pages e confrontare con golden reference.
 ## 2026-11-04 — Deploy Pages B2 riuscito e regressione ripristinata
 - Il run Actions `41926287816` su commit `b23d4b04` ha superato effettivamente **Deploy to GitHub Pages**, non solo il checkout/test.
 - Artefatto distribuito scaricato e verificato in locale: contiene `board-1860.html`, collegamento aggiornato e script versionati. Prima suite completa Node: 40 PASS / 3 FAIL; i 3 FAIL erano test preesistenti con harness non più allineati: `W/H` non definiti nell'estrazione di `game.js` e ancoraggio di nome funzione obsoleto nella prova terreno isometrico.
