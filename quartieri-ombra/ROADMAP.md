@@ -1,3 +1,7 @@
+### 2026-11-05 — Drenaggio urbano e bordi strada
+- [x] Aggiunti tombini in ferro e cordoli sconnessi generati in coordinate mondo nella preview (`c232f8eb`), senza modificare logica gameplay.
+- [ ] Screenshot browser desktop/mobile e confronto golden ancora da eseguire.
+
 ### 2026-11-05 — Cornicioni e marcapiani originali
 - [x] Facciate della preview arricchite con lesene laterali, marcapiani irregolari, ombre sotto cornice e giunti di pietra (`d4c18b10`), senza alterare lotti o gameplay.
 - [ ] Collaudo browser e screenshot golden ancora necessari; non dichiarare approvata la plancia.
