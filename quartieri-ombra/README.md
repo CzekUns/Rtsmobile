@@ -1,5 +1,12 @@
 # Quartieri d'Ombra — RTS di controllo territoriale
 
+## Nuova architettura grafica: blueprint + immagini di isolati
+
+La nuova versione separa **scheletro vettoriale e hitbox** (`board-skeleton.js`) dalla **grafica per gruppi di palazzi** (`board-chunks.js`). È possibile premere **SCHELETRO** per vedere i contorni esatti dei 454 lotti e i fronti strada; **SEGNALINI** per distinguere abitazioni da attività; **GUIDA SVG** per esportare la porzione selezionata e utilizzarla come reference di produzione artistica. Toccare un edificio evidenzia il suo tetto e le sue facciate, anche se in futuro più lotti useranno un'unica illustrazione. La strada è selezionabile separatamente. Lo zoom arriva a **7,5×** mantenendo le geometrie esatte.
+
+Il catalogo [assets/chunk-index.json](assets/chunk-index.json) contiene 117 porzioni grafiche e i posti per tre risoluzioni (`base/detail/ultra`). Le immagini di gruppo non sono ancora state generate e validate, quindi gli slot restano vuoti e l'aspetto della preview è parzialmente vettoriale. L'anteprima ha già il codice per caricare automaticamente le versioni WebP che saranno davvero presenti nel catalogo e per preservare le hitbox indipendenti. Primo gruppo pronto per ImageGen: [guida tecnica Cross Street](assets/guides/cross-street-block-2-skeleton.svg), sei edifici continui. Istruzioni e limiti tecnici: [THREE_LAYER_MAP.md](THREE_LAYER_MAP.md).
+
+
 ## Blocchi edilizi continui — versione sperimentale
 
 È in corso la correzione dell'effetto “figurine”: i palazzi vicini vengono riconosciuti come **file di edifici** anziché immagini isolate, con fronti rivolti alla stessa strada e raccordi di fondazione, tetto e muratura. Questa prima versione crea 337 connessioni geometriche tra lotti; lo sprite PNG viene agganciato alla facciata e applicato soltanto dove la prospettiva di origine è compatibile. Nelle altre angolazioni resta il vettoriale temporaneo.
