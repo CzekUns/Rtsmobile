@@ -1,3 +1,8 @@
+### 2026-11-05 20:00 — Cross Street: sei moduli pilota prerender (PARZIALE)
+- [x] Nuovo `cross-street-kit.js`: 6 moduli trasparenti generati in Canvas offscreen, con geometria ricavata da ciascun footprint, facciate individuali, tetti, finestre e basamenti. Integrati in entrambe le anteprime prima dei PNG generici, senza modificare NPC.
+- [x] Parsing V8 dei sorgenti `cross-street-kit.js` e `board-preview.js`: PASS.
+- [ ] Mancano ancora **sei PNG/WebP ImageGen originali** e **cinque raccordi raster condivisi**; i moduli Canvas sono un passaggio grafico intermedio, NON asset finali. Mancano screenshot browser desktop/Android e approvazione. Non estendere ai restanti 448 lotti prima del QA.
+
 ### 2026-11-05 — Continuità degli isolati (correzione figurine)
 - [x] Nuovo modulo `block-continuity.js` costruisce vicinati reali lungo lo **stesso lato** della stessa via: **337 giunzioni** su 454 lotti, 117 gruppi (105 di almeno due edifici), 170 passaggi `shared` e 167 `passage` (commit `44d2703`). Le giunzioni non alterano collisioni o dati strategici.
 - [x] `board-preview.js` posiziona i PNG sulla vera soglia/fronte strada, non sul centro geometrico della figura; crea fondazioni comuni e raccordi isometrici di muratura/tetto o muro basso nei passaggi; usa solo raster A/B con angolo di facciata verificato, mai deformato/mirrored. Per angoli non coperti fallback vettoriale corretto (commit `d461c20`).
