@@ -56,3 +56,21 @@ test("board variants load joints before renderer and retain existing game",()=>{
  assert(preview.includes('front.kind==="unmatched"'));
  new Function(preview);
 });
+
+
+test("Cross Street six-lot pilot describes one continuous and correctly oriented row",()=>{
+ const pilot=require("../assets/pilot-cross-street.json");
+ assert.deepEqual(pilot.lot_ids,[2,3,4,9,10,11]);
+ assert.equal(pilot.joints.length,5);
+ assert.equal(pilot.buildings.length,6);
+ for(const item of pilot.buildings){
+  const f=layout.byId.get(item.lot_id);
+  assert.equal(f.kind,"A");
+  assert.equal(item.asset_ready,false);
+  assert(Math.abs(f.angle-item.angle_deg)<.01);
+ }
+ for(const joint of pilot.joints)
+  assert(layout.joints.some(j=>j.left===joint.from&&j.right===joint.to&&j.kind===joint.mode));
+ const src=fs.readFileSync(path.resolve(__dirname,"../board-preview.js"),"utf8");
+ assert(src.includes("Math.max(...[j.left,j.right].map(id=>"));
+});
