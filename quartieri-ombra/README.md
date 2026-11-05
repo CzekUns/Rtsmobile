@@ -1,3 +1,7 @@
+## LAB 3D · esperimento camera ad altezza lampione (6 novembre 2026)
+
+Aprire `street-vector-camera.html` o il pulsante **LAB 3D** dalla plancia. Esperimento indipendente che utilizza i sei lotti veri di Cross Street (`2,3,4,9,10,11`) tramite `QOBoardWorld`, costruisce volumi, tetti e finestre vettoriali in 3D e li proietta in prospettiva con telecamera orbitale. Controlli: trascina per ruotare, pizzica/rotella per zoom, slider per quota e distanza, pulsante 90°. Asset ImageGen e gameplay precedenti **immutati**. Il rendering SVG è volutamente minimale e il painter sorting non sostituisce il depth buffer di un futuro renderer WebGL; è un test di visuale e interazione, non arte definitiva.
+
 ## Esperimento SVG 3D a quota lampione (6 novembre 2026)
 
 Gli asset ImageGen e la plancia precedente sono **parcheggiati, non cancellati**. Il nuovo [laboratorio vettoriale](street-vector-lab.html) usa i lotti reali di `board-world.js` con camera prospettica a quota lampione (39 unità iniziali), rotazione a 360°, zoom, spostamento, selezione degli edifici e pulsante di prova **255°**. I palazzi e i dettagli delle facciate sono costruiti tramite geometria e SVG, non da raster. Nessun file del gioco esistente viene sostituito.
