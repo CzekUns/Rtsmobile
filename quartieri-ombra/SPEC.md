@@ -1,3 +1,7 @@
+## Nuovo esperimento di visuale (6 novembre 2026)
+
+Richiesta: parcheggiare gli asset e provare una scena vettoriale con geometria 3D, camera quasi in terza persona all'altezza di un lampione e zoom/rotazione completi. Il vecchio rendering isometrico rimane il riferimento conservato; `street-vector-lab.html` è una prova separata che non cambia hitbox, gameplay, manifest o asset. Priorità alla correttezza dell'occlusione a **255°** e a una migliore qualità dei dettagli senza pattern SVG ripetitivi.
+
 # Specifica — Quartieri d'Ombra (titolo provvisorio)
 
 ## Ultima istruzione di produzione grafica — macro-chunk + hitbox (5 novembre 2026)
