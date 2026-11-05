@@ -7,6 +7,7 @@ import {issuePlaytestOrder,advancePlaytestRoutes} from './playtest/path-routes.j
 import {issueGroupMove} from './playtest/group-orders.js';
 import {selectUnitsInBox,dragMode} from './playtest/rts-touch-core.js';
 import {installMobileRtsControls} from './playtest/mobile-rts-controls.js';
+import {syncFullscreenCanvas} from './playtest/fullscreen-layout.js';
 import {issueWorkOrder,completeWorkArrivals} from './playtest/work-assignments.js';
 import {issueBuildOrder,cancelBuildOrder,advanceConstruction,isBuilder,canBuildFirm} from './playtest/construction.js';
 import {issueRepairOrder,cancelRepairOrder,advanceRepairs,canRepair} from './playtest/repairs.js';
@@ -26,14 +27,28 @@ let input=null,gesture=null,selectionBox=null,groupUnitIds=[];const pointers=new
 const portrait=window.matchMedia('(orientation: portrait)');
 const touchController=installMobileRtsControls({
  joystick:$('touchJoystick'),thumb:$('touchJoyThumb'),modifier:$('touchModifier'),
- onPan:(dx,dy)=>view.moveCamera(dx,dy)
+ toggle:$('touchControlsToggle'),
+ onPan:(dx,dy)=>view.moveCamera(dx*(view.pixelRatio||1),dy*(view.pixelRatio||1))
 });
 function resizeStage(){
- const scale=Math.min(window.innerWidth/800,window.innerHeight/600);
- $('stage').style.transform='translate(-50%,-50%) scale('+Math.max(.1,scale)+')';
+ const rect=$('world').getBoundingClientRect();
+ if(rect.width>0&&rect.height>0)
+  syncFullscreenCanvas(view,rect.width,rect.height,window.devicePixelRatio||1);
 }
-resizeStage();window.addEventListener('resize',resizeStage);
+resizeStage();
+window.addEventListener('resize',resizeStage);
 window.addEventListener('orientationchange',resizeStage);
+window.visualViewport?.addEventListener('resize',resizeStage);
+if(typeof ResizeObserver!=='undefined')new ResizeObserver(resizeStage).observe($('world'));
+function setOrdersVisible(visible){
+ $('stage').classList.toggle('panel-collapsed',!visible);
+ $('sidebarToggle').setAttribute('aria-expanded',String(visible));
+ $('sidebarToggle').textContent=visible?'ORDINI ◂':'ORDINI ▸';
+ $('orderSidebar').setAttribute('aria-hidden',String(!visible));
+}
+setOrdersVisible(!window.matchMedia('(max-width:1000px) and (pointer:coarse)').matches);
+$('sidebarToggle').addEventListener('click',()=>
+ setOrdersVisible($('stage').classList.contains('panel-collapsed')));
 function status(message){
  $('ticker').textContent=message;newsUntil=Date.now()+6000;
 }

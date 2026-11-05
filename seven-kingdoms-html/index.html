@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#777668">
 <title>Seven Kingdoms · HTML Edition (JS nativo)</title>
 <meta name="description" content="Ricostruzione sperimentale del gioco Seven Kingdoms in JavaScript nativo.">
-<link rel="stylesheet" href="style.css?v=5">
+<link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
 <div id="stage" role="application" aria-label="Seven Kingdoms HTML Edition">
@@ -44,7 +44,7 @@
   </header>
   <div class="playfield">
     <div class="land">
-      <canvas id="world" width="612" height="528" aria-label="Mappa interattiva"></canvas>
+      <canvas id="world" width="612" height="528" aria-label="Mappa interattiva a tutto schermo"></canvas>
       <div id="buildBar" class="build-bar" hidden>
         <strong id="buildLabel">Costruzione</strong>
         <button id="cancelBuild" type="button">Annulla ✕</button>
@@ -56,7 +56,9 @@
       </div>
       <div id="ticker" class="ticker">Un nuovo regno greco sorge presso Corinto.</div>
     </div>
-    <aside class="sidebar" aria-label="Minimappa e ordini">
+    <button id="sidebarToggle" class="sidebar-toggle" type="button" aria-controls="orderSidebar"
+      aria-expanded="true" aria-label="Mostra o nascondi il pannello degli ordini">ORDINI ◂</button>
+    <aside class="sidebar" id="orderSidebar" aria-label="Minimappa e ordini">
       <div class="minimap-wrap"><canvas id="minimap" width="184" height="137" aria-label="Minimappa navigabile"></canvas></div>
       <div class="overview">
         <div class="selection-header"><i id="flag"></i><h1 id="selectionTitle">Corinto</h1></div>
@@ -67,8 +69,11 @@
     </aside>
   </div>
 </div>
-<!-- Portable RTS controls remain outside the scaled classic 800×600 stage. -->
+<!-- Optional classic-style RTS controls, anchored to the fullscreen viewport. -->
 <div id="mobileRtsPad" role="group" aria-label="Comandi RTS per touchscreen">
+  <button id="touchControlsToggle" class="touch-controls-toggle" type="button"
+    aria-expanded="false" aria-controls="touchJoystick touchModifier"
+    aria-label="Apri comandi di movimento e MOD"><span aria-hidden="true">✥</span><small>COMANDI</small></button>
   <div id="touchJoystick" role="group" aria-label="Levetta per spostare la mappa">
     <span class="touch-pad-label">MAPPA</span>
     <div id="touchJoyThumb" aria-hidden="true">✥</div>
@@ -83,12 +88,13 @@
   <div id="reportBody" class="report-body"></div>
 </dialog>
 <div id="rotate" aria-live="polite">
- <div class="phone-icon">⟲</div><h2>Ruota lo smartphone</h2><p>La ricostruzione di Seven Kingdoms usa l'interfaccia orizzontale 800×600.</p>
+ <div class="phone-icon">⟲</div><h2>Ruota lo smartphone</h2><p>Per giocare sul telefono ruota il dispositivo in orizzontale: la mappa occuperà tutto lo schermo.</p>
 </div>
 <dialog id="helpDialog">
 <h2>Seven Kingdoms · HTML Edition</h2>
 <p>Questa è la prima ricostruzione <strong>JavaScript nativa</strong>, ancora parziale, del gioco originale. Non è il gioco completo e non usa WebAssembly.</p>
-<p><strong>Controlli RTS per smartphone:</strong> con la <strong>levetta MAPPA</strong> a sinistra sposti continuamente la visuale. Tocco normale seleziona; trascina sulla mappa senza MOD per disegnare il <strong>riquadro di selezione multipla</strong>. Tieni premuto <strong>MOD</strong> sopra la levetta, entrambi a sinistra e tocca una destinazione per ordinare il movimento della singola unità o del gruppo selezionato; MOD + trascinamento sposta la visuale. Due dita sulla mappa regolano lo zoom. Quando costruisci, trascina l’anteprima e rilascia per piazzare. Nel pannello a destra puoi fermare un gruppo.</p>
+<p><strong>Interfaccia a schermo intero:</strong> la plancia riempie il display. Le risorse e i rapporti sono in alto; il pannello <strong>ORDINI</strong> a destra si apre e si richiude per lasciare libera la mappa. La minimappa si trova nel pannello ordini.</p>
+<p><strong>Controlli RTS per smartphone:</strong> tocca <strong>COMANDI</strong> in basso a sinistra per far comparire <strong>MOD</strong> e la <strong>levetta MAPPA</strong>, entrambi sullo stesso lato; toccalo nuovamente per nasconderli. Trascina sulla mappa senza MOD per selezionare più unità; MOD + tocco impartisce l'ordine di movimento alla singola unità o al gruppo. MOD + trascinamento sposta la visuale, la levetta scorre la mappa e due dita regolano lo zoom. Durante il piazzamento, il rilascio imposta il cantiere.</p>
 <p><strong>Rapporti:</strong> i pulsanti in alto (Villaggi, Economia, Militari e altri) aprono una finestra separata. Seleziona una voce per tornare alla mappa e visualizzare i comandi nel pannello destro.</p>
 <p><strong>Villaggi:</strong> seleziona Corinto e poi scegli <strong>Greci</strong> oppure <strong>Normanni</strong> nell’elenco delle popolazioni. Tocca Recluta per far uscire una persona dell’etnia selezionata, oppure <strong>Addestra una professione</strong> per scegliere Costruzione, Comando, Estrazione, Manifattura, Ricerca o Spionaggio. Ogni ordine costa 30 monete e richiede 5 giorni di gioco; gli ordini vengono eseguiti in sequenza e compaiono nella coda del villaggio. Puoi annullarli. I vecchi salvataggi mantengono la cultura già registrata, senza inventare altre etnie.</p>
 <p><strong>Dentro gli edifici:</strong> seleziona un edificio per vedere l'elenco degli abitanti/lavoratori presenti, con abilità, livello e salute. Tocca «Fai uscire» sulla persona desiderata per riportarla sulla mappa. I lavoratori ereditati dalla vecchia demo possono avere dati personali non conosciuti: vengono segnalati esplicitamente.</p>
@@ -99,6 +105,6 @@
 <p><strong>PC:</strong> trascina con il sinistro per selezionare un gruppo e usa il tasto destro per spostarlo in formazione. Trascina col destro per scorrere la mappa. F1–F9 per i rapporti, 0 / Spazio per pausa, 1–5 per velocità, S per salvare. La selezione e i movimenti di gruppo sono una prima implementazione mobile, non ancora il sistema di battaglie originale.</p>
 <form method="dialog"><button type="submit">Continua</button></form>
 </dialog>
-<script type="module" src="game.js?v=11"></script>
+<script type="module" src="game.js?v=12"></script>
 </body>
 </html>

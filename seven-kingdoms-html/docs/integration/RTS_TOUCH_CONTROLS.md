@@ -24,7 +24,7 @@ This module is reusable **without copying Seven Kingdoms gameplay code**. It is 
 | Mouse left-drag / right-drag | Box selection / camera pan | same control grammar |
 | Mouse right-click | Order selected unit or group | same dispatch path |
 
-The joystick and MOD button are **outside** the scaled 800×600 HUD, stacked on the **lower-left** edge (MOD above joystick), leaving the right side of the map free for selection and orders. They are hidden for fine-pointer desktop environments and for portrait mode.
+The map is a **full-viewport, high-DPI canvas**, while the old 800×600 HUD is reorganized as a top command bar and a **collapsible floating orders panel**. In the lower-left corner the classic-style **COMANDI** button expands joystick and MOD above itself (MOD above joystick). Collapsing the menu always releases MOD, leaving the map available for selection and group orders. They are hidden for fine-pointer desktop environments and for portrait mode.
 
 ## Host app integration
 For another RTS such as Ver Sacrum or Quartieri d'Ombra, import the pure helpers and independently implement:
@@ -45,3 +45,7 @@ For another RTS such as Ver Sacrum or Quartieri d'Ombra, import the pure helpers
 - This is a mobile gameplay improvement for the JS demo, **not** a claim of parity with the original 7KAA executable.
 
 Reference implementation: `CzekUns/sevenkindomsmobile/index.html` MOD touch grammar and `mobile-controls.js` joystick; no WebAssembly files are modified.
+
+## Responsive board contract
+
+The game renders at the actual viewport dimensions rather than scaling a 612×528 bitmap within the classic 800×600 frame. `playtest/fullscreen-layout.js` updates `canvas.width`, `canvas.height`, `view.tileSize` and `view.pixelRatio` consistently; pointer hit tests must continue converting from CSS pixels to backing canvas pixels. The state of the pop-out controls and right-side orders panel is UI-only and must **not** be stored in the game's save format. On narrow coarse-pointer devices, the orders panel starts collapsed; the ORDINI button reopens it. The left COMANDI cluster starts collapsed on landscape touch devices.
