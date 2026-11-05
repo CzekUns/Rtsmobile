@@ -38,7 +38,11 @@ const QOChunkArt=(function(){
   // Pixel placement equals the SVG blueprint's padded viewport exactly.
   // The image itself must have a transparent exterior and use that same viewBox.
   const f=chunk.frame,pad=24;
-  ctx.drawImage(image,f.left-pad,f.top-pad,f.width+pad*2,f.height+pad*2);
+  if(entry.source.src?.endsWith("cross-street-block-2-geometry-locked-art-study.svg")){
+   // The study SVG uses the *unpadded* 333×290 authoritative chunk viewBox.
+   // Applying the raster draft padding would visibly misregister every roof.
+   ctx.drawImage(image,f.left,f.top,f.width,f.height);
+  }else ctx.drawImage(image,f.left-pad,f.top-pad,f.width+pad*2,f.height+pad*2);
   return true;
  }
  function manifest(){return [...registered].map(([id,e])=>({
