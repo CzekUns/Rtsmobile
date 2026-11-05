@@ -99,12 +99,16 @@ function svgGuide(skeleton,chunkId,options={}){
   const fa=lot.frontage.map(p=>[(p.x-frame.left).toFixed(1),(p.y-frame.top).toFixed(1)].join(",")).join(" ");
   const label=lot.labelPoint;
   const fill=lot.use==="residential"?"#918064":"#73574e";
-  return'<path d="'+ground+'" fill="#39322b" stroke="#c7b99a" stroke-width=".8"/>'+
-   '<path d="'+roof+'" fill="'+fill+'" stroke="#f1d4a2" stroke-width="1.4"/>'+
+  const walls=lot.faces.map(f=>'<path d="'+path(f.poly)+
+   '" fill="'+(f.side==="street"?"#665442":f.side==="rear"?"#33322e":"#4e4740")+
+   '" stroke="#ad987c" stroke-width=".7"/>').join("");
+  return'<g data-lot-id="'+id+'" data-use="'+lot.use+'">'+
+   '<path d="'+ground+'" fill="#39322b" stroke="#c7b99a" stroke-width=".8"/>'+
+   walls+'<path d="'+roof+'" fill="'+fill+'" stroke="#f1d4a2" stroke-width="1.4"/>'+
    '<polyline points="'+fa+'" stroke="#e5aa55" stroke-width="3" fill="none"/>'+
    '<circle cx="'+(lot.door.x-frame.left).toFixed(1)+'" cy="'+(lot.door.y-frame.top).toFixed(1)+'" r="2.6" fill="#d75f4b"/>'+
    '<text x="'+(label.x-frame.left).toFixed(1)+'" y="'+(label.y-frame.top).toFixed(1)+
-    '" text-anchor="middle" fill="#fbecd2" font-size="9">'+escape(id)+'</text>';
+    '" text-anchor="middle" fill="#fbecd2" font-size="9">'+escape(id)+'</text></g>';
  }).join("");
  // The transparent graphic is a precise technical placement guide ONLY,
  // not a final art sprite. ImageGen output must align with these bounds.
