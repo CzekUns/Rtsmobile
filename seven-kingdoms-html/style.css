@@ -95,7 +95,7 @@ dialog button{min-height:35px;padding:6px 15px}
    These rules override the original 800x600 fixed-layout prototype above. */
 :root{--hud-height:53px;--orders-width:clamp(210px,25vw,270px)}
 #stage{
-  position:fixed;inset:0;width:100%;height:100dvh;left:auto;top:auto;
+  position:fixed;inset:0;width:100%;height:100dvh;left:0;top:0;
   transform:none!important;transform-origin:initial;border:0;box-shadow:none;
   background:#6b8763;overflow:hidden
 }
