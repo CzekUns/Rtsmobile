@@ -1,3 +1,8 @@
+### 2026-11-05 — Prima integrazione runtime asset ImageGen (P0)
+- [x] La preview usa ora PNG originali di caseggiati, botteghe, taverne, officine e stalle da `assets/source/imagegen-2026-11-05/` su una selezione deterministica di lotti; profondità, coordinate e hit testing restano basati sul mondo 3×3. Nessuna deformazione non uniforme, nessun mirroring; fallback vettoriale su caricamento fallito, magazzini e parte degli edifici.
+- [x] Controllo sintattico V8 `new Function` sul sorgente modificato: PASS.
+- [ ] Questa è una prima integrazione, NON il restyling totale: ancora PNG source non ottimizzati, orientamenti e margini trasparenti da verificare, terreno/props/HUD da rasterizzare. Screenshot desktop e Android landscape NON eseguiti; nessuna approvazione visiva.
+
 ### 2026-11-05 — Segnaletica mercatale e carri deterministici
 - [x] Aggiunte insegne pendenti individuali ai banchi (tavole, simboli e colori deterministici), correzione orientamento carri: `p.seed` anziché `p.id` assente nei props (`e5f9fff5`).
 - [x] Parsing V8 `new Function` del sorgente aggiornato: PASS (38203 caratteri).
