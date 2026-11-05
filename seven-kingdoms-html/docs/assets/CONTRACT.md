@@ -48,3 +48,21 @@ Tests: synthetic structural fixtures for RES, DBF, SFRAME, manifest fail-closed 
 - Tests: `node --test` via GitHub Actions; run logs attached to PR.
 - Integration dependency: no runtime adapter until actual image pixels, accurate palette/transparency and original town render have been verified.
 - No fabricated atlas or inferred unit/town original frame; licence of bundled artwork awaiting review.
+
+## Handoff: original indexed pixel decoder and building pipeline (2026-11-05)
+
+**Branch / PR:** `agent/skh-assets/decoder`, [PR #13](https://github.com/CzekUns/Rtsmobile/pull/13), #7/#19/#44. Full evidence and upstream commit: [ORIGINAL_PIXEL_AUDIT.md](./ORIGINAL_PIXEL_AUDIT.md).
+
+New exports (all Node.js, zero WebAssembly):
+
+- `tools/assets/pixel-codec.mjs`: `decodeImportedBitmap(buffer,offset)` accepts a `ResourceDb` source record with a preceding u32 length and returns precise indexed pixels, dimensions and opacity statistics. `decodeStandardPalette(buffer)`, `indexedToRgba(bitmap,palette,{mirror,remap})`, `nationRemapTable(schemeId,{selected})`, `mirrorForDirection(direction,turnResolution)`, `encodePng(width,height,rgba)`.
+- `tools/assets/render-unit.mjs`: `renderUnit(sourceRoot,outputRoot,unitCode)` generates `frames/*.png`, `unit.json`, plus original NORMAN movement contact sheets 1×/2× where supported. Manifest includes original action/direction/frame and SFRAME reference, original bitmap record offset, pixel hash and duplicate frames, source SHA-256, palette, mirror, original offsets, local image-origin pivot, license, `visuallyVerified:false`.
+- `tools/assets/render-firm.mjs`: `parseFirmTables(stdSet)`, `selectedBuild(tables,firmCode,raceCode)`, `renderFirm(sourceRoot,outputRoot,{firmCode,raceCode,colorSchemeId})`. Generates separate PNG files for every relevant FBITMAP, construction phases, idle and active with original nation shade remapping and ground layer, plus `firm.json`.
+
+**Inputs:** a checked-out GPL 7kaa upstream `data/RESOURCE/STD.SET`, `PAL_STD.RES`, source unit `SPRITE/*.SPR` or building `RESOURCE/I_FIRM.RES`; source root may point to the upstream repository or `data/`. **Outputs:** local files written only to the caller-specified output directory. The preview PNGs checked into `assets/previews` document verified *byte-decode* examples, not finished game integration.
+
+**Statuses must not be conflated:** legacy `decode.mjs` `pack.json` remains `metadata-only`/`decoded:false`; generated `unit.json`/`firm.json` become `decoded:true` only after PNG bytes are produced; they retain `visuallyVerified:false` and `integrated:false` until independent side-by-side screenshots and renderer tests. The sample test fixtures contain verbatim original pixel records pinned to upstream sources, not synthetic art.
+
+**Integration boundary:** maintain existing full-screen board, adaptive mobile HUD, multi-select, group movement, and COMANDI/joystick/MOD. No renderer or shared file modification in this PR. The separate integration branch should consume only verified manifest records, key animations on actual unit movement state, draw with nearest-neighbour pixel scaling, apply nation color only to original indices, respect ground layer 4 and fail back for missing assets. A renderer PR is blocked pending original screenshot parity; do not merge PR #13 automatically.
+
+**Command:** `npm --prefix seven-kingdoms-html test`. Real source end-to-end tests: `SKH_7KAA_SOURCE=/path/to/7kaa node --test seven-kingdoms-html/tests/assets/*.test.mjs`. See [audit](./ORIGINAL_PIXEL_AUDIT.md) for direct conversion commands and outstanding visual gates.
