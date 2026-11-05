@@ -1017,12 +1017,17 @@ function scene(){
   const layers=[
    ...world.buildings.filter(b=>!replacedLots.has(b.id)).map(b=>({kind:"building",obj:b,
     depth:Math.max(...b.poly.map(p=>proj(p.x,p.y).y))})),
-   // A macro-illustration is clipped into individually depth-sorted volumes.
-   // This prevents a rear house from painting over a nearer building.
-   ...artworkChunks.flatMap(c=>c.lotIds.map(id=>{
-    const lot=skeleton.byId.get(id);
-    return{kind:"chunk-lot",obj:c,lot,depth:selectionOverlay.depth(lot)};
-   })),
+   // Rejected raster art must stay visible IN FULL for a truthful audit:
+   // its perspective cannot be repaired merely by cutting it into geometry
+   // masks. Runtime and the geometry-locked SVG still use per-lot depth masks.
+   ...artworkChunks.flatMap(c=>
+    artAudit&&["1","draft","clean"].includes(artAudit[1])&&c.id==="block-2"
+    ?[{kind:"chunk-audit",obj:c,depth:Math.max(...c.lotIds.map(id=>selectionOverlay.depth(skeleton.byId.get(id))))}]
+    :c.lotIds.map(id=>{
+      const lot=skeleton.byId.get(id);
+      return{kind:"chunk-lot",obj:c,lot,depth:selectionOverlay.depth(lot)};
+    })
+   ),
    ...rowLayout.joints.filter(j=>!(replacedLots.has(j.left)&&replacedLots.has(j.right))).map(j=>({kind:"joint",obj:j,
     depth:Math.max(...[j.left,j.right].map(id=>
       Math.max(...world.buildings[id].poly.map(p=>proj(p.x,p.y).y))))+.08})),
@@ -1031,6 +1036,7 @@ function scene(){
   ].sort((a,b)=>a.depth-b.depth||(a.obj.id??0)-(b.obj.id??0));
   for(const layer of layers){
    if(layer.kind==="building")drawBuilding(layer.obj);
+   else if(layer.kind==="chunk-audit")chunkArt.draw(ctx,layer.obj,camera.zoom);
    else if(layer.kind==="chunk-lot"){
     ctx.save();selectionOverlay.clipLot(ctx,layer.lot);
     chunkArt.draw(ctx,layer.obj,camera.zoom);ctx.restore();
@@ -1253,9 +1259,10 @@ if(artAudit&&chunkArt){
   camera.x=candidate.frame.left+candidate.frame.width/2;
   camera.y=candidate.frame.top+candidate.frame.height/2;
   camera.zoom=1.65;
-  // The old ?artAudit=1 URL now opens the geometry-locked study.
-  // Keep the rejected, unaligned original as ?artAudit=draft for comparison.
-  const study=!["draft","clean"].includes(artAudit[1]);
+  // Preserve the original shared ART screenshot at its original audit URL.
+  // The geometry-correct SVG remains a separate comparison, never a silent
+  // replacement for the asset the user was inspecting.
+  const study=["study","fixed"].includes(artAudit[1]);
   chunkArt.register(candidate.id,{src:study
     ?"./assets/guides/cross-street-block-2-geometry-locked-art-study.svg"
     :"./assets/runtime/chunks/block-2-draft-audit.webp"},requestDraw);
@@ -1263,10 +1270,10 @@ if(artAudit&&chunkArt){
   $("markers-btn").setAttribute("aria-pressed","false");
   $("markers-btn").textContent="SEGNALINI ○";
   $("board-toast").textContent=study
-    ?"TEST CORRETTO — sagome e selezione per edificio; studio SVG (non ImageGen finale)"
+    ?"STUDIO GEOMETRICO SVG — confronto per singolo palazzo; non è l'asset grafico finale"
     :artAudit[1]==="clean"
-    ?"BOZZA RESPINTA — confronto senza hitbox, NON runtime"
-    :"BOZZA RESPINTA — confronto con hitbox, NON runtime";
+    ?"ASSET IMAGEGEN ORIGINALE — vista completa senza contorni; ancora disallineato"
+    :"ASSET IMAGEGEN RIPRISTINATO — prova raster originale con hitbox, allineamento ancora da correggere";
  }
 }
 fit();
