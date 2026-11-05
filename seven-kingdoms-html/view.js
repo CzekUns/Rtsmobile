@@ -33,7 +33,7 @@ export class WorldView{
   }
   return null;
  }
- draw(g,selection,ghost=null){
+ draw(g,selection,ghost=null,groupIds=[],selectionBox=null){
   const ctx=this.ctx,w=this.canvas.width,h=this.canvas.height,t=this.tile();
   ctx.fillStyle='#7e9673';ctx.fillRect(0,0,w,h);
   const l=Math.max(0,Math.floor(this.cx-w/(2*t))-1);
@@ -62,7 +62,8 @@ export class WorldView{
    this.label(ctx,'Cantiere · in attesa',p.x+w/2,p.y+w/2,t);
   }
   for(const firm of g.firms)this.firmDraw(ctx,firm,selection,t);
-  for(const unit of g.units)this.unitDraw(ctx,unit,selection,t);
+  const group=new Set(groupIds);
+   for(const unit of g.units)this.unitDraw(ctx,unit,selection,t,group.has(unit.id));
   if(ghost){
    const cfg=FIRMS[ghost.kind],pos=this.screen(ghost.x,ghost.y);
    const result=g.occupied(ghost.x,ghost.y,cfg.size);
@@ -70,7 +71,14 @@ export class WorldView{
    ctx.strokeStyle=result?'#ff796a':'#efffbd';ctx.lineWidth=2;
    ctx.strokeRect(pos.x,pos.y,cfg.size*t,cfg.size*t);
   }
-  this.drawMini(g);
+  if(selectionBox){
+    const a=selectionBox.start,b=selectionBox.end;
+    const x=Math.min(a.x,b.x),y=Math.min(a.y,b.y),width=Math.abs(b.x-a.x),height=Math.abs(b.y-a.y);
+    ctx.fillStyle='#e6d79c28';ctx.fillRect(x,y,width,height);
+    ctx.strokeStyle='#f6e4a0';ctx.lineWidth=2;
+    ctx.setLineDash([6,4]);ctx.strokeRect(x,y,width,height);ctx.setLineDash([]);
+   }
+   this.drawMini(g);
  }
  tileDraw(g,ctx,x,y,t){
   const p=this.screen(x,y),type=terrain(g.seed,x,y),n=hash(x,y,g.seed);
@@ -164,7 +172,7 @@ export class WorldView{
   this.label(ctx,FIRMS[firm.kind]?.label||firm.kind,p.x+s*.5,p.y+s+Math.max(7,t*.4),t);
   if(selection===firm.id){ctx.strokeStyle='#fff0a3';ctx.lineWidth=2;ctx.strokeRect(p.x-3,p.y-3,s+6,s+6);}
  }
- unitDraw(ctx,u,selection,t){
+ unitDraw(ctx,u,selection,t,groupSelected=false){
   const p=this.screen(u.x,u.y),s=Math.max(8,t*.70),nation=NATIONS[u.owner]?.color||'#aaa';
   if(p.x<-20||p.y<-20||p.x>this.canvas.width+20||p.y>this.canvas.height+20)return;
   ctx.fillStyle='#18221a80';ctx.beginPath();ctx.ellipse(p.x,p.y+t*.23,s*.35,s*.16,0,0,Math.PI*2);ctx.fill();
@@ -176,7 +184,7 @@ export class WorldView{
    ctx.fillStyle='#68695f';ctx.fillRect(p.x-s*.23,p.y-s*.38,s*.46,s*.13);
    ctx.strokeStyle='#49463c';ctx.lineWidth=Math.max(1,s*.07);ctx.beginPath();ctx.moveTo(p.x+s*.28,p.y-s*.22);ctx.lineTo(p.x+s*.5,p.y+s*.29);ctx.stroke();
   }
-  if(selection===u.id){ctx.strokeStyle='#f6e992';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(p.x,p.y+s*.18,s*.52,s*.27,0,0,Math.PI*2);ctx.stroke();}
+  if(selection===u.id||groupSelected){ctx.strokeStyle='#f6e992';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(p.x,p.y+s*.18,s*.52,s*.27,0,0,Math.PI*2);ctx.stroke();}
  }
  drawMini(g){
   const ctx=this.mctx,c=this.mini,dx=c.width/WORLD_W,dy=c.height/WORLD_H;
