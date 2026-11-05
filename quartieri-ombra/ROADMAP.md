@@ -1,3 +1,9 @@
+### 2026-11-05 — Correzione origine SVG del confronto V2 (causa dello scostamento)
+- [x] Confermato con `QOBoardSkeleton.create`: il chunk `block-2` ha frame reale `(-51,608,285×242)`, mentre `svgGuide` esporta `333×290`, con ulteriore padding di **24 unità per lato**.
+- [x] La versione `v2align` ora sottrae quel padding: ancoraggio `[18.5,18.5]` rispetto al frame reale (invece di `[42.5,42.5]`). Lo shear residuo è ridotto da 0.10 a 0.05. Il vecchio `v2fit` resta come confronto prima/dopo.
+- [x] Aggiornato il test di trasformazione con le coordinate reali del chunk e aggiunta verifica sulla sottrazione di 24.
+- [ ] Ancora da verificare nel browser Android/desktop l'aderenza di **tutti e sei** i tetti/facciate: la correzione delle coordinate non rende matematicamente aderente un artwork libero e non è promozione in runtime.
+
 ### 2026-11-05 — Cross Street V2: calibrazione progressiva visuale (solo audit)
 - [x] Lo screenshot utente mostra uno scarto maggiore nei tetti a sinistra, decrescente verso destra. Una comparazione locale sovrapposta ha suggerito una correzione verticale progressiva senza toccare le hitbox.
 - [x] Nuova modalità `?artAudit=v2align`: artwork originale con shear affine Y di 0.10, ancorato al margine destro del gruppo; i lotti/click restano fissi. `?artAudit=v2alignclean` nasconde le guide; `?artAudit=v2alignclip` verifica il clipping per edificio.
