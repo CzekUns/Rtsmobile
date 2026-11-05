@@ -1,3 +1,7 @@
+### 2026-11-05 — Studio visivo a geometria bloccata Cross Street
+- [x] Pubblicato `assets/guides/cross-street-block-2-illustrated-study.svg`: dettagli di finestre, corsi di mattoni e tetti inseriti sulle pareti/tetti dei sei lotti, senza cambiare i vertici dello scheletro. Commit `916eb871`.
+- [ ] Studio SVG NON è il chunk raster ImageGen corretto: non attivato nel manifest. Restano generazione RGBA vincolata, QA browser e zoom 7.5×.
+
 ### 2026-11-05 — Reference geometrica **da fornire a ImageGen**, non solo overlay a posteriori
 - [x] Generati due SVG nuovi per il gruppo `block-2`: input colorato e alpha master a **identica tela 1332×1160**, ricavati testualmente dalle pareti/tetti autoritativi, senza reinterpretazione prospettica. Tutti e sei i lotti validati contro lo scheletro.
 - [x] Test di regressione e workflow di produzione: ImageGen deve ricevere davvero questa reference come immagine, non essere incaricato di scegliere da sé geometria/maschere.
