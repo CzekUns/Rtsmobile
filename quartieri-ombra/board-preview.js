@@ -6,6 +6,10 @@
 const model=window.QOBoardWorld;
 if(!model)throw new Error("board-world.js is required before board-preview.js");
 const world=model.generate(1860),proj=model.project,unproj=model.inverse;
+const rowLayout=window.QOBlockContinuity
+ ? window.QOBlockContinuity.build(world.buildings,proj)
+ : {joints:[],byId:new Map(),groups:new Map(),stats:{joins:0,supported:0}};
+
 const $=id=>document.getElementById(id);
 const canvas=$("board-canvas");let ctx=canvas.getContext("2d",{alpha:false});
 const mini=$("board-minimap"),mc=mini.getContext("2d");
@@ -79,10 +83,14 @@ function rasterCrop(img){
  rasterCropCache.set(img,full);return full;
 }
 function rasterForBuilding(b){
- const candidates=rasterBuildingFiles[b.type];
- // The warehouse is not substituted by a workshop: no fake typology.
- if(!candidates||b.seed%5===0)return null;
- const sprite=rasterBuildings[candidates[b.seed%candidates.length]];
+ const candidates=rasterBuildingFiles[b.type],front=rowLayout.byId.get(b.id);
+ // A transparent PNG is not a 3D model. Painting it at an arbitrary street
+ // angle makes it appear pasted on. Restrict it to compatible camera azimuths
+ // and the visible street side, otherwise keep the correctly projected facade.
+ if(!candidates||!front||front.kind==="unmatched"||b.seed%5===0)return null;
+ if(front.kind==="B"&&candidates.length<2)return null;
+ const filename=front.kind==="B"?candidates[1]:candidates[0];
+ const sprite=rasterBuildings[filename];
  return sprite&&sprite.complete&&sprite.naturalWidth>0?sprite:null;
 }
 
@@ -554,6 +562,58 @@ function bakeBuilding(b,geometry){
  }finally{ctx=original}
  return {tile,left:geometry.left,top:geometry.top};
 }
+// One continuous ground seating layer for the row, below every roof and wall.
+// These cobbles, plinths and shared foundations are drawn before the architecture,
+// so the buildings no longer hover over a separate cutout shadow.
+function drawStreetFootings(){
+ for(const b of world.buildings){
+  const center=proj(b.x,b.y);
+  if(!pointInViewport(center,165))continue;
+  const foot=b.poly.map(p=>proj(p.x,p.y));
+  polygon(foot,"#29231d99","#45382d",.85);
+  const f0=foot[0],f1=foot[1],front=rowLayout.byId.get(b.id);
+  if(!front)continue;
+  const mid={x:(f0.x+f1.x)/2,y:(f0.y+f1.y)/2};
+  const d=proj(b.door.x,b.door.y),v={x:d.x-mid.x,y:d.y-mid.y};
+  polygon([f0,f1,{x:f1.x+v.x*1.6,y:f1.y+v.y*1.6},
+   {x:f0.x+v.x*1.6,y:f0.y+v.y*1.6}],"#6454429c","#1a1813",.7);
+  line(f0,f1,"#ad927167",1.15);
+ }
+ for(const joint of rowLayout.joints){
+  const f0=proj(joint.frontA.x,joint.frontA.y),f1=proj(joint.frontB.x,joint.frontB.y);
+  const r0=proj(joint.rearA.x,joint.rearA.y),r1=proj(joint.rearB.x,joint.rearB.y);
+  if(!pointInViewport(f0,110)&&!pointInViewport(f1,110))continue;
+  polygon([f0,f1,r1,r0],"#2c251eb4");
+  line(f0,f1,joint.kind==="shared"?"#856b53":"#342a23",joint.kind==="shared"?2.7:1.25);
+ }
+}
+function drawMasonryJoint(joint){
+ const fa=proj(joint.frontA.x,joint.frontA.y),fb=proj(joint.frontB.x,joint.frontB.y);
+ const ra=proj(joint.rearA.x,joint.rearA.y),rb=proj(joint.rearB.x,joint.rearB.y);
+ if(!pointInViewport(fa,160)&&!pointInViewport(fb,160))return;
+ if(joint.kind==="passage"){
+  // A narrow open service gap stays passable: a low rear courtyard wall,
+  // weathered steps and dark rubble connect the two facades visually.
+  const h=11+joint.roadId%5;
+  const raTop={x:ra.x,y:ra.y-h},rbTop={x:rb.x,y:rb.y-h};
+  polygon([ra,rb,rbTop,raTop],"#514033","#241e1b",1);
+  line(raTop,rbTop,"#8a745c",1.8);
+  line(fa,fb,"#271f1a",2.3);
+  return;
+ }
+ // Shared narrow party-wall and matching roof strip join neighboring modules
+ // without moving or enlarging their real footprint geometry.
+ const h=joint.height,faTop={x:fa.x,y:fa.y-h},fbTop={x:fb.x,y:fb.y-h};
+ const raTop={x:ra.x,y:ra.y-h},rbTop={x:rb.x,y:rb.y-h};
+ polygon([fa,fb,fbTop,faTop],"#554033","#251d18",.8);
+ polygon([faTop,fbTop,rbTop,raTop],"#453831","#27221e",.75);
+ line(faTop,fbTop,"#856b55",1.6);
+ for(let t=.22;t<.94;t+=.2){
+  const a=lerp(faTop,fa,t),b=lerp(fbTop,fb,t);
+  line(a,b,"#2d251f96",.6);
+ }
+ line(fa,fb,"#8b71574d",2);
+}
 function drawBuilding(b){
  const center=proj(b.x,b.y);
  if(!pointInViewport(center,210))return;
@@ -583,12 +643,12 @@ function drawBuilding(b){
   const desiredHeight=b.z+Math.max(14,b.d*.35);
   const scale=Math.min(desiredWidth/crop.w,desiredHeight/crop.h);
   const rw=crop.w*scale,rh=crop.h*scale;
-  const footY=Math.max(...geometry.ground.map(p=>p.y));
-  // Contact shadow remains independent of the original transparent image.
-  ellipse(center.x,footY-2,Math.max(9,groundWidth*.39),
-          Math.max(3,groundWidth*.095),"#17130fa8");
+  // Anchor to the actual street-facing base, not to the arbitrary
+  // bounding-box bottom of a crooked lot. Footings and neighbors stay aligned.
+  const p0=geometry.ground[0],p1=geometry.ground[1];
+  const frontX=(p0.x+p1.x)/2,frontY=(p0.y+p1.y)/2;
   ctx.drawImage(raster,crop.x,crop.y,crop.w,crop.h,
-                center.x-rw/2,footY-rh,rw,rh);
+                frontX-rw/2,frontY-rh,rw,rh);
  }else{
   ctx.drawImage(cached.tile,cached.left,cached.top);
  }
@@ -801,14 +861,21 @@ function scene(){
  ctx.fillStyle="#211c18";ctx.fillRect(0,0,width,height);
  ctx.save();ctx.translate(width/2,height/2);
  ctx.scale(camera.zoom,camera.zoom);ctx.translate(-camera.x,-camera.y);
- drawGround();drawRoads();drawStreetDrainage();clickRegions=[];
+ drawGround();drawRoads();drawStreetDrainage();drawStreetFootings();clickRegions=[];
  const layers=[
   ...world.buildings.map(b=>({kind:"building",obj:b,
    depth:Math.max(...b.poly.map(p=>proj(p.x,p.y).y))})),
+  ...rowLayout.joints.map(j=>({kind:"joint",obj:j,
+   depth:Math.max(...[j.frontA,j.frontB,j.rearA,j.rearB].map(p=>proj(p.x,p.y).y))+.05})),
   ...world.props.map(p=>({kind:"prop",obj:p,depth:proj(p.x,p.y).y})),
   ...marketStalls.map(p=>({kind:"stall",obj:p,depth:proj(p.x,p.y).y}))
  ].sort((a,b)=>a.depth-b.depth||a.obj.id-b.obj.id);
- for(const layer of layers){if(layer.kind==="building")drawBuilding(layer.obj);else if(layer.kind==="stall")drawMarketStall(layer.obj);else drawProp(layer.obj)}
+ for(const layer of layers){
+  if(layer.kind==="building")drawBuilding(layer.obj);
+  else if(layer.kind==="joint")drawMasonryJoint(layer.obj);
+  else if(layer.kind==="stall")drawMarketStall(layer.obj);
+  else drawProp(layer.obj);
+ }
  drawStreetAtmosphere();drawDistrictHaze();
  ctx.restore();
  const position=unproj(camera.x,camera.y),region=model.sector(position);
