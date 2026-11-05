@@ -194,3 +194,6 @@
 
 ## 2026-11-05 — Facciate commerciali e balconi
 Commit `77e3b5d8`: nella preview della plancia aggiunti insegne sporgenti, cornici lignee per botteghe, davanzali e ringhiere saltuarie ai piani superiori. Solo rendering; nessun cambiamento NPC/economia. Verificata presenza degli anchor nel sorgente prima della modifica; screenshot browser e Android non eseguiti, quindi confronto GOLDEN ancora aperto.
+
+### 2026-11-05 03:00 — Iterazione atmosfera plancia
+Commit `ceee77bcec11945fc46d68263febe9c7bf1d5f07`: aggiunti `drawStreetAtmosphere` e `drawDistrictHaze` in `board-preview.js`. Aloni radiali ambra dei lampioni, piccole pozze di luce e banchi di foschia originali generati deterministicamente in coordinate mondo; pass separato dai palazzi e dalla logica di gioco. Revisione statica del sorgente eseguita; non eseguiti browser screenshot, Node regression o prova Android in questa esecuzione. La plancia resta da confrontare con l'immagine golden e non è approvata.
