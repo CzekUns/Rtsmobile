@@ -1,3 +1,9 @@
+### 2026-11-05 — Reference geometrica **da fornire a ImageGen**, non solo overlay a posteriori
+- [x] Generati due SVG nuovi per il gruppo `block-2`: input colorato e alpha master a **identica tela 1332×1160**, ricavati testualmente dalle pareti/tetti autoritativi, senza reinterpretazione prospettica. Tutti e sei i lotti validati contro lo scheletro.
+- [x] Test di regressione e workflow di produzione: ImageGen deve ricevere davvero questa reference come immagine, non essere incaricato di scegliere da sé geometria/maschere.
+- [ ] Il risultato della generazione sperimentale corrente **non è un asset conforme**: non promuoverlo in runtime. Manca un artwork generato realmente sulla reference, con facciate e tetti congruenti, test screenshot 1×/3×/7.5×.
+- [ ] Nella fase seguente implementare compositing su piani e maschere vettoriali se ImageGen non conserva esattamente bordi e prospettiva.
+
 ### 2026-11-05 — Ripristino urgente asset raster nel test
 - [x] Ripristinata bozza WebP originale a `?artAudit=1`, senza cancellare il fix di selezione in produzione e senza sostituirla con il solo studio SVG.
 - [x] Sulle sole modalità di confronto raster, il renderer mostra la **macro-illustrazione completa** senza clip inadatto a un disegno non allineato; sopra rimangono gli overlay dei lotti. `?artAudit=clean` omette gli overlay, `?artAudit=study` mostra l'alternativa geometrica.
