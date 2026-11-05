@@ -46,7 +46,10 @@ export function indexedToRgba(bitmap,palette,{mirror=false,remap=null}={}) {
   const raw=bitmap.pixels[sourceIndex];
   if(raw===255) continue; // transparent skip pixels have no colour
   const index=remap?remap[raw]:raw;
-  check(index<248,'Remap produced transparent control code for an opaque pixel');
+  // OGAME.cpp maps OUTLINE_CODE (0xf2) to TRANSPARENT_CODE (0xff)
+  // for unselected buildings. This must produce alpha=0, not a palette tint.
+  if(index===255)continue;
+  check(index<248,'Remap produced unsupported transparent control code');
   rgba[destIndex]=palette[index*3];rgba[destIndex+1]=palette[index*3+1];
   rgba[destIndex+2]=palette[index*3+2];rgba[destIndex+3]=255;
  }
@@ -62,6 +65,18 @@ export function encodePng(width,height,rgba){
  const scan=Buffer.alloc(height*(1+width*4));
  for(let y=0;y<height;y++)rgba.copy(scan,y*(1+width*4)+1,y*width*4,(y+1)*width*4);
  return Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]),chunk('IHDR',header),chunk('IDAT',deflateSync(scan,{level:9})),chunk('IEND',Buffer.alloc(0))]);
+}
+// src/OGAME.cpp::init_remap_table + get_color_remap_table; source shades E0-E7 only.
+// Scheme 0 is independent, 1..7 match the original nation palette slots.
+export function nationRemapTable(colorSchemeId=0,{selected=false}={}){
+ check(Number.isInteger(colorSchemeId)&&colorSchemeId>=0&&colorSchemeId<=7,
+  'Original nation colour scheme must be 0..7');
+ const primary=[0xbc,0xa0,0xa4,0xa8,0xac,0xb0,0xb4,0xb8][colorSchemeId];
+ const secondary=[0xdc,0xc0,0xc4,0xc8,0xcc,0xd0,0xd4,0xd8][colorSchemeId];
+ const remap=Uint8Array.from({length:256},(_,i)=>i);
+ for(let i=0;i<4;i++){remap[0xe0+i]=primary+i;remap[0xe4+i]=secondary+i}
+ remap[0xf2]=selected?0xef:0xff;remap[0xf3]=selected?0xef:0;
+ return remap;
 }
 export function mirrorForDirection(direction,turnResolution){
  check(Number.isInteger(direction)&&direction>=0&&direction<24,'Invalid source display direction');
