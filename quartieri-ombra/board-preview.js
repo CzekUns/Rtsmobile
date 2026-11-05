@@ -901,6 +901,23 @@ function drawStreetDrainage(){
  }
 }
 
+function drawBlueprintTerrain(){
+ // A true schematic layer: no ImageGen surface, texture, decoration or lighting.
+ const border=[proj(0,0),proj(world.width,0),proj(world.width,world.height),proj(0,world.height)];
+ polygon(border,"#222925","#737b71",1.7);
+ for(const road of world.roads){
+  for(let i=1;i<road.points.length;i++){
+   const a=road.points[i-1],b=road.points[i];
+   const pa=proj(a.x,a.y),pb=proj(b.x,b.y);
+   if(!pointInViewport(pa,380)&&!pointInViewport(pb,380))continue;
+   polygon(roadQuad(a,b,road.width),"#4b4b43","#8f8c7a",.8);
+  }
+  for(const j of road.points.slice(1,-1)){
+   const p=proj(j.x,j.y);
+   if(pointInViewport(p,40))ellipse(p.x,p.y,road.width*.34,road.width*.16,"#4b4b43");
+  }
+ }
+}
 function drawBlueprintGuide(){
  // The technical layer remains sharp at any zoom, independent of raster art.
  for(const lot of skeleton.lots){
@@ -965,7 +982,9 @@ function scene(){
  ctx.fillStyle="#211c18";ctx.fillRect(0,0,width,height);
  ctx.save();ctx.translate(width/2,height/2);
  ctx.scale(camera.zoom,camera.zoom);ctx.translate(-camera.x,-camera.y);
- drawGround();drawRoads();if(!blueprintMode){drawStreetDrainage();drawStreetFootings();}clickRegions=[];
+ if(blueprintMode)drawBlueprintTerrain();
+ else{drawGround();drawRoads();drawStreetDrainage();drawStreetFootings();}
+ clickRegions=[];
  if(blueprintMode){
   drawBlueprintGuide();
  }else{
