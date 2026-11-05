@@ -229,3 +229,6 @@ Nota: la proiezione isometrica non deve essere confusa con la regolarità urbani
 ### Plancia — iterazione visiva 2026-11-04 23:58 CET
 - [x] Nuova passata grafica effettiva: ciottoli irregolari per tratto stradale, riparazioni in ardesia e abbaini/sopralzi sui tetti alti (`c2a3957`). Parsing V8 PASS.
 - [ ] Browser reale desktop/mobile landscape, screenshot comparato con reference approvata, controllo prestazioni e fedeltà visiva: ancora da verificare. Non equivale ad approvazione.
+
+- [x] Iterazione grafica 2026-11-05: insegne botteghe, cornici, davanzali e balconi nella preview (`77e3b5d8`).
+- [ ] Collaudo browser desktop/mobile landscape con screenshot e confronto GOLDEN: ancora necessario.
