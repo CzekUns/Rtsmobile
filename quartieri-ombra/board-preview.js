@@ -102,6 +102,23 @@ function drawRoads(){
     const off=r.width*side,nx=-dy/len*off,ny=dx/len*off;
     line(proj(a.x+nx,a.y+ny),proj(b.x+nx,b.y+ny),"#302d28a6",1.7);
    }
+   // Damp carriageway: irregular shallow puddles and wet cobble highlights.
+   // All positions are seeded in world space, so panning never slides the texture.
+   const wet=seeded(186011+r.id*701+i*1297);
+   const wetCount=Math.max(2,Math.floor(len/36));
+   for(let k=0;k<wetCount;k++){
+    const t=(k+.18+wet()*.62)/wetCount;
+    const side=(wet()-.5)*(r.width-13);
+    const nx=-dy/len,ny=dx/len;
+    const p=proj(a.x+dx*t+nx*side,a.y+dy*t+ny*side);
+    if(!pointInViewport(p,20))continue;
+    const radius=2.5+wet()*7;
+    ellipse(p.x,p.y,radius,radius*.29,"#242d2b9c");
+    if(wet()>.3){
+     line({x:p.x-radius*.65,y:p.y-.5},{x:p.x+radius*.28,y:p.y-.8},
+      "#a69a7869",.65);
+    }
+   }
    // Individual broken cobbles, embedded in road coordinates so bends retain perspective.
    // Seeded per segment: stable during camera movement and independent of zoom.
    const stones=seeded(70001+r.id*193+i*911);
