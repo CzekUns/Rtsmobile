@@ -240,3 +240,8 @@ Nota: la proiezione isometrica non deve essere confusa con la regolarità urbani
 ### 2026-11-05 — Illuminazione ambientale modulare
 - [x] Nuovo pass di rendering world-space per aloni ambra dei lampioni, riflessi a terra e 58 banchi di foschia a coordinate fisse; commit `ceee77bc`. Nessuna modifica a NPC o gameplay.
 - [ ] Screenshot desktop/Android e confronto con golden reference ancora mancanti; alpha visiva NON approvata.
+
+### Aggiornamento 2026-11-05 — P0 plancia
+- [x] Iterazione grafica visibile: abbaini e coppie di camini sui tetti, commit `677cf5d` (solo `board-preview.js`).
+- [ ] Screenshot reale desktop/mobile landscape e confronto con golden reference: NON verificati.
+- [ ] Alpha visiva accettabile / approvazione utente: NON raggiunte.
