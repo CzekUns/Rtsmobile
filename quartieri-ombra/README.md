@@ -1,3 +1,7 @@
+## Correzione geometrica V2: margine della guida SVG
+
+La guida di ImageGen `cross-street-block-2-skeleton.svg` esporta i vertici con **24 unità di margine extra** intorno a `chunk.frame`. Il primo tentativo posizionava il gruppo usando gli offset dell'SVG senza rimuovere quel margine, causando uno spostamento sistematico dell'asset. Nel nuovo `?artAudit=v2align` la posizione viene normalizzata correttamente al frame `block-2` e si applica soltanto una lieve correzione residua di prospettiva. `v2fit` resta invariata per il confronto e le hitbox del motore restano originali. È ancora una preview da approvare, non il sostituto definitivo degli edifici.
+
 ## Nuovo confronto visivo Cross Street: calibrazione progressiva
 
 Lo screenshot di audit V2 ha mostrato che i tetti sono sfalsati in misura diversa lungo la fila. Il test `?artAudit=v2align` applica **solo alla macro-illustrazione diagnostica** una correzione affine progressiva, con il punto destro immobile; la geometria delle hitbox NON cambia. Usare `?artAudit=v2fit` per il prima e `?artAudit=v2align` per il dopo; `?artAudit=v2alignclean` nasconde gli overlay e `?artAudit=v2alignclip` prova il ritaglio per lotti. Non sono asset runtime definitivi; le pareti e i tetti centrali richiedono ulteriore verifica e, probabilmente, illustrazioni prodotte sui sei volumi separati.
