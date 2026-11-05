@@ -1,3 +1,17 @@
+### 2026-11-05 — Correzione effetto figurine: isolati continui
+L'utente ha segnalato che la prima integrazione PNG sembrava «palazzi appiccicati come figurine». È stato avviato un restyling **geometrico e di asset** anziché produrre ulteriori palazzi isolati. Non sono state modificate logiche NPC/IA/economia.
+
+**Commit effettivi sulla main:**
+- `44d270378614ae6e1416aac1ad4afa2905419dd5`: nuovo `block-continuity.js` indipendente, 337 giunzioni fra edifici vicini sul medesimo lato strada, 117 gruppi (105 multi-edificio), 170 giunzioni `shared` e 167 passaggi `passage`; classificazione degli angoli A/B e controlli che evitano fronte retro, strade diverse ed estremità duplicate.
+- `d461c20711a6d9f349c26107ff6c6c981d2a3bec`: `board-preview.js` aggancia raster alla metà della vera facciata sul fronte strada, non al centro arbitrario del lotto; aggiunge basamenti comuni, fascia di raccordo in pietra/fango, muri comuni e tetti brevi oppure bassi muri sui passaggi. I raster solo compatibili con gli angoli rappresentati; per angoli privi di asset rimane il disegno isometrico di fallback, mai una rotazione 2D falsa.
+- `10333af8b1e43b08fdc292563bccf1c7d5f32f8f`, `a8d4b3292290f29871f218d903de78334579a61f`: entrambe le pagine board caricano il modulo prima del renderer e forzano aggiornamento cache.
+- `8bb8a7cab4825e918cc13772318460850731e02e`: test permanente `tests/block-continuity.test.cjs`. Documento [BLOCK_ASSET_SPEC.md](BLOCK_ASSET_SPEC.md): contratto asset puzzle e angolazioni di produzione.
+
+**Verifiche eseguite:** V8 con codice GitHub appena fetch: 337 giunzioni senza disallineamenti >18 unità, senza strade incrociate, senza doppio utilizzo degli estremi, esecuzione ripetibile. Smoke mock DOM/Canvas: primo render PASS con 228 prerender creati, funzionano zoom, drag, selezione/tap e minimappa, senza errori JS; conteggio edifici 454. Sono prove mock/di geometria, **non** la suite Node su filesystem o verifica visiva reale.
+
+**Limiti:** l'integrazione dei raster conserva solo circa 150 posizioni con assi A/B potenzialmente compatibili, e per altri tipi/retro ancora meno: servono viste originali dedicate e kit di schiera left/middle/right/corner, oltre a texture/ombra coerenti. Le nuove giunzioni possono ancora richiedere correzioni di occlusione sui PNG. Non sono stati acquisiti screenshot da browser né Android reale, quindi non dichiarare risolto in maniera definitiva l'effetto figurine. Il worker orario è stato aggiornato per priorità assoluta CONTINUITÀ + KIT ASSET fino al restyling completo.
+
+
 ### 2026-11-05 16:00 — Primo passaggio raster ImageGen nella plancia
 - Commit `a8b2f4adc56325709576718f35b015d33bcfe2fb`: caricamento di sei sorgenti PNG originali già presenti nel repository, selezione per tipologia e seed, rendering con proporzioni uniformi ancorato al suolo, fallback al precedente sprite vettoriale; nessuna modifica NPC/pathfinding/IA/economia. Cache bust della preview.
 - Test eseguito: parsing V8 con `new Function` sul JavaScript aggiornato: PASS. **Non** eseguiti screenshot browser/Android, verifica effettiva delle trasparenze, orientamenti e test Node. In particolare la coerenza tra footprint e margini dell'immagine resta da collaudare.
