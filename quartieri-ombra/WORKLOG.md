@@ -233,3 +233,6 @@ Commit `ceee77bcec11945fc46d68263febe9c7bf1d5f07`: aggiunti `drawStreetAtmospher
 
 ### 2026-11-05 — Scenografia mercato (worker)
 Commit `f90db4885619453d777356dd8c20543433ecf973`: introdotti banchi mercatali originali, tettoie e merci in Canvas, generati da botteghe selezionate e ordinati per profondità nel renderer. Nessuna modifica NPC/IA/economia. Verifica statica dei punti di integrazione effettuata; test Node, browser reale, screenshot desktop/mobile e confronto golden NON eseguiti (nessun browser di automazione disponibile in questo turno). Possibili compenetrazioni con facciate da verificare in screenshot. Stato NON approvato.
+
+### 2026-11-05 — Bordature stradali irregolari
+Commit `d5f9b7e`: aggiunta in `board-preview.js` una fascia di ciottoli e spigoli irregolari lungo entrambi i margini di ogni segmento stradale, con seed stabile e culling viewport. Obiettivo: rompere le lunghe sagome vettoriali delle strade senza cambiare la geometria o la navigazione. Verifica effettuata: parsing JavaScript con `new Function` nel runtime JS prima della pubblicazione. NON effettuati screenshot browser, prove Android o suite Node; confronto GOLDEN ancora aperto. NPC e gameplay invariati.
