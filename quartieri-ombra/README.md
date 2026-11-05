@@ -1,5 +1,15 @@
 # Quartieri d'Ombra — RTS di controllo territoriale
 
+## Fix Cross Street: hitbox visibili e profondità dei macro-blocchi (5 novembre 2026)
+
+La plancia disegna ora ciascun lotto contenuto in una macro-immagine tramite la sagoma volumetrica vettoriale del proprio edificio; la profondità viene ordinata **per edificio**, non più per intero blocco. I contorni di selezione e le guide diagnostiche vengono occultati dagli edifici realmente davanti. La modalità audit usa numeri sui tetti e nasconde inizialmente i segnalini per facilitare il controllo.
+
+- `board-preview.html?artAudit=1` o `?artAudit=study`: test corretto **con studio SVG geometry-locked**, non ancora art ImageGen finale.
+- `board-preview.html?artAudit=draft`: precedente immagine ImageGen **non allineata**, solo confronto con geometria.
+- `board-preview.html?artAudit=clean`: stessa bozza non allineata, senza overlay di audit.
+
+Il risultato richiede ancora screenshot desktop/Android e un macro-raster ImageGen realmente conforme allo scheletro: **nessuna promozione dell'asset non allineato in produzione**.
+
 ## Nuova architettura grafica: blueprint + immagini di isolati
 
 La nuova versione separa **scheletro vettoriale e hitbox** (`board-skeleton.js`) dalla **grafica per gruppi di palazzi** (`board-chunks.js`). È possibile premere **SCHELETRO** per vedere i contorni esatti dei 454 lotti e i fronti strada; **SEGNALINI** per distinguere abitazioni da attività; **GUIDA SVG** per esportare la porzione selezionata e utilizzarla come reference di produzione artistica. Toccare un edificio evidenzia il suo tetto e le sue facciate, anche se in futuro più lotti useranno un'unica illustrazione. La strada è selezionabile separatamente. Lo zoom arriva a **7,5×** mantenendo le geometrie esatte.

@@ -12,6 +12,8 @@ const rowLayout=window.QOBlockContinuity
 const skeleton=window.QOBoardSkeleton&&window.QOBoardSkeleton.create(world,proj,rowLayout,unproj);
 if(!skeleton)throw new Error("board-skeleton.js is required before board-preview.js");
 const chunkArt=window.QOChunkArt;
+const selectionOverlay=window.QOSelectionOverlay;
+if(!selectionOverlay)throw new Error("board-selection-overlay.js is required before board-preview.js");
 // This index is an explicit, auditable bridge from newly uploaded ImageGen
 // group illustrations to the fixed logical lot geometry. Null slots load nothing.
 function loadVerifiedChunks(){
@@ -44,7 +46,7 @@ const mini=$("board-minimap"),mc=mini.getContext("2d");
 const stage=$("board-stage");
 const worldCenter=proj(world.hub.x,world.hub.y);
 const camera={x:worldCenter.x,y:worldCenter.y,zoom:1.15};
-const artAudit=/(?:^|[?&])artAudit=(1|clean|study)(?:&|$)/.exec(window.location?.search||"");
+const artAudit=/(?:^|[?&])artAudit=(1|fixed|study|draft|clean)(?:&|$)/.exec(window.location?.search||"");
 const auditGuides=!!artAudit&&artAudit[1]!=="clean";
 const imageNames={barrel:"barrel.svg",crate:"crate.svg",streetLamp:"street_lamp.svg",lantern:"lantern.svg",woodenFence:"wooden_fence.svg"};
 const images={};
@@ -699,11 +701,7 @@ function drawBuilding(b){
   ctx.drawImage(cached.tile,cached.left,cached.top,cached.width,cached.height);
  }
  ctx.restore();
- if(selected&&selected.id===b.id){
-  polygon(geometry.roof,null,"#efc981",2.1);
-  ellipse(center.x,center.y,13,5,"#d5b36b55");
- }
- clickRegions.push({b,ground:geometry.ground,roof:geometry.roof});
+  clickRegions.push({b,ground:geometry.ground,roof:geometry.roof});
 }
 function drawCart(p){
  // Independent period wagon sprite: angled wooden bed, raised sides, spoke wheels,
@@ -955,14 +953,14 @@ function drawLotMarkers(){
  ctx.textBaseline="alphabetic";
 }
 function highlightSelected(){
- // Topmost logical overlay: it works identically on independent art, one
- // complete seamless block PNG, or the technical blueprint.
+ // Topmost logical overlay, clipped so nearer buildings cover the selection.
  if(!selected)return;
  const lot=skeleton.byId.get(selected.id);if(!lot)return;
  ctx.save();
+ selectionOverlay.clipVisible(ctx,skeleton,lot);
  ctx.shadowBlur=14/camera.zoom;ctx.shadowColor="#ffd279";
  for(const face of lot.faces)if(face.visible)
-   polygon(face.poly,"#ffde6433","#ffce7b",2.1/camera.zoom);
+  polygon(face.poly,"#ffde6433","#ffce7b",2.1/camera.zoom);
  polygon(lot.roof,"#f9da5d48","#ffe4a2",2.5/camera.zoom);
  ctx.shadowBlur=0;
  line(lot.frontage[0],lot.frontage[1],"#ffce69",3.2/camera.zoom);
@@ -970,22 +968,26 @@ function highlightSelected(){
  ctx.restore();
 }
 function drawAuditGuides(){
- // Overlay *real* per-building projected roofs and street-facing edges on top
- // of one continuous ImageGen draft. Deliberately exposes alignment errors:
- // this artwork has NOT passed geometry QA, so it is not a production layer.
- const chunk=skeleton.chunkByLot.get(2);
- if(!chunk)return;
- ctx.save();
+ // All six real lot volumes remain separately selectable inside one artwork.
+ const chunk=skeleton.chunkByLot.get(2);if(!chunk)return;
  for(const id of chunk.lotIds){
   const lot=skeleton.byId.get(id);
+  ctx.save();
+  selectionOverlay.clipVisible(ctx,skeleton,lot);
+  // Outline actual roof and visible facades, never an approximate image box.
+  for(const face of lot.faces)if(face.visible)
+   polygon(face.poly,null,"#74e7e4aa",1/camera.zoom);
   polygon(lot.roof,null,"#74e7e4",1.5/camera.zoom);
-  line(lot.frontage[0],lot.frontage[1],"#ffe078",2.4/camera.zoom);
-  ctx.textAlign="center";
-  ctx.fillStyle="#d6fff5";
-  ctx.font=(11/camera.zoom)+"px monospace";
-  ctx.fillText(String(id+1),lot.labelPoint.x,lot.labelPoint.y);
+  line(lot.frontage[0],lot.frontage[1],"#ffe078",2/camera.zoom);
+  const p=selectionOverlay.roofCenter(lot),w=25/camera.zoom,h=17/camera.zoom;
+  ctx.fillStyle="#14231ee9";ctx.fillRect(p.x-w/2,p.y-h/2,w,h);
+  ctx.strokeStyle="#74e7e4";ctx.lineWidth=1/camera.zoom;
+  ctx.strokeRect(p.x-w/2,p.y-h/2,w,h);
+  ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.fillStyle="#e7fff8";ctx.font="bold "+(11/camera.zoom)+"px monospace";
+  ctx.fillText(String(id+1),p.x,p.y);
+  ctx.restore();
  }
- ctx.restore();
 }
 function drawStreetSelection(){
  if(!selectedStreet)return;
@@ -1015,8 +1017,12 @@ function scene(){
   const layers=[
    ...world.buildings.filter(b=>!replacedLots.has(b.id)).map(b=>({kind:"building",obj:b,
     depth:Math.max(...b.poly.map(p=>proj(p.x,p.y).y))})),
-   ...artworkChunks.map(c=>({kind:"chunk",obj:c,
-    depth:Math.max(...c.lotIds.flatMap(id=>skeleton.byId.get(id).ground.map(p=>p.y)))})),
+   // A macro-illustration is clipped into individually depth-sorted volumes.
+   // This prevents a rear house from painting over a nearer building.
+   ...artworkChunks.flatMap(c=>c.lotIds.map(id=>{
+    const lot=skeleton.byId.get(id);
+    return{kind:"chunk-lot",obj:c,lot,depth:selectionOverlay.depth(lot)};
+   })),
    ...rowLayout.joints.filter(j=>!(replacedLots.has(j.left)&&replacedLots.has(j.right))).map(j=>({kind:"joint",obj:j,
     depth:Math.max(...[j.left,j.right].map(id=>
       Math.max(...world.buildings[id].poly.map(p=>proj(p.x,p.y).y))))+.08})),
@@ -1025,7 +1031,10 @@ function scene(){
   ].sort((a,b)=>a.depth-b.depth||(a.obj.id??0)-(b.obj.id??0));
   for(const layer of layers){
    if(layer.kind==="building")drawBuilding(layer.obj);
-   else if(layer.kind==="chunk")chunkArt.draw(ctx,layer.obj,camera.zoom);
+   else if(layer.kind==="chunk-lot"){
+    ctx.save();selectionOverlay.clipLot(ctx,layer.lot);
+    chunkArt.draw(ctx,layer.obj,camera.zoom);ctx.restore();
+   }
    else if(layer.kind==="joint")drawMasonryJoint(layer.obj);
    else if(layer.kind==="stall")drawMarketStall(layer.obj);
    else drawProp(layer.obj);
@@ -1244,15 +1253,20 @@ if(artAudit&&chunkArt){
   camera.x=candidate.frame.left+candidate.frame.width/2;
   camera.y=candidate.frame.top+candidate.frame.height/2;
   camera.zoom=1.65;
-  const study=artAudit[1]==="study";
+  // The old ?artAudit=1 URL now opens the geometry-locked study.
+  // Keep the rejected, unaligned original as ?artAudit=draft for comparison.
+  const study=!["draft","clean"].includes(artAudit[1]);
   chunkArt.register(candidate.id,{src:study
     ?"./assets/guides/cross-street-block-2-geometry-locked-art-study.svg"
     :"./assets/runtime/chunks/block-2-draft-audit.webp"},requestDraw);
+  markersVisible=false;
+  $("markers-btn").setAttribute("aria-pressed","false");
+  $("markers-btn").textContent="SEGNALINI ○";
   $("board-toast").textContent=study
-    ?"STUDIO GEOMETRICO ALLINEATO — SVG provvisorio, non ImageGen: tetti ciano / fronti gialli"
+    ?"TEST CORRETTO — sagome e selezione per edificio; studio SVG (non ImageGen finale)"
     :artAudit[1]==="clean"
-    ?"BOZZA DI ISOLATO — arte non allineata alle hitbox; solo confronto"
-    :"BOZZA NON ALLINEATA — ciano = tetti, giallo = fronte strada. Test di sovrapposizione";
+    ?"BOZZA RESPINTA — confronto senza hitbox, NON runtime"
+    :"BOZZA RESPINTA — confronto con hitbox, NON runtime";
  }
 }
 fit();
