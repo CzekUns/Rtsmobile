@@ -1,0 +1,86 @@
+/* Original old-school RTS HUD; all game gestures stay on the map canvas. */
+:root{color-scheme:dark;--ink:#1b1715;--iron:#332a22;--frame:#94754c;--amber:#d6b47d;--paper:#c9b391}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none;touch-action:none}
+body{position:fixed;inset:0;background:#161311;color:var(--paper);font-family:Georgia,"Times New Roman",serif}
+button,a{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.board-shell{position:fixed;inset:0;display:grid;grid-template-rows:auto minmax(0,1fr) minmax(94px,18vh);overflow:hidden;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+.board-top{z-index:2;display:flex;gap:12px;align-items:center;min-height:48px;padding:5px 12px;background:linear-gradient(#342720,#191613);border-bottom:3px ridge var(--frame);box-shadow:0 4px 13px #000b;min-width:0}
+.board-brand{display:flex;flex-direction:column;white-space:nowrap;min-width:0}
+.board-brand strong{color:#efcf94;letter-spacing:.045em;font-size:16px;text-shadow:1px 2px #090807}
+.board-brand small{color:#ab916c;font-size:9px;letter-spacing:.08em}
+.board-state{display:flex;flex:1;align-items:center;justify-content:center;gap:clamp(10px,3vw,40px);white-space:nowrap;overflow:hidden;font-family:Georgia,serif;font-size:11px}
+.board-state span{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.board-state b{font-size:16px;color:#f2ce86;margin-left:5px}
+.top-controls{display:flex;gap:6px;align-items:center}
+.top-controls a,.top-controls button,.board-zoom button{color:#ead4ac;border:2px outset #8a6b46;border-radius:2px;background:linear-gradient(#403228,#241d19);box-shadow:inset 0 1px #8d7040,0 2px 3px #0009;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;height:34px}
+.top-controls button{width:36px;font-size:23px}
+.top-controls .classic-link{font-size:10px;padding:0 9px;font-weight:bold;letter-spacing:.04em}
+.top-controls button:active,.board-zoom button:active{border-style:inset}
+.board-stage{min-width:0;min-height:0;position:relative;overflow:hidden;touch-action:none;background:#211d19}
+.board-stage canvas{display:block;width:100%;height:100%;touch-action:none;user-select:none;-webkit-user-select:none}
+.board-toast{position:absolute;pointer-events:none;top:11px;left:50%;transform:translateX(-50%);max-width:90%;padding:5px 13px;border:1px solid #785b3f;background:#18120ed8;color:#e8cf9a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font:10px Georgia,serif;letter-spacing:.03em;text-shadow:0 1px #000}
+.board-zoom{position:absolute;right:12px;top:11px;display:flex;flex-direction:column;gap:6px}
+.board-zoom button{font-size:23px;width:35px;height:35px}
+.board-hud{z-index:3;min-height:0;display:grid;grid-template-columns:clamp(140px,18vw,225px) minmax(0,1fr) clamp(165px,26vw,280px);background:linear-gradient(#392d23,#1b1714);border-top:4px ridge #9d7850;box-shadow:0 -5px 12px #000c}
+.board-hud>div{min-width:0;min-height:0;overflow:hidden;padding:7px 10px}
+.board-hud>div+div{border-left:2px ridge #785c3d}
+.map-panel{display:flex;align-items:center}
+.map-panel canvas{display:block;width:100%;height:100%;min-height:0;max-height:100%;background:#261e19;box-shadow:0 0 0 2px #8a6a45;cursor:pointer;touch-action:none}
+.info-tag{font-size:9px;letter-spacing:.14em;color:#a88c64;margin-bottom:4px}
+.board-info strong{display:block;color:#edca8d;font-size:clamp(13px,1.5vw,19px);white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+.board-info p{font:clamp(10px,1.05vw,12px)/1.35 Georgia,serif;margin:4px 0;color:#c3b198;max-height:3em;overflow:hidden}
+.board-actions{font-size:11px}
+.board-hint{margin:2px 0;font-size:clamp(10px,.98vw,12px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rotate-gate{position:fixed;z-index:50;inset:0;display:none;justify-content:center;align-items:center;background:#15110f;padding:24px;text-align:center}
+.gate-paper{max-width:370px;border:4px ridge #886b47;background:#30241d;padding:22px}
+.gate-paper strong{color:#f0cd8c;font-size:19px}
+.gate-paper p{line-height:1.5}
+.rotation-icon{font-size:57px;color:#d3a869}
+@media(orientation:portrait) and (max-width:900px){.rotate-gate{display:flex}}
+@media(orientation:landscape) and (max-height:510px){
+ .board-shell{grid-template-rows:38px minmax(0,1fr) clamp(78px,24vh,100px)}
+ .board-top{min-height:38px;padding:2px 8px;gap:7px}
+ .board-brand strong{font-size:clamp(10px,1.55vw,14px)}
+ .board-brand small{display:none}
+ .board-state{font-size:9px;gap:12px}
+ .board-state b{font-size:12px;margin-left:3px}
+ .top-controls a,.top-controls button{height:29px}
+ .top-controls button{width:30px;font-size:19px}
+ .board-hud>div{padding:4px 8px}
+ .info-tag{font-size:8px;margin:1px 0}
+ .board-info strong{font-size:12px}
+ .board-info p{font-size:10px;line-height:1.15;max-height:3.3em;margin:2px 0}
+ .board-actions{font-size:9px}
+ .board-hint{font-size:9px;line-height:1.2}
+ .board-zoom{top:8px;right:8px;gap:3px}
+ .board-zoom button{height:29px;width:29px;font-size:18px}
+ .board-toast{top:7px;padding:3px 8px;font-size:9px}
+}
+@media(max-width:640px){.board-state span:last-child{display:none}.board-hud{grid-template-columns:30% minmax(0,1fr)}.board-actions{display:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+
+/* Visual blueprint, marker and guide tools for multi-lot 2D chunks. */
+.top-controls{flex-shrink:0}
+.top-controls .board-view-toggle{
+ height:32px;padding:0 7px;flex:0 0 auto;min-width:0;
+ border:2px outset #82623f;border-radius:2px;
+ background:linear-gradient(#433428,#201912);
+ color:#e3c18c;font:bold clamp(8px,.72vw,11px) Georgia,serif;
+ letter-spacing:.025em;white-space:nowrap;
+ box-shadow:inset 0 1px #a98a59;
+}
+.top-controls .board-view-toggle[aria-pressed="true"]{
+ background:linear-gradient(#5c4730,#33251a);
+ border-color:#c39752;color:#ffe0a1;
+}
+@media(orientation:landscape) and (max-height:510px){
+ .top-controls .board-view-toggle{height:28px;padding:0 5px;font-size:8px}
+ .top-controls{gap:3px}
+}
+@media(max-width:740px){
+ .board-state span:first-child,.board-state span:nth-child(2){display:none}
+ .top-controls .board-view-toggle{padding:0 4px;font-size:8px}
+ .board-brand strong{font-size:11px}
+}

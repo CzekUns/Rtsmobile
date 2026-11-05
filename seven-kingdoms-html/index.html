@@ -6,14 +6,14 @@
 <meta name="theme-color" content="#777668">
 <title>Seven Kingdoms · HTML Edition (JS nativo)</title>
 <meta name="description" content="Ricostruzione sperimentale del gioco Seven Kingdoms in JavaScript nativo.">
-<link rel="stylesheet" href="style.css?v=1">
+<link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
 <div id="stage" role="application" aria-label="Seven Kingdoms HTML Edition">
   <header class="topbar">
     <div class="reports" aria-label="Rapporti">
       <button data-report="kingdoms" title="Regni · F1">Regni</button>
-      <button data-report="towns" title="Villaggi · F2" class="active">Villaggi</button>
+      <button data-report="towns" title="Villaggi · F2">Villaggi</button>
       <button data-report="economy" title="Economia · F3">Economia</button>
       <button data-report="trade" title="Commercio · F4">Scambi</button>
       <button data-report="military" title="Militari · F5">Militari</button>
@@ -44,7 +44,7 @@
   </header>
   <div class="playfield">
     <div class="land">
-      <canvas id="world" width="612" height="528" aria-label="Mappa interattiva"></canvas>
+      <canvas id="world" width="612" height="528" aria-label="Mappa interattiva a tutto schermo"></canvas>
       <div id="buildBar" class="build-bar" hidden>
         <strong id="buildLabel">Costruzione</strong>
         <button id="cancelBuild" type="button">Annulla ✕</button>
@@ -56,31 +56,55 @@
       </div>
       <div id="ticker" class="ticker">Un nuovo regno greco sorge presso Corinto.</div>
     </div>
-    <aside class="sidebar" aria-label="Minimappa e ordini">
+    <button id="sidebarToggle" class="sidebar-toggle" type="button" aria-controls="orderSidebar"
+      aria-expanded="true" aria-label="Mostra o nascondi il pannello degli ordini">ORDINI ◂</button>
+    <aside class="sidebar" id="orderSidebar" aria-label="Minimappa e ordini">
       <div class="minimap-wrap"><canvas id="minimap" width="184" height="137" aria-label="Minimappa navigabile"></canvas></div>
       <div class="overview">
         <div class="selection-header"><i id="flag"></i><h1 id="selectionTitle">Corinto</h1></div>
         <div id="selectionMeta" class="selection-meta">Villaggio greco</div>
         <div id="selectionInfo" class="selection-info"></div>
         <div id="selectionActions" class="selection-actions"></div>
-        <div class="report-header" id="reportTitle">VILLAGGI</div>
-        <div id="reportBody" class="report-body"></div>
       </div>
     </aside>
   </div>
 </div>
+<!-- Optional classic-style RTS controls, anchored to the fullscreen viewport. -->
+<div id="mobileRtsPad" role="group" aria-label="Comandi RTS per touchscreen">
+  <button id="touchControlsToggle" class="touch-controls-toggle" type="button"
+    aria-expanded="false" aria-controls="touchJoystick touchModifier"
+    aria-label="Apri comandi di movimento e MOD"><span aria-hidden="true">✥</span><small>COMANDI</small></button>
+  <div id="touchJoystick" role="group" aria-label="Levetta per spostare la mappa">
+    <span class="touch-pad-label">MAPPA</span>
+    <div id="touchJoyThumb" aria-hidden="true">✥</div>
+  </div>
+  <button id="touchModifier" type="button" aria-pressed="false" aria-label="Tieni premuto per impartire ordini alternativi">MOD</button>
+</div>
+<dialog id="reportDialog" class="report-dialog" aria-labelledby="reportTitle">
+  <div class="report-modal-head">
+    <h2 id="reportTitle">RAPPORTO</h2>
+    <button id="closeReport" type="button" aria-label="Chiudi rapporto">Chiudi ✕</button>
+  </div>
+  <div id="reportBody" class="report-body"></div>
+</dialog>
 <div id="rotate" aria-live="polite">
- <div class="phone-icon">⟲</div><h2>Ruota lo smartphone</h2><p>La ricostruzione di Seven Kingdoms usa l'interfaccia orizzontale 800×600.</p>
+ <div class="phone-icon">⟲</div><h2>Ruota lo smartphone</h2><p>Per giocare sul telefono ruota il dispositivo in orizzontale: la mappa occuperà tutto lo schermo.</p>
 </div>
 <dialog id="helpDialog">
 <h2>Seven Kingdoms · HTML Edition</h2>
 <p>Questa è la prima ricostruzione <strong>JavaScript nativa</strong>, ancora parziale, del gioco originale. Non è il gioco completo e non usa WebAssembly.</p>
-<p><strong>Comandi:</strong> tocca o clicca un villaggio, una struttura o un'unità. Con un'unità selezionata, tocca un punto vuoto per farla camminare. Tieni premuto e trascina per scorrere la mappa. Tocca la minimappa per cambiare zona.</p>
-<p><strong>Villaggi:</strong> recluta abitanti, riscuoti tasse e concedi sussidi. La fedeltà influenza il governo; per unire un villaggio indipendente serve un forte vicino e una resistenza bassa.</p>
-<p><strong>Strutture:</strong> dalla scheda Economia scegli un edificio, poi indica sulla mappa dove costruirlo. Recluta abitanti dal villaggio e assegnali agli edifici. Minerali → Fabbriche → Mercati è la prima filiera economica.</p>
-<p><strong>PC:</strong> tasto destro su destinazione per spostare l'unità, F1–F9 per i rapporti, 0 / Spazio per pausa, 1–5 per velocità, S per salvare.</p>
+<p><strong>Interfaccia a schermo intero:</strong> la plancia riempie il display. Le risorse e i rapporti sono in alto; il pannello <strong>ORDINI</strong> a destra si apre e si richiude per lasciare libera la mappa. La minimappa si trova nel pannello ordini.</p>
+<p><strong>Controlli RTS per smartphone:</strong> tocca <strong>COMANDI</strong> in basso a sinistra per far comparire <strong>MOD</strong> e la <strong>levetta MAPPA</strong>, entrambi sullo stesso lato; toccalo nuovamente per nasconderli. Trascina sulla mappa senza MOD per selezionare più unità; MOD + tocco impartisce l'ordine di movimento alla singola unità o al gruppo. MOD + trascinamento sposta la visuale, la levetta scorre la mappa e due dita regolano lo zoom. Durante il piazzamento, il rilascio imposta il cantiere.</p>
+<p><strong>Rapporti:</strong> i pulsanti in alto (Villaggi, Economia, Militari e altri) aprono una finestra separata. Seleziona una voce per tornare alla mappa e visualizzare i comandi nel pannello destro.</p>
+<p><strong>Villaggi:</strong> seleziona Corinto e poi scegli <strong>Greci</strong> oppure <strong>Normanni</strong> nell’elenco delle popolazioni. Tocca Recluta per far uscire una persona dell’etnia selezionata, oppure <strong>Addestra una professione</strong> per scegliere Costruzione, Comando, Estrazione, Manifattura, Ricerca o Spionaggio. Ogni ordine costa 30 monete e richiede 5 giorni di gioco; gli ordini vengono eseguiti in sequenza e compaiono nella coda del villaggio. Puoi annullarli. I vecchi salvataggi mantengono la cultura già registrata, senza inventare altre etnie.</p>
+<p><strong>Dentro gli edifici:</strong> seleziona un edificio per vedere l'elenco degli abitanti/lavoratori presenti, con abilità, livello e salute. Tocca «Fai uscire» sulla persona desiderata per riportarla sulla mappa. I lavoratori ereditati dalla vecchia demo possono avere dati personali non conosciuti: vengono segnalati esplicitamente.</p>
+<p><strong>Professioni e costruzione:</strong> Costruzione permette di erigere tutte le strutture disponibili nella demo. Comando può erigere Forti, Estrazione le Miniere, Manifattura le Fabbriche e Ricerca le Torri della Scienza. Dopo il completamento, lo specialista viene assegnato automaticamente all’edificio compatibile; il Costruttore generico resta libero. Lo Spionaggio richiede ancora il sistema di infiltrazione originale.</p>
+<p><strong>Costruzione:</strong> seleziona un abitante con abilità Costruzione (una nuova partita ne contiene uno per il test), premi <strong>Costruisci</strong>, scegli Mercato o altro edificio, poi tocca un terreno libero sulla mappa. Il costruttore camminerà fino al cantiere e completerà i lavori nel tempo. Se hai una partita precedente, seleziona Corinto e usa «Addestra una professione → Costruzione» (30 monete, 5 giorni di gioco). Il sistema è ancora sperimentale e alcune regole differiscono dall’originale.</p>
+<p><strong>Riparazioni:</strong> nella nuova partita il Mercato di Corinto parte con 98/100 HP per consentire la prova. Selezionalo e scegli «Manda un costruttore a riparare» oppure seleziona il Costruttore e premi «Ripara Mercato». L'unità raggiunge l'edificio a piedi, poi recupera 1 HP ogni 1–6 giorni secondo la propria abilità, finché il lavoro è completato. Puoi annullare con Ferma; l'ordine si conserva anche dopo il salvataggio.</p>
+<p><strong>Strutture e abitanti:</strong> dal pannello del costruttore scegli il tipo di edificio, poi indica sulla mappa dove costruirlo. Recluta un abitante dal villaggio; selezionalo e usa i pulsanti di lavoro a destra oppure tocca un tuo edificio. L’abitante raggiungerà a piedi una casella libera vicino all’ingresso e soltanto all’arrivo comincerà a lavorare. Puoi cambiare destinazione o premere Ferma per annullare. I soldati possono essere inviati soltanto ai forti. Minerali → Fabbriche → Mercati è la prima filiera economica.</p>
+<p><strong>PC:</strong> trascina con il sinistro per selezionare un gruppo e usa il tasto destro per spostarlo in formazione. Trascina col destro per scorrere la mappa. F1–F9 per i rapporti, 0 / Spazio per pausa, 1–5 per velocità, S per salvare. La selezione e i movimenti di gruppo sono una prima implementazione mobile, non ancora il sistema di battaglie originale.</p>
 <form method="dialog"><button type="submit">Continua</button></form>
 </dialog>
-<script type="module" src="game.js?v=1"></script>
+<script type="module" src="game.js?v=12"></script>
 </body>
 </html>

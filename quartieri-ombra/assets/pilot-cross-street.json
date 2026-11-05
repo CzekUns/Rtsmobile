@@ -1,0 +1,254 @@
+{
+  "project": "Quartieri d'Ombra",
+  "status": "asset-kit pilot specification — NOT YET GENERATED",
+  "road": "Cross Street",
+  "street_side": "same facing side",
+  "render_reference": "BOARD_MASTER.md",
+  "orientation_class": "A",
+  "city_camera": "orthographic 2:1",
+  "angle_range_deg": [
+    33.98,
+    39.43
+  ],
+  "purpose": "Six tightly adjacent units for a repeatable street-row kit, not six isolated imagegen houses.",
+  "coords": "world units from board-world.js; lower facade pivot points are authoritative; start/end roles are order along the road, not literal screen-left/right.",
+  "lot_ids": [
+    2,
+    3,
+    4,
+    9,
+    10,
+    11
+  ],
+  "buildings": [
+    {
+      "lot_id": 2,
+      "archetype": "residence",
+      "stories": 3,
+      "role": "start_cap",
+      "angle_deg": 33.98,
+      "orientation": "A",
+      "dimensions_world": {
+        "width": 61.24,
+        "depth": 51.26,
+        "height": 56.66
+      },
+      "front_pivot_world": [
+        1176.84,
+        979.47
+      ],
+      "front_edge_world": [
+        [
+          1207.42,
+          981.98
+        ],
+        [
+          1146.85,
+          973.01
+        ]
+      ],
+      "asset_ready": false,
+      "planned_file": "assets/runtime/block-kits/cross-street/2_residence_start_a.webp"
+    },
+    {
+      "lot_id": 3,
+      "archetype": "tenement",
+      "stories": 3,
+      "role": "row_middle_b",
+      "angle_deg": 33.98,
+      "orientation": "A",
+      "dimensions_world": {
+        "width": 61.51,
+        "depth": 56.46,
+        "height": 53.63
+      },
+      "front_pivot_world": [
+        1107.91,
+        969.26
+      ],
+      "front_edge_world": [
+        [
+          1138.63,
+          971.79
+        ],
+        [
+          1077.78,
+          962.78
+        ]
+      ],
+      "asset_ready": false,
+      "planned_file": "assets/runtime/block-kits/cross-street/3_tenement_middle_a.webp"
+    },
+    {
+      "lot_id": 4,
+      "archetype": "residence",
+      "stories": 3,
+      "role": "row_middle_a",
+      "angle_deg": 33.98,
+      "orientation": "A",
+      "dimensions_world": {
+        "width": 44.67,
+        "depth": 37.91,
+        "height": 53.83
+      },
+      "front_pivot_world": [
+        1047.5,
+        960.31
+      ],
+      "front_edge_world": [
+        [
+          1069.88,
+          961.61
+        ],
+        [
+          1025.7,
+          955.06
+        ]
+      ],
+      "asset_ready": false,
+      "planned_file": "assets/runtime/block-kits/cross-street/4_residence_middle_a.webp"
+    },
+    {
+      "lot_id": 9,
+      "archetype": "workshop",
+      "stories": 3,
+      "role": "row_middle_b",
+      "angle_deg": 39.43,
+      "orientation": "A",
+      "dimensions_world": {
+        "width": 39.73,
+        "depth": 48.48,
+        "height": 55.16
+      },
+      "front_pivot_world": [
+        996.33,
+        947.07
+      ],
+      "front_edge_world": [
+        [
+          1016.1,
+          949.83
+        ],
+        [
+          977.5,
+          940.42
+        ]
+      ],
+      "asset_ready": false,
+      "planned_file": "assets/runtime/block-kits/cross-street/9_workshop_middle_a.webp"
+    },
+    {
+      "lot_id": 10,
+      "archetype": "residence",
+      "stories": 2,
+      "role": "row_middle_a",
+      "angle_deg": 39.43,
+      "orientation": "A",
+      "dimensions_world": {
+        "width": 42.28,
+        "depth": 50.29,
+        "height": 43.5
+      },
+      "front_pivot_world": [
+        947.29,
+        935.12
+      ],
+      "front_edge_world": [
+        [
+          968.31,
+          938.18
+        ],
+        [
+          927.23,
+          928.17
+        ]
+      ],
+      "asset_ready": false,
+      "planned_file": "assets/runtime/block-kits/cross-street/10_residence_middle_a.webp"
+    },
+    {
+      "lot_id": 11,
+      "archetype": "residence",
+      "stories": 2,
+      "role": "end_cap",
+      "angle_deg": 39.43,
+      "orientation": "A",
+      "dimensions_world": {
+        "width": 52.98,
+        "depth": 34.3,
+        "height": 42.74
+      },
+      "front_pivot_world": [
+        897.06,
+        922.87
+      ],
+      "front_edge_world": [
+        [
+          923.27,
+          927.2
+        ],
+        [
+          871.79,
+          914.65
+        ]
+      ],
+      "asset_ready": false,
+      "planned_file": "assets/runtime/block-kits/cross-street/11_residence_end_a.webp"
+    }
+  ],
+  "joints": [
+    {
+      "from": 10,
+      "to": 11,
+      "gap_world": 4.08,
+      "mode": "shared"
+    },
+    {
+      "from": 3,
+      "to": 4,
+      "gap_world": 7.99,
+      "mode": "shared"
+    },
+    {
+      "from": 2,
+      "to": 3,
+      "gap_world": 8.31,
+      "mode": "shared"
+    },
+    {
+      "from": 9,
+      "to": 10,
+      "gap_world": 9.46,
+      "mode": "shared"
+    },
+    {
+      "from": 4,
+      "to": 9,
+      "gap_world": 10.93,
+      "mode": "shared"
+    }
+  ],
+  "requirements": {
+    "background": "transparent RGBA",
+    "key_colors": "smoke-brown brick, charcoal roof, amber windows",
+    "floor_heights": "unified per-story baseline",
+    "style": "late 1990s early 2000s original pre-rendered isometric RTS",
+    "modules": [
+      "start cap",
+      "middle residential variants",
+      "workshop module",
+      "end cap",
+      "shared roof strip",
+      "common plinth",
+      "cobble-mud seam"
+    ],
+    "must_not": [
+      "one large background for whole city",
+      "random viewpoint changes",
+      "screen-space rotation of full PNG",
+      "mirroring building sprite",
+      "text labels",
+      "copyrighted film frames"
+    ]
+  }
+}

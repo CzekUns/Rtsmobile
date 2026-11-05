@@ -1,0 +1,91 @@
+{
+  "title": "Quartieri d'Ombra — Asset catalog",
+  "version": "0.1",
+  "style": "Isometric 2D, 1998-2003 PC RTS, sombre Victorian industrial slums",
+  "approved_reference": "quartieri-ombra/ART_DIRECTION.md",
+  "notes": "Original pixel-based previews generated with image model; 64px-56px playable transparent WebP. SVG tiles/props are additional original low-res game assets. Character frames not full animations yet.",
+  "assets": [
+    {
+      "id": "residential_tenement",
+      "type": "residential",
+      "file": "buildings/residential_tenement_lowres.webp",
+      "ready": true
+    },
+    {
+      "id": "unit_gendarme_idle",
+      "type": "gendarme",
+      "file": "units/gendarme_idle_lowres.webp",
+      "ready": true
+    },
+    {
+      "id": "unit_mercenary_idle",
+      "type": "mercenary",
+      "file": "units/mercenary_idle_lowres.webp",
+      "ready": true
+    },
+    {
+      "id": "terrain_mud",
+      "type": "terrain",
+      "file": "terrain/mud.svg",
+      "ready": true
+    },
+    {
+      "id": "terrain_cobble",
+      "type": "terrain",
+      "file": "terrain/cobble.svg",
+      "ready": true
+    },
+    {
+      "id": "terrain_puddle",
+      "type": "terrain",
+      "file": "terrain/puddle.svg",
+      "ready": true
+    },
+    {
+      "id": "terrain_debris",
+      "type": "terrain",
+      "file": "terrain/debris.svg",
+      "ready": true
+    },
+    {
+      "id": "prop_barrel",
+      "type": "environment",
+      "file": "props/barrel.svg",
+      "ready": true
+    },
+    {
+      "id": "prop_crate",
+      "type": "environment",
+      "file": "props/crate.svg",
+      "ready": true
+    },
+    {
+      "id": "prop_street_lamp",
+      "type": "environment",
+      "file": "props/street_lamp.svg",
+      "ready": true
+    },
+    {
+      "id": "prop_wooden_fence",
+      "type": "environment",
+      "file": "props/wooden_fence.svg",
+      "ready": true
+    },
+    {
+      "id": "prop_lantern",
+      "type": "environment",
+      "file": "props/lantern.svg",
+      "ready": true
+    }
+  ],
+  "planned_binary_assets": [
+    "residential_workers_inn",
+    "industrial_foundry",
+    "industrial_mill",
+    "terrain 12 variants",
+    "gendarme full animation sheet",
+    "mercenary full animation sheet",
+    "HUD atlas",
+    "additional building types from 2026-11-04 imagegen sheet"
+  ]
+}
