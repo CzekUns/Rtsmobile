@@ -80,7 +80,10 @@ test("real board pages and runtime expose blueprint, markers and close zoom",()=
  assert(js.includes('kind:"chunk-lot"'));
  assert(js.includes("selectionOverlay.clipLot(ctx,layer.lot)"));
  assert(js.includes("selectionOverlay.clipVisible(ctx,skeleton,lot)"));
- assert(js.includes('const study=!["draft","clean"].includes'));
+ assert(js.includes('const study=["study","fixed"].includes'));
+ assert(js.includes('kind:"chunk-audit"'),"raster audit should show full grouped image");
+ assert(js.includes('else if(layer.kind==="chunk-audit")chunkArt.draw'));
+ assert(js.includes('./assets/runtime/chunks/block-2-draft-audit.webp'));
  assert(js.includes("blueprintMode"));
  assert(js.includes("ctx.drawImage(pilot.tile,pilot.left,pilot.top,pilot.width,pilot.height)"));
  new Function(js);
