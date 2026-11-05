@@ -233,9 +233,9 @@ function selectedContent(){
       ' · '+(activeSite.status==='walking'?'In marcia':'Lavori '+Math.floor(activeSite.progress*100)+'%'):
      assignedTo?'In viaggio verso '+esc(FIRMS[assignedTo.kind]?.label||'edificio'):
            item.target?'In marcia':'Pronto per gli ordini')+
-    '<br>Tocca il terreno per spostarti oppure scegli un edificio qui sotto. L\'abitante entrerà solo dopo aver raggiunto l\'ingresso.',
+    '<br>Su smartphone usa MOD + tocco per spostarti, oppure scegli un edificio qui sotto. L\'abitante entrerà solo dopo aver raggiunto l\'ingresso.',
    actions:item.owner===1?[
-    btn('move','Sposta: tocca il terreno'),
+    btn('move','Sposta: MOD + tocco'),
     btn('stop','Ferma / annulla ordine',!item.target&&!item.workTargetId&&!item.buildSiteId&&!item.repairTargetId),
     isBuilder(item)?btn('builder-menu','Costruisci · scegli edificio'):null,
     buildButtons,
@@ -327,7 +327,7 @@ function runAction(action){
  if(action==='persuade')r=game.persuade(obj.id);
  if(action==='annex')r=game.annex(obj.id);
  if(action==='dismiss')r=game.dismiss(obj.id);
- if(action==='move'&&game.units.includes(obj))r={ok:true,msg:'Tocca il terreno per ordinare uno spostamento.'};
+ if(action==='move'&&game.units.includes(obj))r={ok:true,msg:'Su smartphone: tieni premuto MOD e tocca il terreno. Sul PC: tasto destro.'};
  if(action==='stop'&&game.units.includes(obj)){
   const cancelled=cancelBuildOrder(game,obj.id);
   const cancelledRepair=cancelRepairOrder(game,obj.id);
@@ -395,6 +395,7 @@ function finishWorkOrders(){
 function mapClick(sx,sy,right=false,{touch=false}={}){
  const p=view.worldAt(sx,sy);let x=p.x,y=p.y;
  if(placing){
+  if(right){cancelBuild();status('Posizionamento annullato con MOD.');return;}
   const result=issueBuildOrder(game,placingBuilderId,placing,x,y);
   status(result.msg);
   if(result.ok){cancelBuild();game.save(saveKey);renderPanel();renderHud();}
