@@ -50,6 +50,8 @@ test('REAL 7KAA NORMAN: all 48 source movement frames decode to PNG + 8 true idl
   assert.deepEqual(m.actions.filter(x=>x.action==='M').map(x=>x.declaredFrames),Array(8).fill(6));
   assert.deepEqual(m.actions.filter(x=>x.action==='M').map(x=>x.distinctPixelFrames),Array(8).fill(5));
   assert.equal(m.frames.filter(x=>x.action==='M').length,48);
+  assert.equal(m.colorSchemeId,1);
+  assert.equal(m.frames.every(x=>x.remap==='nation-remap-OGAME-E0-E7'),true);
   assert.equal(m.frames.filter(x=>x.action==='S').length,8);
   assert.equal(m.frames.filter(x=>x.action==='M'&&x.duplicateOf!==undefined).length,8);
   assert.equal(m.frames.every(x=>x.decoded&&!x.visuallyVerified),true);
