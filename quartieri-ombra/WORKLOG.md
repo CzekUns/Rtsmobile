@@ -1,3 +1,7 @@
+## 2026-11-05 05:00 — Patina architettonica
+- Commit `5514e872f2dbfb4d7184eada272a6f1ea5b0d117`: nuovo pass di usura delle facciate (scrostature, fuliggine, fascia di sporco) con clipping alla geometria del muro e seme deterministico per edificio/lato. Nessuna modifica a NPC/pathfinding/economia.
+- Controllo sintattico JavaScript via compilazione `new Function` superato prima del commit; nessuna prova Node, browser desktop, Android o screenshot. La resa estetica resta da validare sul sito pubblico.
+
 
 ## 2026-11-05 02:00 — Materiali stradali
 - Commit `274b40495162b3d5b451a57767ebcde2ec02a4cb`: nuove chiazze d'acqua scure e sottili riflessi sulle strade, ancorati alle coordinate dei segmenti, senza cambiare topografia, camera, NPC o economia.
