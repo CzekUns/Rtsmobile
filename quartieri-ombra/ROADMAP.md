@@ -1,3 +1,14 @@
+### 2026-11-05 — Nuova plancia in tre layer, scheletro e zoom ravvicinato
+- [x] Implementato `board-skeleton.js`: 454 schede vettoriali con footprint, tetto, facciate street/left/right/rear, porta e tipi `residential/active/decorative`; hit-testing sui poligoni, riconoscimento strada separato, non su box delle immagini (`1c14e50`, `eb0ad23`, `d5d87a8`).
+- [x] Definiti **117 chunk artistici** che includono esattamente tutti i 454 lotti; assegnati frame e coordinate per layer di immagine unica; indice di produzione `assets/chunk-index.json` con LOD `base/detail/ultra` ancora a NULL, senza risorse inesistenti (`42c22b6`).
+- [x] Creato `board-chunks.js`: registra soltanto immagini realmente presenti, disegna una sola immagine per gruppo pur mantenendo tutte le hitbox individuali; scelte LOD in base allo zoom (`6eb224c`, `c5200f9`).
+- [x] `board-preview.js` e entrambe le pagine implementano modalità **SCHELETRO**, **SEGNALINI** residenziali/attività, **GUIDA SVG** del chunk selezionato, evidenziazione dell'intero volume del singolo palazzo e della facciata verso strada, click sulle carreggiate, zoom `0.58×–7.5×` senza cambiare proiezione/camera e fallback vettoriale live a zoom estremo (`4a250ef`, `aaf8b29`).
+- [x] Primo export reale per una porzione: [assets/guides/cross-street-block-2-skeleton.svg](assets/guides/cross-street-block-2-skeleton.svg), 6 lotti con tetti, pareti, fronti strada e porte precise (`935880c`, `ff1796b`). Il pilota Canvas è renderizzato a densità 8× per zoom ravvicinato (`19fc8ad`).
+- [x] Test permanente `tests/board-skeleton.test.cjs` (5 casi), parsing sorgente e smoke V8 con DOM/Canvas simulato: scena inizializzata, una immagine macro-chunk disegnata, edificio interno selezionabile singolarmente, modalità scheletro, zoom e download guida senza eccezioni (`10792de`). **Suite Node non eseguita su checkout**, sito Pages non raggiungibile dall'attuale ambiente web.
+- [ ] **NON ANCORA fatto:** nuovo PNG seamless ImageGen del gruppo Cross Street, registrazione del suo file in runtime, screenshot browser/Android reale e allineamento effettivo disegno/hitbox. L'indice dei chunk contiene LOD null perché non abbiamo ancora arte confermata. Nessuna promessa di zoom senza perdita su PNG insufficientemente risoluti.
+- [ ] Dopo il pilota artistico verificato estendere il sistema ai 117 chunk, incluse varianti 2D del terreno e occlusioni; mantenere la golden reference e sospendere NPC fino all'approvazione completa.
+
+
 ### 2026-11-05 20:00 — Cross Street: sei moduli pilota prerender (PARZIALE)
 - [x] Nuovo `cross-street-kit.js`: 6 moduli trasparenti generati in Canvas offscreen, con geometria ricavata da ciascun footprint, facciate individuali, tetti, finestre e basamenti. Integrati in entrambe le anteprime prima dei PNG generici, senza modificare NPC.
 - [x] Parsing V8 dei sorgenti `cross-street-kit.js` e `board-preview.js`: PASS.
