@@ -321,6 +321,38 @@ function drawRoof(b,foot,roof){
    line({x:x-4,y:y-h},{x:x+4,y:y-h},"#a18a70",2);
   }
  }
+ // Silhouette pass: different roof machinery for working buildings.
+ // Hoist housing and pulley are specific to warehouses; stables get a vented
+ // ridge lantern. Both are baked into the building sprite, not a map overlay.
+ if(type==="warehouse"){
+  const q=lerp(lerp(roof[0],roof[1],.72),lerp(roof[3],roof[2],.72),.37);
+  const h=15+(b.seed%7),w=7;
+  polygon([{x:q.x-w,y:q.y},{x:q.x+w,y:q.y},
+   {x:q.x+w,y:q.y-h},{x:q.x-w,y:q.y-h}],
+   "#574236","#201b18",.8);
+  polygon([{x:q.x-w-3,y:q.y-h},{x:q.x+w+3,y:q.y-h},
+   {x:q.x+w,y:q.y-h-7},{x:q.x-w,y:q.y-h-7}],
+   "#73604d","#26211d",.9);
+  polygon([{x:q.x-3,y:q.y-3},{x:q.x+3,y:q.y-3},
+   {x:q.x+3,y:q.y-h+3},{x:q.x-3,y:q.y-h+3}],
+   "#201b18","#a18b6a",.7);
+  line({x:q.x+7,y:q.y-h+3},{x:q.x+17,y:q.y-h+3},"#a58b64",1.6);
+  ellipse(q.x+17,q.y-h+3,2.4,2.4,"#2a231d");
+  line({x:q.x+17,y:q.y-h+4},{x:q.x+17,y:q.y+7},"#a58b64",.9);
+  line({x:q.x+13,y:q.y+7},{x:q.x+21,y:q.y+7},"#4c392a",2);
+ }else if(type==="stable"){
+  const q=lerp(roof[0],roof[2],.5),h=13;
+  polygon([{x:q.x-10,y:q.y},{x:q.x+10,y:q.y},
+   {x:q.x+10,y:q.y-h},{x:q.x-10,y:q.y-h}],
+   "#493c32","#211d1a",.8);
+  for(let k=0;k<4;k++){
+   const x=q.x-7+k*4;
+   line({x,y:q.y-3},{x,y:q.y-h+3},"#171715",1.6);
+  }
+  polygon([{x:q.x-12,y:q.y-h},{x:q.x+12,y:q.y-h},
+   {x:q.x+7,y:q.y-h-7},{x:q.x-7,y:q.y-h-7}],
+   "#695846","#211c19",.8);
+ }
  // Deterministic roof seams and uneven patches.
  const count=b.type==="stable"?4:7;
  for(let k=1;k<count;k++){
