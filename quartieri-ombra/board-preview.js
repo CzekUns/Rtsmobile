@@ -629,8 +629,11 @@ function drawBuilding(b){
   buildingCache.delete(b.id);buildingCache.set(b.id,cached);
  }
  ctx.save();ctx.imageSmoothingEnabled=false;
- const raster=rasterForBuilding(b);
- if(raster){
+ const pilot=window.QOCrossStreetKit&&window.QOCrossStreetKit.make(b,proj);
+ const raster=pilot?null:rasterForBuilding(b);
+ if(pilot){
+  ctx.drawImage(pilot.tile,pilot.left,pilot.top);
+ }else if(raster){
   // Preserve the authored perspective and image aspect ratio. Footprint
   // remains authoritative for picking and depth sort; bottom is ground level.
   const groundWidth=Math.max(...geometry.ground.map(p=>p.x))-
