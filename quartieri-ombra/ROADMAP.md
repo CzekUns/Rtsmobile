@@ -1,3 +1,7 @@
+### 2026-11-05 — Silhouette produttive differenziate
+- [x] Tetto magazzino con castelletto di sollevamento, puleggia e fune; tetto stalla con lanterna di aerazione a lamelle. Disegno originale modulare integrato nel prerender degli edifici (`ea3a9158`).
+- [x] Parsing V8 della nuova `board-preview.js` riuscito; [ ] screenshot browser/Android, confronto golden e suite Node restano da eseguire. NPC invariati.
+
 ### 2026-11-05 — Drenaggio urbano e bordi strada
 - [x] Aggiunti tombini in ferro e cordoli sconnessi generati in coordinate mondo nella preview (`c232f8eb`), senza modificare logica gameplay.
 - [ ] Screenshot browser desktop/mobile e confronto golden ancora da eseguire.
