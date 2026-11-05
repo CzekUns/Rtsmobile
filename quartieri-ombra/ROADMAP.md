@@ -1,3 +1,14 @@
+### 2026-11-05 — Continuità degli isolati (correzione figurine)
+- [x] Nuovo modulo `block-continuity.js` costruisce vicinati reali lungo lo **stesso lato** della stessa via: **337 giunzioni** su 454 lotti, 117 gruppi (105 di almeno due edifici), 170 passaggi `shared` e 167 `passage` (commit `44d2703`). Le giunzioni non alterano collisioni o dati strategici.
+- [x] `board-preview.js` posiziona i PNG sulla vera soglia/fronte strada, non sul centro geometrico della figura; crea fondazioni comuni e raccordi isometrici di muratura/tetto o muro basso nei passaggi; usa solo raster A/B con angolo di facciata verificato, mai deformato/mirrored. Per angoli non coperti fallback vettoriale corretto (commit `d461c20`).
+- [x] Entrambe le anteprime `board-preview.html` e `board-1860.html` caricano il modulo prima del renderer, con cachebuster aggiornato (`10333af` e `a8d4b32`).
+- [x] Nuova suite permanente `tests/block-continuity.test.cjs` e specifica di produzione `BLOCK_ASSET_SPEC.md`: orientamenti, kit left/middle/right/corner, pivot, usura e raccordi con suolo; prompt worker aggiornato per questa priorità.
+- [x] Prove V8 sul sorgente GitHub: 337 giunzioni, zero link su lati opposti/strade diverse, zero estremità duplicate, risultati deterministici; bootstrap Canvas mock + zoom/pan/tap/minimappa PASS. **NON equivalgono a screenshot desktop/Android reali.**
+- [ ] Fare confronto visivo A/B con foto della build su un isolato pilota, garantendo che le cuciture non coprano porte/finestre e che i raster abbiano l'azimut giusto.
+- [ ] Generare e usare **asset modulari originali** di fila (testata sinistra, centrali A/B, testata destra, angolo, tetto e fondazione) per le orientazioni non coperte. La città contiene ancora fallback vettoriali: restyling non ultimato.
+- [ ] Migliorare continuità terreno e palazzi su tutti i 9 settori; test hardware mobile/desktop e golden reference. **NPC ancora congelati**.
+
+
 ### 2026-11-05 — Prima integrazione runtime asset ImageGen (P0)
 - [x] La preview usa ora PNG originali di caseggiati, botteghe, taverne, officine e stalle da `assets/source/imagegen-2026-11-05/` su una selezione deterministica di lotti; profondità, coordinate e hit testing restano basati sul mondo 3×3. Nessuna deformazione non uniforme, nessun mirroring; fallback vettoriale su caricamento fallito, magazzini e parte degli edifici.
 - [x] Controllo sintattico V8 `new Function` sul sorgente modificato: PASS.
