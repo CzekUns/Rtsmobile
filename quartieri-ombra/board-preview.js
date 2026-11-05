@@ -543,12 +543,12 @@ function buildingGeometry(b){
  const bottom=Math.ceil(Math.max(...coords.map(p=>p.y))+margin);
  return {ground,roof,left,top,width:right-left,height:bottom-top};
 }
-function bakeBuilding(b,geometry){
+function bakeBuilding(b,geometry,density=1){
  const tile=document.createElement("canvas");
- tile.width=geometry.width;tile.height=geometry.height;
+ tile.width=geometry.width*density;tile.height=geometry.height*density;
  const original=ctx;ctx=tile.getContext("2d");
  try{
-  ctx.translate(-geometry.left,-geometry.top);
+  ctx.setTransform(density,0,0,density,-geometry.left*density,-geometry.top*density);
   const {ground,roof}=geometry;
   polygon(ground.map(p=>({x:p.x+7,y:p.y+6})),"#16131099");
   const indices=[0,1,2,3].sort((i,j)=>{
@@ -564,7 +564,7 @@ function bakeBuilding(b,geometry){
     b.id%2?"#9b5550":"#6c86a1");
   }
  }finally{ctx=original}
- return {tile,left:geometry.left,top:geometry.top};
+ return {tile,left:geometry.left,top:geometry.top,width:geometry.width,height:geometry.height,density};
 }
 // One continuous ground seating layer for the row, below every roof and wall.
 // These cobbles, plinths and shared foundations are drawn before the architecture,
@@ -622,21 +622,23 @@ function drawBuilding(b){
  const center=proj(b.x,b.y);
  if(!pointInViewport(center,210))return;
  const geometry=buildingGeometry(b);
- let cached=buildingCache.get(b.id);
+ // At near-street zoom use a separate 3x vector rasterization, not a blurred
+ // stretch of the low-res preview tile. Camera/footprints never change.
+ const density=camera.zoom>=3.1?3:1,cacheKey=b.id+"@"+density;
+ let cached=buildingCache.get(cacheKey);
  if(!cached){
-  cached=bakeBuilding(b,geometry);
-  buildingCache.set(b.id,cached);
+  cached=bakeBuilding(b,geometry,density);
+  buildingCache.set(cacheKey,cached);
   if(buildingCache.size>MAX_BUILDING_SPRITES)
    buildingCache.delete(buildingCache.keys().next().value);
  }else{
-  // Refresh LRU position without re-baking the sprite.
-  buildingCache.delete(b.id);buildingCache.set(b.id,cached);
+  buildingCache.delete(cacheKey);buildingCache.set(cacheKey,cached);
  }
- ctx.save();ctx.imageSmoothingEnabled=false;
+ ctx.save();ctx.imageSmoothingEnabled=camera.zoom>2.25;
  const pilot=window.QOCrossStreetKit&&window.QOCrossStreetKit.make(b,proj);
  const raster=pilot?null:rasterForBuilding(b);
  if(pilot){
-  ctx.drawImage(pilot.tile,pilot.left,pilot.top);
+  ctx.drawImage(pilot.tile,pilot.left,pilot.top,pilot.width,pilot.height);
  }else if(raster){
   // Preserve the authored perspective and image aspect ratio. Footprint
   // remains authoritative for picking and depth sort; bottom is ground level.
@@ -657,7 +659,7 @@ function drawBuilding(b){
   ctx.drawImage(raster,crop.x,crop.y,crop.w,crop.h,
                 frontX-rw/2,frontY-rh,rw,rh);
  }else{
-  ctx.drawImage(cached.tile,cached.left,cached.top);
+  ctx.drawImage(cached.tile,cached.left,cached.top,cached.width,cached.height);
  }
  ctx.restore();
  if(selected&&selected.id===b.id){
