@@ -20,11 +20,13 @@ export function issueGroupMove(game,ids,x,y,{radius=9}={}){
   if(unit.buildSiteId||unit.repairTargetId||unit.workTargetId){
    failed.push(unit.id);continue;
   }
-  let result=null;
+  let result=null,attempts=0;
+  const maxAttempts=Math.max(36,Math.min(120,valid.length*14));
   for(const cell of candidates){
    const key=cell.x+','+cell.y;
    if(reserved.has(key)||staticBlocked(game,cell.x,cell.y))continue;
    if(game.units.some(u=>u!==unit&&Math.round(u.x)===cell.x&&Math.round(u.y)===cell.y))continue;
+   if(++attempts>maxAttempts)break; // Prevent long synchronous A* stalls on blocked targets.
    result=issuePlaytestOrder(game,unit.id,cell.x,cell.y);
    if(!result.ok)continue;
    reserved.add(key);ordered.push(unit.id);break;
