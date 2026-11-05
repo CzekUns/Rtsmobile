@@ -52,7 +52,20 @@ const QOChunkArt=(function(){
     ow=sw*ratio;oh=sh*ratio;
     ox+=(dw-ow)/2;oy+=(dh-oh)/2;
    }
-   ctx.drawImage(image,sx,sy,sw,sh,ox,oy,ow,oh);
+   if(entry.source.mappingMode==="shear"){
+    // DIAGNOSTIC ONLY: progressive camera-space correction grounded in the
+    // observed drift of the generated rooftops. The engine/lot geometry never
+    // moves. At the far right the image is unchanged; toward the first
+    // (upper-left) building the artwork moves progressively upward.
+    const amount=entry.source.shear;
+    if(!Number.isFinite(amount)||amount<0||amount>.25)return false;
+    ctx.save();
+    ctx.transform(1,amount,0,1,0,-amount*(f.left+dx+dw));
+    ctx.drawImage(image,sx,sy,sw,sh,ox,oy,ow,oh);
+    ctx.restore();
+   }else{
+    ctx.drawImage(image,sx,sy,sw,sh,ox,oy,ow,oh);
+   }
    return true;
   }
   if(entry.source.src?.endsWith("cross-street-block-2-geometry-locked-art-study.svg")){

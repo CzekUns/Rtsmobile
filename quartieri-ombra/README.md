@@ -1,3 +1,7 @@
+## Nuovo confronto visivo Cross Street: calibrazione progressiva
+
+Lo screenshot di audit V2 ha mostrato che i tetti sono sfalsati in misura diversa lungo la fila. Il test `?artAudit=v2align` applica **solo alla macro-illustrazione diagnostica** una correzione affine progressiva, con il punto destro immobile; la geometria delle hitbox NON cambia. Usare `?artAudit=v2fit` per il prima e `?artAudit=v2align` per il dopo; `?artAudit=v2alignclean` nasconde gli overlay e `?artAudit=v2alignclip` prova il ritaglio per lotti. Non sono asset runtime definitivi; le pareti e i tetti centrali richiedono ulteriore verifica e, probabilmente, illustrazioni prodotte sui sei volumi separati.
+
 ## ImageGen: input vincolato alla vera geometria (2026-11-05)
 
 Lo screenshot con linee azzurre sovrapposte a una bozza NON è una reference affidabile: l'asset nasce con angolo e fronti diversi. Prima di rigenerare il blocco Cross Street, **allegare materialmente a ImageGen** la [reference dei sei volumi](assets/guides/cross-street-block-2-imagegen-input.svg) (1332×1160, trasparente), e mantenere separata la [maschera alpha deterministica](assets/guides/cross-street-block-2-alpha-master.svg). Il motore decide ingombri, tetti, pareti, hitbox e strade; ImageGen si occupa solo dei materiali e dei dettagli. Procedura esatta: [workflow ImageGen](assets/guides/CROSS_STREET_IMAGEGEN_WORKFLOW.md).

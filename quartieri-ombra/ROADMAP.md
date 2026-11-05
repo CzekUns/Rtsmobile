@@ -1,3 +1,10 @@
+### 2026-11-05 — Cross Street V2: calibrazione progressiva visuale (solo audit)
+- [x] Lo screenshot utente mostra uno scarto maggiore nei tetti a sinistra, decrescente verso destra. Una comparazione locale sovrapposta ha suggerito una correzione verticale progressiva senza toccare le hitbox.
+- [x] Nuova modalità `?artAudit=v2align`: artwork originale con shear affine Y di 0.10, ancorato al margine destro del gruppo; i lotti/click restano fissi. `?artAudit=v2alignclean` nasconde le guide; `?artAudit=v2alignclip` verifica il clipping per edificio.
+- [x] La precedente `?artAudit=v2fit` rimane intatta per confronto; il chunk di produzione non viene cambiato.
+- [x] Smoke runtime JS su trasformazione Canvas e controllo di sintassi; aggiunta suite Node con verifica trasformazione/ripristino stato.
+- [ ] Verifica nel browser pubblico e Android landscape a zoom 1×/3×/7.5×; l'asset NON è ancora geometricamente conforme in tutte le pareti e tetti. Serve rendering guidato per ogni volume, non semplice shear definitivo.
+
 ### 2026-11-05 — Studio visivo a geometria bloccata Cross Street
 - [x] Pubblicato `assets/guides/cross-street-block-2-illustrated-study.svg`: dettagli di finestre, corsi di mattoni e tetti inseriti sulle pareti/tetti dei sei lotti, senza cambiare i vertici dello scheletro. Commit `916eb871`.
 - [ ] Studio SVG NON è il chunk raster ImageGen corretto: non attivato nel manifest. Restano generazione RGBA vincolata, QA browser e zoom 7.5×.
