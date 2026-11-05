@@ -435,10 +435,14 @@ $('world').addEventListener('pointerdown',e=>{
  e.preventDefault();const p=eventXY(e);
  pointers.set(e.pointerId,p);
  try{$('world').setPointerCapture(e.pointerId)}catch(_){}
- if(pointers.size===1)input={id:e.pointerId,start:p,last:p,moved:false,right:e.button===2};
+ if(pointers.size===1){
+  const touch=e.pointerType!=='mouse',right=e.button===2||(touch&&touchController.modifierHeld());
+  input={id:e.pointerId,start:p,last:p,moved:false,right,touch,
+   mode:dragMode({placing:!!placing,modifier:right,button:e.button})};
+ }
  if(pointers.size===2){
   const [a,b]=[...pointers.values()];
-  gesture={dist:Math.hypot(a.x-b.x,a.y-b.y),zoom:view.zoom};input=null;
+  gesture={dist:Math.hypot(a.x-b.x,a.y-b.y),zoom:view.zoom};input=null;selectionBox=null;
  }
 });
 $('world').addEventListener('pointermove',e=>{
@@ -451,15 +455,27 @@ $('world').addEventListener('pointermove',e=>{
  }
  if(placing)ghost={kind:placing,x:Math.floor(view.worldAt(p.x,p.y).x),y:Math.floor(view.worldAt(p.x,p.y).y)};
  if(!input||input.id!==e.pointerId)return;
- if(Math.hypot(p.x-input.start.x,p.y-input.start.y)>7)input.moved=true;
- if(input.moved)view.moveCamera(p.x-input.last.x,p.y-input.last.y);
+ if(Math.hypot(p.x-input.start.x,p.y-input.start.y)>9)input.moved=true;
+ if(input.moved){
+  if(input.mode==='box')selectionBox={start:input.start,end:p};
+  else if(input.mode==='pan')view.moveCamera(p.x-input.last.x,p.y-input.last.y);
+ }
  input.last=p;
 });
 function endPointer(e,cancel=false){
  if(!pointers.has(e.pointerId))return;
  const p=eventXY(e);
- if(!cancel&&pointers.size===1&&input&&!input.moved)mapClick(p.x,p.y,input.right);
- pointers.delete(e.pointerId);input=null;if(pointers.size<2)gesture=null;
+ if(!cancel&&pointers.size===1&&input){
+  if(!input.moved)mapClick(p.x,p.y,input.right,{touch:input.touch});
+  else if(input.mode==='box'){
+   const ids=selectUnitsInBox(game.units,input.start,p,u=>view.screen(u.x,u.y));
+   selectGroup(ids);
+   if(!ids.length)status('Nessuna tua unità nel riquadro.');
+  }else if(input.mode==='placement'&&!input.right)
+   mapClick(p.x,p.y,false,{touch:input.touch});
+ }
+ pointers.delete(e.pointerId);input=null;selectionBox=null;
+ if(pointers.size<2)gesture=null;
 }
 $('world').addEventListener('pointerup',e=>endPointer(e,false));
 $('world').addEventListener('pointercancel',e=>endPointer(e,true));
