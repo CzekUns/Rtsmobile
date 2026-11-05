@@ -44,6 +44,8 @@ const mini=$("board-minimap"),mc=mini.getContext("2d");
 const stage=$("board-stage");
 const worldCenter=proj(world.hub.x,world.hub.y);
 const camera={x:worldCenter.x,y:worldCenter.y,zoom:1.15};
+const artAudit=/(?:^|[?&])artAudit=(1|clean)(?:&|$)/.exec(window.location?.search||"");
+const auditGuides=!!artAudit&&artAudit[1]!=="clean";
 const imageNames={barrel:"barrel.svg",crate:"crate.svg",streetLamp:"street_lamp.svg",lantern:"lantern.svg",woodenFence:"wooden_fence.svg"};
 const images={};
 // First raster integration pass: original ImageGen sources are immutable.
@@ -967,6 +969,24 @@ function highlightSelected(){
  ellipse(lot.door.x,lot.door.y,4.8/camera.zoom,3.1/camera.zoom,"#f4c66b");
  ctx.restore();
 }
+function drawAuditGuides(){
+ // Overlay *real* per-building projected roofs and street-facing edges on top
+ // of one continuous ImageGen draft. Deliberately exposes alignment errors:
+ // this artwork has NOT passed geometry QA, so it is not a production layer.
+ const chunk=skeleton.chunkByLot.get(2);
+ if(!chunk)return;
+ ctx.save();
+ for(const id of chunk.lotIds){
+  const lot=skeleton.byId.get(id);
+  polygon(lot.roof,null,"#74e7e4",1.5/camera.zoom);
+  line(lot.frontage[0],lot.frontage[1],"#ffe078",2.4/camera.zoom);
+  ctx.textAlign="center";
+  ctx.fillStyle="#d6fff5";
+  ctx.font=(11/camera.zoom)+"px monospace";
+  ctx.fillText(String(id+1),lot.labelPoint.x,lot.labelPoint.y);
+ }
+ ctx.restore();
+}
 function drawStreetSelection(){
  if(!selectedStreet)return;
  ctx.save();ctx.strokeStyle="#e6c17e";ctx.lineWidth=2.2/camera.zoom;ctx.setLineDash([10/camera.zoom,5/camera.zoom]);
@@ -1012,7 +1032,7 @@ function scene(){
   }
   drawStreetAtmosphere();drawDistrictHaze();
  }
- drawLotMarkers();drawStreetSelection();highlightSelected();
+ drawLotMarkers();drawStreetSelection();if(auditGuides&&!blueprintMode)drawAuditGuides();highlightSelected();
  ctx.restore();
  const position=unproj(camera.x,camera.y),region=model.sector(position);
  const places=[["WEST CHURCH","NORTH HOUSES","DOCKS"],
@@ -1218,5 +1238,17 @@ document.addEventListener("fullscreenchange",syncFullscreen);
 window.addEventListener("resize",fit);
 window.addEventListener("orientationchange",fit);
 if(typeof ResizeObserver!=="undefined")new ResizeObserver(fit).observe(stage);
+if(artAudit&&chunkArt){
+ const candidate=skeleton.chunkByLot.get(2);
+ if(candidate){
+  camera.x=candidate.frame.left+candidate.frame.width/2;
+  camera.y=candidate.frame.top+candidate.frame.height/2;
+  camera.zoom=1.65;
+  chunkArt.register(candidate.id,{src:"./assets/runtime/chunks/block-2-draft-audit.webp"},requestDraw);
+  $("board-toast").textContent=artAudit[1]==="clean"
+    ?"BOZZA DI ISOLATO — arte non allineata alle hitbox; solo confronto"
+    :"BOZZA NON ALLINEATA — ciano = tetti, giallo = fronte strada. Test di sovrapposizione";
+ }
+}
 fit();
 })();
