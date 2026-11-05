@@ -1,3 +1,11 @@
+### 2026-11-05 — Primo gruppo ImageGen: conservazione e prova di sovrapposizione (non ancora approvato)
+- [x] La nuova immagine continua di un fronte di tenements è stata conservata in **PNG RGBA originale** su GitHub in `assets/source/imagegen-2026-11-05/group_tenements_unaligned_draft.png` (commit `bd22c7b6`) e su Google Drive (ID `1k3kFifxSTf7T_51dLpCzGO6odU5Zsjpp`).
+- [x] Creato WebP sperimentale 1332×1160 a trasparenza, con proporzioni originali preservate e margini trasparenti, in `assets/runtime/chunks/block-2-draft-audit.webp` (commit `add2cedc`); è una **bozza per il confronto**, non una risorsa definitiva.
+- [x] `board-preview.js` ha una **modalità audit opt-in**: `?artAudit=1` sovrappone per prova il macro-asset al gruppo `block-2` di Cross Street e ne mostra le vere sagome tetto ciano/fronti strada gialli; `?artAudit=clean` mostra la bozza senza guide. La preview normale resta invariata. Boot/pittura del chunk/hitbox e modalità scheletro verificati con Canvas mock V8 (commit `5bf80a2`).
+- [x] Provenienza, destinazione e stato non approvato registrati in `assets/chunk-candidates.json` (commit `e1c220a`). **Nessuna iscrizione nel manifest principale `assets/chunk-index.json`**, perché la pendenza illustrata delle facciate non coincide ancora con i tetti/fronti del lotto autorizzato.
+- [ ] **P0** Rigenerare il gruppo con angolo della strada esatto, usando `assets/guides/cross-street-block-2-skeleton.svg` come reference rigida, quindi collaudo browser desktop/Android e comparazione a 1×/3×/7.5×. Solo dopo aggiornare `assets/chunk-index.json` con risorse realmente allineate.
+
+
 ### 2026-11-05 — Nuova plancia in tre layer, scheletro e zoom ravvicinato
 
 - [x] Loader automatico da `assets/chunk-index.json` per i soli asset WebP verificati e corrispondenti agli ID-lotto; nessun tentativo di usare slot null (`0dda842a`). La modalità SCHELETRO usa ora solo vettori (nessuna texture raster), conservando il disegno completo di lotti, muri e strade (`d765f029`).
