@@ -1,3 +1,10 @@
+### 2026-11-05 — Fix profondità e hitbox dei macro-blocchi (correzione tecnica)
+- [x] Il renderer divide ogni macro-illustrazione in regioni per-lotto tramite la silhouette proiettata del volume, ordinandole per profondità in mezzo agli altri palazzi. Non è più dipinta a un'unica profondità che ignora i foreground.
+- [x] Highlight singolo e audit ciano/giallo vengono occultati dai volumi che sono davanti; badge sui centri dei tetti; segnalini nascosti per default nel confronto.
+- [x] `?artAudit=1` ora usa lo studio SVG geometry-locked; bozza ImageGen respinta solo con `?artAudit=draft` o `clean`. `chunk-index.json` resta intatto.
+- [x] Nuovi test isolati Node sul calcolo silhouette/occlusioni e parsing statico JS.
+- [ ] **Non verificato in browser**: screenshot e selezione mobile reale (zoom 1×/3×/7,5×), prestazioni, e l'asset ImageGen finale con prospettiva realmente coerente.
+
 ### 2026-11-05 22:00 — Audit geometrico comparativo (non approvato)
 - [x] `?artAudit=study` visualizza lo studio architettonico SVG già tracciato sulle sei hitbox del blocco Cross Street, usando il viewBox esatto senza padding; `?artAudit=1` conserva la bozza ImageGen non allineata. Modalità soltanto opt-in, senza cambiare `chunk-index.json`.
 - [ ] Da verificare screenshot desktop/Android 1×/3×/7.5×; ancora manca il macro-raster ImageGen corretto. Nessuna promozione runtime.
