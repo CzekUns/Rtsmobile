@@ -150,6 +150,6 @@ export async function renderUnit(root,out,unitCode='NORMAN',{colorSchemeId=1,sel
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){
  const args=process.argv.slice(2),arg=k=>args[args.indexOf(k)+1];
  if(!args.includes('--source')||!args.includes('--out')){
-  console.error('Usage: node render-unit.mjs --source /local/7kaa[/data] --out /tmp/norman --unit NORMAN');process.exitCode=2;
- }else renderUnit(arg('--source'),arg('--out'),arg('--unit')||'NORMAN').then(m=>console.log('Decoded '+m.frames.length+' original unit/idle frames; visual QA pending')).catch(e=>{console.error(e.stack);process.exitCode=1});
+  console.error('Usage: node render-unit.mjs --source /local/7kaa[/data] --out /tmp/norman --unit NORMAN --scheme 1');process.exitCode=2;
+ }else renderUnit(arg('--source'),arg('--out'),arg('--unit')||'NORMAN',{colorSchemeId:Number(arg('--scheme')||1),selected:args.includes('--selected')}).then(m=>console.log('Decoded '+m.frames.length+' original unit/idle frames; visual QA pending')).catch(e=>{console.error(e.stack);process.exitCode=1});
 }
