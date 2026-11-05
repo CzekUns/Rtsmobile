@@ -236,3 +236,7 @@ Nota: la proiezione isometrica non deve essere confusa con la regolarità urbani
 
 - [x] Iterazione grafica 2026-11-05: insegne botteghe, cornici, davanzali e balconi nella preview (`77e3b5d8`).
 - [ ] Collaudo browser desktop/mobile landscape con screenshot e confronto GOLDEN: ancora necessario.
+
+### 2026-11-05 — Illuminazione ambientale modulare
+- [x] Nuovo pass di rendering world-space per aloni ambra dei lampioni, riflessi a terra e 58 banchi di foschia a coordinate fisse; commit `ceee77bc`. Nessuna modifica a NPC o gameplay.
+- [ ] Screenshot desktop/Android e confronto con golden reference ancora mancanti; alpha visiva NON approvata.
