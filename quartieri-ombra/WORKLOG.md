@@ -187,3 +187,6 @@
 ### 2026-11-04 23:58 CET — Board visual pass
 - Commit `c2a3957a8966a2f053a21e0f32f86bc2ab4d8f09`: board-preview.js adds deterministic road-aligned broken cobbles on all road segments and layered slate repairs plus raised roof hatches on tall buildings. These are per-object modular Canvas details; no NPC/gameplay edits.
 - V8 JavaScript parse of fetched updated file: PASS. Browser screenshots, Android touch and golden side-by-side: NOT performed (browser automation unavailable in this runtime). Container raw GitHub fetch failed DNS (curl code 6); no claim of rendering validation. Await visual comparison.
+
+## 2026-11-05 — Facciate commerciali e balconi
+Commit `77e3b5d8`: nella preview della plancia aggiunti insegne sporgenti, cornici lignee per botteghe, davanzali e ringhiere saltuarie ai piani superiori. Solo rendering; nessun cambiamento NPC/economia. Verificata presenza degli anchor nel sorgente prima della modifica; screenshot browser e Android non eseguiti, quindi confronto GOLDEN ancora aperto.
