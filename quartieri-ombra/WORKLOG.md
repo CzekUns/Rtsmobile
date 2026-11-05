@@ -1,3 +1,8 @@
+### 2026-11-05 16:00 — Primo passaggio raster ImageGen nella plancia
+- Commit `a8b2f4adc56325709576718f35b015d33bcfe2fb`: caricamento di sei sorgenti PNG originali già presenti nel repository, selezione per tipologia e seed, rendering con proporzioni uniformi ancorato al suolo, fallback al precedente sprite vettoriale; nessuna modifica NPC/pathfinding/IA/economia. Cache bust della preview.
+- Test eseguito: parsing V8 con `new Function` sul JavaScript aggiornato: PASS. **Non** eseguiti screenshot browser/Android, verifica effettiva delle trasparenze, orientamenti e test Node. In particolare la coerenza tra footprint e margini dell'immagine resta da collaudare.
+- Successivo: ritaglio/normalizzazione WebP delle sorgenti, geometria per orientamenti, screenshot reali; poi terreno, carri, props e HUD. Plancia NON approvata.
+
 ### 2026-11-05 14:00 — Segnaletica mercatale e bug orientamento carri
 Commit `e5f9fff593eedc46388e36c3546a60fd9e262fc1`: aggiunte piccole insegne in legno pendenti con emblemi diversi ai banchi mercatali; corretto `drawCart`, che usava `p.id` mentre i props hanno `seed` e non `id`, producendo un flip sempre uguale. Cambiato solo `board-preview.js`, non NPC/IA/economia. Controllo sintattico V8 del file letto nuovamente da GitHub: PASS, 38203 caratteri. Nessun screenshot browser, test Node o Android effettuato; la fedeltà visiva alla golden non è ancora verificata. Da testare in browser l'occlusione delle insegne.
 
