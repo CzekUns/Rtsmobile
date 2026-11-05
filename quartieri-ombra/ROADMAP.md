@@ -284,3 +284,5 @@ Nota: la proiezione isometrica non deve essere confusa con la regolarità urbani
 - [ ] Collaudo browser reale desktop/mobile landscape, screenshot e confronto GOLDEN; non dichiarare approvata la plancia.
 
 - 2026-11-05: plancia, nuovi banchi di mercato con tettoie e merci come layer depth-sorted indipendente (commit f90db488). Verifica visiva browser/mobile e confronto GOLDEN ancora NON eseguiti; non segnare alpha approvata.
+
+- [x] 2026-11-05: bordi stradali irregolari con ciottoli deterministici nei segmenti delle vie (commit `d5f9b7e`). Resta aperto il confronto screenshot browser con la golden reference e il test mobile landscape; non considerare questa rifinitura un'approvazione.
