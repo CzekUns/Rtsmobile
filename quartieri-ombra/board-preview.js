@@ -553,9 +553,13 @@ function drawProp(p){
 }
 // Distinct street-market canopies are scenery only. They are projected from
 // individual shop lots and baked neither into the ground nor into gameplay.
+// Market stalls sit outside the actual entrance, on the road-facing side.
+// The previous corner+8 placement could put the canopy inside a building.
 const marketStalls=world.buildings.filter(b=>b.shopfront&&b.seed%4===0).map(b=>{
- const p=b.poly,front=p.reduce((best,q)=>proj(q.x,q.y).y>proj(best.x,best.y).y?q:best,p[0]);
- return {x:front.x+8,y:front.y+8,seed:b.seed};
+ const dx=b.door.x-b.x,dy=b.door.y-b.y;
+ const distance=Math.hypot(dx,dy)||1;
+ return {id:b.id,x:b.door.x+dx/distance*13,y:b.door.y+dy/distance*13,
+  seed:b.seed,angle:Math.atan2(dy,dx)};
 });
 function drawMarketStall(stall){
  const q=proj(stall.x,stall.y);
