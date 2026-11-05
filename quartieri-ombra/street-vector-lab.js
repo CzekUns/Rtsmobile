@@ -186,7 +186,7 @@ function paint(){
  const rect=svg.getBoundingClientRect();width=Math.max(320,rect.width);height=Math.max(200,rect.height);
  view=G.camera(S.target,S.yaw,S.height,S.distance,width,height,S.zoom);
  const nearby=world.buildings.filter(b=>G.distance2(b,S.target)<540*540)
-  .sort((a,b)=>G.distance2(a,S.target)-G.distance2(b,S.target)).slice(0,90);
+  .sort((a,b)=>G.distance2(a,S.target)-G.distance2(b,S.target)).slice(0,width<760?42:68);
  const faces=nearby.flatMap(buildingFaces);
  const lamps=world.props.filter(p=>p.type==="streetLamp"&&G.distance2(p,S.target)<450*450).slice(0,35).concat(extraLamps);
  lamps.forEach((p,i)=>{const f=lamp(p,i);if(f)faces.push(f)});
