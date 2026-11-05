@@ -241,3 +241,7 @@ Commit `f90db4885619453d777356dd8c20543433ecf973`: introdotti banchi mercatali o
 
 ### 2026-11-05 — Bordature stradali irregolari
 Commit `d5f9b7e`: aggiunta in `board-preview.js` una fascia di ciottoli e spigoli irregolari lungo entrambi i margini di ogni segmento stradale, con seed stabile e culling viewport. Obiettivo: rompere le lunghe sagome vettoriali delle strade senza cambiare la geometria o la navigazione. Verifica effettuata: parsing JavaScript con `new Function` nel runtime JS prima della pubblicazione. NON effettuati screenshot browser, prove Android o suite Node; confronto GOLDEN ancora aperto. NPC e gameplay invariati.
+
+
+### 2026-11-05 — Asset restyling iteration
+Commit `108a1175`: normalized six ImageGen building sprites at runtime by scanning alpha bounds once per image and anchoring cropped silhouettes at the ground, with a separate contact shadow. Sources untouched, fallback retained, no NPC changes. GitHub code write confirmed; browser screenshot, Android and Node tests NOT executed. Next: real render comparison and WebP production.
