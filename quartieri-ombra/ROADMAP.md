@@ -1,3 +1,7 @@
+### 2026-11-05 22:00 — Audit geometrico comparativo (non approvato)
+- [x] `?artAudit=study` visualizza lo studio architettonico SVG già tracciato sulle sei hitbox del blocco Cross Street, usando il viewBox esatto senza padding; `?artAudit=1` conserva la bozza ImageGen non allineata. Modalità soltanto opt-in, senza cambiare `chunk-index.json`.
+- [ ] Da verificare screenshot desktop/Android 1×/3×/7.5×; ancora manca il macro-raster ImageGen corretto. Nessuna promozione runtime.
+
 
 ### 2026-11-05 21:00 — Block-2 geometry-locked visual study (NOT approved)
 - [x] Added `assets/guides/cross-street-block-2-geometry-locked-art-study.svg`: six buildings traced from the authoritative SVG, with independent walls, slate roofs, brickwork, windows and doors. Preserves positive-slope frontage without rotating the rejected draft (`0b49b6b`).
