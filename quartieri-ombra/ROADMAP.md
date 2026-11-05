@@ -1,3 +1,9 @@
+### 2026-11-05 — Ripristino urgente asset raster nel test
+- [x] Ripristinata bozza WebP originale a `?artAudit=1`, senza cancellare il fix di selezione in produzione e senza sostituirla con il solo studio SVG.
+- [x] Sulle sole modalità di confronto raster, il renderer mostra la **macro-illustrazione completa** senza clip inadatto a un disegno non allineato; sopra rimangono gli overlay dei lotti. `?artAudit=clean` omette gli overlay, `?artAudit=study` mostra l'alternativa geometrica.
+- [x] Verificato che `block-2-draft-audit.webp` esiste in GitHub main ed è un file WebP; parsing del codice aggiornato superato.
+- [ ] L'asset raster resta **disallineato**: ImageGen coerente con prospettiva esatta/LOD e screenshot browser reali non ancora disponibili. Non promuovere nel manifest di produzione.
+
 ### 2026-11-05 — Fix profondità e hitbox dei macro-blocchi (correzione tecnica)
 - [x] Il renderer divide ogni macro-illustrazione in regioni per-lotto tramite la silhouette proiettata del volume, ordinandole per profondità in mezzo agli altri palazzi. Non è più dipinta a un'unica profondità che ignora i foreground.
 - [x] Highlight singolo e audit ciano/giallo vengono occultati dai volumi che sono davanti; badge sui centri dei tetti; segnalini nascosti per default nel confronto.

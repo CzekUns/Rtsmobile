@@ -1,11 +1,22 @@
 # Quartieri d'Ombra — RTS di controllo territoriale
 
+## Ripristino asset Cross Street nel test (?artAudit=1)
+
+Correzione della regressione visiva: il link storico `board-preview.html?artAudit=1` deve mostrare **la vera immagine WebP di sei palazzi** (`assets/runtime/chunks/block-2-draft-audit.webp`), non sostituirla automaticamente con la guida SVG. L'asset resta una bozza **NON ALLINEATA / NON APPROVATA**, ma è indispensabile poterlo vedere per confrontare gli errori. In questa sola modalità diagnostica l'immagine è disegnata tutta intera anziché mascherata dalle sei silhouette non corrispondenti.
+
+- `?artAudit=1`: PNG/WebP ImageGen esistente + guide e hitbox sopra.
+- `?artAudit=clean`: stesso artwork originale, senza guide.
+- `?artAudit=study` o `?artAudit=fixed`: studio SVG costruito sulle quote reali, per confronto delle geometrie.
+- La vera produzione continua a usare la maschera per edificio per i **futuri asset conformi** allo scheletro.
+
+I file originali e il catalogo di produzione non sono cambiati.
+
 ## Fix Cross Street: hitbox visibili e profondità dei macro-blocchi (5 novembre 2026)
 
 La plancia disegna ora ciascun lotto contenuto in una macro-immagine tramite la sagoma volumetrica vettoriale del proprio edificio; la profondità viene ordinata **per edificio**, non più per intero blocco. I contorni di selezione e le guide diagnostiche vengono occultati dagli edifici realmente davanti. La modalità audit usa numeri sui tetti e nasconde inizialmente i segnalini per facilitare il controllo.
 
-- `board-preview.html?artAudit=1` o `?artAudit=study`: test corretto **con studio SVG geometry-locked**, non ancora art ImageGen finale.
-- `board-preview.html?artAudit=draft`: precedente immagine ImageGen **non allineata**, solo confronto con geometria.
+- `board-preview.html?artAudit=study` o `?artAudit=fixed`: test geometry-locked **con studio SVG**, non ancora art ImageGen finale.
+- `board-preview.html?artAudit=1` o `?artAudit=draft`: immagine ImageGen **non allineata ma visibile per intero**, con overlay diagnostico.
 - `board-preview.html?artAudit=clean`: stessa bozza non allineata, senza overlay di audit.
 
 Il risultato richiede ancora screenshot desktop/Android e un macro-raster ImageGen realmente conforme allo scheletro: **nessuna promozione dell'asset non allineato in produzione**.
