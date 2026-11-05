@@ -12,8 +12,11 @@ function make(b,project){
  const pts=[...ground,...roof];
  const minX=Math.floor(Math.min(...pts.map(p=>p.x))-8),minY=Math.floor(Math.min(...pts.map(p=>p.y))-13);
  const maxX=Math.ceil(Math.max(...pts.map(p=>p.x))+8),maxY=Math.ceil(Math.max(...pts.map(p=>p.y))+8);
- const c=document.createElement("canvas");c.width=maxX-minX;c.height=maxY-minY;
- const g=c.getContext("2d");g.translate(-minX,-minY);
+ // 4x source-density sprite survives close street-level zoom, without
+ // stretching the projected geometry or asking the GPU to invent missing pixels.
+ const density=4,worldWidth=maxX-minX,worldHeight=maxY-minY;
+ const c=document.createElement("canvas");c.width=worldWidth*density;c.height=worldHeight*density;
+ const g=c.getContext("2d");g.setTransform(density,0,0,density,-minX*density,-minY*density);
  const pick=(a,b,t)=>({x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t});
  function poly(a,fill,stroke="#261e1a",lw=.8){g.beginPath();a.forEach((p,i)=>i?g.lineTo(p.x,p.y):g.moveTo(p.x,p.y));g.closePath();g.fillStyle=fill;g.fill();if(stroke){g.strokeStyle=stroke;g.lineWidth=lw;g.stroke()}}
  function seg(a,b,color,w=1){g.beginPath();g.moveTo(a.x,a.y);g.lineTo(b.x,b.y);g.strokeStyle=color;g.lineWidth=w;g.stroke()}
@@ -56,7 +59,7 @@ function make(b,project){
  seg({x:chimney.x-5,y:chimney.y-14},{x:chimney.x+2,y:chimney.y-16},"#b29b7c",2);
  // Shared stone foundation across all six units, without independent opaque floor pads.
  seg(ground[0],ground[1],"#a38a6d",2.4);
- const result={tile:c,left:minX,top:minY};
+ const result={tile:c,left:minX,top:minY,width:worldWidth,height:worldHeight,density};
  cache.set(b.id,result);return result;
 }
 global.QOCrossStreetKit={ids,make,cache};
