@@ -44,7 +44,7 @@ const mini=$("board-minimap"),mc=mini.getContext("2d");
 const stage=$("board-stage");
 const worldCenter=proj(world.hub.x,world.hub.y);
 const camera={x:worldCenter.x,y:worldCenter.y,zoom:1.15};
-const artAudit=/(?:^|[?&])artAudit=(1|clean)(?:&|$)/.exec(window.location?.search||"");
+const artAudit=/(?:^|[?&])artAudit=(1|clean|study)(?:&|$)/.exec(window.location?.search||"");
 const auditGuides=!!artAudit&&artAudit[1]!=="clean";
 const imageNames={barrel:"barrel.svg",crate:"crate.svg",streetLamp:"street_lamp.svg",lantern:"lantern.svg",woodenFence:"wooden_fence.svg"};
 const images={};
@@ -1244,8 +1244,13 @@ if(artAudit&&chunkArt){
   camera.x=candidate.frame.left+candidate.frame.width/2;
   camera.y=candidate.frame.top+candidate.frame.height/2;
   camera.zoom=1.65;
-  chunkArt.register(candidate.id,{src:"./assets/runtime/chunks/block-2-draft-audit.webp"},requestDraw);
-  $("board-toast").textContent=artAudit[1]==="clean"
+  const study=artAudit[1]==="study";
+  chunkArt.register(candidate.id,{src:study
+    ?"./assets/guides/cross-street-block-2-geometry-locked-art-study.svg"
+    :"./assets/runtime/chunks/block-2-draft-audit.webp"},requestDraw);
+  $("board-toast").textContent=study
+    ?"STUDIO GEOMETRICO ALLINEATO — SVG provvisorio, non ImageGen: tetti ciano / fronti gialli"
+    :artAudit[1]==="clean"
     ?"BOZZA DI ISOLATO — arte non allineata alle hitbox; solo confronto"
     :"BOZZA NON ALLINEATA — ciano = tetti, giallo = fronte strada. Test di sovrapposizione";
  }
