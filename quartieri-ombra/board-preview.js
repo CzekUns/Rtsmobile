@@ -543,28 +543,31 @@ function buildingGeometry(b){
  const bottom=Math.ceil(Math.max(...coords.map(p=>p.y))+margin);
  return {ground,roof,left,top,width:right-left,height:bottom-top};
 }
+function paintBuildingGeometry(b,geometry){
+ const {ground,roof}=geometry;
+ polygon(ground.map(p=>({x:p.x+7,y:p.y+6})),"#16131099");
+ const indices=[0,1,2,3].sort((i,j)=>{
+  const q=k=>(ground[k].y+ground[(k+1)%4].y)/2;
+  return q(i)-q(j);
+ });
+ for(const i of indices)drawFace(b,roof,ground,i);
+ drawRoof(b,ground,roof);
+ if(b.controlled){
+  const top=lerp(roof[1],roof[2],.5);
+  line({x:top.x,y:top.y-24},{x:top.x,y:top.y+4},"#b6a27b",1);
+  polygon([{x:top.x,y:top.y-24},{x:top.x+10,y:top.y-20},{x:top.x,y:top.y-15}],
+   b.id%2?"#9b5550":"#6c86a1");
+ }
+}
 function bakeBuilding(b,geometry,density=1){
  const tile=document.createElement("canvas");
  tile.width=geometry.width*density;tile.height=geometry.height*density;
  const original=ctx;ctx=tile.getContext("2d");
  try{
   ctx.setTransform(density,0,0,density,-geometry.left*density,-geometry.top*density);
-  const {ground,roof}=geometry;
-  polygon(ground.map(p=>({x:p.x+7,y:p.y+6})),"#16131099");
-  const indices=[0,1,2,3].sort((i,j)=>{
-   const q=k=>(ground[k].y+ground[(k+1)%4].y)/2;
-   return q(i)-q(j);
-  });
-  for(const i of indices)drawFace(b,roof,ground,i);
-  drawRoof(b,ground,roof);
-  if(b.controlled){
-   const top=lerp(roof[1],roof[2],.5);
-   line({x:top.x,y:top.y-24},{x:top.x,y:top.y+4},"#b6a27b",1);
-   polygon([{x:top.x,y:top.y-24},{x:top.x+10,y:top.y-20},{x:top.x,y:top.y-15}],
-    b.id%2?"#9b5550":"#6c86a1");
-  }
+  paintBuildingGeometry(b,geometry);
  }finally{ctx=original}
- return {tile,left:geometry.left,top:geometry.top,width:geometry.width,height:geometry.height,density};
+ return{tile,left:geometry.left,top:geometry.top,width:geometry.width,height:geometry.height,density};
 }
 // One continuous ground seating layer for the row, below every roof and wall.
 // These cobbles, plinths and shared foundations are drawn before the architecture,
@@ -624,15 +627,19 @@ function drawBuilding(b){
  const geometry=buildingGeometry(b);
  // At near-street zoom use a separate 3x vector rasterization, not a blurred
  // stretch of the low-res preview tile. Camera/footprints never change.
- const density=camera.zoom>=3.1?3:1,cacheKey=b.id+"@"+density;
- let cached=buildingCache.get(cacheKey);
- if(!cached){
-  cached=bakeBuilding(b,geometry,density);
-  buildingCache.set(cacheKey,cached);
-  if(buildingCache.size>MAX_BUILDING_SPRITES)
-   buildingCache.delete(buildingCache.keys().next().value);
- }else{
-  buildingCache.delete(cacheKey);buildingCache.set(cacheKey,cached);
+ const directVector=camera.zoom>4.3;
+ const density=camera.zoom>=2.7?3:1,cacheKey=b.id+"@"+density;
+ let cached=null;
+ if(!directVector){
+  cached=buildingCache.get(cacheKey);
+  if(!cached){
+   cached=bakeBuilding(b,geometry,density);
+   buildingCache.set(cacheKey,cached);
+   if(buildingCache.size>MAX_BUILDING_SPRITES)
+    buildingCache.delete(buildingCache.keys().next().value);
+  }else{
+   buildingCache.delete(cacheKey);buildingCache.set(cacheKey,cached);
+  }
  }
  ctx.save();ctx.imageSmoothingEnabled=camera.zoom>2.25;
  const pilot=window.QOCrossStreetKit&&window.QOCrossStreetKit.make(b,proj);
@@ -658,6 +665,10 @@ function drawBuilding(b){
   const frontX=(p0.x+p1.x)/2,frontY=(p0.y+p1.y)/2;
   ctx.drawImage(raster,crop.x,crop.y,crop.w,crop.h,
                 frontX-rw/2,frontY-rh,rw,rh);
+ }else if(directVector){
+  // True vector geometry at extreme zoom: no pixelated enlargement of a
+  // temporary 1x sprite. Original ImageGen artwork requires its own LODs.
+  paintBuildingGeometry(b,geometry);
  }else{
   ctx.drawImage(cached.tile,cached.left,cached.top,cached.width,cached.height);
  }
@@ -951,7 +962,7 @@ function scene(){
   ].sort((a,b)=>a.depth-b.depth||(a.obj.id??0)-(b.obj.id??0));
   for(const layer of layers){
    if(layer.kind==="building")drawBuilding(layer.obj);
-   else if(layer.kind==="chunk")chunkArt.draw(ctx,layer.obj);
+   else if(layer.kind==="chunk")chunkArt.draw(ctx,layer.obj,camera.zoom);
    else if(layer.kind==="joint")drawMasonryJoint(layer.obj);
    else if(layer.kind==="stall")drawMarketStall(layer.obj);
    else drawProp(layer.obj);
