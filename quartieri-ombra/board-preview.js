@@ -96,6 +96,29 @@ function drawRoads(){
    }
    polygon(roadQuad(a,b,r.width+6),"#665d4e","#4d453a");
    polygon(roadQuad(a,b,r.width-2),r.kind==="main"?"#594b3c":"#4d4235");
+   // Broken stone shoulders interrupt the long straight vector road edges.
+   // Small world-anchored cobbles create an uneven nineteenth-century street silhouette.
+   const edgeRng=seeded(320617+r.id*3079+i*613);
+   const edgeCount=Math.max(1,Math.floor(Math.hypot(b.x-a.x,b.y-a.y)/11));
+   const edgeDX=b.x-a.x,edgeDY=b.y-a.y;
+   const edgeLength=Math.hypot(edgeDX,edgeDY)||1;
+   const edgeNX=-edgeDY/edgeLength,edgeNY=edgeDX/edgeLength;
+   for(let edge=0;edge<2;edge++){
+    const side=edge===0?-1:1;
+    for(let k=0;k<edgeCount;k++){
+     const t=(k+.15+edgeRng()*.7)/edgeCount;
+     const shoulder=side*(r.width*.48+edgeRng()*3);
+     const q=proj(a.x+edgeDX*t+edgeNX*shoulder,
+      a.y+edgeDY*t+edgeNY*shoulder);
+     if(!pointInViewport(q,9))continue;
+     const size=1.5+edgeRng()*3.6;
+     ellipse(q.x,q.y,size,size*.32,
+      edgeRng()>.65?"#a08b6c":"#39342b");
+     if(edgeRng()>.76)
+      line({x:q.x-size*.7,y:q.y-.4},{x:q.x+size*.5,y:q.y-.6},
+       "#c1a58185",.6);
+    }
+   }
    // Parallel wagon ruts follow the bend and remain small in the isometric scale.
    const dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1;
    for(const side of[-.20,.20]){
