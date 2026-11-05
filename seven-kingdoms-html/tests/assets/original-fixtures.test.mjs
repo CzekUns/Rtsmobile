@@ -46,3 +46,33 @@ test('original FBITMAP:1 under construction has true 93x77 silhouette and valid 
  }
  assert.ok(ordinary>0);assert.equal(affected>=0,true);
 });
+
+test('original NORMAN bitmap obeys Unit::draw nation remap, without changing ordinary body pixels',()=>{
+ const src=fixture.samples.find(x=>x.record==='SFRAME:1');
+ const bitmap=decodeImportedBitmap(Buffer.from(src.recordBase64,'base64'));
+ const pal=decodeStandardPalette(Buffer.from(fixture.palette.rawBase64,'base64'));
+ const vanilla=indexedToRgba(bitmap,pal),red=indexedToRgba(bitmap,pal,{remap:nationRemapTable(1)});
+ let teamCount=0,normalCount=0,outlineCount=0;
+ const mapped=nationRemapTable(1);
+ for(let i=0;i<bitmap.pixels.length;i++){
+  const value=bitmap.pixels[i],j=i*4;
+  if(value>=0xe0&&value<=0xe7){
+   teamCount++;
+   assert.equal(red[j],pal[mapped[value]*3]);
+   assert.equal(red[j+1],pal[mapped[value]*3+1]);
+   assert.equal(red[j+2],pal[mapped[value]*3+2]);
+  }else if(value===0xf2){
+   outlineCount++;
+   assert.equal(red[j+3],0,'unselected unit outline must be transparent');
+  }else if(value===0xf3){
+   outlineCount++;
+   assert.equal(red[j],pal[0]);assert.equal(red[j+1],pal[1]);assert.equal(red[j+2],pal[2]);
+  }else{
+   normalCount++;
+   assert.deepEqual([...red.subarray(j,j+4)],[...vanilla.subarray(j,j+4)]);
+  }
+ }
+ assert.ok(teamCount>50,'genuine Norman sprite should contain faction-colour code pixels');
+ assert.ok(normalCount>100,'genuine Norman sprite should keep non-faction pixels');
+ assert.ok(outlineCount>0,'source outline pixels must be handled by source OGAME rules');
+});
