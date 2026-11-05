@@ -1,3 +1,6 @@
+### 2026-11-05 22:00 — Comparatore di geometria visiva
+Implementata opzione `board-preview.html?artAudit=study` (commit `4439e2c`, `c32aef8`) per vedere i sei edifici dello studio geometrico con coordinate di chunk non stirate. Resta disponibile `?artAudit=1` per confronto con il draft ImageGen errato. Controllo statico del codice e registrazione GitHub; **nessuno screenshot browser reale e nessun test Android eseguiti in questa esecuzione**. Non sono stati toccati NPC, economia o manifest asset.
+
 
 ### 2026-11-05 21:00 — Geometric visual study, no draft promotion
 Created six-parcel geometry-locked illustrated SVG at `assets/guides/cross-street-block-2-geometry-locked-art-study.svg` (`0b49b6b`), derived from the authoritative roof/wall polygons with positive-slope street fronts. It is a separate **vector art study**, not the requested ImageGen PNG, and is not registered in runtime. Original unaligned draft, padded WebP and null chunk index untouched. No real browser/Android screenshots or test suite in this run; visual acceptance still blocked pending corrected macro-image and audit comparison. NPC/IA/pathfinding/economy untouched.
