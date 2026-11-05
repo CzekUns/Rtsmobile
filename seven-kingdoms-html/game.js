@@ -4,6 +4,9 @@
 import {SevenGame,NATIONS,FIRMS,WORLD_W,WORLD_H,SAVE_KEY} from './rules.js';
 import {createFrameAccumulator,accumulateFrame} from './core/clock.js';
 import {issuePlaytestOrder,advancePlaytestRoutes} from './playtest/path-routes.js';
+import {issueGroupMove} from './playtest/group-orders.js';
+import {selectUnitsInBox,dragMode} from './playtest/rts-touch-core.js';
+import {installMobileRtsControls} from './playtest/mobile-rts-controls.js';
 import {issueWorkOrder,completeWorkArrivals} from './playtest/work-assignments.js';
 import {issueBuildOrder,cancelBuildOrder,advanceConstruction,isBuilder,canBuildFirm} from './playtest/construction.js';
 import {issueRepairOrder,cancelRepairOrder,advanceRepairs,canRepair} from './playtest/repairs.js';
@@ -19,8 +22,12 @@ let game=SevenGame.load(saveKey)||new SevenGame();
 const view=new WorldView($('world'),$('minimap'));
 let selection=game.towns.find(t=>t.owner===1)?.id||null;
 let report=null,placing=null,placingBuilderId=null,builderMenuId=null,trainingMenuTownId=null,ghost=null,newsUntil=0,last=0,lastPanel=0,lastSave=0;
-let input=null,gesture=null;const pointers=new Map();
+let input=null,gesture=null,selectionBox=null,groupUnitIds=[];const pointers=new Map();
 const portrait=window.matchMedia('(orientation: portrait)');
+const touchController=installMobileRtsControls({
+ joystick:$('touchJoystick'),thumb:$('touchJoyThumb'),modifier:$('touchModifier'),
+ onPan:(dx,dy)=>view.moveCamera(dx,dy)
+});
 function resizeStage(){
  const scale=Math.min(window.innerWidth/800,window.innerHeight/600);
  $('stage').style.transform='translate(-50%,-50%) scale('+Math.max(.1,scale)+')';
@@ -33,9 +40,27 @@ function status(message){
 function selected(){return game.get(selection);}
 function select(id){
  if(id&&!game.get(id))return;
+ groupUnitIds=[];
  selection=id;
  closeReport();
  renderPanel();
+}
+function activeGroup(){
+ groupUnitIds=groupUnitIds.filter(id=>{
+  const u=game.get(id);
+  return u&&game.units.includes(u)&&u.owner===1;
+ });
+ return groupUnitIds;
+}
+function selectGroup(ids){
+ const units=[...new Set(ids)].filter(id=>{
+  const u=game.get(id);
+  return u&&game.units.includes(u)&&u.owner===1;
+ });
+ if(units.length<=1){select(units[0]||null);return;}
+ groupUnitIds=units;selection=units[0];
+ closeReport();renderPanel();
+ status(units.length+' unità selezionate · tieni premuto MOD e tocca per spostarle.');
 }
 function closeReport(){
  if($('reportDialog').open)$('reportDialog').close();
@@ -79,6 +104,18 @@ function workBtn(firm,unit){
   '>'+esc(label)+'</button>';
 }
 function selectedContent(){
+ const group=activeGroup();
+ if(group.length>1){
+  const soldiers=group.filter(id=>game.get(id)?.kind==='soldier').length;
+  return {
+   title:'Gruppo di '+group.length,
+   meta:'Unità selezionate · Greci',color:NATIONS[1].color,
+   info:'Soldati <strong>'+soldiers+'</strong> · Abitanti <strong>'+(group.length-soldiers)+'</strong>'+
+    '<br>MOD + tocco: muovi il gruppo in formazione.'+
+    '<br>Trascina per cambiare selezione. Unità impegnate in cantieri o riparazioni restano ferme.',
+   actions:btn('stop-group','Ferma tutte le unità')
+  };
+ }
  const item=selected();
  if(!item)return {title:'Seven Kingdoms',meta:'HTML Edition',color:'#aaa',info:'Seleziona un elemento sulla mappa.',actions:''};
  const nation=NATIONS[item.owner]||NATIONS[0],color=nation.color;
@@ -196,9 +233,9 @@ function selectedContent(){
       ' · '+(activeSite.status==='walking'?'In marcia':'Lavori '+Math.floor(activeSite.progress*100)+'%'):
      assignedTo?'In viaggio verso '+esc(FIRMS[assignedTo.kind]?.label||'edificio'):
            item.target?'In marcia':'Pronto per gli ordini')+
-    '<br>Tocca il terreno per spostarti oppure scegli un edificio qui sotto. L\'abitante entrerà solo dopo aver raggiunto l\'ingresso.',
+    '<br>Su smartphone usa MOD + tocco per spostarti, oppure scegli un edificio qui sotto. L\'abitante entrerà solo dopo aver raggiunto l\'ingresso.',
    actions:item.owner===1?[
-    btn('move','Sposta: tocca il terreno'),
+    btn('move','Sposta: MOD + tocco'),
     btn('stop','Ferma / annulla ordine',!item.target&&!item.workTargetId&&!item.buildSiteId&&!item.repairTargetId),
     isBuilder(item)?btn('builder-menu','Costruisci · scegli edificio'):null,
     buildButtons,
@@ -260,6 +297,18 @@ function renderPanel(){
  renderReport();
 }
 function runAction(action){
+ if(action==='stop-group'){
+  const ids=activeGroup();
+  if(ids.length<=1)return;
+  for(const id of ids){
+   const unit=game.get(id);
+   if(!unit)continue;
+   cancelBuildOrder(game,id);cancelRepairOrder(game,id);
+   unit.route=[];unit.target=null;unit.workTargetId=null;
+  }
+  status('Gruppo fermato: '+ids.length+' unità.');
+  game.save(saveKey);renderPanel();renderHud();return;
+ }
  const obj=selected();if(!obj)return;
  let r={ok:false,msg:'Ordine non valido.'};
  if(action==='recruit')r=game.recruit(obj.id,obj.selectedRaceId);
@@ -278,7 +327,7 @@ function runAction(action){
  if(action==='persuade')r=game.persuade(obj.id);
  if(action==='annex')r=game.annex(obj.id);
  if(action==='dismiss')r=game.dismiss(obj.id);
- if(action==='move'&&game.units.includes(obj))r={ok:true,msg:'Tocca il terreno per ordinare uno spostamento.'};
+ if(action==='move'&&game.units.includes(obj))r={ok:true,msg:'Su smartphone: tieni premuto MOD e tocca il terreno. Sul PC: tasto destro.'};
  if(action==='stop'&&game.units.includes(obj)){
   const cancelled=cancelBuildOrder(game,obj.id);
   const cancelledRepair=cancelRepairOrder(game,obj.id);
@@ -343,9 +392,10 @@ function finishWorkOrders(){
  }
  if(results.length){renderPanel();game.save(saveKey);}
 }
-function mapClick(sx,sy,right=false){
+function mapClick(sx,sy,right=false,{touch=false}={}){
  const p=view.worldAt(sx,sy);let x=p.x,y=p.y;
  if(placing){
+  if(right){cancelBuild();status('Posizionamento annullato con MOD.');return;}
   const result=issueBuildOrder(game,placingBuilderId,placing,x,y);
   status(result.msg);
   if(result.ok){cancelBuild();game.save(saveKey);renderPanel();renderHud();}
@@ -353,19 +403,25 @@ function mapClick(sx,sy,right=false){
  }
  const hit=view.pick(game,x,y),unit=selected();
  const canOrder=unit&&game.units.includes(unit)&&unit.owner===1;
+ if(right&&activeGroup().length>1){
+  const result=issueGroupMove(game,groupUnitIds,x,y);
+  status(result.msg);
+  if(result.ok)game.save(saveKey);
+  renderPanel();return;
+ }
  if(right&&canOrder){
   const r=sendOrder(unit.id,x,y);status(r.msg);renderPanel();return;
  }
  if(hit){
   const item=game.get(hit);
-  if(canOrder&&item&&game.firms.includes(item)&&item.owner===1&&item.id!==unit.id){
+  if(!touch&&canOrder&&item&&game.firms.includes(item)&&item.owner===1&&item.id!==unit.id){
    const r=sendOrder(unit.id,x,y);status(r.msg);
    if(r.ok&&r.unit)selection=r.unit.id;
    renderPanel();return;
   }
   select(hit);return;
  }
- if(canOrder){
+ if(!touch&&canOrder){
   const r=sendOrder(unit.id,x,y);status(r.msg);renderPanel();return;
  }
  select(null);
@@ -380,10 +436,14 @@ $('world').addEventListener('pointerdown',e=>{
  e.preventDefault();const p=eventXY(e);
  pointers.set(e.pointerId,p);
  try{$('world').setPointerCapture(e.pointerId)}catch(_){}
- if(pointers.size===1)input={id:e.pointerId,start:p,last:p,moved:false,right:e.button===2};
+ if(pointers.size===1){
+  const touch=e.pointerType!=='mouse',right=e.button===2||(touch&&touchController.modifierHeld());
+  input={id:e.pointerId,start:p,last:p,moved:false,right,touch,
+   mode:dragMode({placing:!!placing,modifier:right,button:e.button})};
+ }
  if(pointers.size===2){
   const [a,b]=[...pointers.values()];
-  gesture={dist:Math.hypot(a.x-b.x,a.y-b.y),zoom:view.zoom};input=null;
+  gesture={dist:Math.hypot(a.x-b.x,a.y-b.y),zoom:view.zoom};input=null;selectionBox=null;
  }
 });
 $('world').addEventListener('pointermove',e=>{
@@ -396,15 +456,27 @@ $('world').addEventListener('pointermove',e=>{
  }
  if(placing)ghost={kind:placing,x:Math.floor(view.worldAt(p.x,p.y).x),y:Math.floor(view.worldAt(p.x,p.y).y)};
  if(!input||input.id!==e.pointerId)return;
- if(Math.hypot(p.x-input.start.x,p.y-input.start.y)>7)input.moved=true;
- if(input.moved)view.moveCamera(p.x-input.last.x,p.y-input.last.y);
+ if(Math.hypot(p.x-input.start.x,p.y-input.start.y)>9)input.moved=true;
+ if(input.moved){
+  if(input.mode==='box')selectionBox={start:input.start,end:p};
+  else if(input.mode==='pan')view.moveCamera(p.x-input.last.x,p.y-input.last.y);
+ }
  input.last=p;
 });
 function endPointer(e,cancel=false){
  if(!pointers.has(e.pointerId))return;
  const p=eventXY(e);
- if(!cancel&&pointers.size===1&&input&&!input.moved)mapClick(p.x,p.y,input.right);
- pointers.delete(e.pointerId);input=null;if(pointers.size<2)gesture=null;
+ if(!cancel&&pointers.size===1&&input){
+  if(!input.moved)mapClick(p.x,p.y,input.right,{touch:input.touch});
+  else if(input.mode==='box'){
+   const ids=selectUnitsInBox(game.units,input.start,p,u=>view.screen(u.x,u.y));
+   selectGroup(ids);
+   if(!ids.length)status('Nessuna tua unità nel riquadro.');
+  }else if(input.mode==='placement'&&!input.right)
+   mapClick(p.x,p.y,false,{touch:input.touch});
+ }
+ pointers.delete(e.pointerId);input=null;selectionBox=null;
+ if(pointers.size<2)gesture=null;
 }
 $('world').addEventListener('pointerup',e=>endPointer(e,false));
 $('world').addEventListener('pointercancel',e=>endPointer(e,true));
@@ -505,7 +577,7 @@ document.addEventListener('click',e=>{
  if(menu){
   if(menu.dataset.menu==='save')status(game.save(saveKey)?'Partita salvata nel browser.':'Salvataggio non disponibile.');
   if(menu.dataset.menu==='new'&&confirm('Cominciare una nuova partita? Il salvataggio attuale verrà sostituito.')){
-   game=new SevenGame(Math.floor(Math.random()*1000000));selection=game.ownTowns()[0]?.id||null;trainingMenuTownId=null;cancelBuild();view.center(27,27);game.save(saveKey);closeReport();renderPanel();status('Nuova partita avviata.');
+   game=new SevenGame(Math.floor(Math.random()*1000000));selection=game.ownTowns()[0]?.id||null;groupUnitIds=[];selectionBox=null;trainingMenuTownId=null;cancelBuild();view.center(27,27);game.save(saveKey);closeReport();renderPanel();status('Nuova partita avviata.');
   }
   if(menu.dataset.menu==='help')$('helpDialog').showModal();
   if(menu.dataset.menu==='speed'){game.setSpeed(game.paused?1:game.speed===5?0:game.speed+1);renderHud();}
@@ -575,7 +647,7 @@ function tick(t){
    handleConstructionEvents(advanceConstruction(game,travel));
    handleConstructionEvents(advanceRepairs(game));
   }
-  view.draw(game,selection,ghost);
+  view.draw(game,selection,ghost,groupUnitIds,selectionBox);
  }
  if(t-lastPanel>400){renderPanel();renderHud();lastPanel=t}
  if(t-lastSave>20000){game.save(saveKey);lastSave=t}

@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#777668">
 <title>Seven Kingdoms · HTML Edition (JS nativo)</title>
 <meta name="description" content="Ricostruzione sperimentale del gioco Seven Kingdoms in JavaScript nativo.">
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
 <div id="stage" role="application" aria-label="Seven Kingdoms HTML Edition">
@@ -67,6 +67,14 @@
     </aside>
   </div>
 </div>
+<!-- Portable RTS controls remain outside the scaled classic 800×600 stage. -->
+<div id="mobileRtsPad" role="group" aria-label="Comandi RTS per touchscreen">
+  <div id="touchJoystick" role="group" aria-label="Levetta per spostare la mappa">
+    <span class="touch-pad-label">MAPPA</span>
+    <div id="touchJoyThumb" aria-hidden="true">✥</div>
+  </div>
+  <button id="touchModifier" type="button" aria-pressed="false" aria-label="Tieni premuto per impartire ordini alternativi">MOD</button>
+</div>
 <dialog id="reportDialog" class="report-dialog" aria-labelledby="reportTitle">
   <div class="report-modal-head">
     <h2 id="reportTitle">RAPPORTO</h2>
@@ -80,7 +88,7 @@
 <dialog id="helpDialog">
 <h2>Seven Kingdoms · HTML Edition</h2>
 <p>Questa è la prima ricostruzione <strong>JavaScript nativa</strong>, ancora parziale, del gioco originale. Non è il gioco completo e non usa WebAssembly.</p>
-<p><strong>Comandi:</strong> tocca o clicca un villaggio, una struttura o un'unità. Il pannello a destra mostra solo informazioni e ordini dell'elemento selezionato. Con un'unità selezionata, tocca un punto vuoto per farla camminare. Tieni premuto e trascina per scorrere la mappa. Tocca la minimappa per cambiare zona.</p>
+<p><strong>Controlli RTS per smartphone:</strong> con la <strong>levetta MAPPA</strong> a sinistra sposti continuamente la visuale. Tocco normale seleziona; trascina sulla mappa senza MOD per disegnare il <strong>riquadro di selezione multipla</strong>. Tieni premuto <strong>MOD</strong> a destra e tocca una destinazione per ordinare il movimento della singola unità o del gruppo selezionato; MOD + trascinamento sposta la visuale. Due dita sulla mappa regolano lo zoom. Quando costruisci, trascina l’anteprima e rilascia per piazzare. Nel pannello a destra puoi fermare un gruppo.</p>
 <p><strong>Rapporti:</strong> i pulsanti in alto (Villaggi, Economia, Militari e altri) aprono una finestra separata. Seleziona una voce per tornare alla mappa e visualizzare i comandi nel pannello destro.</p>
 <p><strong>Villaggi:</strong> seleziona Corinto e poi scegli <strong>Greci</strong> oppure <strong>Normanni</strong> nell’elenco delle popolazioni. Tocca Recluta per far uscire una persona dell’etnia selezionata, oppure <strong>Addestra una professione</strong> per scegliere Costruzione, Comando, Estrazione, Manifattura, Ricerca o Spionaggio. Ogni ordine costa 30 monete e richiede 5 giorni di gioco; gli ordini vengono eseguiti in sequenza e compaiono nella coda del villaggio. Puoi annullarli. I vecchi salvataggi mantengono la cultura già registrata, senza inventare altre etnie.</p>
 <p><strong>Dentro gli edifici:</strong> seleziona un edificio per vedere l'elenco degli abitanti/lavoratori presenti, con abilità, livello e salute. Tocca «Fai uscire» sulla persona desiderata per riportarla sulla mappa. I lavoratori ereditati dalla vecchia demo possono avere dati personali non conosciuti: vengono segnalati esplicitamente.</p>
@@ -88,9 +96,9 @@
 <p><strong>Costruzione:</strong> seleziona un abitante con abilità Costruzione (una nuova partita ne contiene uno per il test), premi <strong>Costruisci</strong>, scegli Mercato o altro edificio, poi tocca un terreno libero sulla mappa. Il costruttore camminerà fino al cantiere e completerà i lavori nel tempo. Se hai una partita precedente, seleziona Corinto e usa «Addestra una professione → Costruzione» (30 monete, 5 giorni di gioco). Il sistema è ancora sperimentale e alcune regole differiscono dall’originale.</p>
 <p><strong>Riparazioni:</strong> nella nuova partita il Mercato di Corinto parte con 98/100 HP per consentire la prova. Selezionalo e scegli «Manda un costruttore a riparare» oppure seleziona il Costruttore e premi «Ripara Mercato». L'unità raggiunge l'edificio a piedi, poi recupera 1 HP ogni 1–6 giorni secondo la propria abilità, finché il lavoro è completato. Puoi annullare con Ferma; l'ordine si conserva anche dopo il salvataggio.</p>
 <p><strong>Strutture e abitanti:</strong> dal pannello del costruttore scegli il tipo di edificio, poi indica sulla mappa dove costruirlo. Recluta un abitante dal villaggio; selezionalo e usa i pulsanti di lavoro a destra oppure tocca un tuo edificio. L’abitante raggiungerà a piedi una casella libera vicino all’ingresso e soltanto all’arrivo comincerà a lavorare. Puoi cambiare destinazione o premere Ferma per annullare. I soldati possono essere inviati soltanto ai forti. Minerali → Fabbriche → Mercati è la prima filiera economica.</p>
-<p><strong>PC:</strong> tasto destro su destinazione per spostare l'unità, F1–F9 per i rapporti, 0 / Spazio per pausa, 1–5 per velocità, S per salvare.</p>
+<p><strong>PC:</strong> trascina con il sinistro per selezionare un gruppo e usa il tasto destro per spostarlo in formazione. Trascina col destro per scorrere la mappa. F1–F9 per i rapporti, 0 / Spazio per pausa, 1–5 per velocità, S per salvare. La selezione e i movimenti di gruppo sono una prima implementazione mobile, non ancora il sistema di battaglie originale.</p>
 <form method="dialog"><button type="submit">Continua</button></form>
 </dialog>
-<script type="module" src="game.js?v=10"></script>
+<script type="module" src="game.js?v=11"></script>
 </body>
 </html>
