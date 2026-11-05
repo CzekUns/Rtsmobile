@@ -1,3 +1,16 @@
+## Esperimento indipendente: telecamera 3D ad altezza lampione (6 novembre 2026)
+
+**Aprire `street-vector-camera.html`** dalla plancia tramite **LAB 3D**. Questo è un esperimento, non una sostituzione della plancia né una modifica al gameplay.
+
+- Usa i **sei lotti veri** di Cross Street (`2,3,4,9,10,11`) generati da `QOBoardWorld.generate(1860)`, non sprite e non raster.
+- Calcola le coordinate tridimensionali di ogni parete, tetto e finestra; riproietta a ogni angolo di rotazione con prospettiva. I poligoni vengono ordinati per profondità a ogni frame, senza il vecchio ordine fisso che rompeva la visuale a 255°.
+- Telecamera iniziale a quota 25 (altezza lampione approssimativa nelle unità del mondo), distanza 220; trascina per orbitare, pizzica/rotella per zoom, slider per quota e distanza, pulsante rotazione di 90°.
+- Le facciate sono volutamente semplici, senza pattern generati a mano: il prototipo serve a verificare **proiezione, sovrapposizione e leggibilità** prima di adottare un motore grafico.
+- I risultati di ricerca skill installate non includono uno skill specifico per geometria 3D o generazione procedurale di città. Valutare successivamente Three.js (rendering WebGL) e librerie di asset modulari con licenze compatibili, dopo aver validato il controllo camera.
+- **Limite:** il painter sorting dei poligoni SVG può fallire su geometrie che si intersecano; la soluzione di produzione dovrebbe usare un vero **depth buffer WebGL**. Il test non certifica l'assenza di artefatti a tutte le angolazioni.
+
+Gli asset precedenti restano nel repository, non vengono rimossi o caricati dal nuovo esperimento.
+
 ## Correzione geometrica V2: margine della guida SVG
 
 La guida di ImageGen `cross-street-block-2-skeleton.svg` esporta i vertici con **24 unità di margine extra** intorno a `chunk.frame`. Il primo tentativo posizionava il gruppo usando gli offset dell'SVG senza rimuovere quel margine, causando uno spostamento sistematico dell'asset. Nel nuovo `?artAudit=v2align` la posizione viene normalizzata correttamente al frame `block-2` e si applica soltanto una lieve correzione residua di prospettiva. `v2fit` resta invariata per il confronto e le hitbox del motore restano originali. È ancora una preview da approvare, non il sostituto definitivo degli edifici.
