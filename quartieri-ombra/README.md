@@ -1,5 +1,12 @@
 # Quartieri d'Ombra — RTS di controllo territoriale
 
+## Blocchi edilizi continui — versione sperimentale
+
+È in corso la correzione dell'effetto “figurine”: i palazzi vicini vengono riconosciuti come **file di edifici** anziché immagini isolate, con fronti rivolti alla stessa strada e raccordi di fondazione, tetto e muratura. Questa prima versione crea 337 connessioni geometriche tra lotti; lo sprite PNG viene agganciato alla facciata e applicato soltanto dove la prospettiva di origine è compatibile. Nelle altre angolazioni resta il vettoriale temporaneo.
+
+La specifica dei nuovi moduli originali — `left/middle/right/corner`, basi, vicoli e orientamenti — è in [BLOCK_ASSET_SPEC.md](BLOCK_ASSET_SPEC.md). Restano da produrre e integrare asset realmente continui; le giunzioni attuali non certificano il risultato visivo senza screenshot. **Lavoro NPC ancora sospeso.**
+
+
 ## Plancia 3×3 — prima build realmente esplorabile
 
 **Nuova anteprima:** [board-preview.html](board-preview.html) · URL prevista su Pages: https://czekuns.github.io/Rtsmobile/quartieri-ombra/board-preview.html
