@@ -1,4 +1,8 @@
 ### 2026-11-05 — Implementazione scheletro completo + grafica per porzioni
+
+**Ultimi raccordi della stessa implementazione:** commit `0dda842a` abilita il caricamento automatico dell'indice `assets/chunk-index.json` con verifica ID e numero/ordine lotti e soli URL locali WebP esistenti dopo upload; gli slot tutti null non generano richieste inesistenti. Commit `d765f029` rende davvero solo vettoriale il toggle SCHELETRO (terreno e strade geometrici senza texture). Test V8 ripetuto con mock di un intero blocco immagine disegnato: il click su tetto lotto 2 seleziona l'**Abitazione – Lotto 3** dentro quel medesimo blocco e illumina il volume; blueprint/zoom/esportazione SVG funzionano senza eccezioni. Test Node su checkout e screenshot browser/Android reali non ancora eseguiti.
+
+
 La direzione corretta dall'utente è: (1) hitbox/scheletro isometrico autoritativo disegnato una sola volta, (2) nuova grafica da ImageGen **per gruppi**, allineata al blueprint per porzioni, (3) overlay di selezione e segnalini interattivi sopra l'immagine; zoom fino a osservare da vicino il fronte strada senza deformazioni prospettiche.
 
 **Implementato e committato sulla main, senza toccare gameplay NPC:**
