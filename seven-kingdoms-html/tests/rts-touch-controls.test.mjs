@@ -103,7 +103,7 @@ test('joystick and MOD share the left edge with vertical spacing and no right-si
  const html=source('index.html'),css=source('style.css');
  assert.ok(html.includes('style.css?v=5'));
  const joy=css.split('#touchJoystick{')[1]?.split('}')[0];
- const mod=css.split('#touchModifier{')[1]?.split('}')[0];
+ const mod=css.slice(css.lastIndexOf('#touchModifier{')).split('{')[1]?.split('}')[0];
  assert.ok(joy&&mod);
  assert.ok(joy.includes('left:max(8px,env(safe-area-inset-left))'));
  assert.ok(joy.includes('bottom:max(15px,env(safe-area-inset-bottom))'));
