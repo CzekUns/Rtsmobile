@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "status": "AUDIT_ONLY",
+  "updated": "2026-11-05",
+  "purpose": "Store truthful generated art candidates without silently replacing geometry-compatible production chunks.",
+  "candidates": [
+    {
+      "id": "cross-street-six-house-first-draft",
+      "suggested_chunk_id": "block-2",
+      "lot_ids": [
+        2,
+        3,
+        4,
+        9,
+        10,
+        11
+      ],
+      "street": "Cross Street",
+      "source_png": "./assets/source/imagegen-2026-11-05/group_tenements_unaligned_draft.png",
+      "source_pixel_dimensions": [
+        1448,
+        1086
+      ],
+      "audit_webp": "./assets/runtime/chunks/block-2-draft-audit.webp",
+      "audit_pixel_dimensions": [
+        1332,
+        1160
+      ],
+      "geometry_guide": "./assets/guides/cross-street-block-2-skeleton.svg",
+      "status": "UNALIGNED_DRAFT_NOT_ACCEPTED",
+      "notes": "Generated six-building continuous illustration is visually appropriate for a tenement block but its visible frontage slope and roof outline are not proven congruent with Cross Street block-2 geometry. A 4x transparent padded audit WebP preserves original aspect; no perspective warp, mirroring, or lot boundaries were edited. Test opt-in with board-preview.html?artAudit=1. Do not place in default chunk-index until roof/frontage alignment verified.",
+      "user_asset_roles": "draft graphic only; all six logical buildings, type overlays, road and picking remain separately defined by board-skeleton.js"
+    }
+  ]
+}
