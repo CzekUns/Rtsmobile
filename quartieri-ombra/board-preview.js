@@ -353,6 +353,27 @@ function drawRoof(b,foot,roof){
    {x:q.x+7,y:q.y-h-7},{x:q.x-7,y:q.y-h-7}],
    "#695846","#211c19",.8);
  }
+ // Rooftop drying yards: timber uprights, sagging rope and individual
+ // muted linen pieces. Every element belongs to this building's cached sprite.
+ // Kept away from low stables to preserve a plausible district silhouette.
+ if((type==="tenement"||type==="residence")&&b.floors>=3&&b.seed%7<2){
+  const left=lerp(lerp(roof[0],roof[1],.17),lerp(roof[3],roof[2],.17),.62);
+  const right=lerp(lerp(roof[0],roof[1],.82),lerp(roof[3],roof[2],.82),.62);
+  const pole=11+b.seed%6;
+  const a={x:left.x,y:left.y-pole},z={x:right.x,y:right.y-pole};
+  line(left,a,"#b39b77",1.5);line(right,z,"#b39b77",1.5);
+  ctx.beginPath();ctx.moveTo(a.x,a.y);
+  ctx.quadraticCurveTo((a.x+z.x)/2,(a.y+z.y)/2+4,z.x,z.y);
+  ctx.strokeStyle="#c1ae8b";ctx.lineWidth=.8;ctx.stroke();
+  const cloth=["#b9a78b","#827b70","#6d5347","#a69a7d"];
+  for(let k=0;k<3;k++){
+   const t=.19+k*.28,q=lerp(a,z,t),sag=4*4*t*(1-t);
+   const x=q.x,y=q.y+sag,h=5+(b.seed+k*3)%5;
+   polygon([{x:x-3,y},{x:x+3,y:y+.4},{x:x+2.5,y:y+h},
+    {x:x-2,y:y+h+1}],cloth[(b.seed+k)%cloth.length],"#423a31",.35);
+   line({x:x-1,y:y+2},{x:x-1,y:y+h-1},"#e1d0ae55",.5);
+  }
+ }
  // Deterministic roof seams and uneven patches.
  const count=b.type==="stable"?4:7;
  for(let k=1;k<count;k++){
