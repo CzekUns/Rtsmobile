@@ -1,4 +1,7 @@
 ### 2026-11-05 — Nuova plancia in tre layer, scheletro e zoom ravvicinato
+
+- [x] Loader automatico da `assets/chunk-index.json` per i soli asset WebP verificati e corrispondenti agli ID-lotto; nessun tentativo di usare slot null (`0dda842a`). La modalità SCHELETRO usa ora solo vettori (nessuna texture raster), conservando il disegno completo di lotti, muri e strade (`d765f029`).
+
 - [x] Implementato `board-skeleton.js`: 454 schede vettoriali con footprint, tetto, facciate street/left/right/rear, porta e tipi `residential/active/decorative`; hit-testing sui poligoni, riconoscimento strada separato, non su box delle immagini (`1c14e50`, `eb0ad23`, `d5d87a8`).
 - [x] Definiti **117 chunk artistici** che includono esattamente tutti i 454 lotti; assegnati frame e coordinate per layer di immagine unica; indice di produzione `assets/chunk-index.json` con LOD `base/detail/ultra` ancora a NULL, senza risorse inesistenti (`42c22b6`).
 - [x] Creato `board-chunks.js`: registra soltanto immagini realmente presenti, disegna una sola immagine per gruppo pur mantenendo tutte le hitbox individuali; scelte LOD in base allo zoom (`6eb224c`, `c5200f9`).
