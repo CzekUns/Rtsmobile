@@ -1,5 +1,11 @@
 # Sistema modulare di isolati — contratto grafico e tecnico (2026-11-05)
 
+## NUOVO METODO VINCOLANTE — macro-blocchi (5 novembre 2026)
+
+Questa scheda storicizza il metodo di raccordi per singoli asset. **Nuova direzione dell'utente: usare un unico asset grafico per un intero gruppo di edifici**, con hitbox indipendenti per ciascuno, non tanti PNG di case slegate. Usare [THREE_LAYER_MAP.md](THREE_LAYER_MAP.md) per workflow aggiornato: blueprint vettoriale per tutte le strade, 117 gruppi artistici, guide SVG per porzione, tre LOD (base/detail/ultra), selezione volume e lato strada. I raccordi esistenti possono servire come fallback fino alla produzione e validazione della macro-immagine. I vecchi kit left/middle/right restano una possibile tecnica *interna al gruppo*, **non** la composizione finale richiesta. Attenzione all'integrazione reale: l'artwork deve registrarsi con la geometria e, se necessario, va modificato fino a coincidere con le hitbox.
+
+
+
 ## Decisione: non più figurine isolate
 
 L’utente ha osservato che gli edifici raster singoli sembrano “appiccicati come figurine”, senza continuità urbana. La soluzione non è generare ancora case isolate casuali, ma **un sistema di isolati modulari** che tiene conto di fronte strada, azimut, profondità, vicini, muri comuni e raccordi con il suolo.
