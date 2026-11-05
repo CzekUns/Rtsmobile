@@ -1,3 +1,6 @@
+### 2026-11-05 — Iterazione drenaggio stradale
+Commit `c232f8eba6b1482eb7c82d4d7fcb6a87f015ee8e`: `board-preview.js` aggiunge tombini in ferro con feritoie e bordi sconnessi lungo le strade, deterministici e ancorati alla mappa. Controllo sintattico V8 superato; nessun collaudo browser, screenshot Android o confronto visuale golden in questa esecuzione. NPC/IA/economia invariati.
+
 ### 2026-11-05 — Iterazione facciate (`d4c18b10`)
 Aggiunti a `board-preview.js` marcapiani per piano, lesene di estremità, conci, cornici e ombre di gronda, con varianti deterministiche per edificio. Nessun file NPC o meccaniche modificato. Modifica pubblicata su main; test runtime Node/browser e screenshot Android non eseguiti in questo turno. La qualità comparativa con il riferimento ImageGen resta non verificata.
 
