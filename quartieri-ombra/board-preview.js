@@ -359,6 +359,49 @@ function drawProp(p){
   ctx.fillStyle="#e7b36a55";ellipse(q.x,gy,4,3,"#dfb36e70");
  }
 }
+// Street lighting is a separate world-space atmosphere pass, not part of building sprites.
+// Fixed coordinates prevent halos drifting when the camera pans or zooms.
+const lightSources=world.props.filter(p=>p.type==="streetLamp"||p.type==="lantern");
+function drawStreetAtmosphere(){
+ ctx.save();
+ ctx.globalCompositeOperation="screen";
+ for(const lamp of lightSources){
+  const p=proj(lamp.x,lamp.y);
+  if(!pointInViewport(p,95))continue;
+  const raised=lamp.type==="streetLamp"?35:13;
+  const flameY=p.y-raised;
+  // Soft amber pools reveal the irregular street surfaces around lamps.
+  const halo=ctx.createRadialGradient(p.x,flameY,1,p.x,flameY,53);
+  halo.addColorStop(0,"rgba(255,191,93,.28)");
+  halo.addColorStop(.24,"rgba(227,150,61,.12)");
+  halo.addColorStop(1,"rgba(227,150,61,0)");
+  ctx.fillStyle=halo;ctx.beginPath();ctx.ellipse(p.x,flameY,53,30,0,0,Math.PI*2);ctx.fill();
+  const ground=ctx.createRadialGradient(p.x,p.y,1,p.x,p.y,35);
+  ground.addColorStop(0,"rgba(221,151,73,.19)");
+  ground.addColorStop(1,"rgba(221,151,73,0)");
+  ctx.fillStyle=ground;ctx.beginPath();ctx.ellipse(p.x,p.y,35,11,0,0,Math.PI*2);ctx.fill();
+  ellipse(p.x,flameY,1.8,2.8,"#ffd18a");
+ }
+ ctx.restore();
+}
+// Thin smoke banks are individual translucent objects anchored to district coordinates.
+const smokeBanks=Array.from({length:58},(_,i)=>{
+ const rng=seeded(86021+i*479);
+ return{x:65+rng()*(world.width-130),y:55+rng()*(world.height-110),
+  width:28+rng()*64,height:9+rng()*16,opacity:.018+rng()*.029};
+});
+function drawDistrictHaze(){
+ ctx.save();
+ for(const bank of smokeBanks){
+  const p=proj(bank.x,bank.y);
+  if(!pointInViewport(p,100))continue;
+  const g=ctx.createRadialGradient(p.x,p.y,2,p.x,p.y,bank.width);
+  g.addColorStop(0,"rgba(174,164,145,"+bank.opacity+")");
+  g.addColorStop(1,"rgba(174,164,145,0)");
+  ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(p.x,p.y,bank.width,bank.height,0,0,Math.PI*2);ctx.fill();
+ }
+ ctx.restore();
+}
 function scene(){
  ctx.setTransform(pixelRatio,0,0,pixelRatio,0,0);
  ctx.fillStyle="#211c18";ctx.fillRect(0,0,width,height);
@@ -371,6 +414,7 @@ function scene(){
   ...world.props.map(p=>({kind:"prop",obj:p,depth:proj(p.x,p.y).y}))
  ].sort((a,b)=>a.depth-b.depth||a.obj.id-b.obj.id);
  for(const layer of layers){if(layer.kind==="building")drawBuilding(layer.obj);else drawProp(layer.obj)}
+ drawStreetAtmosphere();drawDistrictHaze();
  ctx.restore();
  const position=unproj(camera.x,camera.y),region=model.sector(position);
  const places=[["WEST CHURCH","NORTH HOUSES","DOCKS"],
