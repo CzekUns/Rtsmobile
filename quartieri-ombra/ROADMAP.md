@@ -1,3 +1,8 @@
+
+### 2026-11-05 21:00 — Block-2 geometry-locked visual study (NOT approved)
+- [x] Added `assets/guides/cross-street-block-2-geometry-locked-art-study.svg`: six buildings traced from the authoritative SVG, with independent walls, slate roofs, brickwork, windows and doors. Preserves positive-slope frontage without rotating the rejected draft (`0b49b6b`).
+- [ ] This is a **vector art study**, NOT the requested corrected ImageGen transparent macro-chunk, not a runtime WebP and not validated by browser screenshots. `chunk-index.json` remains unchanged and draft stays opt-in audit only. Next: create corrected ImageGen raster aligned to this geometry, compare 1×/3×/7.5× and individual picking before promotion.
+
 ### 2026-11-05 — Primo gruppo ImageGen: conservazione e prova di sovrapposizione (non ancora approvato)
 - [x] La nuova immagine continua di un fronte di tenements è stata conservata in **PNG RGBA originale** su GitHub in `assets/source/imagegen-2026-11-05/group_tenements_unaligned_draft.png` (commit `bd22c7b6`) e su Google Drive (ID `1k3kFifxSTf7T_51dLpCzGO6odU5Zsjpp`).
 - [x] Creato WebP sperimentale 1332×1160 a trasparenza, con proporzioni originali preservate e margini trasparenti, in `assets/runtime/chunks/block-2-draft-audit.webp` (commit `add2cedc`); è una **bozza per il confronto**, non una risorsa definitiva.
