@@ -33,6 +33,28 @@ for(const filename of new Set(Object.values(rasterBuildingFiles).flat())){
  sprite.onerror=()=>requestDraw();
  sprite.src="./assets/source/imagegen-2026-11-05/"+filename;
 }
+// Cache nontransparent bounding boxes once per source sprite. Cropping here
+// changes neither the source PNG nor the authored viewing angle.
+const rasterCropCache=new WeakMap();
+function rasterCrop(img){
+ const previous=rasterCropCache.get(img);if(previous)return previous;
+ const full={x:0,y:0,w:img.naturalWidth,h:img.naturalHeight};
+ try{
+  const scratch=document.createElement("canvas");
+  scratch.width=img.naturalWidth;scratch.height=img.naturalHeight;
+  const s=scratch.getContext("2d",{willReadFrequently:true});
+  s.drawImage(img,0,0);
+  const pixels=s.getImageData(0,0,scratch.width,scratch.height).data;
+  let left=scratch.width,top=scratch.height,right=-1,bottom=-1;
+  for(let y=0;y<scratch.height;y++)for(let x=0;x<scratch.width;x++){
+   if(pixels[(y*scratch.width+x)*4+3]<12)continue;
+   left=Math.min(left,x);right=Math.max(right,x);
+   top=Math.min(top,y);bottom=Math.max(bottom,y);
+  }
+  if(right>=left)Object.assign(full,{x:left,y:top,w:right-left+1,h:bottom-top+1});
+ }catch(_){/* Browser memory/security fallback: retain complete image. */}
+ rasterCropCache.set(img,full);return full;
+}
 function rasterForBuilding(b){
  const candidates=rasterBuildingFiles[b.type];
  // The warehouse is not substituted by a workshop: no fake typology.
@@ -528,13 +550,20 @@ function drawBuilding(b){
   // remains authoritative for picking and depth sort; bottom is ground level.
   const groundWidth=Math.max(...geometry.ground.map(p=>p.x))-
                     Math.min(...geometry.ground.map(p=>p.x));
-  const desiredWidth=groundWidth*1.12;
+  // Trim transparent padding at draw-time, without touching archived originals.
+  // ImageGen source sheets often contain generous transparent margins: fitting
+  // the whole PNG made actual houses tiny compared with their lot footprints.
+  const crop=rasterCrop(raster);
+  const desiredWidth=groundWidth*.98;
   const desiredHeight=b.z+Math.max(14,b.d*.35);
-  const scale=Math.min(desiredWidth/raster.naturalWidth,
-                       desiredHeight/raster.naturalHeight);
-  const rw=raster.naturalWidth*scale,rh=raster.naturalHeight*scale;
+  const scale=Math.min(desiredWidth/crop.w,desiredHeight/crop.h);
+  const rw=crop.w*scale,rh=crop.h*scale;
   const footY=Math.max(...geometry.ground.map(p=>p.y));
-  ctx.drawImage(raster,center.x-rw/2,footY-rh,rw,rh);
+  // Contact shadow remains independent of the original transparent image.
+  ellipse(center.x,footY-2,Math.max(9,groundWidth*.39),
+          Math.max(3,groundWidth*.095),"#17130fa8");
+  ctx.drawImage(raster,crop.x,crop.y,crop.w,crop.h,
+                center.x-rw/2,footY-rh,rw,rh);
  }else{
   ctx.drawImage(cached.tile,cached.left,cached.top);
  }
