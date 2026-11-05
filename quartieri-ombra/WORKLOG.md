@@ -208,3 +208,7 @@ Commit `ceee77bcec11945fc46d68263febe9c7bf1d5f07`: aggiunti `drawStreetAtmospher
 ### 2026-11-05 — Plancia, profili dei tetti
 - Commit `677cf5d`: nuovi abbaini con finestra e tetto aggettante, coppie di comignoli in muratura su palazzi 3+ piani; elementi originali deterministici disegnati nel singolo sprite cache, senza modifiche a NPC/IA/economia.
 - Verifica effettuata: parsing JavaScript V8 (`new Function`) prima della pubblicazione. **Non eseguiti** browser screenshot, test Android o test Node: fedeltà visiva alla golden reference ancora da dimostrare.
+
+### 2026-11-05 — Carri e cavalli originali (commit `4dac14cf`)
+- `board-preview.js`: sostituita la sagoma piatta dei carri con un carro a cassa isometrica, assi di legno, carico, ruote a raggi, stanghe, cavallo con finimenti e zampe. Orientamento variabile per ID, senza asset esterni e senza toccare NPC.
+- Verifica: modifica sorgente pubblicata; screenshot browser/Android e test automatici **non eseguiti** in questo turno. Rendering visivo e confronto GOLDEN ancora aperti.
