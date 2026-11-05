@@ -72,11 +72,11 @@ button:focus-visible{outline:2px solid #e9bc60}
 /* Viewport-sized controls: do not scale with the original 800x600 HUD. */
 #mobileRtsPad{position:fixed;inset:0;z-index:45;pointer-events:none;font:700 14px Georgia,serif}
 #touchJoystick,#touchModifier{position:absolute;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
-#touchJoystick{width:100px;height:100px;left:max(7px,env(safe-area-inset-left));top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center;border:3px solid #ba9b65;border-radius:50%;background:radial-gradient(circle,#807058dd,#29261edc);box-shadow:0 3px 12px #000b}
+#touchJoystick{width:100px;height:100px;left:max(8px,env(safe-area-inset-left));bottom:max(15px,env(safe-area-inset-bottom));display:flex;align-items:center;justify-content:center;border:3px solid #ba9b65;border-radius:50%;background:radial-gradient(circle,#807058dd,#29261edc);box-shadow:0 3px 12px #000b}
 #touchJoystick.active{border-color:#ffe5aa;box-shadow:0 0 15px #c9aa64cc}
 .touch-pad-label{position:absolute;top:-22px;color:#f6e4bd;font:700 11px Georgia,serif;text-shadow:0 1px 3px #000}
 #touchJoyThumb{height:45px;width:45px;border-radius:50%;display:grid;place-items:center;border:2px solid #e6d2a0;background:linear-gradient(135deg,#c0a87a,#685134);box-shadow:0 2px 5px #000a;color:#382a1d;font-size:25px;pointer-events:none}
-#touchModifier{right:max(7px,env(safe-area-inset-right));top:50%;transform:translateY(-50%);min-width:66px;height:62px;border:3px outset #d4b77e;border-radius:12px;background:linear-gradient(#4c4232,#282820);box-shadow:0 3px 12px #000c;color:#fff1c9;font:bold 17px Georgia,serif;letter-spacing:.08em}
+#touchModifier{left:max(24px,calc(env(safe-area-inset-left) + 16px));right:auto;bottom:calc(max(15px,env(safe-area-inset-bottom)) + 114px);min-width:66px;height:62px;border:3px outset #d4b77e;border-radius:12px;background:linear-gradient(#4c4232,#282820);box-shadow:0 3px 12px #000c;color:#fff1c9;font:bold 17px Georgia,serif;letter-spacing:.08em}
 #touchModifier.active{background:linear-gradient(#a78c56,#776036);color:#fff;border-style:inset}
 @media (pointer:fine),(orientation:portrait){#mobileRtsPad{display:none!important}}
 #rotate{display:none}
