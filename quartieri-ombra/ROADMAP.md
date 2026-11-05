@@ -1,3 +1,7 @@
+### 2026-11-05 — Scale antincendio sulle facciate
+- [x] Inserite passerelle e scale esterne in ferro su un sottoinsieme deterministico di caseggiati alti, con geometria agganciata alla parete (`e223ab3a`).
+- [ ] Rendering browser, suite Node e confronto visivo golden non verificati in questa iterazione: rete locale DNS indisponibile. Non considerare approvata la plancia.
+
 ### 2026-11-05 — Stenditoi sui tetti dei caseggiati
 - [x] Nuovi stenditoi originali con pali, corda incurvata e panni individuali su una parte dei tetti residenziali alti; integrati nello sprite cache di ogni edificio (`c0827073`).
 - [ ] Test automatici, screenshot reali desktop/mobile e confronto golden ancora mancanti: non dichiarare approvazione visiva.
