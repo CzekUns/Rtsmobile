@@ -296,3 +296,7 @@ Nota: la proiezione isometrica non deve essere confusa con la regolarità urbani
 ### 2026-11-05 — Raster buildings: transparent-margin normalization
 - [x] Runtime crop alpha bounding-box cached per source PNG; real building silhouette fits lot footprint rather than transparent ImageGen canvas. Contact shadows now align to ground. Commit `108a1175`.
 - [ ] Still pending: real browser screenshots, Android landscape, WebP optimization, terrain/props/HUD raster integration and visual approval. No gameplay changes.
+
+### 2026-11-05 — raster terrain pass (parziale)
+- [x] Layer raster ImageGen fango e acciottolato inseriti nel renderer della plancia, ritagliati ai poligoni mondo (commit `f7de871c`). Source PNG invariati.
+- [ ] Convertire in WebP runtime e validare tileability/stacchi con screenshot; browser e Android landscape non ancora collaudati. Non approvato.
