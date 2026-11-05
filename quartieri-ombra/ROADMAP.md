@@ -1,3 +1,7 @@
+
+### 2026-11-05 — Rendering strade bagnate
+- [x] Aggiunte pozzanghere e riflessi discreti lungo ogni segmento stradale, con distribuzione deterministica e culling viewport (`board-preview.js`, commit `274b4049`).
+- [ ] Non ancora verificato screenshot desktop/Android; nessuna approvazione visiva. NPC invariati.
 ### Rilascio B2 verificato — 2026-11-04
 - [x] Workflow [41926287816](https://github.com/CzekUns/Rtsmobile/actions/runs/41926287816): step **Deploy to GitHub Pages = success** (non skipped); prima pubblicazione comprovata del nuovo link `board-1860.html`.
 - [x] Test in Node sull'artefatto Pages B2: 49/49 dopo riparazione di tre harness obsoleti; nessuna modifica a NPC, IA, gameplay.
