@@ -104,6 +104,18 @@ function workBtn(firm,unit){
   '>'+esc(label)+'</button>';
 }
 function selectedContent(){
+ const group=activeGroup();
+ if(group.length>1){
+  const soldiers=group.filter(id=>game.get(id)?.kind==='soldier').length;
+  return {
+   title:'Gruppo di '+group.length,
+   meta:'Unità selezionate · Greci',color:NATIONS[1].color,
+   info:'Soldati <strong>'+soldiers+'</strong> · Abitanti <strong>'+(group.length-soldiers)+'</strong>'+
+    '<br>MOD + tocco: muovi il gruppo in formazione.'+
+    '<br>Trascina per cambiare selezione. Unità impegnate in cantieri o riparazioni restano ferme.',
+   actions:btn('stop-group','Ferma tutte le unità')
+  };
+ }
  const item=selected();
  if(!item)return {title:'Seven Kingdoms',meta:'HTML Edition',color:'#aaa',info:'Seleziona un elemento sulla mappa.',actions:''};
  const nation=NATIONS[item.owner]||NATIONS[0],color=nation.color;
@@ -285,6 +297,18 @@ function renderPanel(){
  renderReport();
 }
 function runAction(action){
+ if(action==='stop-group'){
+  const ids=activeGroup();
+  if(ids.length<=1)return;
+  for(const id of ids){
+   const unit=game.get(id);
+   if(!unit)continue;
+   cancelBuildOrder(game,id);cancelRepairOrder(game,id);
+   unit.route=[];unit.target=null;unit.workTargetId=null;
+  }
+  status('Gruppo fermato: '+ids.length+' unità.');
+  game.save(saveKey);renderPanel();renderHud();return;
+ }
  const obj=selected();if(!obj)return;
  let r={ok:false,msg:'Ordine non valido.'};
  if(action==='recruit')r=game.recruit(obj.id,obj.selectedRaceId);
@@ -368,7 +392,7 @@ function finishWorkOrders(){
  }
  if(results.length){renderPanel();game.save(saveKey);}
 }
-function mapClick(sx,sy,right=false){
+function mapClick(sx,sy,right=false,{touch=false}={}){
  const p=view.worldAt(sx,sy);let x=p.x,y=p.y;
  if(placing){
   const result=issueBuildOrder(game,placingBuilderId,placing,x,y);
@@ -378,19 +402,25 @@ function mapClick(sx,sy,right=false){
  }
  const hit=view.pick(game,x,y),unit=selected();
  const canOrder=unit&&game.units.includes(unit)&&unit.owner===1;
+ if(right&&activeGroup().length>1){
+  const result=issueGroupMove(game,groupUnitIds,x,y);
+  status(result.msg);
+  if(result.ok)game.save(saveKey);
+  renderPanel();return;
+ }
  if(right&&canOrder){
   const r=sendOrder(unit.id,x,y);status(r.msg);renderPanel();return;
  }
  if(hit){
   const item=game.get(hit);
-  if(canOrder&&item&&game.firms.includes(item)&&item.owner===1&&item.id!==unit.id){
+  if(!touch&&canOrder&&item&&game.firms.includes(item)&&item.owner===1&&item.id!==unit.id){
    const r=sendOrder(unit.id,x,y);status(r.msg);
    if(r.ok&&r.unit)selection=r.unit.id;
    renderPanel();return;
   }
   select(hit);return;
  }
- if(canOrder){
+ if(!touch&&canOrder){
   const r=sendOrder(unit.id,x,y);status(r.msg);renderPanel();return;
  }
  select(null);
@@ -530,7 +560,7 @@ document.addEventListener('click',e=>{
  if(menu){
   if(menu.dataset.menu==='save')status(game.save(saveKey)?'Partita salvata nel browser.':'Salvataggio non disponibile.');
   if(menu.dataset.menu==='new'&&confirm('Cominciare una nuova partita? Il salvataggio attuale verrà sostituito.')){
-   game=new SevenGame(Math.floor(Math.random()*1000000));selection=game.ownTowns()[0]?.id||null;trainingMenuTownId=null;cancelBuild();view.center(27,27);game.save(saveKey);closeReport();renderPanel();status('Nuova partita avviata.');
+   game=new SevenGame(Math.floor(Math.random()*1000000));selection=game.ownTowns()[0]?.id||null;groupUnitIds=[];selectionBox=null;trainingMenuTownId=null;cancelBuild();view.center(27,27);game.save(saveKey);closeReport();renderPanel();status('Nuova partita avviata.');
   }
   if(menu.dataset.menu==='help')$('helpDialog').showModal();
   if(menu.dataset.menu==='speed'){game.setSpeed(game.paused?1:game.speed===5?0:game.speed+1);renderHud();}
@@ -600,7 +630,7 @@ function tick(t){
    handleConstructionEvents(advanceConstruction(game,travel));
    handleConstructionEvents(advanceRepairs(game));
   }
-  view.draw(game,selection,ghost);
+  view.draw(game,selection,ghost,groupUnitIds,selectionBox);
  }
  if(t-lastPanel>400){renderPanel();renderHud();lastPanel=t}
  if(t-lastSave>20000){game.save(saveKey);lastSave=t}
