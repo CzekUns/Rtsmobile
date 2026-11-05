@@ -1,3 +1,6 @@
+### 2026-11-05 — Collocazione banchi commerciali
+Commit `be52cb08636d1891a2128c906972c9d390fe4554`: corretto il punto d'ancoraggio dei banchi in `board-preview.js`, ora calcolato a partire dalla porta dell'edificio e dal vettore verso la strada; la precedente scelta di un vertice del lotto più 8 unità poteva sovrapporre banchi e facciate. Nessun file di gameplay modificato. GitHub connector ha confermato la scrittura; Chromium è disponibile nell'ambiente locale, ma la rete del container non risolve github.com e la preview pubblica non è accessibile dal browser web disponibile: impossibile acquisire screenshot della build reale in questa esecuzione. Non eseguiti test Node né prova Android. Da verificare la distanza dei banchi dalla carreggiata e il sorting visivo.
+
 ### 2026-11-05 — Iterazione plancia: scale esterne
 Implementazione effettiva `e223ab3a`: scale e pianerottoli in ferro su facciate di alcuni edifici residenziali di almeno quattro piani; nessuna modifica a logiche NPC o economia. Il container dispone di Node v22.16.0, ma `curl` della preview GitHub Pages è fallito con `Could not resolve host`; nessuna cattura browser, test Android o suite Node effettuata. Verificare geometria e possibili occlusioni nella prossima prova visiva.
 
