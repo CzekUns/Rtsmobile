@@ -253,3 +253,7 @@ Nota: la proiezione isometrica non deve essere confusa con la regolarità urbani
 - [x] Iterazione grafica visibile: abbaini e coppie di camini sui tetti, commit `677cf5d` (solo `board-preview.js`).
 - [ ] Screenshot reale desktop/mobile landscape e confronto con golden reference: NON verificati.
 - [ ] Alpha visiva accettabile / approvazione utente: NON raggiunte.
+
+### Aggiornamento plancia 2026-11-05
+- [x] Carri con sagoma isometrica dettagliata, cavallo e finimenti originali nel renderer (`4dac14cf`).
+- [ ] Collaudo browser reale desktop/mobile landscape, screenshot e confronto GOLDEN; non dichiarare approvata la plancia.
