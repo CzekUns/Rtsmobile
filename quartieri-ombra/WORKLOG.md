@@ -1,3 +1,6 @@
+### 2026-11-05 — Differenziazione silhouette magazzini e stalle
+Commit `ea3a9158a43a62f4fe0c6840bcf37f45121e9e85`: aggiornato `board-preview.js` con castelletto, puleggia, fune per magazzini e lanterna ventilata sul colmo delle stalle; componenti disegnati nel roof pass e memorizzati negli sprite prerenderizzati. Parsing del sorgente completo con `new Function` in V8: PASS (33.440 caratteri). Tentativo di clone GitHub nell'ambiente locale bloccato da DNS (`Could not resolve host: github.com`), quindi nessuna suite Node o screenshot reale; non certificare qualità visiva. Solo plancia, nessuna logica NPC/IA/economia toccata.
+
 ### 2026-11-05 — Iterazione drenaggio stradale
 Commit `c232f8eba6b1482eb7c82d4d7fcb6a87f015ee8e`: `board-preview.js` aggiunge tombini in ferro con feritoie e bordi sconnessi lungo le strade, deterministici e ancorati alla mappa. Controllo sintattico V8 superato; nessun collaudo browser, screenshot Android o confronto visuale golden in questa esecuzione. NPC/IA/economia invariati.
 
