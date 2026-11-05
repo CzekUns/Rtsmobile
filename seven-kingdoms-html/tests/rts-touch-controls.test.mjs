@@ -101,18 +101,17 @@ test('mobile controls are wired to original HTML HUD without adding permanent ri
 
 test('joystick and MOD share the left edge with vertical spacing and no right-side overlay',()=>{
  const html=source('index.html'),css=source('style.css');
- assert.match(html,/style\\.css\\?v=5/);
- const joy=css.match(/#touchJoystick\\{([^}]*)\\}/)?.[1];
- const mod=css.match(/#touchModifier\\{([^}]*)\\}/)?.[1];
+ assert.ok(html.includes('style.css?v=5'));
+ const joy=css.split('#touchJoystick{')[1]?.split('}')[0];
+ const mod=css.split('#touchModifier{')[1]?.split('}')[0];
  assert.ok(joy&&mod);
- assert.match(joy,/left:max\\(8px,env\\(safe-area-inset-left\\)\\)/);
- assert.match(joy,/bottom:max\\(15px,env\\(safe-area-inset-bottom\\)\\)/);
- assert.match(mod,/left:max\\(24px,calc\\(env\\(safe-area-inset-left\\) \\+ 16px\\)\\)/);
- assert.match(mod,/right:auto/);
- assert.match(mod,/bottom:calc\\(max\\(15px,env\\(safe-area-inset-bottom\\)\\) \\+ 114px\\)/);
- // Joystick height 100px at bottom+15, MOD height 62px above bottom+129:
- // 14px of separation, shared centerline across the two different widths.
- assert.match(joy,/width:100px;height:100px/);
- assert.match(mod,/height:62px/);
- assert.doesNotMatch(mod,/top:50%/);
+ assert.ok(joy.includes('left:max(8px,env(safe-area-inset-left))'));
+ assert.ok(joy.includes('bottom:max(15px,env(safe-area-inset-bottom))'));
+ assert.ok(mod.includes('left:max(24px,calc(env(safe-area-inset-left) + 16px))'));
+ assert.ok(mod.includes('right:auto'));
+ assert.ok(mod.includes('bottom:calc(max(15px,env(safe-area-inset-bottom)) + 114px)'));
+ // The 100px joystick and 62px MOD have a 14px vertical gap.
+ assert.ok(joy.includes('width:100px;height:100px'));
+ assert.ok(mod.includes('height:62px'));
+ assert.ok(!mod.includes('top:50%'));
 });
