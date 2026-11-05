@@ -38,12 +38,16 @@ const fields = {
 export function decodeTable(type,buffer){
   const db=parseDbf(buffer), schema=fields[type]; assert(schema,'Unsupported table '+type);
   const expected=schema.reduce((n,[,s])=>n+s,0);
-  assert(db.recordSize===expected,type+' record width '+db.recordSize+' differs from packed '+expected);
+  // Original STD.SET DBF rows have one trailing 0x20 separator byte.
+  // Existing 7KAA fixture tables may use the unpadded packed struct.
+  assert(db.recordSize===expected || db.recordSize===expected+1,type+' record width '+db.recordSize+' differs from packed '+expected);
+  if(db.recordSize===expected+1)for(const row of db.records)
+    assert(row[expected]===32,'Invalid original DBF record trailer');
   const records=db.records.map((r,i)=>{
     let pos=0;const row={recordNo:i+1};
     for(const [key,size] of schema){
       const b=r.subarray(pos,pos+size); pos+=size;
-      row[key]=key==='bitmapOffset'?b.readUInt32LE(0):['firstAction','actionCount','direction','firstFrame','frameCount','frameId','offsetX','offsetY','width','height','locWidth','locHeight'].includes(key)?number(b):ascii(b);
+      row[key]=key==='bitmapOffset'?b.readUInt32LE(0):(['firstAction','actionCount','firstFrame','frameCount','frameId','offsetX','offsetY','width','height','locWidth','locHeight'].includes(key) || (key==='direction' && type==='SACTION'))?number(b):ascii(b);
     }
     return row;
   });
@@ -62,7 +66,9 @@ export function makeManifest({source,sourceHash,sprites,actions,frames}){
         assert(f.width>0 && f.height>0,'Invalid dimensions for frame '+f.recordNo);
         out.push({id:spr.code,action:a.action,direction:a.direction,frame:j,width:f.width,height:f.height,
           offsetX:f.offsetX,offsetY:f.offsetY,pivotX:-f.offsetX,pivotY:-f.offsetY,
-          palette:null,path:null,bitmapFile:f.file,bitmapOffset:f.bitmapOffset,sourceFrame:f.recordNo,decoded:false});
+          palette:null,path:null,bitmapFile:spr.code+'.SPR',sourceBitmapName:f.file,
+          originalFrameDirection:f.direction,turnResolution:Number(spr.turnResolution),
+          bitmapOffset:f.bitmapOffset,sourceFrame:f.recordNo,decoded:false,visuallyVerified:false});
       }
     }
   }
@@ -77,7 +83,12 @@ export async function run(source,out){
   const lookup=(name)=>allFiles.find(f=>f.toUpperCase().endsWith('/'+name.toUpperCase())||f.toUpperCase().endsWith('\\\\'+name.toUpperCase()));
   const resFiles=allFiles.filter(n=>/\.res$/i.test(n));
   const res=[];
-  for(const n of resFiles){const b=await readFile(n);res.push({file:n,sha256:sha256(b),records:parseRes(b)});}
+  // .RES denotes both indexed ResourceIdx archives and unindexed ResourceDb
+  // bitmap streams (e.g. I_FIRM.RES, I_TOWN.RES). Do not force one layout.
+  for(const n of resFiles){const b=await readFile(n),hash=sha256(b);
+    try {res.push({file:n,sha256:hash,format:'ResourceIdx',records:parseRes(b)});}
+    catch(e){res.push({file:n,sha256:hash,format:'unknown-or-imported',records:null,parseError:e.message});}
+  }
   const tables={}; const hashes={};
   for(const name of Object.keys(fields)){
     const filename=lookup(name+'.DBF');
