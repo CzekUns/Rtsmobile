@@ -1,3 +1,14 @@
+### 2026-11-05 20:48 — Dove applicare il gruppo di case ImageGen
+Target tecnico: **Cross Street, chunk `block-2`, sei lotti cliccabili [2,3,4,9,10,11]**. L'immagine ImageGen appena generata rappresenta un fronte edilizio coerente, ma **l'orientamento del suo fronte non corrisponde alla pendenza delle sagome e dei tetti reali** in `assets/guides/cross-street-block-2-skeleton.svg`. Applicarla come texture di produzione ora causerebbe disallineamento con selezione e facciate. L'approccio corretto è conservarla come reference e pubblicare una prova isolata di sovrapposizione.
+
+- **Backup verificato:** Google Drive https://drive.google.com/file/d/1k3kFifxSTf7T_51dLpCzGO6odU5Zsjpp/view e GitHub `assets/source/imagegen-2026-11-05/group_tenements_unaligned_draft.png`, commit `bd22c7b6`, blob Git `4482c60c6f0d6b118366733bc4f226ef1827e994`. File originale 1448×1086 PNG RGBA, 2.664.548 byte.
+- **Materiale per prova:** `assets/runtime/chunks/block-2-draft-audit.webp` con proporzioni originali non deformate e padding trasparente 1332×1160, GitHub commit `add2cedc`, Google Drive file `11D4wSmfms1wHLUTgDJ1BkS2-ZDWLjASr`. Non è un redesign in prospettiva corretta.
+- **Codice operativo:** `board-preview.js` committato in `5bf80a2` registra la bozza **soltanto** se URL contiene `?artAudit=1` o `?artAudit=clean`, centra la camera su `block-2`, sovrappone i veri profili tetto/facciate per evidenziare gli scarti, lascia hitbox individuali inalterate. Cache-busting aggiunto a `board-preview.html` e `board-1860.html`. Candidato documentato in `assets/chunk-candidates.json` `e1c220a`; manifest di produzione non alterato.
+- **Prove eseguite in mock V8** su sorgenti scaricati da GitHub: attivazione da query, immagine registrata e effettivamente disegnata come chunk, canvas render, toast diagnostico, toggle SCHELETRO funzionante. **Nessuno screenshot live da Pages/Android**; non dichiarare superato il criterio di allineamento.
+
+Prossimo passo vincolante: creare la nuova angolazione controllata dalla SVG di Cross Street, con un'unica illustrazione del gruppo e versioni ravvicinate; non deformare questa vecchia immagine né modificare geometry e NPC per farla entrare.
+
+
 ### 2026-11-05 — Implementazione scheletro completo + grafica per porzioni
 
 **Ultimi raccordi della stessa implementazione:** commit `0dda842a` abilita il caricamento automatico dell'indice `assets/chunk-index.json` con verifica ID e numero/ordine lotti e soli URL locali WebP esistenti dopo upload; gli slot tutti null non generano richieste inesistenti. Commit `d765f029` rende davvero solo vettoriale il toggle SCHELETRO (terreno e strade geometrici senza texture). Test V8 ripetuto con mock di un intero blocco immagine disegnato: il click su tetto lotto 2 seleziona l'**Abitazione – Lotto 3** dentro quel medesimo blocco e illumina il volume; blueprint/zoom/esportazione SVG funzionano senza eccezioni. Test Node su checkout e screenshot browser/Android reali non ancora eseguiti.
