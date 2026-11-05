@@ -4,6 +4,7 @@
 - [x] Entrambe le anteprime `board-preview.html` e `board-1860.html` caricano il modulo prima del renderer, con cachebuster aggiornato (`10333af` e `a8d4b32`).
 - [x] Nuova suite permanente `tests/block-continuity.test.cjs` e specifica di produzione `BLOCK_ASSET_SPEC.md`: orientamenti, kit left/middle/right/corner, pivot, usura e raccordi con suolo; prompt worker aggiornato per questa priorità.
 - [x] Prove V8 sul sorgente GitHub: 337 giunzioni, zero link su lati opposti/strade diverse, zero estremità duplicate, risultati deterministici; bootstrap Canvas mock + zoom/pan/tap/minimappa PASS. **NON equivalgono a screenshot desktop/Android reali.**
+- [x] Settore pilota Cross Street: **6 lotti consecutivi** (ID 2,3,4,9,10,11), 5 raccordi condivisi, classe prospettica A reale **33,98°–39,43°**; pivot, impronte e ruoli start/middle/end in `assets/pilot-cross-street.json` (`2eb1a620`), test specifico aggiornato (`3782ea93`). Il kit ImageGen per il settore resta **da produrre**, non inventare file runtime.
 - [ ] Fare confronto visivo A/B con foto della build su un isolato pilota, garantendo che le cuciture non coprano porte/finestre e che i raster abbiano l'azimut giusto.
 - [ ] Generare e usare **asset modulari originali** di fila (testata sinistra, centrali A/B, testata destra, angolo, tetto e fondazione) per le orientazioni non coperte. La città contiene ancora fallback vettoriali: restyling non ultimato.
 - [ ] Migliorare continuità terreno e palazzi su tutti i 9 settori; test hardware mobile/desktop e golden reference. **NPC ancora congelati**.
