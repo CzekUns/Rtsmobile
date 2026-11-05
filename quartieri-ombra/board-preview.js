@@ -8,7 +8,11 @@ if(!model)throw new Error("board-world.js is required before board-preview.js");
 const world=model.generate(1860),proj=model.project,unproj=model.inverse;
 const rowLayout=window.QOBlockContinuity
  ? window.QOBlockContinuity.build(world.buildings,proj)
- : {joints:[],byId:new Map(),groups:new Map(),stats:{joins:0,supported:0}};
+ : {joints:[],byId:new Map(),groups:new Map(),groupByBuilding:new Map(),stats:{joins:0,supported:0}};
+const skeleton=window.QOBoardSkeleton&&window.QOBoardSkeleton.create(world,proj,rowLayout,unproj);
+if(!skeleton)throw new Error("board-skeleton.js is required before board-preview.js");
+const chunkArt=window.QOChunkArt;
+let blueprintMode=false,markersVisible=true,selectedStreet=null,selectedSide="roof";
 
 const $=id=>document.getElementById(id);
 const canvas=$("board-canvas");let ctx=canvas.getContext("2d",{alpha:false});
@@ -859,29 +863,100 @@ function drawStreetDrainage(){
   }
  }
 }
+
+function drawBlueprintGuide(){
+ // The technical layer remains sharp at any zoom, independent of raster art.
+ for(const lot of skeleton.lots){
+  const c=lot.projectedCenter;if(!pointInViewport(c,200))continue;
+  const color=lot.use==="residential"?"#98b48d":"#c9a276";
+  polygon(lot.ground,"#283b3670","#6b7f73",.65);
+  for(const face of lot.faces)if(face.visible)
+    polygon(face.poly,"#28433c63",color,.75);
+  polygon(lot.roof,"#122d2bd0",color,1);
+  line(lot.frontage[0],lot.frontage[1],"#e4bb5b",2.1);
+  if(camera.zoom>=1.5){
+   const p=lot.door;
+   ellipse(p.x,p.y,2.3/camera.zoom,2.3/camera.zoom,"#e89a6b");
+   ctx.fillStyle="#ece2ca";ctx.font=(11/camera.zoom)+"px monospace";
+   ctx.textAlign="center";ctx.fillText(String(lot.id),lot.labelPoint.x,lot.labelPoint.y);
+  }
+ }
+}
+function drawLotMarkers(){
+ // Game semantics remain independent from a single painted block illustration.
+ if(!markersVisible||blueprintMode||camera.zoom<1.45)return;
+ const radius=9.4/camera.zoom;
+ for(const lot of skeleton.lots){
+  if(!pointInViewport(lot.door,30))continue;
+  const p=lot.door,home=lot.use==="residential";
+  ctx.beginPath();ctx.arc(p.x,p.y,radius,0,Math.PI*2);
+  ctx.fillStyle="#211912e8";ctx.fill();
+  ctx.lineWidth=1.5/camera.zoom;ctx.strokeStyle=home?"#92b5a4":"#deb875";ctx.stroke();
+  ctx.textAlign="center";ctx.textBaseline="middle";ctx.font=(11/camera.zoom)+"px Georgia,serif";
+  ctx.fillStyle=home?"#c6e2d0":"#f8dcaa";
+  ctx.fillText(home?"⌂":"◆",p.x,p.y+(.5/camera.zoom));
+ }
+ ctx.textBaseline="alphabetic";
+}
+function highlightSelected(){
+ // Topmost logical overlay: it works identically on independent art, one
+ // complete seamless block PNG, or the technical blueprint.
+ if(!selected)return;
+ const lot=skeleton.byId.get(selected.id);if(!lot)return;
+ ctx.save();
+ ctx.shadowBlur=14/camera.zoom;ctx.shadowColor="#ffd279";
+ for(const face of lot.faces)if(face.visible)
+   polygon(face.poly,"#ffde6433","#ffce7b",2.1/camera.zoom);
+ polygon(lot.roof,"#f9da5d48","#ffe4a2",2.5/camera.zoom);
+ ctx.shadowBlur=0;
+ line(lot.frontage[0],lot.frontage[1],"#ffce69",3.2/camera.zoom);
+ ellipse(lot.door.x,lot.door.y,4.8/camera.zoom,3.1/camera.zoom,"#f4c66b");
+ ctx.restore();
+}
+function drawStreetSelection(){
+ if(!selectedStreet)return;
+ ctx.save();ctx.strokeStyle="#e6c17e";ctx.lineWidth=2.2/camera.zoom;ctx.setLineDash([10/camera.zoom,5/camera.zoom]);
+ ctx.beginPath();
+ for(let i=0;i<selectedStreet.points.length;i++){
+  const p=proj(selectedStreet.points[i].x,selectedStreet.points[i].y);
+  if(i)ctx.lineTo(p.x,p.y);else ctx.moveTo(p.x,p.y);
+ }
+ ctx.stroke();ctx.restore();
+}
 function scene(){
  ctx.setTransform(pixelRatio,0,0,pixelRatio,0,0);
  ctx.fillStyle="#211c18";ctx.fillRect(0,0,width,height);
  ctx.save();ctx.translate(width/2,height/2);
  ctx.scale(camera.zoom,camera.zoom);ctx.translate(-camera.x,-camera.y);
- drawGround();drawRoads();drawStreetDrainage();drawStreetFootings();clickRegions=[];
- const layers=[
-  ...world.buildings.map(b=>({kind:"building",obj:b,
-   depth:Math.max(...b.poly.map(p=>proj(p.x,p.y).y))})),
-  ...rowLayout.joints.map(j=>({kind:"joint",obj:j,
-   // Paint after *both* adjoining modules so a PNG edge cannot hide the seam.
-   depth:Math.max(...[j.left,j.right].map(id=>
-     Math.max(...world.buildings[id].poly.map(p=>proj(p.x,p.y).y))))+.08})),
-  ...world.props.map(p=>({kind:"prop",obj:p,depth:proj(p.x,p.y).y})),
-  ...marketStalls.map(p=>({kind:"stall",obj:p,depth:proj(p.x,p.y).y}))
- ].sort((a,b)=>a.depth-b.depth||a.obj.id-b.obj.id);
- for(const layer of layers){
-  if(layer.kind==="building")drawBuilding(layer.obj);
-  else if(layer.kind==="joint")drawMasonryJoint(layer.obj);
-  else if(layer.kind==="stall")drawMarketStall(layer.obj);
-  else drawProp(layer.obj);
+ drawGround();drawRoads();if(!blueprintMode){drawStreetDrainage();drawStreetFootings();}clickRegions=[];
+ if(blueprintMode){
+  drawBlueprintGuide();
+ }else{
+  // An approved seamless block illustration replaces visual building sprites,
+  // but the hitbox skeleton remains complete and independently interactive.
+  const artworkChunks=chunkArt?skeleton.chunks.filter(c=>chunkArt.ready(c.id)):[];
+  const replacedLots=new Set(artworkChunks.flatMap(c=>c.lotIds));
+  const layers=[
+   ...world.buildings.filter(b=>!replacedLots.has(b.id)).map(b=>({kind:"building",obj:b,
+    depth:Math.max(...b.poly.map(p=>proj(p.x,p.y).y))})),
+   ...artworkChunks.map(c=>({kind:"chunk",obj:c,
+    depth:Math.max(...c.lotIds.flatMap(id=>skeleton.byId.get(id).ground.map(p=>p.y)))})),
+   ...rowLayout.joints.filter(j=>!(replacedLots.has(j.left)&&replacedLots.has(j.right))).map(j=>({kind:"joint",obj:j,
+    depth:Math.max(...[j.left,j.right].map(id=>
+      Math.max(...world.buildings[id].poly.map(p=>proj(p.x,p.y).y))))+.08})),
+   ...world.props.map(p=>({kind:"prop",obj:p,depth:proj(p.x,p.y).y})),
+   ...marketStalls.map(p=>({kind:"stall",obj:p,depth:proj(p.x,p.y).y}))
+  ].sort((a,b)=>a.depth-b.depth||(a.obj.id??0)-(b.obj.id??0));
+  for(const layer of layers){
+   if(layer.kind==="building")drawBuilding(layer.obj);
+   else if(layer.kind==="chunk")chunkArt.draw(ctx,layer.obj);
+   else if(layer.kind==="joint")drawMasonryJoint(layer.obj);
+   else if(layer.kind==="stall")drawMarketStall(layer.obj);
+   else drawProp(layer.obj);
+  }
+  drawStreetAtmosphere();drawDistrictHaze();
  }
- drawStreetAtmosphere();drawDistrictHaze();
+ drawLotMarkers();drawStreetSelection();highlightSelected();
  ctx.restore();
  const position=unproj(camera.x,camera.y),region=model.sector(position);
  const places=[["WEST CHURCH","NORTH HOUSES","DOCKS"],
@@ -937,7 +1012,7 @@ function toProjected(p){return{x:camera.x+(p.x-width/2)/camera.zoom,
  y:camera.y+(p.y-height/2)/camera.zoom}}
 function zoomAt(factor,p){
  const before=toProjected(p);
- camera.zoom=minmax(camera.zoom*factor,.68,2.7);
+ camera.zoom=minmax(camera.zoom*factor,.58,7.5);
  const after=toProjected(p);
  camera.x+=before.x-after.x;camera.y+=before.y-after.y;
  clampCamera();requestDraw();
@@ -952,26 +1027,36 @@ function pointInPoly(p,poly){
 }
 function choose(p){
  const worldP=toProjected(p);
- let found=null;
- for(let i=clickRegions.length-1;i>=0;i--){
-  const h=clickRegions[i],b=h.b;
-  if(pointInPoly(worldP,h.roof)){found=b;break}
-  const projected=proj(b.x,b.y);
-  if(Math.abs(worldP.x-projected.x)<60&&worldP.y>=projected.y-b.z-20&&worldP.y<=projected.y+20){
-   found=b;break;
+ let hit=null;
+ if(markersVisible&&!blueprintMode&&camera.zoom>=1.45){
+  // The small street-facing marker belongs to its own lot even if its
+  // center lies in the adjacent road.
+  let best=16/camera.zoom;
+  for(const lot of skeleton.lots){
+   const d=Math.hypot(worldP.x-lot.door.x,worldP.y-lot.door.y);
+   if(d<best){best=d;hit={kind:"building",lot,side:"street"}}
   }
  }
- selected=found;
- if(found){
+ if(!hit)hit=window.QOBoardSkeleton.pick(skeleton,worldP);
+ selected=hit.kind==="building"?hit.lot.building:null;
+ selectedStreet=hit.kind==="street"?hit.road:null;
+ selectedSide=hit.side||"roof";
+ if(selected){
   const names={shop:"Bottega",tavern:"Taverna",warehouse:"Magazzino",workshop:"Officina",
-    stable:"Scuderia",tenement:"Caseggiato",residence:"Abitazione"};
-  $("selected-name").textContent=names[found.type]||"Edificio";
-  $("selected-description").textContent=found.floors+" piani · "+found.road+
-   " · Settore "+(found.section.row*3+found.section.col+1)+
-   " · lotto indipendente n. "+(found.id+1)+".";
+   stable:"Scuderia",tenement:"Caseggiato",residence:"Abitazione"};
+  const designation=hit.lot.use==="residential"?"Residenziale":"Attività";
+  const sides={street:"facciata sulla strada",rear:"retro",left:"lato sinistro",right:"lato destro",roof:"tetto"};
+  $("selected-name").textContent=names[selected.type]||"Edificio";
+  $("selected-description").textContent=designation+" · "+selected.floors+" piani · "+selected.road+
+   " · "+(sides[selectedSide]||"lotto")+" · Lotto "+(selected.id+1)+
+   ". L'hitbox resta indipendente dall'asset grafico.";
+ }else if(selectedStreet){
+  $("selected-name").textContent=selectedStreet.name;
+  $("selected-description").textContent="Carreggiata distinta dai palazzi · "+(selectedStreet.kind==="main"?"strada principale":"vicolo")+
+   " · il fronte degli edifici adiacenti resta selezionabile.";
  }else{
   $("selected-name").textContent="Five Points — il distretto";
-  $("selected-description").textContent="Vista urbana illustrativa. Nessun NPC attivo nella modalità plancia; il gioco tattico rimane accessibile da ALPHA.";
+  $("selected-description").textContent="Nessun edificio selezionato. Usa la modalità SCHELETRO per vedere le hitbox e i fronti strada.";
  }
  requestDraw();
 }
@@ -1012,6 +1097,28 @@ function pointerEnd(e){
 }
 for(const event of["pointerup","pointercancel","lostpointercapture"])canvas.addEventListener(event,pointerEnd);
 canvas.addEventListener("wheel",e=>{e.preventDefault();zoomAt(e.deltaY<0?1.13:1/1.13,local(e))},{passive:false});
+$("blueprint-btn").onclick=()=>{
+ blueprintMode=!blueprintMode;selected=null;selectedStreet=null;
+ $("blueprint-btn").setAttribute("aria-pressed",String(blueprintMode));
+ $("blueprint-btn").textContent=blueprintMode?"CITTÀ":"SCHELETRO";
+ requestDraw();
+};
+$("markers-btn").onclick=()=>{
+ markersVisible=!markersVisible;
+ $("markers-btn").setAttribute("aria-pressed",String(markersVisible));
+ $("markers-btn").textContent=markersVisible?"SEGNALINI ●":"SEGNALINI ○";
+ requestDraw();
+};
+$("guide-btn").onclick=()=>{
+ // Show a real, coordinate-derived SVG blueprint for ImageGen production.
+ const chunk=skeleton.chunks.find(c=>c.lotIds.includes(selected?.id))
+    ||skeleton.chunkByLot.get(2)||skeleton.chunks[0];
+ const svg=window.QOBoardSkeleton.svgGuide(skeleton,chunk.id,{title:"Five Points — "+chunk.id});
+ const blob=new Blob([svg],{type:"image/svg+xml;charset=utf-8"});
+ const url=URL.createObjectURL(blob),link=document.createElement("a");
+ link.href=url;link.download=chunk.id+"-geometry.svg";link.click();
+ URL.revokeObjectURL(url);
+};
 $("zoom-in").onclick=()=>zoomAt(1.2,{x:width/2,y:height/2});
 $("zoom-out").onclick=()=>zoomAt(1/1.2,{x:width/2,y:height/2});
 $("home-btn").onclick=()=>{camera.x=worldCenter.x;camera.y=worldCenter.y;camera.zoom=1.15;clampCamera();requestDraw()};
