@@ -14,6 +14,33 @@ const worldCenter=proj(world.hub.x,world.hub.y);
 const camera={x:worldCenter.x,y:worldCenter.y,zoom:1.15};
 const imageNames={barrel:"barrel.svg",crate:"crate.svg",streetLamp:"street_lamp.svg",lantern:"lantern.svg",woodenFence:"wooden_fence.svg"};
 const images={};
+// First raster integration pass: original ImageGen sources are immutable.
+// PNGs are temporary runtime inputs until trimmed WebP atlases are validated.
+// No arbitrary mirroring or skewing: use only the supplied front-facing angle.
+const rasterBuildingFiles={
+ tenement:["building_tenement_front_a.png","building_tenement_front_b.png"],
+ residence:["building_tenement_front_a.png","building_tenement_front_b.png"],
+ shop:["building_corner_shop.png"],
+ tavern:["building_tavern_front_a.png"],
+ workshop:["building_workshop.png"],
+ stable:["building_stable.png"]
+};
+const rasterBuildings={};
+for(const filename of new Set(Object.values(rasterBuildingFiles).flat())){
+ const sprite=new Image();
+ rasterBuildings[filename]=sprite;
+ sprite.onload=()=>requestDraw();
+ sprite.onerror=()=>requestDraw();
+ sprite.src="./assets/source/imagegen-2026-11-05/"+filename;
+}
+function rasterForBuilding(b){
+ const candidates=rasterBuildingFiles[b.type];
+ // The warehouse is not substituted by a workshop: no fake typology.
+ if(!candidates||b.seed%5===0)return null;
+ const sprite=rasterBuildings[candidates[b.seed%candidates.length]];
+ return sprite&&sprite.complete&&sprite.naturalWidth>0?sprite:null;
+}
+
 let width=1,height=1,pixelRatio=1,pending=false,selected=null;
 let clickRegions=[],usedMulti=false,down=null,priorCenter=null,priorDistance=0;
 const pointers=new Map();
@@ -495,7 +522,23 @@ function drawBuilding(b){
   buildingCache.delete(b.id);buildingCache.set(b.id,cached);
  }
  ctx.save();ctx.imageSmoothingEnabled=false;
- ctx.drawImage(cached.tile,cached.left,cached.top);ctx.restore();
+ const raster=rasterForBuilding(b);
+ if(raster){
+  // Preserve the authored perspective and image aspect ratio. Footprint
+  // remains authoritative for picking and depth sort; bottom is ground level.
+  const groundWidth=Math.max(...geometry.ground.map(p=>p.x))-
+                    Math.min(...geometry.ground.map(p=>p.x));
+  const desiredWidth=groundWidth*1.12;
+  const desiredHeight=b.z+Math.max(14,b.d*.35);
+  const scale=Math.min(desiredWidth/raster.naturalWidth,
+                       desiredHeight/raster.naturalHeight);
+  const rw=raster.naturalWidth*scale,rh=raster.naturalHeight*scale;
+  const footY=Math.max(...geometry.ground.map(p=>p.y));
+  ctx.drawImage(raster,center.x-rw/2,footY-rh,rw,rh);
+ }else{
+  ctx.drawImage(cached.tile,cached.left,cached.top);
+ }
+ ctx.restore();
  if(selected&&selected.id===b.id){
   polygon(geometry.roof,null,"#efc981",2.1);
   ellipse(center.x,center.y,13,5,"#d5b36b55");
