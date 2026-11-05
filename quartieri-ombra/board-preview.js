@@ -866,7 +866,9 @@ function scene(){
   ...world.buildings.map(b=>({kind:"building",obj:b,
    depth:Math.max(...b.poly.map(p=>proj(p.x,p.y).y))})),
   ...rowLayout.joints.map(j=>({kind:"joint",obj:j,
-   depth:Math.max(...[j.frontA,j.frontB,j.rearA,j.rearB].map(p=>proj(p.x,p.y).y))+.05})),
+   // Paint after *both* adjoining modules so a PNG edge cannot hide the seam.
+   depth:Math.max(...[j.left,j.right].map(id=>
+     Math.max(...world.buildings[id].poly.map(p=>proj(p.x,p.y).y))))+.08})),
   ...world.props.map(p=>({kind:"prop",obj:p,depth:proj(p.x,p.y).y})),
   ...marketStalls.map(p=>({kind:"stall",obj:p,depth:proj(p.x,p.y).y}))
  ].sort((a,b)=>a.depth-b.depth||a.obj.id-b.obj.id);
