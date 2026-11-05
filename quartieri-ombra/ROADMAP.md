@@ -1,3 +1,7 @@
+### 2026-11-05 — Usura delle facciate
+- [x] Inseriti intonaci scrostati, macchie di fuliggine e sporco alla base dei muri, ritagliati sulle facciate e variati per edificio (`5514e872`).
+- [ ] Screenshot della build reale e confronto con golden reference ancora mancanti; nessuna approvazione visiva.
+
 
 ### 2026-11-05 — Rendering strade bagnate
 - [x] Aggiunte pozzanghere e riflessi discreti lungo ogni segmento stradale, con distribuzione deterministica e culling viewport (`board-preview.js`, commit `274b4049`).
