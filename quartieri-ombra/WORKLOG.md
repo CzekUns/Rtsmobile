@@ -1,3 +1,6 @@
+### 2026-11-06 — Camera WebGL: collisioni su main corrente
+Ramo `agent/qo-webgl-camera-clearance-robust-1106`: aggiunta collisione contro volumi di lotti canonici dopo orbita, pan, zoom e preset. Cinque casi geometrici eseguiti con V8 (5/5 PASS), test Node persistente creato ma non eseguito in Node. Nessuna prova GPU desktop/Android; nessun screenshot. PR #78 e #80 hanno implementazioni alternative in conflitto: non integrate. Solo quartieri-ombra/.
+
 ### 2026-11-06 — Ripristino contesto WebGL, ramo aggiornato
 Su main aggiornato dopo merge touch #79, implementato recovery `webglcontextrestored` e RAF deduplicato. Test persistente `tests/webgl-context-lifecycle.test.cjs` simula realmente gli eventi e i frame; equivalente simulazione V8 eseguita con PASS. Non è stato possibile aprire la build con WebGL GPU o Android; non certificata resa grafica. PR #81 precedente è in conflitto con main: nuova implementazione mirata su branch aggiornato. Nessun altro progetto toccato.
 
