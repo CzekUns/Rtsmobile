@@ -327,6 +327,19 @@ function stepStickMovement(seconds){
  controls.target.x+=dx;controls.target.z+=dz;
 }
 let lastUiState="";
+// Rolling one-second diagnostic: actual rendered frames, not assumed refresh rate.
+let perfStart=null,perfFrames=0,perfFps=0,perfDraws=0,perfTriangles=0;
+function samplePerformance(now){
+ if(perfStart===null)perfStart=now;
+ perfFrames++;
+ const elapsed=now-perfStart;
+ if(elapsed>=1000){
+  perfFps=Math.round(perfFrames*1000/elapsed);
+  perfDraws=renderer.info.render.calls;
+  perfTriangles=renderer.info.render.triangles;
+  perfFrames=0;perfStart=now;
+ }
+}
 function updateHUD(){
  const delta=camera.position.clone().sub(controls.target);
  const angle=Math.round(Core.angleDeg(Math.atan2(delta.x,delta.z)));
@@ -334,7 +347,7 @@ function updateHUD(){
  const horizontal=Math.round(Math.hypot(delta.x,delta.z));
  const sectorX=Math.min(3,Math.max(1,Math.ceil(camera.position.x/(data.width/3))));
  const sectorZ=Math.min(3,Math.max(1,Math.ceil(camera.position.z/(data.height/3))));
- const next=`${angle}° · quota ${altitude} · settore ${sectorX}×${sectorZ} · ${renderedBuildings.size}/${data.buildings.length} edifici visibili`;
+ const next=`${angle}° · quota ${altitude} · settore ${sectorX}×${sectorZ} · ${renderedBuildings.size}/${data.buildings.length} edifici visibili · ${perfFps} FPS · ${perfDraws} draw · ${perfTriangles} triangoli`;
  if(next!==lastUiState){status.textContent=next;lastUiState=next}
  heightEl.value=String(Core.clamp(altitude,+heightEl.min,+heightEl.max));
  distanceEl.value=String(Core.clamp(horizontal,+distanceEl.min,+distanceEl.max));
@@ -445,6 +458,7 @@ function frame(now){
   keepCameraOutside();
   updateVisibleCity();
   renderer.render(scene,camera);
+  samplePerformance(now);
   updateHUD();
  }
  requestFrame();
