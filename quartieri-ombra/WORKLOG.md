@@ -348,3 +348,6 @@ Commit `108a1175`: normalized six ImageGen building sprites at runtime by scanni
 
 ### 2026-11-05 — passata raster su suolo e strade
 Commit `f7de871c`: `board-preview.js` carica `terrain_mud.png` e `terrain_cobbles.png` come texture raster, applica pattern con clipping sui poligoni della plancia e delle carreggiate. Fallback vettoriale preservato se caricamento fallisce. Nessun file gameplay modificato. **Non eseguiti** screenshot browser/Android né suite Node in questa esecuzione; resta da verificare continuità e prestazioni, e da convertire in WebP runtime.
+
+### 2026-11-07 00:03 — Consolidamento sweep WebGL
+Branch `agent/qo-webgl-sweep-consolidated-20261107` creato da main `933b5f9`. Aggiunta `sweepCameraMovement` analitica in `street-webgl-core.js`, collegata alla levetta in `street-webgl.js`, con controllo altezza alla collisione. Test `tests/street-webgl-sweep-consolidated.test.cjs`. Eseguiti cinque controlli JavaScript V8: tutti superati. Suite Node permanente non eseguita, né screenshot desktop/Android, FPS o deploy verificato. Demo prevista: https://czekuns.github.io/Rtsmobile/quartieri-ombra/street-webgl.html . Soglia estetica invariata. PR precedenti #91/#95 da riconciliare; non integrare implementazioni duplicate.
