@@ -1,3 +1,6 @@
+### 2026-11-06 — Collisione camera nel LAB WebGL
+Implementata risoluzione della posizione camera contro i poligoni originali dei 38 palazzi, con uscita verso il bordo più vicino e margine 3 unità, applicata dopo orbit/zoom e preset. Non toccati NPC, asset né altri progetti. Quattro controlli V8 eseguiti con esito PASS; aggiunto test persistente Node a cinque casi, **non eseguito in Node** per assenza di accesso di rete al checkout. Browser reale e Android ancora da collaudare; non certificare occlusioni/qualità visiva.
+
 ### 2026-11-06 — Implementazione LAB WebGL a quota lampione
 Aggiunta scena sperimentale Three.js r187 da import map CDN (MIT) in `street-webgl.html`, con `street-webgl-core.js` che legge esattamente `QOBoardWorld` per i lotti Cross Street [2,3,4,9,10,11]. Render di 38 edifici reali, superfici a base di quadrilateri tridimensionali, profondità WebGL, tetti, facciate, vetri stilizzati, ingressi e strade reali; camera iniziale 27 unità, touch orbit/pinch/pan, slider di quota/distanza, test 255° e selezione mediante raycast. Non è più necessario gestire la profondità con ordinamento SVG fisso. Nuovo link LAB 3D nella plancia; LAB SVG precedente conservato.
 
