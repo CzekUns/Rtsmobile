@@ -58,10 +58,13 @@ function pointInsideFootprint(p,poly){
 }
 function resolveCameraCollision(position,buildings,clearance=3){
  const p={x:position.x,y:position.y,z:position.z};
- for(let pass=0;pass<12;pass++){
+ // Treat clearance as a genuine radius, including when the eye is just
+ // OUTSIDE a wall. A point-only inside test allows near-plane wall clipping.
+ for(let pass=0;pass<16;pass++){
   let moved=false;
   for(const b of buildings){
-   if(p.y>b.z+clearance||!pointInsideFootprint(p,b.poly))continue;
+   if(p.y>b.z+clearance||!b.poly||b.poly.length<3)continue;
+   const inside=pointInsideFootprint(p,b.poly);
    let best=null;
    for(let i=0;i<b.poly.length;i++){
     const a=b.poly[i],c=b.poly[(i+1)%b.poly.length];
@@ -71,13 +74,22 @@ function resolveCameraCollision(position,buildings,clearance=3){
     const d2=(p.x-qx)**2+(p.z-qz)**2;
     if(!best||d2<best.d2)best={qx,qz,d2,dx,dz};
    }
-   if(!best)continue;
-   const cx=b.poly.reduce((n,v)=>n+v.x,0)/b.poly.length;
-   const cz=b.poly.reduce((n,v)=>n+v.y,0)/b.poly.length;
-   let nx=best.qx-cx,nz=best.qz-cz,mag=Math.hypot(nx,nz);
-   if(mag<1e-8){nx=-best.dz;nz=best.dx;mag=Math.hypot(nx,nz)||1}
-   p.x=best.qx+nx/mag*clearance;
-   p.z=best.qz+nz/mag*clearance;
+   if(!best||(!inside&&best.d2>=clearance*clearance))continue;
+   let nx=p.x-best.qx,nz=p.z-best.qz,mag=Math.hypot(nx,nz);
+   if(inside||mag<1e-8){
+    // The polygon's winding determines which side of its nearest edge is
+    // outside. A centroid vector is incorrect for long or concave footprints.
+    let area=0;
+    for(let i=0;i<b.poly.length;i++){
+     const a=b.poly[i],c=b.poly[(i+1)%b.poly.length];
+     area+=a.x*c.y-c.x*a.y;
+    }
+    nx=area>=0?best.dz:-best.dz;
+    nz=area>=0?-best.dx:best.dx;
+    mag=Math.hypot(nx,nz)||1;
+   }
+   p.x=best.qx+nx/mag*(clearance+1e-4);
+   p.z=best.qz+nz/mag*(clearance+1e-4);
    moved=true;
   }
   if(!moved)break;
