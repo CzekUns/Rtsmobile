@@ -436,3 +436,8 @@ Nota: la proiezione isometrica non deve essere confusa con la regolarità urbani
 ### 2026-11-05 — raster terrain pass (parziale)
 - [x] Layer raster ImageGen fango e acciottolato inseriti nel renderer della plancia, ritagliati ai poligoni mondo (commit `f7de871c`). Source PNG invariati.
 - [ ] Convertire in WebP runtime e validare tileability/stacchi con screenshot; browser e Android landscape non ancora collaudati. Non approvato.
+
+### 2026-11-07 — P0 camera sweep consolidation
+- [x] Branch isolato da main `933b5f9`: controllo continuo analitico del segmento joystick contro i perimetri reali, con verifica della quota all'intersezione e test Node permanente.
+- [ ] Test Node da eseguire nel runtime Node; 5 verifiche V8 eseguite sul modulo (parete sottile, sopra tetto, strada libera, movimento lungo, salita verso parete). Nessun collaudo browser GPU/Android; nessuna approvazione grafica.
+- [ ] Verificare collisioni e rotazioni 0/90/180/255/270/359 nel browser, FPS e picking; non promuovere asset precedenti.
