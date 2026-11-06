@@ -1,3 +1,6 @@
+### 2026-11-06 — Ripristino contesto WebGL, ramo aggiornato
+Su main aggiornato dopo merge touch #79, implementato recovery `webglcontextrestored` e RAF deduplicato. Test persistente `tests/webgl-context-lifecycle.test.cjs` simula realmente gli eventi e i frame; equivalente simulazione V8 eseguita con PASS. Non è stato possibile aprire la build con WebGL GPU o Android; non certificata resa grafica. PR #81 precedente è in conflitto con main: nuova implementazione mirata su branch aggiornato. Nessun altro progetto toccato.
+
 ### 2026-11-06 — Correzione input LAB WebGL
 Il raycast su `pointerup` ora accetta soltanto un vero tap del medesimo `pointerId` iniziato col pulsante principale, senza multi-touch e con spostamento massimo 9 px. Questo evita selezioni accidentali durante pinch e trascinamento a due dita e con il pulsante destro. Nuovo helper puro `Core.isTap` e test permanente. **Eseguiti 5 casi JS** tramite runtime JavaScript del connettore: PASS; test Node e browser reali NON eseguiti. Asset, NPC, economia, gameplay e altre cartelle intatti. PR separata per review; nessun deploy dichiarato.
 
