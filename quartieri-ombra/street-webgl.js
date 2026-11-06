@@ -202,11 +202,16 @@ controls.maxTargetRadius=540;
 controls.minDistance=65;controls.maxDistance=540;
 controls.minPolarAngle=.72;controls.maxPolarAngle=1.56;
 controls.rotateSpeed=.62;controls.zoomSpeed=.9;
+function keepCameraOutside(){
+ const safe=Core.resolveCameraCollision(camera.position,cluster.buildings,3);
+ camera.position.set(safe.x,safe.y,safe.z);
+}
 function setCamera(azimuth,height,dist){
  const p=Core.cameraPoint({x:controls.target.x,z:controls.target.z},azimuth,height,dist);
  camera.position.set(p.x,p.y,p.z);
  camera.lookAt(controls.target);
  controls.update();
+ keepCameraOutside();
 }
 setCamera(45*Math.PI/180,27,225);
 const heightEl=$("height"),distanceEl=$("distance");
@@ -316,6 +321,7 @@ function frame(){
  if(stopped)return;
  if(!document.hidden){
   controls.update();
+  keepCameraOutside();
   renderer.render(scene,camera);
   updateHUD();
  }
