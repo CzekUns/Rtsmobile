@@ -297,6 +297,8 @@ function frame(){
  requestAnimationFrame(frame);
  if(document.hidden)return;
  controls.update();
+ const safe=Core.cameraClearance(camera.position,cluster.buildings,3);
+ camera.position.set(safe.x,safe.y,safe.z);
  renderer.render(scene,camera);
  updateHUD();
 }
