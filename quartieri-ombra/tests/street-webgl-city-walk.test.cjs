@@ -52,6 +52,6 @@ test("renderer uses full-map roads/ground, all-world collision, and dynamic visi
  assert(js.includes("unloadBuilding"));
  assert(js.includes("disposeGeometry"));
  assert(!js.includes("cluster.buildings.length"),"old fixed pilot count should be gone");
- assert(html.includes('value="42"')&&html.includes("webgl-walk"),"zoom and assets must use walking defaults");
- assert.doesNotThrow(()=>new Function(js.replace(/^import .*?;\\s*$/gm,"")));
+ assert(html.includes('value="42"')&&html.includes("20261106-walk2"),"zoom and assets must use walking defaults");
+ assert.doesNotThrow(()=>new Function(js.replace('import * as THREE from "three";',"").replace('import {OrbitControls} from "three/addons/controls/OrbitControls.js";',"")));
 });
