@@ -1,3 +1,8 @@
+### 2026-11-06 — Implementazione LAB WebGL a quota lampione
+Aggiunta scena sperimentale Three.js r187 da import map CDN (MIT) in `street-webgl.html`, con `street-webgl-core.js` che legge esattamente `QOBoardWorld` per i lotti Cross Street [2,3,4,9,10,11]. Render di 38 edifici reali, superfici a base di quadrilateri tridimensionali, profondità WebGL, tetti, facciate, vetri stilizzati, ingressi e strade reali; camera iniziale 27 unità, touch orbit/pinch/pan, slider di quota/distanza, test 255° e selezione mediante raycast. Non è più necessario gestire la profondità con ordinamento SVG fisso. Nuovo link LAB 3D nella plancia; LAB SVG precedente conservato.
+
+Test statici JS su sorgenti GitHub: parsing PASS; modello dati 38 edifici / 304 vertici di base, ID pilota esatti e funzione camera a 255° con coordinate finite. Test Node aggiunti ma **rendering vero browser/WebGL non ancora provato** per impossibilità di caricare CDN dall'ambiente locale senza rete. Asset precedenti, IA, gameplay, manifest e altri progetti invariati.
+
 ### 2026-11-06 — Laboratorio SVG immersivo, asset parcheggiati
 Implementata prova isolata `street-vector-lab.html`: generazione 3D di pareti/tetti dai lotti originali; proiezione prospettica vicino alla quota di un lampione, scelta quota/zoom/yaw, spostamento, selezione dei palazzi. A 255° il backface culling usa l'orientamento dei lati reali, non la rotazione di sprite piatti. Depth sort SVG resta un'approssimazione per le occlusioni tra volumi complessi. Nessuna modifica al manifest asset o ai renderer principali. I file di prova sono sull'apposito branch; smoke simulato sul rendering e test JS; test browser reale non eseguito. Worker degli asset ImageGen messo in pausa.
 
