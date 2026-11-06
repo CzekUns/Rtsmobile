@@ -1,3 +1,6 @@
+### 2026-11-06 — Correzione input LAB WebGL
+Il raycast su `pointerup` ora accetta soltanto un vero tap del medesimo `pointerId` iniziato col pulsante principale, senza multi-touch e con spostamento massimo 9 px. Questo evita selezioni accidentali durante pinch e trascinamento a due dita e con il pulsante destro. Nuovo helper puro `Core.isTap` e test permanente. **Eseguiti 5 casi JS** tramite runtime JavaScript del connettore: PASS; test Node e browser reali NON eseguiti. Asset, NPC, economia, gameplay e altre cartelle intatti. PR separata per review; nessun deploy dichiarato.
+
 ### 2026-11-06 — Implementazione LAB WebGL a quota lampione
 Aggiunta scena sperimentale Three.js r187 da import map CDN (MIT) in `street-webgl.html`, con `street-webgl-core.js` che legge esattamente `QOBoardWorld` per i lotti Cross Street [2,3,4,9,10,11]. Render di 38 edifici reali, superfici a base di quadrilateri tridimensionali, profondità WebGL, tetti, facciate, vetri stilizzati, ingressi e strade reali; camera iniziale 27 unità, touch orbit/pinch/pan, slider di quota/distanza, test 255° e selezione mediante raycast. Non è più necessario gestire la profondità con ordinamento SVG fisso. Nuovo link LAB 3D nella plancia; LAB SVG precedente conservato.
 

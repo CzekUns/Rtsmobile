@@ -41,6 +41,10 @@ function cameraPoint(target,azimuth,height,distance){
  return{x:target.x+Math.sin(azimuth)*distance,y:height,
   z:target.z+Math.cos(azimuth)*distance};
 }
+function isTap(start,end,threshold=9){
+ return !!start&&!!end&&start.id===end.id&&start.button===0&&!start.multi&&
+  Math.hypot(end.x-start.x,end.y-start.y)<=threshold;
+}
 function evaluateGeometry(buildings){
  let vertices=0;
  for(const b of buildings){
@@ -50,7 +54,7 @@ function evaluateGeometry(buildings){
  }
  return{buildings:buildings.length,vertices};
 }
-return{PILOT_IDS,clamp,angleDeg,center,segmentDistance,doorEdgeIndex,cluster,cameraPoint,evaluateGeometry};
+return{PILOT_IDS,clamp,angleDeg,center,segmentDistance,doorEdgeIndex,cluster,cameraPoint,isTap,evaluateGeometry};
 })();
 if(typeof window!=="undefined")window.QOStreetWebGLCore=QOStreetWebGLCore;
 if(typeof module!=="undefined"&&module.exports)module.exports=QOStreetWebGLCore;

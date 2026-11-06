@@ -1,3 +1,8 @@
+### 2026-11-06 — WebGL P0: picking touch protetto (PR in revisione)
+- [x] Tracciamento `pointerId` e classificazione tap: il secondo dito, pinch, drag e click destro non selezionano accidentalmente edifici; selezione consentita soltanto al rilascio dello stesso puntatore.
+- [x] Cinque casi JS puri eseguiti con esito positivo; test Node permanente aggiunto in `tests/street-webgl-pointer.test.cjs` (non eseguito in Node in questo ambiente).
+- [ ] Da verificare in browser desktop e Android landscape: gesture reali, raycast, 255°, collisioni camera, FPS e context loss. Nessuna approvazione grafica o integrazione gameplay.
+
 ### 2026-11-06 — Nuovo laboratorio WebGL (P0 sperimentale)
 - [x] `street-webgl.html`, `street-webgl-core.js`, `street-webgl.js`: scena reale Three.js/WebGL2 con z-buffer, camera prospettica bassa, orbit 360°, prova 255°, zoom/pan touch, selezione 3D per lotto.
 - [x] Sei lotti Cross Street conservati con i vertici esatti e fino a 32 edifici vicini per verificare occlusioni; facciate, tetti, finestre e ingressi disegnati come volumi/quad 3D originali, non asset ImageGen o pattern SVG.

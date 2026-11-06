@@ -264,17 +264,22 @@ function chooseBuilding(id){
   :"Tocca una facciata per selezionare un edificio.";
 }
 const raycaster=new THREE.Raycaster(),mouse=new THREE.Vector2();
-let pointerStart=null,multi=false;
+let pointerStart=null;
+const activePointers=new Set();
 renderer.domElement.addEventListener("pointerdown",e=>{
- if(e.isPrimary){pointerStart={x:e.clientX,y:e.clientY};multi=false}
- else multi=true;
+ activePointers.add(e.pointerId);
+ if(activePointers.size>1&&pointerStart)pointerStart.multi=true;
+ if(activePointers.size===1&&e.button===0)
+  pointerStart={id:e.pointerId,button:e.button,x:e.clientX,y:e.clientY,multi:false};
 });
-renderer.domElement.addEventListener("pointercancel",()=>{pointerStart=null});
+renderer.domElement.addEventListener("pointercancel",e=>{
+ activePointers.delete(e.pointerId);pointerStart=null;
+});
 renderer.domElement.addEventListener("pointerup",e=>{
- if(!pointerStart||multi)return;
- const delta=Math.hypot(e.clientX-pointerStart.x,e.clientY-pointerStart.y);
- pointerStart=null;
- if(delta>9)return;
+ activePointers.delete(e.pointerId);
+ const start=pointerStart;
+ if(start?.id===e.pointerId)pointerStart=null;
+ if(!Core.isTap(start,{id:e.pointerId,x:e.clientX,y:e.clientY},9))return;
  const box=renderer.domElement.getBoundingClientRect();
  mouse.set((e.clientX-box.left)/box.width*2-1,-(e.clientY-box.top)/box.height*2+1);
  raycaster.setFromCamera(mouse,camera);
