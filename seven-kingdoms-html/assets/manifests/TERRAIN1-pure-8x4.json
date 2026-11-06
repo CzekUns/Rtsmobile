@@ -293,5 +293,8 @@
     "Only pure terrain samples: no original corner transition sequencing yet",
     "Current JavaScript world terrain classification is unchanged; water collision remains rule-defined"
   ],
-  "tileSize": 32
+  "tileSize": 32,
+  "decoded": true,
+  "visuallyVerified": false,
+  "integrated": false
 }
