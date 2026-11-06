@@ -195,14 +195,17 @@ if(lamps.length<3)for(const b of cluster.pilot.slice(0,3))streetLamp(b.door.x+9,
 const controls=new OrbitControls(camera,renderer.domElement);
 controls.target.copy(TARGET);
 controls.enableDamping=true;controls.dampingFactor=.085;
-controls.enablePan=false;
+controls.enablePan=true;
+controls.screenSpacePanning=false;
+controls.panSpeed=.7;
+controls.maxTargetRadius=540;
 controls.minDistance=65;controls.maxDistance=540;
 controls.minPolarAngle=.72;controls.maxPolarAngle=1.56;
 controls.rotateSpeed=.62;controls.zoomSpeed=.9;
 function setCamera(azimuth,height,dist){
- const p=Core.cameraPoint({x:TARGET.x,z:TARGET.z},azimuth,height,dist);
+ const p=Core.cameraPoint({x:controls.target.x,z:controls.target.z},azimuth,height,dist);
  camera.position.set(p.x,p.y,p.z);
- camera.lookAt(TARGET);
+ camera.lookAt(controls.target);
  controls.update();
 }
 setCamera(45*Math.PI/180,27,225);
@@ -221,13 +224,13 @@ function updateHUD(){
  $("distance-value").textContent=String(horizontal);
 }
 function viewAt(angle){
- const offset=camera.position.clone().sub(TARGET);
+ const offset=camera.position.clone().sub(controls.target);
  const horizontal=Math.max(65,Math.hypot(offset.x,offset.z));
  setCamera(angle*Math.PI/180,camera.position.y,horizontal);
  updateHUD();
 }
 $("turn90").addEventListener("click",()=>{
- const d=camera.position.clone().sub(TARGET);
+ const d=camera.position.clone().sub(controls.target);
  viewAt(Core.angleDeg(Math.atan2(d.x,d.z))+90);
 });
 $("test255").addEventListener("click",()=>viewAt(255));
@@ -236,12 +239,12 @@ $("reset").addEventListener("click",()=>{
  chooseBuilding(null);updateHUD();
 });
 heightEl.addEventListener("input",()=>{
- const d=camera.position.clone().sub(TARGET);
+ const d=camera.position.clone().sub(controls.target);
  setCamera(Math.atan2(d.x,d.z),+heightEl.value,Math.hypot(d.x,d.z));
  updateHUD();
 });
 distanceEl.addEventListener("input",()=>{
- const d=camera.position.clone().sub(TARGET);
+ const d=camera.position.clone().sub(controls.target);
  setCamera(Math.atan2(d.x,d.z),camera.position.y,+distanceEl.value);
  updateHUD();
 });
