@@ -1,0 +1,10 @@
+const assert=require('node:assert/strict');
+const Core=require('../street-webgl-core.js');
+const b={id:2,x:5,y:5,z:35,poly:[{x:0,y:0},{x:10,y:0},{x:10,y:10},{x:0,y:10}]};
+assert.equal(Core.pointInPolygon({x:5,y:5},b.poly),true);
+assert.equal(Core.pointInPolygon({x:12,y:5},b.poly),false);
+const inside=Core.cameraClearance({x:5,y:15,z:5},[b]);
+assert.equal(Core.pointInPolygon({x:inside.x,y:inside.z},b.poly),false,'camera must exit building');
+assert.deepEqual(Core.cameraClearance({x:5,y:40,z:5},[b]),{x:5,y:40,z:5},'camera above roof unchanged');
+assert.deepEqual(Core.cameraClearance({x:20,y:15,z:20},[b]),{x:20,y:15,z:20},'camera in street unchanged');
+console.log('WebGL camera clearance: OK');

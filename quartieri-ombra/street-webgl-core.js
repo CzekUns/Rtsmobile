@@ -50,7 +50,39 @@ function evaluateGeometry(buildings){
  }
  return{buildings:buildings.length,vertices};
 }
-return{PILOT_IDS,clamp,angleDeg,center,segmentDistance,doorEdgeIndex,cluster,cameraPoint,evaluateGeometry};
+
+// Keep the street-level camera out of solid buildings. The footprint is
+// authoritative; no screen-space approximations or painter ordering.
+function pointInPolygon(p,poly){
+ let inside=false;
+ for(let i=0,j=poly.length-1;i<poly.length;j=i++){
+  const a=poly[i],b=poly[j];
+  if(((a.y>p.y)!==(b.y>p.y)) &&
+   p.x<(b.x-a.x)*(p.y-a.y)/(b.y-a.y)+a.x)inside=!inside;
+ }
+ return inside;
+}
+function cameraClearance(position,buildings,margin=3){
+ const p={x:position.x,y:position.z};
+ for(const b of buildings){
+  if(position.y>b.z+margin||!pointInPolygon(p,b.poly))continue;
+  let best=null;
+  for(let i=0;i<b.poly.length;i++){
+   const a=b.poly[i],c=b.poly[(i+1)%b.poly.length];
+   const dx=c.x-a.x,dy=c.y-a.y,len2=dx*dx+dy*dy||1;
+   const t=clamp(((p.x-a.x)*dx+(p.y-a.y)*dy)/len2,0,1);
+   const q={x:a.x+t*dx,y:a.y+t*dy};
+   const d=Math.hypot(p.x-q.x,p.y-q.y);
+   if(!best||d<best.d)best={...q,d};
+  }
+  if(best){
+   const dx=best.x-b.x,dy=best.y-b.y,len=Math.hypot(dx,dy)||1;
+   p.x=best.x+dx/len*margin;p.y=best.y+dy/len*margin;
+  }
+ }
+ return{x:p.x,y:position.y,z:p.y};
+}
+return{PILOT_IDS,clamp,angleDeg,center,segmentDistance,doorEdgeIndex,cluster,cameraPoint,evaluateGeometry,pointInPolygon,cameraClearance};
 })();
 if(typeof window!=="undefined")window.QOStreetWebGLCore=QOStreetWebGLCore;
 if(typeof module!=="undefined"&&module.exports)module.exports=QOStreetWebGLCore;

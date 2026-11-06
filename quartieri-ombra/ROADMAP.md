@@ -1,3 +1,7 @@
+### 2026-11-06 — WebGL P0: camera collision clearance
+- [x] Aggiunto controllo geometrico del footprint per impedire alla camera a quota stradale di attraversare gli edifici durante orbit/pan; sopra i tetti la camera resta libera. Test dedicato incluso.
+- [ ] Test browser desktop/Android e screenshot a 255° ancora necessari; nessuna dichiarazione di qualità visiva approvata.
+
 ### 2026-11-06 — Nuovo laboratorio WebGL (P0 sperimentale)
 - [x] `street-webgl.html`, `street-webgl-core.js`, `street-webgl.js`: scena reale Three.js/WebGL2 con z-buffer, camera prospettica bassa, orbit 360°, prova 255°, zoom/pan touch, selezione 3D per lotto.
 - [x] Sei lotti Cross Street conservati con i vertici esatti e fino a 32 edifici vicini per verificare occlusioni; facciate, tetti, finestre e ingressi disegnati come volumi/quad 3D originali, non asset ImageGen o pattern SVG.
