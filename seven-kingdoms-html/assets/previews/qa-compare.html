@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>7KAA · Asset parity inspector (not the game)</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color-scheme:dark;background:#101720;color:#e5edf5}
+*{box-sizing:border-box}body{margin:0;padding:20px;max-width:1400px;margin-inline:auto}
+h1{font-size:22px;margin:0 0 8px}p{line-height:1.45;color:#b8c7d6}small{color:#aebbc8}
+.toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin:18px 0}
+label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:#b8c7d6}
+button,select,input,textarea{background:#223041;border:1px solid #596b7d;color:#fff;border-radius:6px;padding:8px;font:inherit}
+input[type=number]{width:82px}input[type=range]{padding:0;min-width:140px}
+input[type=checkbox]{width:18px;height:18px}
+button{cursor:pointer}button:hover{background:#32465c}button:disabled{opacity:.5;cursor:default}
+.panes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,390px),1fr));gap:16px}
+.panel{background:#18232e;border:1px solid #35485b;border-radius:10px;padding:14px;min-width:0}
+.panel header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px}
+h2{font-size:16px;margin:0}
+.stage{overflow:auto;max-width:100%;min-height:190px;background-color:#29303a;background-image:linear-gradient(45deg,#20252b 25%,transparent 25%),linear-gradient(-45deg,#20252b 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#20252b 75%),linear-gradient(-45deg,transparent 75%,#20252b 75%);background-size:18px 18px;background-position:0 0,0 9px,9px -9px,-9px 0;display:flex;align-items:flex-start;justify-content:center;padding:8px}
+canvas{display:block;image-rendering:pixelated;border:1px solid #465969}
+fieldset{border:1px solid #41556c;border-radius:8px;margin-top:12px;padding:10px}
+legend{color:#bcd1e5;padding:0 6px}#summary{font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;color:#d8e4ee}
+.bad{color:#ffb58d}.ok{color:#a0e9c2}
+.notes{width:100%;min-height:70px;resize:vertical;margin-top:8px}
+.footer{margin-top:16px;font-size:13px;color:#b6c4d5}
+</style>
+</head>
+<body>
+<h1>Seven Kingdoms · Verifica degli asset autentici</h1>
+<p>Strumento isolato della corsia Asset: mostra i pixel sorgente, l'ordine dei frame e lo zoom nearest-neighbor. Per confrontare una scena del gioco originale, carica uno screenshot <strong>realmente catturato</strong>: questo strumento non lo inventa e non certifica da solo la parità.</p>
+<div class="toolbar">
+<label>Risorsa
+<select id="asset"><option value="unit">NORMAN · unità (M)</option><option value="firm">BASE:NORMAN · edificio</option></select>
+</label>
+<label id="dirField">Direzione originale
+<select id="direction"><option value="0">0 · Nord</option><option value="1">1 · NE</option><option value="2">2 · Est</option><option value="3">3 · SE</option><option value="4">4 · Sud</option><option value="5">5 · SW (mirror)</option><option value="6">6 · Ovest (mirror)</option><option value="7">7 · NW (mirror)</option></select>
+</label>
+<label id="frameField">Frame 1–6
+<input type="range" id="frame" min="0" max="5" value="0" step="1"/>
+</label>
+<label>Scala (pixel reali)
+<select id="zoom"><option value="1">1×</option><option value="2" selected>2×</option><option value="4">4×</option><option value="8">8×</option></select>
+</label>
+<label>Asse di riferimento (origine coordinate)
+<input id="guides" type="checkbox" checked/>
+</label>
+<button id="play">Riproduci M</button>
+<label>PNG dell'atlante, opzionale
+<input id="atlasFile" type="file" accept="image/png"/>
+</label>
+</div>
+<div class="panes">
+<section class="panel">
+<header><h2>PNG estratto da 7KAA</h2><small id="assetState">Caricamento…</small></header>
+<div class="stage"><canvas id="native" aria-label="Frame autentico"></canvas></div>
+<pre id="summary"></pre>
+</section>
+<section class="panel">
+<header><h2>Screenshot del gioco originale</h2><small id="referenceState" class="bad">Non fornito: confronto in sospeso</small></header>
+<label>Carica screenshot originale per confronto manuale
+<input type="file" id="reference" accept="image/png,image/jpeg,image/webp"/>
+</label>
+<div class="toolbar">
+<label>Ritaglio X (pixel)<input id="cropX" type="number" value="0" min="0"/></label>
+<label>Ritaglio Y (pixel)<input id="cropY" type="number" value="0" min="0"/></label>
+</div>
+<div class="stage"><canvas id="original" aria-label="Ritaglio screenshot originale"></canvas></div>
+<small>I due pannelli usano lo stesso ritaglio in pixel e la stessa scala. Imposta X/Y sul punto d'ancoraggio equivalente dello screenshot, senza presupporre che le immagini online rappresentino lo stesso frame.</small>
+</section>
+</div>
+<fieldset>
+<legend>Verbale manuale (non è una verifica automatica)</legend>
+<div class="toolbar">
+<label>Dimensioni e orientamento corretti <input type="checkbox" id="checkGeometry"/></label>
+<label>Colori/trasparenza corretti <input type="checkbox" id="checkPalette"/></label>
+<label>Passo diagonale / strati corretti <input type="checkbox" id="checkMotion"/></label>
+<label>Ancoraggio a terra corretto <input type="checkbox" id="checkAnchor"/></label>
+</div>
+<label>Osservazioni<textarea class="notes" id="notes" placeholder="Descrivi il confronto effettivamente visto, inclusi eventuali difetti."></textarea></label>
+<div class="toolbar"><button id="export">Esporta verbale JSON</button><small>Lo stato `visuallyVerified` non viene modificato automaticamente.</small></div>
+</fieldset>
+<p class="footer">Fonti: `the3dfxdude/7kaa` e relativi record `SFRAME`, `FBUILD`, `FFRAME`, `FBITMAP`. L'immagine NORMAN applica `OGAME.cpp` scheme 1; fasi BASE in ordine U0, U1, U2, A. Questa pagina non modifica `game.js`, `view.js`, salvataggi, levetta, MOD o HUD.</p>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const settings={
+ unit:{file:'NORMAN-M-1x.png',width:96,height:112,rows:6,columns:8,anchor:[40,50]},
+ firm:{file:'BASE-NORMAN-phases-1x.png',width:180,height:160,rows:1,columns:4,anchor:[30,10]}
+};
+let atlas=null,reference=null,referenceName='',playing=null;
+function loadImage(src){return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(Error('PNG non disponibile: '+src));im.src=src})}
+function stop(){if(playing!==null){clearInterval(playing);playing=null}$('play').textContent='Riproduci M'}
+const state=()=>({kind:$('asset').value,dir:Number($('direction').value),frame:Number($('frame').value),zoom:Number($('zoom').value)});
+function paint(canvas,source,sx,sy,w,h,zoom,anchor=null){
+ canvas.width=w*zoom;canvas.height=h*zoom;
+ const ctx=canvas.getContext('2d',{alpha:true});ctx.imageSmoothingEnabled=false;
+ if(source)ctx.drawImage(source,sx,sy,w,h,0,0,canvas.width,canvas.height);
+ if(anchor&&$('guides').checked){
+  const x=anchor[0]*zoom+.5,y=anchor[1]*zoom+.5;
+  ctx.save();ctx.strokeStyle='rgba(255,228,60,.85)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);ctx.stroke();ctx.restore();
+ }
+}
+function render(){
+ const s=state(),cfg=settings[s.kind],col=s.kind==='unit'?s.dir:s.frame;
+ paint($('native'),atlas,col*cfg.width,s.kind==='unit'?s.frame*cfg.height:0,cfg.width,cfg.height,s.zoom,cfg.anchor);
+ paint($('original'),reference,Number($('cropX').value)||0,Number($('cropY').value)||0,cfg.width,cfg.height,s.zoom,null);
+ const label=s.kind==='unit'?('Direzione '+s.dir+', M frame '+(s.frame+1)+' di 6'+(s.frame===3?' (stesso bitmap del frame 1)':'')):['Costruzione fase 1','Costruzione fase 2','Costruzione fase 3','Edificio completato'][s.frame];
+ $('summary').textContent=[label,'Scala '+s.zoom+'× (nearest neighbor)','Immagine frame nativa '+cfg.width+' × '+cfg.height+' px','Croce gialla = origine del tile (NON necessariamente contatto piedi)','Stato: pixel decodificati; confronto con motore originale non certificato'].join('\n');
+ $('referenceState').textContent=reference?'Screenshot caricato; allinea manualmente':'Non fornito: confronto in sospeso';
+ $('referenceState').className=reference?'ok':'bad';
+}
+async function loadAtlas(file=null){
+ atlas=null;$('assetState').textContent='Caricamento…';
+ try{
+  const url=file?URL.createObjectURL(file):settings[state().kind].file;
+  atlas=await loadImage(url);
+  if(file)URL.revokeObjectURL(url);
+  const cfg=settings[state().kind];
+  if(atlas.width!==cfg.width*cfg.columns||atlas.height!==cfg.height*cfg.rows)throw Error('Dimensione atlante inesperata '+atlas.width+'×'+atlas.height);
+  $('assetState').textContent='PNG: '+atlas.width+'×'+atlas.height;
+ }catch(e){$('assetState').textContent=e.message;}
+ render();
+}
+$('asset').addEventListener('change',()=>{stop();$('frame').max=state().kind==='unit'?'5':'3';$('frame').value='0';$('dirField').hidden=state().kind!=='unit';$('play').disabled=state().kind!=='unit';loadAtlas()});
+$('atlasFile').addEventListener('change',e=>{if(e.target.files[0])loadAtlas(e.target.files[0])});
+for(const id of ['direction','frame','zoom','guides','cropX','cropY'])$(id).addEventListener('input',render);
+$('play').addEventListener('click',()=>{if(playing!==null){stop();return}
+ if(!atlas)return;playing=setInterval(()=>{$('frame').value=(Number($('frame').value)+1)%6;render()},160);$('play').textContent='Ferma animazione'});
+$('reference').addEventListener('change',async e=>{if(!e.target.files[0])return;referenceName=e.target.files[0].name;const url=URL.createObjectURL(e.target.files[0]);try{reference=await loadImage(url);$('cropX').max=reference.width;$('cropY').max=reference.height;}catch(err){reference=null;$('referenceState').textContent=err.message;}finally{URL.revokeObjectURL(url)}render()});
+$('export').addEventListener('click',()=>{
+ const s=state(),checklist=['checkGeometry','checkPalette','checkMotion','checkAnchor'].map(id=>Boolean($(id).checked));
+ const report={version:1,asset:s.kind==='unit'?'NORMAN':'BASE:NORMAN',action:s.kind==='unit'?'M':'construction/complete',
+  direction:s.kind==='unit'?s.dir:null,frame:s.frame,referenceScreenshot:referenceName||null,
+  crop:{x:Number($('cropX').value),y:Number($('cropY').value)},zoom:s.zoom,
+  checks:{geometry:checklist[0],palette:checklist[1],motionOrLayers:checklist[2],groundAnchor:checklist[3]},
+  notes:$('notes').value,
+  visuallyVerified:Boolean(reference&&checklist.every(Boolean))};
+ const a=document.createElement('a'),blob=new Blob([JSON.stringify(report,null,2)+'\n'],{type:'application/json'});
+ a.href=URL.createObjectURL(blob);a.download='7kaa-visual-qa-'+s.kind+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+});
+loadAtlas();
+</script>
+</body>
+</html>
