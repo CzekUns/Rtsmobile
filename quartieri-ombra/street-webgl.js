@@ -321,7 +321,7 @@ function stepStickMovement(seconds){
  const destination=Core.clampToWorld({
   x:camera.position.x+movement.x,y:camera.position.y,z:camera.position.z+movement.z
  },data,18);
- const next=Core.resolveCameraCollision(destination,data.buildings,3);
+ const next=Core.sweepCameraMovement(camera.position,destination,data.buildings,3);
  const dx=next.x-camera.position.x,dz=next.z-camera.position.z;
  camera.position.x=next.x;camera.position.z=next.z;
  controls.target.x+=dx;controls.target.z+=dz;
