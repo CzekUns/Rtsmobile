@@ -2,6 +2,7 @@
  * Rendering only; simulation rules are in rules.js. GPL-2.0-only.
  */
 import {WORLD_W,WORLD_H,NATIONS,FIRMS,terrain,range} from './rules.js';
+import {OriginalSpritePreview,compassDirection,walkingFrame} from './playtest/original-sprites.js';
 const COLORS={
   grass:['#81996a','#8aa171','#769367'],forest:['#496d46','#567b4b','#3e6645'],
   hill:['#a59d7f','#aaa487','#8e9077'],dry:['#b6a983','#c1ad86','#a89f7f'],
@@ -10,8 +11,10 @@ const COLORS={
 const hash=(x,y,s)=>Math.abs(Math.sin(x*13.37+y*42.17+s*.13)*7867.3481)%1;
 const lim=(v,a,b)=>Math.max(a,Math.min(b,v));
 export class WorldView{
- constructor(world,mini){
+ constructor(world,mini,{previewOriginalSprites=false}={}){
   this.canvas=world;this.ctx=world.getContext('2d');
+  this.originalSprites=previewOriginalSprites?new OriginalSpritePreview():null;
+  this.spriteMotion=new Map();this.spritePaused=false;
   this.mini=mini;this.mctx=mini.getContext('2d');
   this.cx=27;this.cy=27;this.zoom=1;this.tileSize=24;
  }
@@ -33,7 +36,7 @@ export class WorldView{
   }
   return null;
  }
- draw(g,selection,ghost=null,groupIds=[],selectionBox=null){
+ draw(g,selection,ghost=null,groupIds=[],selectionBox=null,now=0){
   const ctx=this.ctx,w=this.canvas.width,h=this.canvas.height,t=this.tile();
   ctx.fillStyle='#7e9673';ctx.fillRect(0,0,w,h);
   const l=Math.max(0,Math.floor(this.cx-w/(2*t))-1);
@@ -63,7 +66,12 @@ export class WorldView{
   }
   for(const firm of g.firms)this.firmDraw(ctx,firm,selection,t);
   const group=new Set(groupIds);
-   for(const unit of g.units)this.unitDraw(ctx,unit,selection,t,group.has(unit.id));
+  this.spritePaused=!!g.paused;
+  for(const unit of g.units)this.unitDraw(ctx,unit,selection,t,group.has(unit.id),now);
+  if(this.originalSprites){
+   const live=new Set(g.units.map(u=>u.id));
+   for(const id of this.spriteMotion.keys())if(!live.has(id))this.spriteMotion.delete(id);
+  }
   if(ghost){
    const cfg=FIRMS[ghost.kind],pos=this.screen(ghost.x,ghost.y);
    const result=g.occupied(ghost.x,ghost.y,cfg.size);
@@ -130,6 +138,9 @@ export class WorldView{
  firmDraw(ctx,firm,selection,t){
   const p=this.screen(firm.x,firm.y),s=firm.size*t,color=NATIONS[firm.owner]?.color||'#ccc';
   if(p.x+s<0||p.y+s<0||p.x>this.canvas.width||p.y>this.canvas.height)return;
+  // The Norman Seat of Power acts only as a visual proxy for the demo's red fort.
+  const originalFirm=this.originalSprites?.drawFirm(ctx,firm,p.x,p.y,t)??false;
+  if(!originalFirm){
   ctx.fillStyle='#555449';ctx.fillRect(p.x+s*.08,p.y+s*.16,s*.86,s*.77);
   const shades={fort:'#a3a49b',mine:'#898278',factory:'#aa9385',market:'#c1a57c',research:'#b8b3a1',inn:'#b09b78'};
   ctx.fillStyle=shades[firm.kind]||'#aaa';ctx.fillRect(p.x+s*.15,p.y+s*.23,s*.7,s*.62);
@@ -153,9 +164,10 @@ export class WorldView{
   }
   ctx.fillStyle=color;ctx.fillRect(p.x+s*.07,p.y+s*.85,s*.86,s*.08);
   ctx.strokeStyle='#3c392f';ctx.lineWidth=2;ctx.strokeRect(p.x+s*.08,p.y+s*.16,s*.86,s*.77);
+  }
   if(firm.underConstruction){
    const progress=Math.max(0,Math.min(1,firm.buildProgress||0));
-   ctx.fillStyle='#a78553ac';ctx.fillRect(p.x+s*.13,p.y+s*.12,s*.75,s*.72);
+   if(!originalFirm){ctx.fillStyle='#a78553ac';ctx.fillRect(p.x+s*.13,p.y+s*.12,s*.75,s*.72);}
    ctx.strokeStyle='#f7cf78';ctx.lineWidth=Math.max(2,t*.075);
    ctx.strokeRect(p.x+s*.13,p.y+s*.12,s*.75,s*.72);
    const bx=p.x+s*.13,by=p.y+s*.87,bw=s*.75,bh=Math.max(4,t*.18);
@@ -172,10 +184,21 @@ export class WorldView{
   this.label(ctx,FIRMS[firm.kind]?.label||firm.kind,p.x+s*.5,p.y+s+Math.max(7,t*.4),t);
   if(selection===firm.id){ctx.strokeStyle='#fff0a3';ctx.lineWidth=2;ctx.strokeRect(p.x-3,p.y-3,s+6,s+6);}
  }
- unitDraw(ctx,u,selection,t,groupSelected=false){
+ unitDraw(ctx,u,selection,t,groupSelected=false,now=0){
   const p=this.screen(u.x,u.y),s=Math.max(8,t*.70),nation=NATIONS[u.owner]?.color||'#aaa';
   if(p.x<-20||p.y<-20||p.x>this.canvas.width+20||p.y>this.canvas.height+20)return;
   ctx.fillStyle='#18221a80';ctx.beginPath();ctx.ellipse(p.x,p.y+t*.23,s*.35,s*.16,0,0,Math.PI*2);ctx.fill();
+  let originalUnit=false;
+  if(this.originalSprites){
+   const previous=this.spriteMotion.get(u.id);
+   const moved=!!previous&&(Math.abs(u.x-previous.x)+Math.abs(u.y-previous.y)>.0001);
+   const direction=moved?compassDirection(u.x-previous.x,u.y-previous.y,previous.dir):previous?.dir??4;
+   const lastMovedAt=moved?now:previous?.lastMovedAt??-Infinity;
+   this.spriteMotion.set(u.id,{x:u.x,y:u.y,dir:direction,lastMovedAt});
+   const moving=!this.spritePaused&&now-lastMovedAt<180;
+   originalUnit=this.originalSprites.drawUnit(ctx,u,p.x,p.y,t,direction,walkingFrame(now,moving));
+  }
+  if(!originalUnit){
   ctx.fillStyle=u.kind==='soldier'?'#b4aa8c':'#c4b18e';
   ctx.fillRect(p.x-s*.22,p.y-s*.14,s*.44,s*.47);
   ctx.fillStyle=nation;ctx.fillRect(p.x-s*.22,p.y+s*.07,s*.44,s*.23);
@@ -183,6 +206,7 @@ export class WorldView{
   if(u.kind==='soldier'){
    ctx.fillStyle='#68695f';ctx.fillRect(p.x-s*.23,p.y-s*.38,s*.46,s*.13);
    ctx.strokeStyle='#49463c';ctx.lineWidth=Math.max(1,s*.07);ctx.beginPath();ctx.moveTo(p.x+s*.28,p.y-s*.22);ctx.lineTo(p.x+s*.5,p.y+s*.29);ctx.stroke();
+  }
   }
   if(selection===u.id||groupSelected){ctx.strokeStyle='#f6e992';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(p.x,p.y+s*.18,s*.52,s*.27,0,0,Math.PI*2);ctx.stroke();}
  }
