@@ -1,3 +1,7 @@
+
+### 2026-11-06 — Collisione continua durante camminata WebGL
+- [x] La levetta ora campiona il segmento percorso dalla telecamera rispetto ai footprint solidi canonici; un frame veloce non può attraversare un edificio stretto passando da un lato all'altro. Arresto prima della prima collisione, senza modificare l'orbita né il gameplay.
+- [ ] Verificare su GPU desktop e Android landscape, in particolare scorrimento lungo le facciate e FPS; prova geometrica JS isolata 3/3, non equivale a smoke browser.
 ### 2026-11-06 — Corretto il blocco della telecamera al bordo della plancia
 Dopo feedback utente che la levetta non permetteva di camminare nel quartiere, riscontrati tre limiti del vecchio LAB: un solo cluster di 38 edifici, terreno tagliato a 1350 unità e `controls.maxTargetRadius=540` **centrato sull'origine globale** invece del quartiere a coordinate (~1320,1030). Il LAB ora avvia il giocatore nel vero incrocio Five Points e guarda lungo la strada, con 42 unità di distanza e 27 di quota; nessun limite radiale artificiale. Gli edifici dell'intera mappa 2700×2100 vengono caricati in gruppi intorno alla camera via `Core.nearbyBuildings` (fino a 120 renderizzati), rimuovendo i gruppi lasciati alle spalle con `dispose()` di geometrie/materiali propri. I dettagli vicini sono per-lotto e gestiti separatamente. Collisioni verificano sempre 454 sagome, strade/terreno estesi a tutta la plancia, selezione aggiornata. Test puri 5/5 PASS via harness JS; test browser GPU e telefono non eseguiti. Nessun asset precedente o gameplay modificato.
 
