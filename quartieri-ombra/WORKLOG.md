@@ -1,3 +1,6 @@
+### 2026-11-06 — Input thumbstick mobile LAB WebGL
+Su richiesta dell'utente, sostituito il gesto scomodo "trascina con due dita per spostarsi" con una levetta virtuale a sinistra, mobile-friendly e responsiva all'altezza reale della barra HUD. Posizione persistente con pointer capture, direzioni basate sull'orientamento orizzontale della telecamera, zona morta e velocità analogica, movimenti simultanei con OrbitControls sul canvas. Lo spostamento avviene su camera+target, senza cambiare quota; a valle resta attiva la protezione da edifici della PR #83. Le cinque verifiche matematiche/funzionali JS del nuovo helper sono state eseguite (5/5 PASS), controllo sintattico renderer PASS. Niente prova GPU/Android fisico ancora: verificare manualmente in landscape la levetta e i controlli, in particolare vista 255°. Altri giochi e asset intatti.
+
 ### 2026-11-06 — Camera WebGL: collisioni su main corrente
 Ramo `agent/qo-webgl-camera-clearance-robust-1106`: aggiunta collisione contro volumi di lotti canonici dopo orbita, pan, zoom e preset. Cinque casi geometrici eseguiti con V8 (5/5 PASS), test Node persistente creato ma non eseguito in Node. Nessuna prova GPU desktop/Android; nessun screenshot. PR #78 e #80 hanno implementazioni alternative in conflitto: non integrate. Solo quartieri-ombra/.
 
