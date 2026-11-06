@@ -1,3 +1,10 @@
+### 2026-11-06 — LAB WebGL: joystick di movimento basso-sinistra (richiesta utente)
+- [x] Levetta overlay touch nel LAB WebGL in basso a sinistra, sempre sopra l'HUD adattivo: il pollice sinistro sposta la telecamera + target nel piano delle strade, mentre un dito sul canvas continua a ruotare la visuale.
+- [x] Movimento relativo alla direzione corrente (incluse viste a 255°), velocità proporzionale alla pressione, zona morta, clamp circolare e limiti delta-time; reset immediato al rilascio, perdita focus, visibilità o perdita del contesto grafico.
+- [x] Preservati pinch zoom, raycast selezione, OrbitControls, rotazione, quote e collisioni 3D della PR #83; il movimento si applica prima della protezione dalle collisioni.
+- [x] Eseguiti in harness JavaScript i 5 test dedicati (5/5 PASS), oltre al parsing del renderer; test persistente `tests/street-webgl-joystick.test.cjs`.
+- [ ] Verifica browser Android landscape reale: levetta + rotazione simultanea, pannello HUD su vari schermi, collisioni ravvicinate e prestazioni. Il LAB rimane sperimentale.
+
 ### 2026-11-06 — P0 WebGL camera collision (branch aggiornato)
 - [x] Resolver volumetrico su footprint canonici e tetti; controllo dopo OrbitControls e preset, senza asset legacy o gameplay.
 - [x] Cinque casi geometrici eseguiti nel runtime V8: 5/5 PASS; test Node permanente aggiunto, esecuzione Node ancora da fare.
