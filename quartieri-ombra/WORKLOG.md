@@ -1,3 +1,6 @@
+### 2026-11-06 — WebGL camera clearance
+Aggiunti `pointInPolygon` e `cameraClearance` nel core, applicazione nel render loop e test `tests/street-webgl-clearance.test.cjs`. Eseguito smoke effettivo sul modulo GitHub tramite runtime JavaScript V8: punto interno rilevato, camera spostata fuori dal footprint, camera sopra tetto invariata. Non eseguito Node/browser Android in questo run; non sono disponibili screenshot reali. Branch `agent/qo-webgl-camera-clearance-1106`; PR in preparazione. Nessun asset legacy o gameplay modificato.
+
 ### 2026-11-06 — Implementazione LAB WebGL a quota lampione
 Aggiunta scena sperimentale Three.js r187 da import map CDN (MIT) in `street-webgl.html`, con `street-webgl-core.js` che legge esattamente `QOBoardWorld` per i lotti Cross Street [2,3,4,9,10,11]. Render di 38 edifici reali, superfici a base di quadrilateri tridimensionali, profondità WebGL, tetti, facciate, vetri stilizzati, ingressi e strade reali; camera iniziale 27 unità, touch orbit/pinch/pan, slider di quota/distanza, test 255° e selezione mediante raycast. Non è più necessario gestire la profondità con ordinamento SVG fisso. Nuovo link LAB 3D nella plancia; LAB SVG precedente conservato.
 
