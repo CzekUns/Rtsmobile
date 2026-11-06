@@ -293,16 +293,32 @@ function resize(){
 }
 window.addEventListener("resize",resize);
 resize();updateHUD();window.__qoWebGLReady=true;
-let stopped=false;
+let stopped=false,frameRequested=false;
+function requestFrame(){
+ if(stopped||frameRequested)return;
+ frameRequested=true;
+ requestAnimationFrame(frame);
+}
 renderer.domElement.addEventListener("webglcontextlost",event=>{
- event.preventDefault();stopped=true;status.textContent="Contesto grafico perso. Ricarica la pagina per riavviare il LAB WebGL.";
+ event.preventDefault();
+ stopped=true;
+ status.textContent="Contesto WebGL perso: rendering sospeso, attendo il ripristino grafico…";
+});
+renderer.domElement.addEventListener("webglcontextrestored",()=>{
+ stopped=false;
+ lastUiState="";
+ status.textContent="Contesto WebGL ripristinato: ripresa del rendering.";
+ resize();
+ requestFrame();
 });
 function frame(){
+ frameRequested=false;
  if(stopped)return;
- requestAnimationFrame(frame);
- if(document.hidden)return;
- controls.update();
- renderer.render(scene,camera);
- updateHUD();
+ if(!document.hidden){
+  controls.update();
+  renderer.render(scene,camera);
+  updateHUD();
+ }
+ requestFrame();
 }
-frame();
+requestFrame();
