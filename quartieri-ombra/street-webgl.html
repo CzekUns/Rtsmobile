@@ -49,8 +49,8 @@ footer{gap:6px;padding-left:8px;padding-right:8px}button,a{padding:7px 8px}#hint
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/"}}
 </script>
 <script src="./board-world.js?v=20261106-webgl1" defer></script>
-<script src="./street-webgl-core.js?v=20261106-stick1" defer></script>
-<script type="module" src="./street-webgl.js?v=20261106-stick1"></script>
+<script src="./street-webgl-core.js?v=20261106-walk2" defer></script>
+<script type="module" src="./street-webgl.js?v=20261106-walk2"></script>
 <script>
 window.addEventListener("error",function(e){const s=document.getElementById("status");if(s&&!window.__qoWebGLReady)s.textContent="Avvio WebGL non riuscito: "+(e.message||"controlla la connessione")});
 window.addEventListener("unhandledrejection",function(e){const s=document.getElementById("status");if(s)s.textContent="Errore WebGL: "+String(e.reason?.message||e.reason||"risorsa non disponibile")});
@@ -62,18 +62,18 @@ window.addEventListener("load",function(){setTimeout(function(){if(!window.__qoW
 <div id="move-stick" role="group" aria-label="Levetta di movimento: trascina verso la direzione in cui vuoi spostarti" tabindex="0">
  <span id="move-stick-thumb" aria-hidden="true">✦</span><span id="stick-caption" aria-hidden="true">MUOVITI</span>
 </div>
-<header><h1>QUARTIERI D'OMBRA · WEBGL</h1><small>NEW YORK 1860 · LABORATORIO QUOTA LAMPIONE</small></header>
+<header><h1>QUARTIERI D'OMBRA · WEBGL</h1><small>NEW YORK 1860 · ESPLORAZIONE DEI NOVE SETTORI</small></header>
 <div id="status" role="status" aria-live="polite">Avvio del rendering tridimensionale…</div>
 <aside id="selected"><strong id="selected-title">Cross Street</strong><small id="selected-text">Tocca una facciata per selezionare un edificio.</small></aside>
 <footer id="webgl-controls">
 <button id="turn90" type="button">Ruota +90°</button>
 <button id="test255" type="button">Prova 255°</button>
 <label>Quota <input id="height" type="range" min="12" max="110" step="1" value="27" aria-label="Altezza della telecamera"><output id="height-value">27</output></label>
-<label>Zoom <input id="distance" type="range" min="65" max="480" step="1" value="225" aria-label="Distanza della telecamera"><output id="distance-value">225</output></label>
+<label>Zoom <input id="distance" type="range" min="16" max="480" step="1" value="42" aria-label="Distanza della telecamera"><output id="distance-value">42</output></label>
 <button id="details" type="button" aria-pressed="true">Dettagli: sì</button>
 <button id="reset" type="button">Ripristina</button>
 <a href="./street-vector-camera.html">LAB SVG</a>
 <a href="./board-preview.html">Plancia</a>
-<span id="hint">Levetta sinistra: sposta · Trascina a destra: ruota · Pizzica: zoom · Tocca: seleziona</span>
+<span id="hint">Levetta: percorri le strade · Dito destro: guarda · Pizzica: zoom · Tocca: seleziona</span>
 </footer>
 </body></html>
