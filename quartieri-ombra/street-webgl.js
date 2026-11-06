@@ -215,6 +215,56 @@ function setCamera(azimuth,height,dist){
 }
 setCamera(45*Math.PI/180,27,225);
 const heightEl=$("height"),distanceEl=$("distance");
+// Left thumbstick is deliberately outside the WebGL canvas: OrbitControls
+// continues to own one-finger orbit, while movement owns a separate pointer.
+const stickEl=$("move-stick"),stickThumb=$("move-stick-thumb");
+let stickPointerId=null,stickAxes={x:0,y:0};
+function stickReset(){
+ stickPointerId=null;stickAxes={x:0,y:0};
+ stickThumb.style.transform="translate(0px, 0px)";
+ stickEl.classList.remove("active");
+}
+function updateStick(e){
+ const rect=stickEl.getBoundingClientRect();
+ const radius=Math.min(rect.width,rect.height)*.32;
+ stickAxes=Core.joystickAxes(e.clientX-rect.left-rect.width/2,
+  rect.top+rect.height/2-e.clientY,radius);
+ stickThumb.style.transform=`translate(${Math.round(stickAxes.x*radius)}px,${Math.round(-stickAxes.y*radius)}px)`;
+}
+stickEl.addEventListener("pointerdown",e=>{
+ if(stickPointerId!==null||e.button!==0)return;
+ e.preventDefault();e.stopPropagation();
+ stickPointerId=e.pointerId;stickEl.setPointerCapture(e.pointerId);
+ stickEl.classList.add("active");updateStick(e);
+});
+stickEl.addEventListener("pointermove",e=>{
+ if(e.pointerId!==stickPointerId)return;
+ e.preventDefault();updateStick(e);
+});
+function stopStick(e){
+ if(e.pointerId!==stickPointerId)return;
+ e.preventDefault();stickReset();
+ if(stickEl.hasPointerCapture(e.pointerId))stickEl.releasePointerCapture(e.pointerId);
+}
+for(const name of ["pointerup","pointercancel","lostpointercapture"])
+ stickEl.addEventListener(name,stopStick);
+window.addEventListener("blur",stickReset);
+document.addEventListener("visibilitychange",()=>{if(document.hidden)stickReset()});
+// Optional keyboard equivalent for desktop QA; does not affect inputs or OrbitControls.
+stickEl.addEventListener("keydown",e=>{
+ const directions={ArrowUp:[0,1],ArrowDown:[0,-1],ArrowLeft:[-1,0],ArrowRight:[1,0]};
+ if(!directions[e.key])return;
+ e.preventDefault();stickAxes={x:directions[e.key][0],y:directions[e.key][1]};
+ stickThumb.style.transform=`translate(${stickAxes.x*34}px,${-stickAxes.y*34}px)`;
+});
+stickEl.addEventListener("keyup",e=>{if(e.key.startsWith("Arrow"))stickReset()});
+function stepStickMovement(seconds){
+ if(!stickAxes.x&&!stickAxes.y)return;
+ const offset=camera.position.clone().sub(controls.target);
+ const movement=Core.joystickDisplacement({x:offset.x,z:offset.z},stickAxes,88,seconds);
+ camera.position.x+=movement.x;camera.position.z+=movement.z;
+ controls.target.x+=movement.x;controls.target.z+=movement.z;
+}
 let lastUiState="";
 function updateHUD(){
  const delta=camera.position.clone().sub(controls.target);
@@ -295,10 +345,13 @@ function resize(){
  const w=Math.max(1,host.clientWidth),h=Math.max(1,host.clientHeight);
  camera.aspect=w/h;camera.updateProjectionMatrix();
  renderer.setSize(w,h,false);
+ document.documentElement.style.setProperty("--webgl-hud-height",
+  Math.ceil($("webgl-controls").getBoundingClientRect().height)+"px");
 }
 window.addEventListener("resize",resize);
+if(typeof ResizeObserver!=="undefined")new ResizeObserver(resize).observe($("webgl-controls"));
 resize();updateHUD();window.__qoWebGLReady=true;
-let stopped=false,frameRequested=false;
+let stopped=false,frameRequested=false,lastFrameTime=null;
 function requestFrame(){
  if(stopped||frameRequested)return;
  frameRequested=true;
@@ -306,21 +359,24 @@ function requestFrame(){
 }
 renderer.domElement.addEventListener("webglcontextlost",event=>{
  event.preventDefault();
- stopped=true;
+ stopped=true;lastFrameTime=null;stickReset();
  status.textContent="Contesto WebGL perso: rendering sospeso, attendo il ripristino grafico…";
 });
 renderer.domElement.addEventListener("webglcontextrestored",()=>{
- stopped=false;
+ stopped=false;lastFrameTime=null;
  lastUiState="";
  status.textContent="Contesto WebGL ripristinato: ripresa del rendering.";
  resize();
  requestFrame();
 });
-function frame(){
+function frame(now){
  frameRequested=false;
  if(stopped)return;
+ const delta=lastFrameTime===null?0:Math.max(0,Math.min(.05,(now-lastFrameTime)/1000));
+ lastFrameTime=now;
  if(!document.hidden){
   controls.update();
+  stepStickMovement(delta);
   keepCameraOutside();
   renderer.render(scene,camera);
   updateHUD();
