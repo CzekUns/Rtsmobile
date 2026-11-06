@@ -1,3 +1,7 @@
+## Comandi touch aggiornati — LAB WebGL (6 novembre 2026)
+
+Nella pagina [street-webgl.html](street-webgl.html) una nuova **levetta analogica in basso a sinistra** sposta la telecamera e il punto osservato lungo le strade; il movimento è relativo alla direzione dello sguardo, non agli assi globali. Il joystick è indipendente dal canvas: usa il pollice sinistro per camminare nella mappa e un dito sulla parte destra dello schermo per ruotare. Pizzica sul canvas per lo zoom, oppure usa i cursori Quota e Zoom. Il joystick include zona morta, movimento proporzionale, cattura del puntatore e stop al rilascio. Il suo bordo inferiore segue l'altezza effettiva dell'HUD, anche quando i comandi vanno a capo. Il tasto 255° resta disponibile. I palazzi e la logica di gioco non sono stati modificati; mobile Android reale ancora da verificare.
+
 ## LAB WEBGL — camera ad altezza lampione (6 novembre 2026)
 
 Nuova prova autonoma: [street-webgl.html](street-webgl.html). Il motore del gioco pubblicato non viene sostituito e gli asset ImageGen/SVG precedenti rimangono conservati. Il LAB WebGL usa **Three.js r187 (MIT, caricato con import map CDN bloccata a 0.187.0)** e il modello reale di `QOBoardWorld.generate(1860)`. I sei edifici di Cross Street hanno geometria esplicita da quattro vertici a terra e altezze reali; fino a 32 palazzi confinanti assicurano un test di occlusione realistico.
