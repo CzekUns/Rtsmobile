@@ -23,7 +23,7 @@ test("WebGL mode uses GPU depth, actual 3D roofs, raycasting, and no painter sor
  assert.match(js,/new THREE\.PerspectiveCamera/);
  assert.match(js,/new OrbitControls\(camera,renderer\.domElement\)/);
  assert.match(js,/const raycaster=new THREE\.Raycaster/);
- assert.match(js,/const top=b\.poly\.map\(p=>p3\(p,b\.z\)\)/);
+ assert.match(js,/top=b\.poly\.map\(p=>p3\(p,b\.z\)\)/);
  assert.match(js,/scene\.add\(container\)/);
  assert.match(js,/viewAt\(255\)/);
  assert.doesNotMatch(js,/drawable\.sort|faces\.sort/);
