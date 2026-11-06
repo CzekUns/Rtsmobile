@@ -45,6 +45,24 @@ export function terrain(seed,x,y){
 export function range(a,b){return Math.hypot((a.x||0)-(b.x||0),(a.y||0)-(b.y||0));}
 let nextId=1;
 function entity(prefix,p){return {id:prefix+(nextId++),...p};}
+// The HTML skirmish includes two visible Norman defenders, not AI combat.
+// On old saves, add them once without resetting progress or changing ownership.
+const NORMAN_SCOUT_SPOTS=[[48,33],[52,34],[48,32],[52,32],[47,34],[51,32]];
+function ensureNormanScoutDemo(game){
+ if(game.normanScoutDemoInitialized)return;
+ let needed=game.units.some(u=>u.owner===2&&u.kind==='soldier')?0:2;
+ for(const [x,y] of NORMAN_SCOUT_SPOTS){
+  if(needed<=0)break;
+  if(game.occupied(x,y,1)||terrain(game.seed,x,y)==='water'||
+    game.units.some(u=>Math.abs(u.x-x)<.7&&Math.abs(u.y-y)<.7))continue;
+  const unit=entity('u',{owner:2,x,y,kind:'soldier',hp:100,level:1,
+   target:null,route:[],training:40,personId:null,culture:'Normanni',
+   raceId:'norman',skillId:0,skillLevel:0,combatLevel:40});
+  unit.personId=unit.id;
+  game.units.push(unit);needed--;
+ }
+ game.normanScoutDemoInitialized=true;
+}
 export class SevenGame{
  constructor(seed=73429){
   this.version=1;this.seed=seed;this.day=1;this.elapsed=0;
@@ -53,6 +71,7 @@ export class SevenGame{
   this.events=[];this.towns=[];this.firms=[];this.units=[];
   this.constructionSites=[];this.nextConstructionId=0;
   this.createSkirmish();
+  ensureNormanScoutDemo(this);
   for(const firm of this.firms)ensureFirmPersonnel(firm);
  }
  static load(key=SAVE_KEY){
@@ -80,6 +99,7 @@ export class SevenGame{
    }
    const all=[...g.towns,...g.firms,...g.units];
    nextId=Math.max(1,...all.map(o=>Number(String(o.id).slice(1))||0))+1;
+   ensureNormanScoutDemo(g);
    return g;
   }catch(_){return null;}
  }
