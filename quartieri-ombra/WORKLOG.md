@@ -342,3 +342,6 @@ Commit `108a1175`: normalized six ImageGen building sprites at runtime by scanni
 
 ### 2026-11-05 — passata raster su suolo e strade
 Commit `f7de871c`: `board-preview.js` carica `terrain_mud.png` e `terrain_cobbles.png` come texture raster, applica pattern con clipping sui poligoni della plancia e delle carreggiate. Fallback vettoriale preservato se caricamento fallisce. Nessun file gameplay modificato. **Non eseguiti** screenshot browser/Android né suite Node in questa esecuzione; resta da verificare continuità e prestazioni, e da convertire in WebP runtime.
+
+### 2026-11-06 — WebGL camera wall clearance (branch agent/qo-camera-clearance-20261106)
+- Fixed wall-near camera clipping using polygon winding and closest boundary, including exterior and corner clearance. Added tests/street-webgl-clearance.test.cjs. Four executable V8 geometry cases passed in connector runtime; fifth case in committed Node test not executed here. Browser screenshots, Android, FPS, 255° remain unverified. PR pending; no gameplay or asset changes.
