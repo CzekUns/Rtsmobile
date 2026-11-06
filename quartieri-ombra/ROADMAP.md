@@ -1,3 +1,7 @@
+### 2026-11-06 — P0 WebGL: ripristino contesto GPU su main aggiornato
+- [x] Gestione `webglcontextrestored`, ripresa del loop RAF con deduplicazione e resize; test simulato V8 eseguito (boot, loss, recovery, resume). Nessuna modifica a gameplay o asset.
+- [ ] Verifica GPU reale desktop/Android e screenshot rotazioni 255° ancora obbligatori.
+
 ### 2026-11-06 — WebGL P0: picking touch protetto (PR in revisione)
 - [x] Tracciamento `pointerId` e classificazione tap: il secondo dito, pinch, drag e click destro non selezionano accidentalmente edifici; selezione consentita soltanto al rilascio dello stesso puntatore.
 - [x] Cinque casi JS puri eseguiti con esito positivo; test Node permanente aggiunto in `tests/street-webgl-pointer.test.cjs` (non eseguito in Node in questo ambiente).
