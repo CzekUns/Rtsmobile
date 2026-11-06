@@ -11,7 +11,8 @@ const listeners={},frames=[],status={textContent:""},renderer={
 };
 const sandbox={
  renderer,status,lastUiState:"ready",resize:()=>{sandbox.resizes++},resizes:0,
- controls:{update:()=>{}},scene:{},camera:{},updateHUD:()=>{},\n stickReset:()=>{},stepStickMovement:()=>{},keepCameraOutside:()=>{},updateVisibleCity:()=>{},
+ controls:{update:()=>{}},scene:{},camera:{},updateHUD:()=>{},
+ stickReset:()=>{},stepStickMovement:()=>{},keepCameraOutside:()=>{},updateVisibleCity:()=>{},
  document:{hidden:false},requestAnimationFrame:fn=>{frames.push(fn)}
 };
 vm.runInNewContext(tail,sandbox);
