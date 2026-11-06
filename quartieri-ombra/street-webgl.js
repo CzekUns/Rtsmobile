@@ -247,13 +247,19 @@ controls.enableDamping=true;controls.dampingFactor=.085;
 controls.enablePan=true;
 controls.screenSpacePanning=false;
 controls.panSpeed=.7;
-controls.maxTargetRadius=540;
-controls.minDistance=65;controls.maxDistance=540;
-controls.minPolarAngle=.72;controls.maxPolarAngle=1.56;
+// The previous 540-unit clamp was relative to world (0,0), not Cross Street,
+ // and prevented travel through the 2700×2100 map.
+controls.maxTargetRadius=Infinity;
+controls.minDistance=16;controls.maxDistance=540;
+controls.minPolarAngle=1.08;controls.maxPolarAngle=1.56;
 controls.rotateSpeed=.62;controls.zoomSpeed=.9;
 function keepCameraOutside(){
- const safe=Core.resolveCameraCollision(camera.position,cluster.buildings,3);
+ const safe=Core.resolveCameraCollision(camera.position,data.buildings,3);
+ // If the eye touches a wall, move the look-at point with the eye to avoid
+ // jerking the camera orientation or restoring the blocked offset next frame.
+ const dx=safe.x-camera.position.x,dz=safe.z-camera.position.z;
  camera.position.set(safe.x,safe.y,safe.z);
+ controls.target.x+=dx;controls.target.z+=dz;
 }
 function setCamera(azimuth,height,dist){
  const p=Core.cameraPoint({x:controls.target.x,z:controls.target.z},azimuth,height,dist);
@@ -262,7 +268,8 @@ function setCamera(azimuth,height,dist){
  controls.update();
  keepCameraOutside();
 }
-setCamera(45*Math.PI/180,27,225);
+camera.position.set(START.eye.x,START.eye.y,START.eye.z);
+camera.lookAt(TARGET);controls.update();keepCameraOutside();
 const heightEl=$("height"),distanceEl=$("distance");
 // Left thumbstick is deliberately outside the WebGL canvas: OrbitControls
 // continues to own one-finger orbit, while movement owns a separate pointer.
@@ -310,9 +317,14 @@ stickEl.addEventListener("keyup",e=>{if(e.key.startsWith("Arrow"))stickReset()})
 function stepStickMovement(seconds){
  if(!stickAxes.x&&!stickAxes.y)return;
  const offset=camera.position.clone().sub(controls.target);
- const movement=Core.joystickDisplacement({x:offset.x,z:offset.z},stickAxes,88,seconds);
- camera.position.x+=movement.x;camera.position.z+=movement.z;
- controls.target.x+=movement.x;controls.target.z+=movement.z;
+ const movement=Core.joystickDisplacement({x:offset.x,z:offset.z},stickAxes,112,seconds);
+ const destination=Core.clampToWorld({
+  x:camera.position.x+movement.x,y:camera.position.y,z:camera.position.z+movement.z
+ },data,18);
+ const next=Core.resolveCameraCollision(destination,data.buildings,3);
+ const dx=next.x-camera.position.x,dz=next.z-camera.position.z;
+ camera.position.x=next.x;camera.position.z=next.z;
+ controls.target.x+=dx;controls.target.z+=dz;
 }
 let lastUiState="";
 function updateHUD(){
@@ -320,7 +332,9 @@ function updateHUD(){
  const angle=Math.round(Core.angleDeg(Math.atan2(delta.x,delta.z)));
  const altitude=Math.round(camera.position.y);
  const horizontal=Math.round(Math.hypot(delta.x,delta.z));
- const next=`${angle}° · quota ${altitude} · distanza ${horizontal} · ${cluster.buildings.length} edifici WebGL · depth buffer attivo`;
+ const sectorX=Math.min(3,Math.max(1,Math.ceil(camera.position.x/(data.width/3))));
+ const sectorZ=Math.min(3,Math.max(1,Math.ceil(camera.position.z/(data.height/3))));
+ const next=`${angle}° · quota ${altitude} · settore ${sectorX}×${sectorZ} · ${renderedBuildings.size}/${data.buildings.length} edifici visibili`;
  if(next!==lastUiState){status.textContent=next;lastUiState=next}
  heightEl.value=String(Core.clamp(altitude,+heightEl.min,+heightEl.max));
  distanceEl.value=String(Core.clamp(horizontal,+distanceEl.min,+distanceEl.max));
@@ -339,8 +353,10 @@ $("turn90").addEventListener("click",()=>{
 });
 $("test255").addEventListener("click",()=>viewAt(255));
 $("reset").addEventListener("click",()=>{
- controls.target.copy(TARGET);setCamera(Math.PI/4,27,225);
- chooseBuilding(null);updateHUD();
+ controls.target.copy(TARGET);
+ camera.position.set(START.eye.x,START.eye.y,START.eye.z);
+ camera.lookAt(TARGET);controls.update();keepCameraOutside();
+ updateVisibleCity(true);chooseBuilding(null);updateHUD();
 });
 heightEl.addEventListener("input",()=>{
  const d=camera.position.clone().sub(controls.target);
@@ -399,7 +415,7 @@ function resize(){
 }
 window.addEventListener("resize",resize);
 if(typeof ResizeObserver!=="undefined")new ResizeObserver(resize).observe($("webgl-controls"));
-resize();updateHUD();window.__qoWebGLReady=true;
+resize();updateVisibleCity(true);updateHUD();window.__qoWebGLReady=true;
 let stopped=false,frameRequested=false,lastFrameTime=null;
 function requestFrame(){
  if(stopped||frameRequested)return;
@@ -427,6 +443,7 @@ function frame(now){
   controls.update();
   stepStickMovement(delta);
   keepCameraOutside();
+  updateVisibleCity();
   renderer.render(scene,camera);
   updateHUD();
  }
