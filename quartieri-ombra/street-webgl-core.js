@@ -41,6 +41,43 @@ function cameraPoint(target,azimuth,height,distance){
  return{x:target.x+Math.sin(azimuth)*distance,y:height,
   z:target.z+Math.cos(azimuth)*distance};
 }
+// Keep the eye outside solid occupied volumes while allowing views over roofs.
+// This operates on canonical lot polygons, not approximate bounding boxes.
+function pointInsidePolygon(p,poly){
+ let inside=false;
+ for(let i=0,j=poly.length-1;i<poly.length;j=i++){
+  const a=poly[i],b=poly[j];
+  if((a.y>p.z)!==(b.y>p.z)&&p.x<(b.x-a.x)*(p.z-a.y)/(b.y-a.y)+a.x)inside=!inside;
+ }
+ return inside;
+}
+function resolveCameraCollision(position,buildings,clearance=3){
+ const p={x:position.x,y:position.y,z:position.z};
+ for(let pass=0;pass<6;pass++){
+  let changed=false;
+  for(const b of buildings){
+   if(p.y>b.z+clearance||!pointInsidePolygon(p,b.poly))continue;
+   let best=null;
+   for(let i=0;i<b.poly.length;i++){
+    const a=b.poly[i],c=b.poly[(i+1)%b.poly.length];
+    const dx=c.x-a.x,dz=c.y-a.y,len2=dx*dx+dz*dz||1;
+    const t=clamp(((p.x-a.x)*dx+(p.z-a.y)*dz)/len2,0,1);
+    const qx=a.x+t*dx,qz=a.y+t*dz,d=Math.hypot(p.x-qx,p.z-qz);
+    if(!best||d<best.d)best={qx,qz,d,dx,dz};
+   }
+   if(!best)continue;
+   const cx=b.poly.reduce((n,v)=>n+v.x,0)/b.poly.length;
+   const cz=b.poly.reduce((n,v)=>n+v.y,0)/b.poly.length;
+   let nx=best.qx-cx,nz=best.qz-cz,mag=Math.hypot(nx,nz);
+   if(mag<1e-6){nx=-best.dz;nz=best.dx;mag=Math.hypot(nx,nz)||1}
+   p.x=best.qx+nx/mag*clearance;
+   p.z=best.qz+nz/mag*clearance;
+   changed=true;
+  }
+  if(!changed)break;
+ }
+ return p;
+}
 function evaluateGeometry(buildings){
  let vertices=0;
  for(const b of buildings){
@@ -50,7 +87,7 @@ function evaluateGeometry(buildings){
  }
  return{buildings:buildings.length,vertices};
 }
-return{PILOT_IDS,clamp,angleDeg,center,segmentDistance,doorEdgeIndex,cluster,cameraPoint,evaluateGeometry};
+return{PILOT_IDS,clamp,angleDeg,center,segmentDistance,doorEdgeIndex,cluster,cameraPoint,evaluateGeometry,pointInsidePolygon,resolveCameraCollision};
 })();
 if(typeof window!=="undefined")window.QOStreetWebGLCore=QOStreetWebGLCore;
 if(typeof module!=="undefined"&&module.exports)module.exports=QOStreetWebGLCore;
