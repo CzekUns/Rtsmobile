@@ -3,8 +3,8 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 const path=require("node:path");
 const source=fs.readFileSync(path.join(__dirname,"..","street-webgl.js"),"utf8");
-const tail=source.slice(source.indexOf("let stopped=false,frameRequested=false;"));
-assert.ok(tail.startsWith("let stopped=false,frameRequested=false;"),"RAF lifecycle found");
+const tail=source.slice(source.indexOf("let stopped=false,frameRequested=false,lastFrameTime=null;"));
+assert.ok(tail.startsWith("let stopped=false,frameRequested=false,lastFrameTime=null;"),"RAF lifecycle found");
 const listeners={},frames=[],status={textContent:""},renderer={
  domElement:{addEventListener:(name,fn)=>{listeners[name]=fn}},
  render:()=>{renderer.renders++},renders:0
@@ -12,6 +12,7 @@ const listeners={},frames=[],status={textContent:""},renderer={
 const sandbox={
  renderer,status,lastUiState:"ready",resize:()=>{sandbox.resizes++},resizes:0,
  controls:{update:()=>{}},scene:{},camera:{},updateHUD:()=>{},
+ stickReset:()=>{},stepStickMovement:()=>{},keepCameraOutside:()=>{},updateVisibleCity:()=>{},
  document:{hidden:false},requestAnimationFrame:fn=>{frames.push(fn)}
 };
 vm.runInNewContext(tail,sandbox);
