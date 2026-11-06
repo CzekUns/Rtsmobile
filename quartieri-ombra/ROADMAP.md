@@ -1,3 +1,6 @@
+### 2026-11-06 · Streaming geometrico WebGL (PR #94)
+Correzione proposta: distanza dagli spigoli del footprint reale per evitare scomparsa dei palazzi lunghi. Quattro controlli V8 superati; test Node aggiunto ma non eseguito. PR #92 sovrapposta: riconciliare prima del merge. Rendering desktop/Android e deploy non verificati. Demo main: https://czekuns.github.io/Rtsmobile/quartieri-ombra/street-webgl.html (non contiene ancora PR #94). Priorità: consolidamento PR e test GPU reale.
+
 ### 2026-11-06 — Navigazione reale dentro la plancia, non soltanto orbita sul margine (feedback utente)
 - [x] Diagnosi: LAB WebGL visualizzava soltanto 38 palazzi attorno al gruppo Cross Street, terreno 1350×1350 e strade entro 660 unità; OrbitControls imponeva `maxTargetRadius=540` attorno all'origine (0,0), bloccando la camera lontano dalla mappa 2700×2100.
 - [x] Rimossa la restrizione radiale; ingresso della telecamera al vero crocevia `world.hub` a quota lampione, orientato lungo Cross Street, vista ravvicinata.
