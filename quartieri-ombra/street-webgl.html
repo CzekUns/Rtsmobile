@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#191612">
+<title>Quartieri d'Ombra — LAB WebGL a quota lampione</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,-apple-system,sans-serif;background:#181510;color:#f2dec1}
+*{box-sizing:border-box}body{margin:0;overflow:hidden;height:100dvh}
+#viewport{position:fixed;inset:0;background:linear-gradient(#424b50,#756951 70%,#554437);touch-action:none}
+#viewport canvas{display:block;width:100%;height:100%}
+header{position:fixed;z-index:3;left:0;right:0;top:0;padding:calc(8px + env(safe-area-inset-top)) 14px 17px;background:linear-gradient(#181510ed,#18151000);pointer-events:none}
+h1{margin:0;font:700 18px Georgia,serif;letter-spacing:.04em;color:#f1d5a4}
+header small{font-size:11px;color:#d7b78d;letter-spacing:.08em}
+#status{position:fixed;top:calc(61px + env(safe-area-inset-top));left:14px;z-index:3;max-width:min(80vw,410px);border:1px solid #95734e;background:#211a15e8;padding:8px 11px;border-radius:5px;font-size:12px;line-height:1.4;pointer-events:none}
+#selected{position:fixed;bottom:calc(119px + env(safe-area-inset-bottom));left:14px;z-index:2;padding:10px 13px;background:#1c1712e3;border:1px solid #806346;border-radius:5px;max-width:310px}
+#selected strong{font:700 15px Georgia,serif;color:#f3d5a5}
+#selected small{display:block;margin-top:4px;color:#c6af90;font-size:11px}
+footer{position:fixed;bottom:0;left:0;right:0;z-index:4;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:#201a16ed;border-top:1px solid #856744;display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+button,a{background:#51402e;color:#ffe4b6;border:1px solid #ad8453;border-radius:6px;padding:8px 10px;text-decoration:none;font:600 12px system-ui,sans-serif;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #eac38d;outline-offset:2px}
+label{display:flex;gap:5px;align-items:center;font-size:11px;white-space:nowrap}
+input[type=range]{max-width:108px;accent-color:#e4b576}
+output{min-width:22px;text-align:right;font-variant-numeric:tabular-nums}
+#hint{font-size:11px;color:#c0a587}
+@media(max-width:640px){header h1{font-size:15px}#selected{bottom:calc(154px + env(safe-area-inset-bottom));padding:7px 10px}
+footer{gap:6px;padding-left:8px;padding-right:8px}button,a{padding:7px 8px}#hint{flex-basis:100%;text-align:center}}
+@media(max-height:480px){#selected{bottom:85px}#status{top:54px;max-width:240px}#hint{display:none}footer{padding-top:6px;padding-bottom:calc(6px + env(safe-area-inset-bottom))}}
+</style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/"}}
+</script>
+<script src="./board-world.js?v=20261106-webgl1" defer></script>
+<script src="./street-webgl-core.js?v=20261106-webgl1" defer></script>
+<script type="module" src="./street-webgl.js?v=20261106-webgl1"></script>
+<script>
+window.addEventListener("error",function(e){const s=document.getElementById("status");if(s&&!window.__qoWebGLReady)s.textContent="Avvio WebGL non riuscito: "+(e.message||"controlla la connessione")});
+window.addEventListener("unhandledrejection",function(e){const s=document.getElementById("status");if(s)s.textContent="Errore WebGL: "+String(e.reason?.message||e.reason||"risorsa non disponibile")});
+window.addEventListener("load",function(){setTimeout(function(){if(!window.__qoWebGLReady){const s=document.getElementById("status");if(s&&s.textContent.includes("Avvio"))s.textContent="Impossibile avviare WebGL. Verifica connessione, browser e supporto WebGL2."}},9000)});
+</script>
+</head>
+<body>
+<div id="viewport" role="application" aria-label="Five Points — telecamera stradale WebGL con rotazione e zoom"></div>
+<header><h1>QUARTIERI D'OMBRA · WEBGL</h1><small>NEW YORK 1860 · LABORATORIO QUOTA LAMPIONE</small></header>
+<div id="status" role="status" aria-live="polite">Avvio del rendering tridimensionale…</div>
+<aside id="selected"><strong id="selected-title">Cross Street</strong><small id="selected-text">Tocca una facciata per selezionare un edificio.</small></aside>
+<footer>
+<button id="turn90" type="button">Ruota +90°</button>
+<button id="test255" type="button">Prova 255°</button>
+<label>Quota <input id="height" type="range" min="12" max="110" step="1" value="27" aria-label="Altezza della telecamera"><output id="height-value">27</output></label>
+<label>Zoom <input id="distance" type="range" min="65" max="480" step="1" value="225" aria-label="Distanza della telecamera"><output id="distance-value">225</output></label>
+<button id="details" type="button" aria-pressed="true">Dettagli: sì</button>
+<button id="reset" type="button">Ripristina</button>
+<a href="./street-vector-camera.html">LAB SVG</a>
+<a href="./board-preview.html">Plancia</a>
+<span id="hint">Trascina: ruota · Due dita: zoom/sposta · Tocca: seleziona</span>
+</footer>
+</body></html>

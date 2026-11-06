@@ -1,3 +1,15 @@
+## LAB WEBGL — camera ad altezza lampione (6 novembre 2026)
+
+Nuova prova autonoma: [street-webgl.html](street-webgl.html). Il motore del gioco pubblicato non viene sostituito e gli asset ImageGen/SVG precedenti rimangono conservati. Il LAB WebGL usa **Three.js r187 (MIT, caricato con import map CDN bloccata a 0.187.0)** e il modello reale di `QOBoardWorld.generate(1860)`. I sei edifici di Cross Street hanno geometria esplicita da quattro vertici a terra e altezze reali; fino a 32 palazzi confinanti assicurano un test di occlusione realistico.
+
+- La profondità usa il **depth buffer WebGL**, non il painter sorting dell'esperimento SVG: 255° non richiede un riordinamento manuale delle facciate.
+- Telecamera prospettica quasi stradale (quota iniziale 27), drag per orbita, due dita/rotella per zoom, due dita/pulsante destro per spostarsi, slider quota/distanza, pulsanti +90° e **255°**.
+- Raycasting di pareti/tetti per selezionare i lotti esatti; selezione evidenziata. Dettagli geometrici semplificati (finestre, cornici, ingressi, lampioni), disattivabili per separare struttura ed estetica.
+- **Nessun asset 2D** disegnato nella nuova vista e nessuna modifica ai poligoni, a NPC/economia o alla plancia originale. LAB SVG storico ancora raggiungibile.
+- Serve browser con WebGL2 e connessione al CDN per il caricamento della libreria; il LAB non è funzionante offline. La resa su Android reale e le prestazioni da smartphone non sono ancora certificate.
+
+Questo è il test tecnico della telecamera e delle occlusioni, non un'anteprima grafica definitiva.
+
 ## LAB 3D · esperimento camera ad altezza lampione (6 novembre 2026)
 
 Aprire `street-vector-camera.html` o il pulsante **LAB 3D** dalla plancia. Esperimento indipendente che utilizza i sei lotti veri di Cross Street (`2,3,4,9,10,11`) tramite `QOBoardWorld`, costruisce volumi, tetti e finestre vettoriali in 3D e li proietta in prospettiva con telecamera orbitale. Controlli: trascina per ruotare, pizzica/rotella per zoom, slider per quota e distanza, pulsante 90°. Asset ImageGen e gameplay precedenti **immutati**. Il rendering SVG è volutamente minimale e il painter sorting non sostituisce il depth buffer di un futuro renderer WebGL; è un test di visuale e interazione, non arte definitiva.

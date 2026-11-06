@@ -1,3 +1,11 @@
+### 2026-11-06 — Nuovo laboratorio WebGL (P0 sperimentale)
+- [x] `street-webgl.html`, `street-webgl-core.js`, `street-webgl.js`: scena reale Three.js/WebGL2 con z-buffer, camera prospettica bassa, orbit 360°, prova 255°, zoom/pan touch, selezione 3D per lotto.
+- [x] Sei lotti Cross Street conservati con i vertici esatti e fino a 32 edifici vicini per verificare occlusioni; facciate, tetti, finestre e ingressi disegnati come volumi/quad 3D originali, non asset ImageGen o pattern SVG.
+- [x] Controlli quota e distanza, toggle dettagli, reset; link al nuovo laboratorio dalla plancia e link di ritorno al vecchio laboratorio SVG.
+- [x] Test di regressione aggiunti per coordinate, camera a 255°, selezione di fronte strada e contratto WebGL; parsing sintattico verificato.
+- [ ] Collaudo reale **in browser desktop e Android landscape** (compreso 255°, selezione e controllo touch); qui non disponibile browser con rete per caricare la dipendenza CDN.
+- [ ] Misurare FPS/memoria su dispositivo reale e perfezionare estetica 1860. **Non promuovere il LAB come gioco definitivo**, non rimuovere asset precedenti.
+
 ### 2026-11-06 — Prototipo separato SVG 3D a quota lampione
 - [x] Pagina autonoma `street-vector-lab.html` con geometria `street-vector-geometry.js`, renderer `street-vector-lab.js` e stylesheet dedicato.
 - [x] Camera prospettica bassa, slider quota 24–120, yaw 0–360°, zoom .55–3.6, pan/touch, selezione lotti, prova diretta 255°.
