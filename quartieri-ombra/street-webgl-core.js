@@ -84,6 +84,38 @@ function resolveCameraCollision(position,buildings,clearance=3){
  }
  return p;
 }
+
+// Continuous camera movement: test segment intersections before resolving the
+// endpoint. An endpoint-only collision check can tunnel through thin buildings.
+function sweepCameraMovement(start,end,buildings,clearance=3){
+ const from={x:start.x,y:start.y,z:start.z};
+ const to={x:end.x,y:end.y,z:end.z};
+ const dx=to.x-from.x,dz=to.z-from.z;
+ const distance=Math.hypot(dx,dz);
+ if(!Number.isFinite(distance)||!Number.isFinite(from.y)||!Number.isFinite(to.y))
+  return from;
+ if(distance<1e-9)return resolveCameraCollision(to,buildings,clearance);
+ let first=1;
+ for(const b of buildings){
+  if(Math.min(from.y,to.y)>b.z+clearance)continue;
+  // A start already inside a footprint must be recovered before movement.
+  if(pointInsideFootprint(from,b.poly))return resolveCameraCollision(from,buildings,clearance);
+  for(let i=0;i<b.poly.length;i++){
+   const a=b.poly[i],c=b.poly[(i+1)%b.poly.length];
+   const ex=c.x-a.x,ez=c.y-a.y;
+   const denom=dx*ez-dz*ex;
+   if(Math.abs(denom)<1e-10)continue;
+   const rx=a.x-from.x,rz=a.y-from.z;
+   const t=(rx*ez-rz*ex)/denom;
+   const u=(rx*dz-rz*dx)/denom;
+   if(t>=0&&t<=first&&u>=0&&u<=1)first=t;
+  }
+ }
+ // Back away from the crossing by the camera's clearance radius.
+ const safeT=first<1?Math.max(0,first-clearance/distance):1;
+ const candidate={x:from.x+dx*safeT,y:from.y+(to.y-from.y)*safeT,z:from.z+dz*safeT};
+ return resolveCameraCollision(candidate,buildings,clearance);
+}
 // Normalize the mobile joystick into a circular -1..1 input, with a dead zone
 // to avoid drifting if the player's thumb rests near the center.
 function joystickAxes(dx,dy,radius=38,deadzone=.14){
@@ -146,7 +178,7 @@ function evaluateGeometry(buildings){
  }
  return{buildings:buildings.length,vertices};
 }
-return{PILOT_IDS,clamp,angleDeg,center,segmentDistance,doorEdgeIndex,cluster,cameraPoint,isTap,evaluateGeometry,pointInsideFootprint,resolveCameraCollision,joystickAxes,joystickDisplacement,streetSpawn,nearbyBuildings,clampToWorld};
+return{PILOT_IDS,clamp,angleDeg,center,segmentDistance,doorEdgeIndex,cluster,cameraPoint,isTap,evaluateGeometry,pointInsideFootprint,resolveCameraCollision,sweepCameraMovement,joystickAxes,joystickDisplacement,streetSpawn,nearbyBuildings,clampToWorld};
 })();
 if(typeof window!=="undefined")window.QOStreetWebGLCore=QOStreetWebGLCore;
 if(typeof module!=="undefined"&&module.exports)module.exports=QOStreetWebGLCore;
