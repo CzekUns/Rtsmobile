@@ -107,6 +107,28 @@ function joystickDisplacement(cameraOffset,axes,speed,seconds){
  return{x:(rightX*side+forwardX*forward)*amount,
   z:(rightZ*side+forwardZ*forward)*amount};
 }
+// Start INSIDE the real street junction, looking along Cross Street.
+// The previous orbit lab started hundreds of world units away from its focus.
+function streetSpawn(world,lookAhead=42,height=27){
+ const h=world.hub,road=world.roads.find(r=>r.name==="Cross Street")||world.roads[0];
+ const a=road.points[0],b=road.points[1];
+ const dist=Math.hypot(b.x-a.x,b.y-a.y)||1;
+ const length=clamp(lookAhead,18,80);
+ return{eye:{x:h.x,y:height,z:h.y},
+  target:{x:h.x+(b.x-a.x)/dist*length,y:Math.min(18,height-3),z:h.y+(b.y-a.y)/dist*length}};
+}
+// This is display-only streaming: ALL canonical lots remain in world state.
+// Stable ordering and a capped count make navigation on lower-end phones viable.
+function nearbyBuildings(buildings,location,radius=480,limit=100){
+ if(!Number.isFinite(location.x)||!Number.isFinite(location.z)||radius<=0)return[];
+ return buildings.map(b=>({b,d:Math.hypot(b.x-location.x,b.y-location.z)}))
+  .filter(v=>v.d<=radius).sort((a,b)=>a.d-b.d||a.b.id-b.b.id)
+  .slice(0,Math.max(0,limit)).map(v=>v.b);
+}
+function clampToWorld(p,world,margin=12){
+ return{x:clamp(p.x,margin,world.width-margin),y:p.y,
+  z:clamp(p.z,margin,world.height-margin)};
+}
 function evaluateGeometry(buildings){
  let vertices=0;
  for(const b of buildings){
@@ -116,7 +138,7 @@ function evaluateGeometry(buildings){
  }
  return{buildings:buildings.length,vertices};
 }
-return{PILOT_IDS,clamp,angleDeg,center,segmentDistance,doorEdgeIndex,cluster,cameraPoint,isTap,evaluateGeometry,pointInsideFootprint,resolveCameraCollision,joystickAxes,joystickDisplacement};
+return{PILOT_IDS,clamp,angleDeg,center,segmentDistance,doorEdgeIndex,cluster,cameraPoint,isTap,evaluateGeometry,pointInsideFootprint,resolveCameraCollision,joystickAxes,joystickDisplacement,streetSpawn,nearbyBuildings,clampToWorld};
 })();
 if(typeof window!=="undefined")window.QOStreetWebGLCore=QOStreetWebGLCore;
 if(typeof module!=="undefined"&&module.exports)module.exports=QOStreetWebGLCore;
