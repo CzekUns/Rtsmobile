@@ -19,7 +19,6 @@
       }
     ]
   },
-  "textureSize": 32,
   "columns": 8,
   "rows": 4,
   "atlas": "TERRAIN1-pure-8x4.png",
@@ -30,64 +29,64 @@
         "sourceRecordNo": 455,
         "fileName": "GG-044A",
         "originalBitmapOffset": 331272,
-        "originalCornerCode": "G+",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "G+"
       },
       {
         "index": 1,
         "sourceRecordNo": 456,
         "fileName": "GG-044B",
         "originalBitmapOffset": 381840,
-        "originalCornerCode": "G+",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "G+"
       },
       {
         "index": 2,
         "sourceRecordNo": 457,
         "fileName": "GG-044C",
         "originalBitmapOffset": 382872,
-        "originalCornerCode": "G+",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "G+"
       },
       {
         "index": 3,
         "sourceRecordNo": 458,
         "fileName": "GG-044D",
         "originalBitmapOffset": 383904,
-        "originalCornerCode": "G+",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "G+"
       },
       {
         "index": 4,
         "sourceRecordNo": 459,
         "fileName": "GG-044E",
         "originalBitmapOffset": 384936,
-        "originalCornerCode": "G+",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "G+"
       },
       {
         "index": 5,
         "sourceRecordNo": 578,
         "fileName": "GG-000A",
         "originalBitmapOffset": 0,
-        "originalCornerCode": "G0",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "G0"
       },
       {
         "index": 6,
         "sourceRecordNo": 579,
         "fileName": "GG-000B",
         "originalBitmapOffset": 377712,
-        "originalCornerCode": "G0",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "G0"
       },
       {
         "index": 7,
         "sourceRecordNo": 580,
         "fileName": "GG-000C",
         "originalBitmapOffset": 378744,
-        "originalCornerCode": "G0",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "G0"
       }
     ],
     "F": [
@@ -96,64 +95,64 @@
         "sourceRecordNo": 222,
         "fileName": "FF-044A",
         "originalBitmapOffset": 427248,
-        "originalCornerCode": "F+",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "F+"
       },
       {
         "index": 1,
         "sourceRecordNo": 223,
         "fileName": "FF-044B",
         "originalBitmapOffset": 477816,
-        "originalCornerCode": "F+",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "F+"
       },
       {
         "index": 2,
         "sourceRecordNo": 224,
         "fileName": "FF-044C",
         "originalBitmapOffset": 478848,
-        "originalCornerCode": "F+",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "F+"
       },
       {
         "index": 3,
         "sourceRecordNo": 225,
         "fileName": "FF-044D",
         "originalBitmapOffset": 479880,
-        "originalCornerCode": "F+",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "F+"
       },
       {
         "index": 4,
         "sourceRecordNo": 226,
         "fileName": "FF-044E",
         "originalBitmapOffset": 480912,
-        "originalCornerCode": "F+",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "F+"
       },
       {
         "index": 5,
         "sourceRecordNo": 336,
         "fileName": "FF-000A",
         "originalBitmapOffset": 385968,
-        "originalCornerCode": "F0",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "F0"
       },
       {
         "index": 6,
         "sourceRecordNo": 337,
         "fileName": "FF-000B",
         "originalBitmapOffset": 473688,
-        "originalCornerCode": "F0",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "F0"
       },
       {
         "index": 7,
         "sourceRecordNo": 338,
         "fileName": "FF-000C",
         "originalBitmapOffset": 474720,
-        "originalCornerCode": "F0",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "F0"
       }
     ],
     "D": [
@@ -162,64 +161,64 @@
         "sourceRecordNo": 9,
         "fileName": "DD-044A",
         "originalBitmapOffset": 523224,
-        "originalCornerCode": "D+",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "D+"
       },
       {
         "index": 1,
         "sourceRecordNo": 10,
         "fileName": "DD-044B",
         "originalBitmapOffset": 573792,
-        "originalCornerCode": "D+",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "D+"
       },
       {
         "index": 2,
         "sourceRecordNo": 11,
         "fileName": "DD-044C",
         "originalBitmapOffset": 574824,
-        "originalCornerCode": "D+",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "D+"
       },
       {
         "index": 3,
         "sourceRecordNo": 12,
         "fileName": "DD-044D",
         "originalBitmapOffset": 575856,
-        "originalCornerCode": "D+",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "D+"
       },
       {
         "index": 4,
         "sourceRecordNo": 13,
         "fileName": "DD-044E",
         "originalBitmapOffset": 576888,
-        "originalCornerCode": "D+",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "D+"
       },
       {
         "index": 5,
         "sourceRecordNo": 121,
         "fileName": "DD-000A",
         "originalBitmapOffset": 481944,
-        "originalCornerCode": "D0",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "D0"
       },
       {
         "index": 6,
         "sourceRecordNo": 122,
         "fileName": "DD-000B",
         "originalBitmapOffset": 569664,
-        "originalCornerCode": "D0",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "D0"
       },
       {
         "index": 7,
         "sourceRecordNo": 123,
         "fileName": "DD-000C",
         "originalBitmapOffset": 570696,
-        "originalCornerCode": "D0",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "D0"
       }
     ],
     "S": [
@@ -228,64 +227,64 @@
         "sourceRecordNo": 672,
         "fileName": "SS-001",
         "originalBitmapOffset": 1032,
-        "originalCornerCode": "S*",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "S*"
       },
       {
         "index": 1,
         "sourceRecordNo": 673,
         "fileName": "SS-002",
         "originalBitmapOffset": 2064,
-        "originalCornerCode": "S*",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "S*"
       },
       {
         "index": 2,
         "sourceRecordNo": 674,
         "fileName": "SS-003",
         "originalBitmapOffset": 3096,
-        "originalCornerCode": "S*",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "S*"
       },
       {
         "index": 3,
         "sourceRecordNo": 675,
         "fileName": "SS-004",
         "originalBitmapOffset": 4128,
-        "originalCornerCode": "S*",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "S*"
       },
       {
         "index": 4,
         "sourceRecordNo": 676,
         "fileName": "SS-005",
         "originalBitmapOffset": 5160,
-        "originalCornerCode": "S*",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "S*"
       },
       {
         "index": 5,
         "sourceRecordNo": 677,
         "fileName": "SS-006",
         "originalBitmapOffset": 6192,
-        "originalCornerCode": "S*",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "S*"
       },
       {
         "index": 6,
         "sourceRecordNo": 678,
         "fileName": "SS-007",
         "originalBitmapOffset": 7224,
-        "originalCornerCode": "S*",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "S*"
       },
       {
         "index": 7,
         "sourceRecordNo": 672,
         "fileName": "SS-001",
         "originalBitmapOffset": 1032,
-        "originalCornerCode": "S*",
-        "palette": "PAL_STD.RES"
+        "palette": "PAL_STD.RES",
+        "cornerCode": "S*"
       }
     ]
   },
@@ -293,5 +292,6 @@
     "Pure original 7KAA terrain bitmap pixels, palette PAL_STD.RES",
     "Only pure terrain samples: no original corner transition sequencing yet",
     "Current JavaScript world terrain classification is unchanged; water collision remains rule-defined"
-  ]
+  ],
+  "tileSize": 32
 }
