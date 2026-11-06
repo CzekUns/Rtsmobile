@@ -1,3 +1,7 @@
+### 2026-11-06 — Diagnostica FPS LAB WebGL
+- [x] HUD con FPS misurati su intervalli di almeno 1 secondo, draw call e triangoli effettivamente renderizzati da Three.js; nessuna stima inventata di prestazioni Android.
+- [ ] Acquisire misure reali desktop/Android landscape, incluso 255°, e screenshot; il solo contatore non certifica performance.
+
 ### 2026-11-06 — Navigazione reale dentro la plancia, non soltanto orbita sul margine (feedback utente)
 - [x] Diagnosi: LAB WebGL visualizzava soltanto 38 palazzi attorno al gruppo Cross Street, terreno 1350×1350 e strade entro 660 unità; OrbitControls imponeva `maxTargetRadius=540` attorno all'origine (0,0), bloccando la camera lontano dalla mappa 2700×2100.
 - [x] Rimossa la restrizione radiale; ingresso della telecamera al vero crocevia `world.hub` a quota lampione, orientato lungo Cross Street, vista ravvicinata.
