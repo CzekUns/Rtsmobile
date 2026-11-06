@@ -3,6 +3,7 @@
  */
 import {WORLD_W,WORLD_H,NATIONS,FIRMS,terrain,range} from './rules.js';
 import {OriginalSpritePreview,compassDirection,walkingFrame} from './playtest/original-sprites.js';
+import {OriginalTerrainPreview} from './playtest/original-terrain.js';
 const COLORS={
   grass:['#81996a','#8aa171','#769367'],forest:['#496d46','#567b4b','#3e6645'],
   hill:['#a59d7f','#aaa487','#8e9077'],dry:['#b6a983','#c1ad86','#a89f7f'],
@@ -14,6 +15,7 @@ export class WorldView{
  constructor(world,mini,{previewOriginalSprites=false}={}){
   this.canvas=world;this.ctx=world.getContext('2d');
   this.originalSprites=previewOriginalSprites?new OriginalSpritePreview():null;
+  this.originalTerrain=previewOriginalSprites?new OriginalTerrainPreview():null;
   this.spriteMotion=new Map();this.spritePaused=false;
   this.mini=mini;this.mctx=mini.getContext('2d');
   this.cx=27;this.cy=27;this.zoom=1;this.tileSize=24;
@@ -90,8 +92,11 @@ export class WorldView{
  }
  tileDraw(g,ctx,x,y,t){
   const p=this.screen(x,y),type=terrain(g.seed,x,y),n=hash(x,y,g.seed);
-  const arr=COLORS[type];ctx.fillStyle=arr[Math.min(arr.length-1,Math.floor(n*arr.length))];
-  ctx.fillRect(Math.floor(p.x),Math.floor(p.y),Math.ceil(t+1),Math.ceil(t+1));
+  const originalGround=this.originalTerrain?.drawTile(ctx,p.x,p.y,t,type,n)??false;
+  if(!originalGround){
+   const arr=COLORS[type];ctx.fillStyle=arr[Math.min(arr.length-1,Math.floor(n*arr.length))];
+   ctx.fillRect(Math.floor(p.x),Math.floor(p.y),Math.ceil(t+1),Math.ceil(t+1));
+  }
   if(t<10)return;
   if(type==='forest'&&n>.12){
    ctx.fillStyle='#273f2b';ctx.beginPath();ctx.moveTo(p.x+t*.52,p.y+t*.07);ctx.lineTo(p.x+t*.14,p.y+t*.75);ctx.lineTo(p.x+t*.87,p.y+t*.75);ctx.closePath();ctx.fill();
@@ -138,7 +143,7 @@ export class WorldView{
  firmDraw(ctx,firm,selection,t){
   const p=this.screen(firm.x,firm.y),s=firm.size*t,color=NATIONS[firm.owner]?.color||'#ccc';
   if(p.x+s<0||p.y+s<0||p.x>this.canvas.width||p.y>this.canvas.height)return;
-  // The Norman Seat of Power acts only as a visual proxy for the demo's red fort.
+  // The blue Norman Seat of Power remains a visual proxy for the demo's blue fort.
   const originalFirm=this.originalSprites?.drawFirm(ctx,firm,p.x,p.y,t)??false;
   if(!originalFirm){
   ctx.fillStyle='#555449';ctx.fillRect(p.x+s*.08,p.y+s*.16,s*.86,s*.77);

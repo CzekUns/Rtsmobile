@@ -48,7 +48,7 @@ test('fullscreen HTML and HUD overlays are layered above the map, not cutting it
  assert.ok(game.includes('syncFullscreenCanvas(view,rect.width,rect.height,window.devicePixelRatio||1)'));
  assert.ok(game.includes("new ResizeObserver(resizeStage).observe($('world'))"));
  assert.ok(game.includes("setOrdersVisible(!window.matchMedia"));
- assert.ok(html.includes('style.css?v=6')&&html.includes('game.js?v=13'));
+ assert.ok(html.includes('style.css?v=6')&&html.includes('game.js?v=14'));
 });
 test('classic pop-out is accessible and starts collapsed, with controls on the lower left',()=>{
  const html=source('index.html'),css=source('style.css'),js=source('playtest/mobile-rts-controls.js');

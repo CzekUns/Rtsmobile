@@ -590,6 +590,7 @@ document.addEventListener('click',e=>{
   if(camera.dataset.camera==='plus')view.scale(1.2);
   if(camera.dataset.camera==='minus')view.scale(1/1.2);
   if(camera.dataset.camera==='center'){const t=game.ownTowns()[0];if(t)view.center(t.x+2,t.y+2);}
+  if(camera.dataset.camera==='normans'){const t=game.towns.find(t=>t.owner===2);if(t){view.center(t.x+1,t.y+1);status('Eboracum · regno normanno');}}
  }
  if(menu){
   if(menu.dataset.menu==='save')status(game.save(saveKey)?'Partita salvata nel browser.':'Salvataggio non disponibile.');
@@ -672,7 +673,7 @@ function tick(t){
 }
 renderPanel();renderHud();
 if(playtest)status('MODALITÀ TEST · percorsi attorno ad acqua ed edifici · salvataggio separato.');
-if(previewOriginalSprites)status('ANTEPRIMA GRAFICA ORIGINALE · NORMAN su soldati rossi e BASE:NORMAN sui forti rossi come proxy grafici, non modelli definitivi.');
+if(previewOriginalSprites)status('ASSET ORIGINALI · Normanni blu a Eboracum; premi N per raggiungerli. Terreno originale di prova; coste e vegetazione in lavorazione.');
 if(!localStorage.getItem('seven-kingdoms-html-instructions-v1')){
  localStorage.setItem('seven-kingdoms-html-instructions-v1','1');
  try{$('helpDialog').showModal()}catch(_){}
