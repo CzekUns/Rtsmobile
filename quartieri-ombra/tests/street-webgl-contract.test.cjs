@@ -1,0 +1,40 @@
+"use strict";
+const test=require("node:test"),assert=require("node:assert/strict");
+const fs=require("node:fs"),path=require("node:path");
+const root=path.resolve(__dirname,"..");
+const read=n=>fs.readFileSync(path.join(root,n),"utf8");
+const html=read("street-webgl.html"),js=read("street-webgl.js");
+const world=require("../board-world.js").generate(1860);
+const core=require("../street-webgl-core.js");
+test("WebGL page pins a real Three.js module and keeps existing labs",()=>{
+ assert.match(html,/type="importmap"/);
+ assert.match(html,/three@0\.187\.0\/build\/three\.module\.js/);
+ assert.match(html,/three@0\.187\.0\/examples\/jsm\//);
+ assert.match(html,/street-webgl-core\.js/);
+ assert.match(html,/street-webgl\.js/);
+ assert.match(html,/id="test255"/);
+ assert.match(html,/id="height"/);
+ assert.match(html,/id="distance"/);
+ assert.match(read("board-preview.html"),/href="\.\/street-webgl\.html"/);
+ assert.match(read("street-vector-camera.html"),/href="\.\/street-webgl\.html"/);
+});
+test("WebGL mode uses GPU depth, actual 3D roofs, raycasting, and no painter sort",()=>{
+ assert.match(js,/new THREE\.WebGLRenderer\(\{alpha:false,antialias:true,depth:true/);
+ assert.match(js,/new THREE\.PerspectiveCamera/);
+ assert.match(js,/new OrbitControls\(camera,renderer\.domElement\)/);
+ assert.match(js,/const raycaster=new THREE\.Raycaster/);
+ assert.match(js,/const top=b\.poly\.map\(p=>p3\(p,b\.z\)\)/);
+ assert.match(js,/scene\.add\(container\)/);
+ assert.match(js,/viewAt\(255\)/);
+ assert.doesNotMatch(js,/drawable\.sort|faces\.sort/);
+ assert.doesNotThrow(()=>new Function(js.replace(/^import .*;\s*$/gm,"")));
+});
+test("all candidate buildings use actual deterministic coordinates",()=>{
+ const x=core.cluster(world,{radius:460,limit:38});
+ assert.deepEqual(x.pilot.map(b=>b.id),[2,3,4,9,10,11]);
+ const before=x.buildings.map(b=>b.poly.map(p=>({...p})));
+ core.evaluateGeometry(x.buildings);
+ const q=core.cameraPoint({x:x.focus.x,z:x.focus.y},255*Math.PI/180,27,225);
+ assert(Number.isFinite(q.x)&&Number.isFinite(q.z));
+ assert.deepEqual(x.buildings.map(b=>b.poly.map(p=>({...p}))),before);
+});
