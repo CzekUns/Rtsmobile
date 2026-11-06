@@ -216,7 +216,6 @@ function updateVisibleCity(force=false){
  }
 }
 const roadSegments=[];
-const distanceToFocus=p=>Math.hypot(p.x-focus.x,p.y-focus.y);
 for(const road of data.roads)for(let i=1;i<road.points.length;i++){
  const a=road.points[i-1],b=road.points[i];
  const dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1;
@@ -254,7 +253,8 @@ controls.minDistance=16;controls.maxDistance=540;
 controls.minPolarAngle=1.08;controls.maxPolarAngle=1.56;
 controls.rotateSpeed=.62;controls.zoomSpeed=.9;
 function keepCameraOutside(){
- const safe=Core.resolveCameraCollision(camera.position,data.buildings,3);
+ const bounded=Core.clampToWorld(camera.position,data,12);
+ const safe=Core.resolveCameraCollision(bounded,data.buildings,3);
  // If the eye touches a wall, move the look-at point with the eye to avoid
  // jerking the camera orientation or restoring the blocked offset next frame.
  const dx=safe.x-camera.position.x,dz=safe.z-camera.position.z;
