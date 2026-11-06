@@ -43,6 +43,6 @@ test("WEBGL page has a joystick over the responsive HUD without replacing touch 
   assert(html.includes(fragment)||renderer.includes(fragment),fragment);
  for(const fragment of ["Core.joystickAxes","Core.joystickDisplacement","stickEl.setPointerCapture","lostpointercapture","stepStickMovement(delta)","keepCameraOutside()","pointerup"])
   assert(renderer.includes(fragment),fragment);
- assert(renderer.indexOf("stepStickMovement(delta)")<renderer.indexOf("keepCameraOutside();\n  renderer.render"));
+ assert(renderer.indexOf("stepStickMovement(delta)")<renderer.indexOf("keepCameraOutside();\n  updateVisibleCity();\n  renderer.render"));
  assert(renderer.includes("const controls=new OrbitControls"));
 });
