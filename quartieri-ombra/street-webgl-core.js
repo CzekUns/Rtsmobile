@@ -121,7 +121,10 @@ function streetSpawn(world,lookAhead=42,height=27){
 // Stable ordering and a capped count make navigation on lower-end phones viable.
 function nearbyBuildings(buildings,location,radius=480,limit=100){
  if(!Number.isFinite(location.x)||!Number.isFinite(location.z)||radius<=0)return[];
- return buildings.map(b=>({b,d:Math.hypot(b.x-location.x,b.y-location.z)}))
+ // Distance to canonical footprint edges, not the center of a long tenement.
+ return buildings.map(b=>({b,d:Array.isArray(b.poly)&&b.poly.length>=2
+  ?Math.min(...b.poly.map((p,i)=>segmentDistance({x:location.x,y:location.z},p,b.poly[(i+1)%b.poly.length])))
+  :Math.hypot(b.x-location.x,b.y-location.z)}))
   .filter(v=>v.d<=radius).sort((a,b)=>a.d-b.d||a.b.id-b.b.id)
   .slice(0,Math.max(0,limit)).map(v=>v.b);
 }
