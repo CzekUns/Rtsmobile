@@ -1,3 +1,8 @@
+
+### 2026-11-06 — WebGL context recovery
+- Modificato solo `street-webgl.js`: il loop si ferma su `webglcontextlost`, riprende su `webglcontextrestored`, con richiesta RAF deduplicata e resize. Test permanente `tests/webgl-context-recovery.test.cjs` aggiunto; test Node integrato e browser/Android NON eseguiti in questo ambiente.
+- Branch `agent/qo-webgl-context-recovery-1106`, commit `0ecc60cf8baa1bc9934a245b683893c5cc6df1bf` e `c248b3c0a0321c1292dff26fe363d14334e33f32`. Nessuna modifica a NPC, asset o altri progetti.
+
 ### 2026-11-06 — Implementazione LAB WebGL a quota lampione
 Aggiunta scena sperimentale Three.js r187 da import map CDN (MIT) in `street-webgl.html`, con `street-webgl-core.js` che legge esattamente `QOBoardWorld` per i lotti Cross Street [2,3,4,9,10,11]. Render di 38 edifici reali, superfici a base di quadrilateri tridimensionali, profondità WebGL, tetti, facciate, vetri stilizzati, ingressi e strade reali; camera iniziale 27 unità, touch orbit/pinch/pan, slider di quota/distanza, test 255° e selezione mediante raycast. Non è più necessario gestire la profondità con ordinamento SVG fisso. Nuovo link LAB 3D nella plancia; LAB SVG precedente conservato.
 
