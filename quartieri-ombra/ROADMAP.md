@@ -1,3 +1,8 @@
+### 2026-11-06 — P0 WebGL camera collision (branch aggiornato)
+- [x] Resolver volumetrico su footprint canonici e tetti; controllo dopo OrbitControls e preset, senza asset legacy o gameplay.
+- [x] Cinque casi geometrici eseguiti nel runtime V8: 5/5 PASS; test Node permanente aggiunto, esecuzione Node ancora da fare.
+- [ ] Browser GPU, screenshot 255°, Android landscape e FPS non verificati; PR #78/#80 alternative conflittuali da non fondere automaticamente.
+
 ### 2026-11-06 — P0 WebGL: ripristino contesto GPU su main aggiornato
 - [x] Gestione `webglcontextrestored`, ripresa del loop RAF con deduplicazione e resize; test simulato V8 eseguito (boot, loss, recovery, resume). Nessuna modifica a gameplay o asset.
 - [ ] Verifica GPU reale desktop/Android e screenshot rotazioni 255° ancora obbligatori.
