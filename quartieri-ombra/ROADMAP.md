@@ -1,3 +1,8 @@
+### 2026-11-06 — Streaming WebGL: evitare palazzi che scompaiono vicino alla camera
+- [x] Selezione dei lotti da disegnare basata sulla distanza minima dal **poligono reale**, non solo dal centro: edifici lunghi visibili sul bordo del raggio non spariscono più prematuramente.
+- [x] Quattro controlli eseguiti in runtime JavaScript (4/4 PASS); aggiunta suite Node persistente, **non eseguita con Node** in questo run.
+- [ ] Verifica visiva reale desktop/Android del passaggio fra settori, performance e occlusioni 255° ancora necessaria. Demo: https://czekuns.github.io/Rtsmobile/quartieri-ombra/street-webgl.html (deploy di questa PR non verificato).
+
 ### 2026-11-06 — Navigazione reale dentro la plancia, non soltanto orbita sul margine (feedback utente)
 - [x] Diagnosi: LAB WebGL visualizzava soltanto 38 palazzi attorno al gruppo Cross Street, terreno 1350×1350 e strade entro 660 unità; OrbitControls imponeva `maxTargetRadius=540` attorno all'origine (0,0), bloccando la camera lontano dalla mappa 2700×2100.
 - [x] Rimossa la restrizione radiale; ingresso della telecamera al vero crocevia `world.hub` a quota lampione, orientato lungo Cross Street, vista ravvicinata.
