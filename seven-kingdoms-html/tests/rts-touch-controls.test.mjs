@@ -87,7 +87,7 @@ test('mobile controls are wired to original HTML HUD without adding permanent ri
  assert.match(html,/id="touchJoystick"/);
  assert.match(html,/id="touchJoyThumb"/);
  assert.match(html,/id="touchModifier"/);
- assert.match(html,/game\.js\?v=12/);
+ assert.match(html,/game\.js\?v=13/);
  assert.match(js,/installMobileRtsControls/);
  assert.match(js,/selectUnitsInBox\(game\.units/);
  assert.match(js,/issueGroupMove\(game,groupUnitIds/);
