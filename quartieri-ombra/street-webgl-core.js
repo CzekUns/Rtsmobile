@@ -84,6 +84,29 @@ function resolveCameraCollision(position,buildings,clearance=3){
  }
  return p;
 }
+// Normalize the mobile joystick into a circular -1..1 input, with a dead zone
+// to avoid drifting if the player's thumb rests near the center.
+function joystickAxes(dx,dy,radius=38,deadzone=.14){
+ if(![dx,dy,radius,deadzone].every(Number.isFinite)||radius<=0) return{x:0,y:0};
+ const x=dx/radius,y=dy/radius;
+ const mag=Math.hypot(x,y);
+ const safeDeadzone=clamp(deadzone,0,.95);
+ if(mag<=safeDeadzone)return{x:0,y:0};
+ const strength=clamp((mag-safeDeadzone)/(1-safeDeadzone),0,1);
+ return{x:x/mag*strength,y:y/mag*strength};
+}
+// Joystick up follows the camera's horizontal look direction, not world north.
+// Three.js uses X/Z ground axes, Y elevation. Both the eye and target move.
+function joystickDisplacement(cameraOffset,axes,speed,seconds){
+ const dist=Math.hypot(cameraOffset.x,cameraOffset.z);
+ if(!dist||!Number.isFinite(dist)||!Number.isFinite(speed)||!Number.isFinite(seconds)||seconds<=0)return{x:0,z:0};
+ const forwardX=-cameraOffset.x/dist,forwardZ=-cameraOffset.z/dist;
+ const rightX=-forwardZ,rightZ=forwardX;
+ const side=clamp(axes.x||0,-1,1),forward=clamp(axes.y||0,-1,1);
+ const amount=Math.max(0,speed)*Math.min(seconds,.05);
+ return{x:(rightX*side+forwardX*forward)*amount,
+  z:(rightZ*side+forwardZ*forward)*amount};
+}
 function evaluateGeometry(buildings){
  let vertices=0;
  for(const b of buildings){
@@ -93,7 +116,7 @@ function evaluateGeometry(buildings){
  }
  return{buildings:buildings.length,vertices};
 }
-return{PILOT_IDS,clamp,angleDeg,center,segmentDistance,doorEdgeIndex,cluster,cameraPoint,isTap,evaluateGeometry,pointInsideFootprint,resolveCameraCollision};
+return{PILOT_IDS,clamp,angleDeg,center,segmentDistance,doorEdgeIndex,cluster,cameraPoint,isTap,evaluateGeometry,pointInsideFootprint,resolveCameraCollision,joystickAxes,joystickDisplacement};
 })();
 if(typeof window!=="undefined")window.QOStreetWebGLCore=QOStreetWebGLCore;
 if(typeof module!=="undefined"&&module.exports)module.exports=QOStreetWebGLCore;
