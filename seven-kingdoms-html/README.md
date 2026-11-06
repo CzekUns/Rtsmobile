@@ -6,6 +6,8 @@
 
 **[Apri la build di prova Core + Movimento](https://czekuns.github.io/Rtsmobile/seven-kingdoms-html/?playtest=1)**
 
+**Anteprima con i primi PNG originali (una volta pubblicate entrambe le PR):** [Apri il gioco con gli sprite NORMAN](https://czekuns.github.io/Rtsmobile/seven-kingdoms-html/?sprites=1). Compatibile anche con `?playtest=1&sprites=1`. I due soldati e il forte del regno rosso sono soltanto *proxy grafici di prova*: asset normanni su entità ancora dimostrative, senza cambiamenti a gameplay, salvataggi e input. Gli altri elementi mantengono la grafica temporanea. Il confronto con la medesima scena originale 7KAA e il test Android sono ancora da completare.
+
 Questa modalità è **opzionale**: la versione normale dello stesso indirizzo senza `?playtest=1` resta invariata. La partita di prova usa una diversa chiave di salvataggio (`seven-kingdoms-html-quick-playtest-v1`), quindi non sovrascrive la demo precedente.
 
 Cosa testare in 2 minuti: aprire in orizzontale, chiudere la guida, toccare un soldato vicino a Corinto, quindi un terreno libero oltre un edificio o una striscia d'acqua; l'unità deve cercare un percorso senza attraversare il blocco. Verificare pausa/riprendi, costruzione e salvataggio. Se il punto è occupato, compare un messaggio: scegliere una casella libera.

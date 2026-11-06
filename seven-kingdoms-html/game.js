@@ -16,11 +16,13 @@ import {SKILLS,skillLabel,workerRoleLabel,workerRaceLabel,ensureFirmPersonnel} f
 import {ensureTownRaces,selectedTownRace,recruitableTownPeople} from './playtest/town-races.js';
 const $=id=>document.getElementById(id);
 const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const playtest=new URLSearchParams(location.search).get('playtest')==='1';
+const query=new URLSearchParams(location.search);
+const playtest=query.get('playtest')==='1';
+const previewOriginalSprites=query.get('sprites')==='1';
 const saveKey=playtest?'seven-kingdoms-html-quick-playtest-v1':SAVE_KEY;
 let fixedClock=createFrameAccumulator({tickUs:50000,maxFrameUs:250000});
 let game=SevenGame.load(saveKey)||new SevenGame();
-const view=new WorldView($('world'),$('minimap'));
+const view=new WorldView($('world'),$('minimap'),{previewOriginalSprites});
 let selection=game.towns.find(t=>t.owner===1)?.id||null;
 let report=null,placing=null,placingBuilderId=null,builderMenuId=null,trainingMenuTownId=null,ghost=null,newsUntil=0,last=0,lastPanel=0,lastSave=0;
 let input=null,gesture=null,selectionBox=null,groupUnitIds=[];const pointers=new Map();
@@ -662,7 +664,7 @@ function tick(t){
    handleConstructionEvents(advanceConstruction(game,travel));
    handleConstructionEvents(advanceRepairs(game));
   }
-  view.draw(game,selection,ghost,groupUnitIds,selectionBox);
+  view.draw(game,selection,ghost,groupUnitIds,selectionBox,t);
  }
  if(t-lastPanel>400){renderPanel();renderHud();lastPanel=t}
  if(t-lastSave>20000){game.save(saveKey);lastSave=t}
@@ -670,6 +672,7 @@ function tick(t){
 }
 renderPanel();renderHud();
 if(playtest)status('MODALITÀ TEST · percorsi attorno ad acqua ed edifici · salvataggio separato.');
+if(previewOriginalSprites)status('ANTEPRIMA GRAFICA ORIGINALE · NORMAN su soldati rossi e BASE:NORMAN sui forti rossi come proxy grafici, non modelli definitivi.');
 if(!localStorage.getItem('seven-kingdoms-html-instructions-v1')){
  localStorage.setItem('seven-kingdoms-html-instructions-v1','1');
  try{$('helpDialog').showModal()}catch(_){}
