@@ -9,15 +9,15 @@ const $=id=>document.getElementById(id);
 const host=$("viewport"),status=$("status");
 const world=window.QOBoardWorld,Core=window.QOStreetWebGLCore;
 if(!world||!Core)throw new Error("Missing QOBoardWorld or street-webgl-core.js");
-const data=world.generate(1860),cluster=Core.cluster(data,{radius:460,limit:38});
-Core.evaluateGeometry(cluster.buildings);
-const pilotIds=new Set(cluster.pilot.map(b=>b.id));
-const focus=cluster.focus;
+const data=world.generate(1860);
+Core.evaluateGeometry(data.buildings);
+const START=Core.streetSpawn(data,42,27);
+const focus={x:data.hub.x,y:data.hub.y};
 const scene=new THREE.Scene();
 scene.background=new THREE.Color("#41464a");
 scene.fog=new THREE.FogExp2("#5b574d",0.00125);
 const camera=new THREE.PerspectiveCamera(63,1,0.3,2500);
-const TARGET=new THREE.Vector3(focus.x,12,focus.y);
+const TARGET=new THREE.Vector3(START.target.x,START.target.y,START.target.z);
 let renderer;
 try{
  renderer=new THREE.WebGLRenderer({alpha:false,antialias:true,depth:true,stencil:false,powerPreference:"high-performance"});
@@ -54,9 +54,10 @@ const mats={
 };
 const detailGroup=new THREE.Group();scene.add(detailGroup);
 const pickMeshes=[],buildingsById=new Map(),selectionEdges=new Map();
-const plane=new THREE.Mesh(new THREE.PlaneGeometry(1350,1350),mats.ground);
+const renderedBuildings=new Map();
+const plane=new THREE.Mesh(new THREE.PlaneGeometry(data.width+240,data.height+240),mats.ground);
 plane.rotation.x=-Math.PI/2;
-plane.position.set(focus.x,-1.1,focus.y);
+plane.position.set(data.width/2,-1.1,data.height/2);
 scene.add(plane);
 const axisY=new THREE.Vector3(0,1,0),tmpA=new THREE.Vector3(),tmpB=new THREE.Vector3();
 const quadGeometry=points=>{
@@ -116,25 +117,25 @@ function addFacadeDetails(b,group){
     if(y1<=y0)continue;
     const lit=((b.seed+floor*3+bay*7+i)%7)<2;
     const geom=facePanel(a,c,normal,t0,t1,y0,y1,.31);
-    quad(geom,lit?mats.glassLit:mats.glassDark,detailGroup);
-    beam(geom[0],geom[1],y0-.42,.8,.9,mats.trim,detailGroup,normal);
+    quad(geom,lit?mats.glassLit:mats.glassDark,group);
+    beam(geom[0],geom[1],y0-.42,.8,.9,mats.trim,group,normal);
    }
   }
   // Stone coping connects to the true wall edge, not an image bounding box.
-  beam(a,c,b.z-1.4,2.3,2.4,mats.trim,detailGroup,normal);
+  beam(a,c,b.z-1.4,2.3,2.4,mats.trim,group,normal);
   if(i===doorEdge){
    const dt=.5,tw=Math.min(.12,4.0/length);
    quad(facePanel(a,c,normal,dt-tw,dt+tw,.6,Math.min(11,b.z*.3),.44),
-    mats.entry,detailGroup);
+    mats.entry,group);
    const entry=lerp(a,c,.5);
    const stepMesh=new THREE.Mesh(new THREE.BoxGeometry(9,1.6,4.5),mats.sidewalk);
    stepMesh.position.set(entry.x+normal.x*2.5,.5,entry.z+normal.z*2.5);
    stepMesh.rotation.y=-Math.atan2(c.z-a.z,c.x-a.x);
-   detailGroup.add(stepMesh);
+   group.add(stepMesh);
    if(active){
     const light=new THREE.Mesh(new THREE.SphereGeometry(1.6,9,8),mats.lamp);
     light.position.set(entry.x+normal.x*1.4,12,entry.z+normal.z*1.4);
-    detailGroup.add(light);
+    group.add(light);
    }
   }
  }
@@ -150,7 +151,7 @@ function addBuilding(b,priority){
   pickMeshes.push(m);
  }
  pickMeshes.push(quad([top[0],top[1],top[2],top[3]],roofMaterial,container,{lotId:b.id}));
- if(priority)addFacadeDetails(b,container);
+ // Each building's detail group will now be owned and disposed by its streaming node.
  // Exact footprint/roof highlight. Geometry is reused, no approximated AABB.
  const selectedMaterial=new THREE.LineBasicMaterial({color:"#ffe2a2",depthTest:true,transparent:true,opacity:.97});
  const points=[];
@@ -163,13 +164,61 @@ function addBuilding(b,priority){
  const selection=new THREE.LineSegments(g,selectedMaterial);
  selection.visible=false;scene.add(selection);selectionEdges.set(b.id,selection);
  buildingsById.set(b.id,b);
+ const node={container,selection,details:null,wallMaterial,roofMaterial};
+ renderedBuildings.set(b.id,node);
+ if(priority)setDetails(b,node,true);
 }
-for(let i=0;i<cluster.buildings.length;i++)addBuilding(cluster.buildings[i],i<16);
+function disposeGeometry(group){
+ group.traverse(node=>{if(node.geometry)node.geometry.dispose()});
+}
+function setDetails(b,node,enabled){
+ if(enabled&&!node.details){
+  node.details=new THREE.Group();
+  detailGroup.add(node.details);
+  addFacadeDetails(b,node.details);
+ }else if(!enabled&&node.details){
+  detailGroup.remove(node.details);disposeGeometry(node.details);
+  node.details=null;
+ }
+}
+function unloadBuilding(id){
+ const node=renderedBuildings.get(id);
+ if(!node)return;
+ if(node.details)setDetails(buildingsById.get(id),node,false);
+ scene.remove(node.container);disposeGeometry(node.container);
+ node.wallMaterial.dispose();node.roofMaterial.dispose();
+ scene.remove(node.selection);disposeGeometry(node.selection);node.selection.material.dispose();
+ for(let i=pickMeshes.length-1;i>=0;i--)
+  if(pickMeshes[i].userData.lotId===id)pickMeshes.splice(i,1);
+ renderedBuildings.delete(id);selectionEdges.delete(id);buildingsById.delete(id);
+ if(chosenId===id)chooseBuilding(null);
+}
+let lastStreamCenter=null,lastStreamRadius=0;
+function updateVisibleCity(force=false){
+ const p={x:camera.position.x,z:camera.position.z};
+ const offset=camera.position.clone().sub(controls.target);
+ const horizontal=Math.hypot(offset.x,offset.z);
+ const radius=Core.clamp(420+horizontal*.7,440,760);
+ if(!force&&lastStreamCenter&&Math.hypot(p.x-lastStreamCenter.x,p.z-lastStreamCenter.z)<45&&
+  Math.abs(radius-lastStreamRadius)<35)return;
+ lastStreamCenter=p;lastStreamRadius=radius;
+ const nearby=Core.nearbyBuildings(data.buildings,p,radius,120);
+ const desired=new Set(nearby.map(b=>b.id));
+ for(const id of [...renderedBuildings.keys()])if(!desired.has(id))unloadBuilding(id);
+ for(const b of nearby){
+  const d=Math.hypot(b.x-p.x,b.y-p.z);
+  if(!renderedBuildings.has(b.id))addBuilding(b,d<165);
+  else{
+   const node=renderedBuildings.get(b.id);
+   if(d<165)setDetails(b,node,true);
+   if(d>230)setDetails(b,node,false);
+  }
+ }
+}
 const roadSegments=[];
 const distanceToFocus=p=>Math.hypot(p.x-focus.x,p.y-focus.y);
 for(const road of data.roads)for(let i=1;i<road.points.length;i++){
- const a=road.points[i-1],b=road.points[i],mid={x:(a.x+b.x)/2,y:(a.y+b.y)/2};
- if(Math.min(distanceToFocus(a),distanceToFocus(b),distanceToFocus(mid))>660)continue;
+ const a=road.points[i-1],b=road.points[i];
  const dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1;
  const nx=-dy/len*road.width/2,nz=dx/len*road.width/2;
  quad([
@@ -188,9 +237,9 @@ function streetLamp(x,z){
  glow.position.y=17.7;root.add(glow);
  scene.add(root);
 }
-const lamps=data.props.filter(p=>p.type==="streetLamp"&&distanceToFocus(p)<410).slice(0,16);
+const lamps=data.props.filter(p=>p.type==="streetLamp");
 lamps.forEach(p=>streetLamp(p.x,p.y));
-if(lamps.length<3)for(const b of cluster.pilot.slice(0,3))streetLamp(b.door.x+9,b.door.y+7);
+if(lamps.length<3)for(const b of Core.cluster(data).pilot.slice(0,3))streetLamp(b.door.x+9,b.door.y+7);
 
 const controls=new OrbitControls(camera,renderer.domElement);
 controls.target.copy(TARGET);
