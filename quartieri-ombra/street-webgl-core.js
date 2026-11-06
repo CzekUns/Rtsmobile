@@ -84,6 +84,27 @@ function resolveCameraCollision(position,buildings,clearance=3){
  }
  return p;
 }
+
+// Sweep along the whole camera path so a fast frame cannot tunnel through a
+// thin tenement. All collision checks use the canonical footprint polygons.
+function sweepCameraMovement(start,end,buildings,clearance=3){
+ const dx=end.x-start.x,dz=end.z-start.z;
+ const length=Math.hypot(dx,dz);
+ if(!Number.isFinite(length)||!Number.isFinite(end.y))return {...start};
+ const steps=Math.max(1,Math.ceil(length/Math.max(1,clearance*.5)));
+ const maxSteps=Math.min(steps,2048);
+ let last={x:start.x,y:start.y,z:start.z};
+ for(let i=1;i<=maxSteps;i++){
+  const t=i/steps;
+  const candidate={x:start.x+dx*t,y:start.y+(end.y-start.y)*t,z:start.z+dz*t};
+  const resolved=resolveCameraCollision(candidate,buildings,clearance);
+  if(Math.hypot(resolved.x-candidate.x,resolved.z-candidate.z)>Math.max(.01,clearance*.05))
+   return last;
+  last=candidate;
+ }
+ return last;
+}
+
 // Normalize the mobile joystick into a circular -1..1 input, with a dead zone
 // to avoid drifting if the player's thumb rests near the center.
 function joystickAxes(dx,dy,radius=38,deadzone=.14){
@@ -138,7 +159,7 @@ function evaluateGeometry(buildings){
  }
  return{buildings:buildings.length,vertices};
 }
-return{PILOT_IDS,clamp,angleDeg,center,segmentDistance,doorEdgeIndex,cluster,cameraPoint,isTap,evaluateGeometry,pointInsideFootprint,resolveCameraCollision,joystickAxes,joystickDisplacement,streetSpawn,nearbyBuildings,clampToWorld};
+return{PILOT_IDS,clamp,angleDeg,center,segmentDistance,doorEdgeIndex,cluster,cameraPoint,isTap,evaluateGeometry,pointInsideFootprint,resolveCameraCollision,sweepCameraMovement,joystickAxes,joystickDisplacement,streetSpawn,nearbyBuildings,clampToWorld};
 })();
 if(typeof window!=="undefined")window.QOStreetWebGLCore=QOStreetWebGLCore;
 if(typeof module!=="undefined"&&module.exports)module.exports=QOStreetWebGLCore;

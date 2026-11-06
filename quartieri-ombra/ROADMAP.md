@@ -1,3 +1,8 @@
+### 2026-11-06 — WebGL joystick swept collision (PR in review)
+- [x] Aggiunto controllo lungo il segmento di movimento, con campionamento inferiore al margine di collisione, per evitare attraversamento di edifici sottili tra due frame.
+- [x] Collegato al movimento della levetta usando tutti i footprint canonici; 4 verifiche V8 eseguite e superate, test Node persistente aggiunto ma non eseguito in Node.
+- [ ] Test GPU desktop/Android e verifica dell'interazione con le PR camera concorrenti prima del merge.
+
 ### 2026-11-06 — Navigazione reale dentro la plancia, non soltanto orbita sul margine (feedback utente)
 - [x] Diagnosi: LAB WebGL visualizzava soltanto 38 palazzi attorno al gruppo Cross Street, terreno 1350×1350 e strade entro 660 unità; OrbitControls imponeva `maxTargetRadius=540` attorno all'origine (0,0), bloccando la camera lontano dalla mappa 2700×2100.
 - [x] Rimossa la restrizione radiale; ingresso della telecamera al vero crocevia `world.hub` a quota lampione, orientato lungo Cross Street, vista ravvicinata.
