@@ -1,3 +1,11 @@
+### 2026-11-06 — Navigazione reale dentro la plancia, non soltanto orbita sul margine (feedback utente)
+- [x] Diagnosi: LAB WebGL visualizzava soltanto 38 palazzi attorno al gruppo Cross Street, terreno 1350×1350 e strade entro 660 unità; OrbitControls imponeva `maxTargetRadius=540` attorno all'origine (0,0), bloccando la camera lontano dalla mappa 2700×2100.
+- [x] Rimossa la restrizione radiale; ingresso della telecamera al vero crocevia `world.hub` a quota lampione, orientato lungo Cross Street, vista ravvicinata.
+- [x] **Streaming dei 454 lotti canonici**: costruisce e rimuove mesh dei palazzi vicini durante la camminata, con limite 120 contemporanei; grafiche dettagliate caricate solo vicino, geometrie GPU rilasciate alla rimozione, raycast e selezione aggiornati; collisioni su **tutti** i palazzi, indipendentemente da quelli visibili.
+- [x] Terreno e strade estesi alla dimensione reale del mondo. Spostamento joystick fisico di camera+target, collisioni canoniche, restrizione solo ai veri confini città; HUD con settore e conteggio edifici visibili.
+- [x] Casi funzionali nel runtime JavaScript sullo spawn in strada, settori distanti, limiti fisici, movimento e contratto renderer: 5/5 PASS. Aggiunto test persistente e adattati test joystick/context lifecycle.
+- [ ] Collaudo visuale con WebGL2 desktop e **Android landscape**: assicurarsi di poter attraversare diversi settori, mantenendo prestazioni, navigazione ed effettiva collisione con gli edifici. Non dichiarare ancora gioco finito.
+
 ### 2026-11-06 — LAB WebGL: joystick di movimento basso-sinistra (richiesta utente)
 - [x] Levetta overlay touch nel LAB WebGL in basso a sinistra, sempre sopra l'HUD adattivo: il pollice sinistro sposta la telecamera + target nel piano delle strade, mentre un dito sul canvas continua a ruotare la visuale.
 - [x] Movimento relativo alla direzione corrente (incluse viste a 255°), velocità proporzionale alla pressione, zona morta, clamp circolare e limiti delta-time; reset immediato al rilascio, perdita focus, visibilità o perdita del contesto grafico.
