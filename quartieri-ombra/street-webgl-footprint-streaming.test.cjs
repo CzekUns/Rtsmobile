@@ -1,0 +1,9 @@
+const test=require('node:test');
+const assert=require('node:assert/strict');
+const Core=require('./street-webgl-core.js');
+const long={id:1,x:500,y:5,poly:[{x:0,y:0},{x:1000,y:0},{x:1000,y:10},{x:0,y:10}]};
+const far={id:2,x:3000,y:3000,poly:[{x:2990,y:2990},{x:3010,y:2990},{x:3010,y:3010},{x:2990,y:3010}]};
+test('long lot stays visible near either endpoint',()=>{assert.equal(Core.nearbyBuildings([long],{x:5,z:15},20).length,1);assert.equal(Core.nearbyBuildings([long],{x:995,z:15},20).length,1)});
+test('lot disappears outside footprint radius',()=>assert.equal(Core.nearbyBuildings([long],{x:5,z:40},20).length,0));
+test('nearest footprint wins streaming cap',()=>assert.equal(Core.nearbyBuildings([far,long],{x:5,z:15},100,1)[0].id,1));
+test('camera inside footprint stays within clearance radius',()=>assert.equal(Core.nearbyBuildings([long],{x:5,z:5},6).length,1));
