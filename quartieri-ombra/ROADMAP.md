@@ -1,3 +1,7 @@
+
+### 2026-11-06 — Collisione continua durante camminata WebGL
+- [x] La levetta ora campiona il segmento percorso dalla telecamera rispetto ai footprint solidi canonici; un frame veloce non può attraversare un edificio stretto passando da un lato all'altro. Arresto prima della prima collisione, senza modificare l'orbita né il gameplay.
+- [ ] Verificare su GPU desktop e Android landscape, in particolare scorrimento lungo le facciate e FPS; prova geometrica JS isolata 3/3, non equivale a smoke browser.
 ### 2026-11-06 — Navigazione reale dentro la plancia, non soltanto orbita sul margine (feedback utente)
 - [x] Diagnosi: LAB WebGL visualizzava soltanto 38 palazzi attorno al gruppo Cross Street, terreno 1350×1350 e strade entro 660 unità; OrbitControls imponeva `maxTargetRadius=540` attorno all'origine (0,0), bloccando la camera lontano dalla mappa 2700×2100.
 - [x] Rimossa la restrizione radiale; ingresso della telecamera al vero crocevia `world.hub` a quota lampione, orientato lungo Cross Street, vista ravvicinata.
