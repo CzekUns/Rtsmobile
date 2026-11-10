@@ -42,13 +42,19 @@ window.addEventListener('resize',resizeStage);
 window.addEventListener('orientationchange',resizeStage);
 window.visualViewport?.addEventListener('resize',resizeStage);
 if(typeof ResizeObserver!=='undefined')new ResizeObserver(resizeStage).observe($('world'));
+const compactOrders=window.matchMedia('(max-width:1000px) and (pointer:coarse)');
 function setOrdersVisible(visible){
+ const sidebar=$('orderSidebar');
+ if(!visible&&sidebar.contains(document.activeElement))$('sidebarToggle').focus();
  $('stage').classList.toggle('panel-collapsed',!visible);
  $('sidebarToggle').setAttribute('aria-expanded',String(visible));
  $('sidebarToggle').textContent=visible?'ORDINI ◂':'ORDINI ▸';
- $('orderSidebar').setAttribute('aria-hidden',String(!visible));
+ sidebar.setAttribute('aria-hidden',String(!visible));
+ // aria-hidden alone leaves hidden buttons reachable via keyboard.
+ sidebar.inert=!visible;
 }
-setOrdersVisible(!window.matchMedia('(max-width:1000px) and (pointer:coarse)').matches);
+setOrdersVisible(!compactOrders.matches);
+compactOrders.addEventListener('change',()=>setOrdersVisible(!compactOrders.matches));
 $('sidebarToggle').addEventListener('click',()=>
  setOrdersVisible($('stage').classList.contains('panel-collapsed')));
 function status(message){
