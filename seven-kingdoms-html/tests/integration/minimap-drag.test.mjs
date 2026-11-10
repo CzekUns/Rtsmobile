@@ -40,3 +40,8 @@ test('other pointers and secondary mouse button cannot hijack drag',()=>{
  handlers.pointercancel({pointerId:2});
  assert.deepEqual(camera,[[0,0]]);
 });
+
+test('minimap owns touch gestures instead of browser pan or zoom',()=>{
+ const css=readFileSync(new URL('../../style.css',import.meta.url),'utf8');
+ assert.match(css,/#minimap\s*\{[^}]*touch-action:\s*none\s*[;}]/,'touch drag requires touch-action:none on minimap canvas');
+});
