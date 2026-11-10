@@ -4,7 +4,7 @@
 import {WORLD_W,WORLD_H,NATIONS,FIRMS,terrain,range} from './rules.js';
 import {OriginalSpritePreview,compassDirection,walkingFrame} from './playtest/original-sprites.js';
 import {OriginalTerrainPreview} from './playtest/original-terrain.js';
-import {clipMinimapViewport} from './playtest/minimap-viewport.js';
+import {clipMinimapViewport,insetMinimapStroke} from './playtest/minimap-viewport.js';
 const COLORS={
   grass:['#81996a','#8aa171','#769367'],forest:['#496d46','#567b4b','#3e6645'],
   hill:['#a59d7f','#aaa487','#8e9077'],dry:['#b6a983','#c1ad86','#a89f7f'],
@@ -233,7 +233,8 @@ export class WorldView{
   const vw=this.canvas.width/this.tile(),vh=this.canvas.height/this.tile();
   const visible=clipMinimapViewport(this.cx,this.cy,vw,vh,WORLD_W,WORLD_H);
   ctx.strokeStyle='#fff0ad';ctx.lineWidth=1.2;
-  ctx.strokeRect(visible.x*dx,visible.y*dy,visible.width*dx,visible.height*dy);
+  const outline=insetMinimapStroke({x:visible.x*dx,y:visible.y*dy,width:visible.width*dx,height:visible.height*dy},c.width,c.height,ctx.lineWidth);
+  ctx.strokeRect(outline.x,outline.y,outline.width,outline.height);
  }
  minimapAt(px,py){this.center(px*this.canvas.width/this.canvas.width*WORLD_W/this.mini.width,py*WORLD_H/this.mini.height)}
 }
