@@ -82,7 +82,7 @@ function selectGroup(ids){
 function closeReport(){
  if($('reportDialog').open)$('reportDialog').close();
  report=null;
- document.querySelectorAll('[data-report]').forEach(b=>b.classList.remove('active'));
+ document.querySelectorAll('[data-report]').forEach(b=>{b.classList.remove('active');b.setAttribute('aria-pressed','false');});
 }
 function renderReport(){
  if(!report||!$('reportDialog').open)return;
@@ -92,7 +92,7 @@ function renderReport(){
 }
 function setReport(name){
  report=name;
- document.querySelectorAll('[data-report]').forEach(b=>b.classList.toggle('active',b.dataset.report===name));
+ document.querySelectorAll('[data-report]').forEach(b=>{const active=b.dataset.report===name;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});
  if(!$('reportDialog').open)$('reportDialog').showModal();
  renderReport();
 }
@@ -608,7 +608,7 @@ document.addEventListener('click',e=>{
 });
 $('reportDialog').addEventListener('close',()=>{
  report=null;
- document.querySelectorAll('[data-report]').forEach(b=>b.classList.remove('active'));
+ document.querySelectorAll('[data-report]').forEach(b=>{b.classList.remove('active');b.setAttribute('aria-pressed','false');});
 });
 $('closeReport').addEventListener('click',closeReport);
 $('menuBtn').addEventListener('click',()=>{
@@ -631,7 +631,7 @@ document.addEventListener('fullscreenchange',()=>{
 });
 document.addEventListener('keydown',e=>{
  if(e.target instanceof HTMLInputElement)return;
- if(e.key==='Escape'){closeReport();cancelBuild();$('gameMenu').hidden=true;return;}
+ if(e.key==='Escape'){closeReport();cancelBuild();$('gameMenu').hidden=true;$('menuBtn').setAttribute('aria-expanded','false');return;}
  if(e.key===' '||e.key==='0'){e.preventDefault();game.paused=!game.paused;renderHud();return;}
  if(/^[1-5]$/.test(e.key)){game.setSpeed(Number(e.key));renderHud();return;}
  if(e.key.toLowerCase()==='s'&&!e.ctrlKey){e.preventDefault();status(game.save(saveKey)?'Partita salvata.':'Errore di salvataggio.');return;}
