@@ -12,6 +12,7 @@ import {issueWorkOrder,completeWorkArrivals} from './playtest/work-assignments.j
 import {issueBuildOrder,cancelBuildOrder,advanceConstruction,isBuilder,canBuildFirm} from './playtest/construction.js';
 import {issueRepairOrder,cancelRepairOrder,advanceRepairs,canRepair} from './playtest/repairs.js';
 import {WorldView} from './view.js';
+import {shouldIgnoreGlobalShortcut} from './playtest/keyboard-focus-guard.js';
 import {SKILLS,skillLabel,workerRoleLabel,workerRaceLabel,ensureFirmPersonnel} from './playtest/personnel.js';
 import {ensureTownRaces,selectedTownRace,recruitableTownPeople} from './playtest/town-races.js';
 const $=id=>document.getElementById(id);
@@ -630,7 +631,7 @@ document.addEventListener('fullscreenchange',()=>{
  $('fullscreenBtn').textContent=document.fullscreenElement?'⤢':'⛶';resizeStage();
 });
 document.addEventListener('keydown',e=>{
- if(e.target instanceof HTMLInputElement)return;
+ if(shouldIgnoreGlobalShortcut(e.target))return;
  if(e.key==='Escape'){closeReport();cancelBuild();$('gameMenu').hidden=true;return;}
  if(e.key===' '||e.key==='0'){e.preventDefault();game.paused=!game.paused;renderHud();return;}
  if(/^[1-5]$/.test(e.key)){game.setSpeed(Number(e.key));renderHud();return;}
