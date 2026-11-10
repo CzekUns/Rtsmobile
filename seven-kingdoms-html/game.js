@@ -499,9 +499,36 @@ $('world').addEventListener('pointerup',e=>endPointer(e,false));
 $('world').addEventListener('pointercancel',e=>endPointer(e,true));
 $('world').addEventListener('contextmenu',e=>e.preventDefault());
 $('world').addEventListener('wheel',e=>{e.preventDefault();view.scale(e.deltaY<0?1.12:1/1.12)},{passive:false});
-$('minimap').addEventListener('pointerdown',e=>{
- const rect=e.currentTarget.getBoundingClientRect();
- view.center((e.clientX-rect.left)/rect.width*WORLD_W,(e.clientY-rect.top)/rect.height*WORLD_H);
+// Dragging the overview keeps the camera under the pointer on touch and mouse.
+// Ignore non-primary mouse buttons so a right-click cannot unexpectedly pan.
+const minimap=$('minimap');
+let minimapPointer=null;
+function navigateMinimap(e){
+ const rect=minimap.getBoundingClientRect();
+ if(!rect.width||!rect.height)return;
+ const x=Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width));
+ const y=Math.max(0,Math.min(1,(e.clientY-rect.top)/rect.height));
+ view.center(x*WORLD_W,y*WORLD_H);
+}
+minimap.addEventListener('pointerdown',e=>{
+ if(e.pointerType==='mouse'&&e.button!==0)return;
+ if(minimapPointer!==null)return;
+ minimapPointer=e.pointerId;
+ minimap.setPointerCapture?.(e.pointerId);
+ navigateMinimap(e);
+});
+minimap.addEventListener('pointermove',e=>{
+ if(e.pointerId===minimapPointer)navigateMinimap(e);
+});
+function endMinimapPointer(e){
+ if(e.pointerId!==minimapPointer)return;
+ minimapPointer=null;
+ if(minimap.hasPointerCapture?.(e.pointerId))minimap.releasePointerCapture(e.pointerId);
+}
+minimap.addEventListener('pointerup',endMinimapPointer);
+minimap.addEventListener('pointercancel',endMinimapPointer);
+minimap.addEventListener('lostpointercapture',e=>{
+ if(e.pointerId===minimapPointer)minimapPointer=null;
 });
 document.addEventListener('click',e=>{
  const menu=e.target.closest('[data-menu]');
