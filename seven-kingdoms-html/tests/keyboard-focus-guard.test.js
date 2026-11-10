@@ -13,3 +13,9 @@ test('map canvas and document remain eligible for RTS shortcuts', () => {
   assert.equal(shouldIgnoreGlobalShortcut(target('canvas')),false);
   assert.equal(shouldIgnoreGlobalShortcut(null),false);
 });
+
+test('modal dialogs suspend RTS shortcuts even with canvas focus', () => {
+  assert.equal(shouldIgnoreGlobalShortcut(target('canvas'),true),true);
+  assert.equal(shouldIgnoreGlobalShortcut(null,true),true);
+  assert.equal(shouldIgnoreGlobalShortcut(target('canvas'),false),false);
+});
