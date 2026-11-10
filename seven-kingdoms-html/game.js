@@ -631,8 +631,17 @@ document.addEventListener('fullscreenchange',()=>{
  $('fullscreenBtn').textContent=document.fullscreenElement?'⤢':'⛶';resizeStage();
 });
 document.addEventListener('keydown',e=>{
- if(shouldIgnoreGlobalShortcut(e.target))return;
- if(e.key==='Escape'){closeReport();cancelBuild();$('gameMenu').hidden=true;return;}
+ if(e.key==='Escape'){
+  // Escape must work even when a HUD button has keyboard focus.
+  // Leave native dialog dismissal to the browser.
+  if(!$('helpDialog').open&&!$('reportDialog').open){
+   cancelBuild();
+   $('gameMenu').hidden=true;
+   $('menuBtn').setAttribute('aria-expanded','false');
+  }
+  return;
+ }
+ if(shouldIgnoreGlobalShortcut(e.target,$('helpDialog').open||$('reportDialog').open))return;
  if(e.key===' '||e.key==='0'){e.preventDefault();game.paused=!game.paused;renderHud();return;}
  if(/^[1-5]$/.test(e.key)){game.setSpeed(Number(e.key));renderHud();return;}
  if(e.key.toLowerCase()==='s'&&!e.ctrlKey){e.preventDefault();status(game.save(saveKey)?'Partita salvata.':'Errore di salvataggio.');return;}
