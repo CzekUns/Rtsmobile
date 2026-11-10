@@ -4,6 +4,7 @@
 import {WORLD_W,WORLD_H,NATIONS,FIRMS,terrain,range} from './rules.js';
 import {OriginalSpritePreview,compassDirection,walkingFrame} from './playtest/original-sprites.js';
 import {OriginalTerrainPreview} from './playtest/original-terrain.js';
+import {clipMinimapViewport} from './playtest/minimap-viewport.js';
 const COLORS={
   grass:['#81996a','#8aa171','#769367'],forest:['#496d46','#567b4b','#3e6645'],
   hill:['#a59d7f','#aaa487','#8e9077'],dry:['#b6a983','#c1ad86','#a89f7f'],
@@ -230,8 +231,9 @@ export class WorldView{
    ctx.fillRect((firm.x+1)*dx,(firm.y+1)*dy,dx*1.5,dy*1.5);
   }
   const vw=this.canvas.width/this.tile(),vh=this.canvas.height/this.tile();
-  const left=(this.cx-vw/2)*dx,top=(this.cy-vh/2)*dy;
-  ctx.strokeStyle='#fff0ad';ctx.lineWidth=1.2;ctx.strokeRect(left,top,vw*dx,vh*dy);
+  const visible=clipMinimapViewport(this.cx,this.cy,vw,vh,WORLD_W,WORLD_H);
+  ctx.strokeStyle='#fff0ad';ctx.lineWidth=1.2;
+  ctx.strokeRect(visible.x*dx,visible.y*dy,visible.width*dx,visible.height*dy);
  }
  minimapAt(px,py){this.center(px*this.canvas.width/this.canvas.width*WORLD_W/this.mini.width,py*WORLD_H/this.mini.height)}
 }
