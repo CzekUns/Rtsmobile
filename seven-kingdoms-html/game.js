@@ -12,6 +12,7 @@ import {issueWorkOrder,completeWorkArrivals} from './playtest/work-assignments.j
 import {issueBuildOrder,cancelBuildOrder,advanceConstruction,isBuilder,canBuildFirm} from './playtest/construction.js';
 import {issueRepairOrder,cancelRepairOrder,advanceRepairs,canRepair} from './playtest/repairs.js';
 import {WorldView} from './view.js';
+import {selectionMeter} from './selection-meter.js';
 import {SKILLS,skillLabel,workerRoleLabel,workerRaceLabel,ensureFirmPersonnel} from './playtest/personnel.js';
 import {ensureTownRaces,selectedTownRace,recruitableTownPeople} from './playtest/town-races.js';
 const $=id=>document.getElementById(id);
@@ -142,8 +143,7 @@ function selectedContent(){
   const selectedRace=selectedTownRace(item);
   const available=selectedRace?recruitableTownPeople(item,selectedRace.raceId):0;
   const info='Popolazione <strong>'+item.pop+'</strong> · '+races.length+' etnie'+
-    '<br>'+(independent?'Resistenza <strong>'+Math.floor(item.resistance)+'</strong>/100':
-                   'Fedeltà media <strong>'+Math.floor(item.loyalty)+'</strong>/100')+
+    '<br>'+selectionMeter(independent?'Resistenza':'Fedeltà media',independent?item.resistance:item.loyalty)+
     '<br>Regno: '+esc(nation.name)+
     (selectedRace?'<br>Selezionata: <strong>'+esc(selectedRace.culture)+'</strong> · liberi '+available:'')+
     (item.trainingQueue?.length?'<br>In addestramento: '+item.trainingQueue.length+'/10':'');
@@ -207,8 +207,8 @@ function selectedContent(){
   return {
    title:rule.label,meta:'Edificio · '+nation.name,color,
    info:'Lavoratori <strong>'+staff.length+'</strong>/8'+
-    '<br>Integrità edificio <strong>'+Math.floor(item.hp??100)+'</strong>/'+(item.maxHp??100)+' HP'+
-    (item.underConstruction?'<br><strong>IN COSTRUZIONE '+Math.floor((item.buildProgress||0)*100)+'%</strong>':'')+
+    '<br>'+selectionMeter('Integrità edificio',item.hp??100,item.maxHp??100)+
+    (item.underConstruction?'<br>'+selectionMeter('In costruzione',item.buildProgress||0,1):'')+
     '<br>Esperienza '+Math.floor(item.experience)+
     (item.kind==='fort'?'<br>Il forte influenza i villaggi collegati.':
       item.kind==='mine'?'<br>Produce minerali grezzi.':
