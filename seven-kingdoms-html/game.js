@@ -12,7 +12,7 @@ import {issueWorkOrder,completeWorkArrivals} from './playtest/work-assignments.j
 import {issueBuildOrder,cancelBuildOrder,advanceConstruction,isBuilder,canBuildFirm} from './playtest/construction.js';
 import {issueRepairOrder,cancelRepairOrder,advanceRepairs,canRepair} from './playtest/repairs.js';
 import {WorldView} from './view.js';
-import {minimapKeyTarget} from './playtest/minimap-keyboard.js';
+import {minimapKeyboardTarget} from './playtest/minimap-keyboard.js';
 import {SKILLS,skillLabel,workerRoleLabel,workerRaceLabel,ensureFirmPersonnel} from './playtest/personnel.js';
 import {ensureTownRaces,selectedTownRace,recruitableTownPeople} from './playtest/town-races.js';
 const $=id=>document.getElementById(id);
@@ -501,7 +501,7 @@ $('world').addEventListener('pointercancel',e=>endPointer(e,true));
 $('world').addEventListener('contextmenu',e=>e.preventDefault());
 $('world').addEventListener('wheel',e=>{e.preventDefault();view.scale(e.deltaY<0?1.12:1/1.12)},{passive:false});
 $('minimap').addEventListener('keydown',e=>{
- const target=minimapKeyTarget(e.key,{x:view.cx,y:view.cy},WORLD_W,WORLD_H);
+ const target=minimapKeyboardTarget(e,{x:view.cx,y:view.cy},WORLD_W,WORLD_H);
  if(!target)return;
  e.preventDefault();
  view.center(target.x,target.y);
