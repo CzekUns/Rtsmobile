@@ -212,3 +212,10 @@ dialog button{min-height:35px;padding:6px 15px}
 @media(orientation:portrait){
  #stage{visibility:hidden}
 }
+
+/* Selection indicators use existing HUD tones; original bitmap parity pending. */
+.selection-meter{display:flex;flex-direction:column;gap:2px;margin:3px 0 5px;min-width:0}
+.selection-meter-track{display:block;height:9px;border:1px solid #676b5d;background:#a7a99a;overflow:hidden}
+.selection-meter-fill{display:block;height:100%;background:#a18e61;max-width:100%;min-width:0}
+.selection-meter-caption{font:11px/1.2 Georgia,serif;color:#242922;overflow-wrap:anywhere}
+.selection-meter-caption strong{font-variant-numeric:tabular-nums}
