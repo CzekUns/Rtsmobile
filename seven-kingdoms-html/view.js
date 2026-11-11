@@ -236,9 +236,19 @@ export class WorldView{
    ctx.fillStyle=NATIONS[unit.owner]?.color||'#fff';
    ctx.fillRect(unit.x*dx,unit.y*dy,Math.max(1,dx),Math.max(1,dy));
   }
+  // Clip the camera rectangle to the actual map. At high zoom-out or near
+  // an edge the world view extends beyond the playable area.
   const vw=this.canvas.width/this.tile(),vh=this.canvas.height/this.tile();
-  const left=(this.cx-vw/2)*dx,top=(this.cy-vh/2)*dy;
-  ctx.strokeStyle='#fff0ad';ctx.lineWidth=1.2;ctx.strokeRect(left,top,vw*dx,vh*dy);
+  const left=Math.max(0,(this.cx-vw/2)*dx);
+  const top=Math.max(0,(this.cy-vh/2)*dy);
+  const right=Math.min(c.width,(this.cx+vw/2)*dx);
+  const bottom=Math.min(c.height,(this.cy+vh/2)*dy);
+  if(right>left&&bottom>top){
+   ctx.strokeStyle='#fff0ad';ctx.lineWidth=1.2;
+   ctx.strokeRect(left,top,right-left,bottom-top);
+  }
  }
- minimapAt(px,py){this.center(px*this.canvas.width/this.canvas.width*WORLD_W/this.mini.width,py*WORLD_H/this.mini.height)}
+ minimapAt(px,py){
+  this.center(px*WORLD_W/this.mini.width,py*WORLD_H/this.mini.height);
+ }
 }
