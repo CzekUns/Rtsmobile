@@ -221,13 +221,20 @@ export class WorldView{
   for(let y=0;y<WORLD_H;y+=2)for(let x=0;x<WORLD_W;x+=2){
    const type=terrain(g.seed,x,y);ctx.fillStyle=COLORS[type][0];ctx.fillRect(x*dx,y*dy,dx*2+.6,dy*2+.6);
   }
+  // Use the same tile footprints and nation colors as the world renderer.
+  // Do not offset markers by one tile: that shifts the strategic map.
   for(const town of g.towns){
    ctx.fillStyle=NATIONS[town.owner]?.color||'#fff';
-   ctx.fillRect((town.x+1)*dx,(town.y+1)*dy,Math.max(2,2*dx),Math.max(2,2*dy));
+   ctx.fillRect(town.x*dx,town.y*dy,town.size*dx,town.size*dy);
   }
   for(const firm of g.firms){
    ctx.fillStyle=NATIONS[firm.owner]?.color||'#fff';
-   ctx.fillRect((firm.x+1)*dx,(firm.y+1)*dy,dx*1.5,dy*1.5);
+   ctx.fillRect(firm.x*dx,firm.y*dy,firm.size*dx,firm.size*dy);
+  }
+  // Units are shown after settlements, matching their draw order on the map.
+  for(const unit of g.units){
+   ctx.fillStyle=NATIONS[unit.owner]?.color||'#fff';
+   ctx.fillRect(unit.x*dx,unit.y*dy,Math.max(1,dx),Math.max(1,dy));
   }
   const vw=this.canvas.width/this.tile(),vh=this.canvas.height/this.tile();
   const left=(this.cx-vw/2)*dx,top=(this.cy-vh/2)*dy;
