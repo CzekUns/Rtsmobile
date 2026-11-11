@@ -152,7 +152,8 @@ function selectedContent(){
    const active=r.raceId===item.selectedRaceId;
    return '<button type="button" class="town-race-choice'+(active?' active':'')+'" data-town-race="'+esc(r.raceId)+'" aria-pressed="'+active+'">'+
     esc(r.culture)+' · '+r.population+' abitanti'+
-    '<small>Disoccupati '+r.jobless+' · Fedeltà '+Math.floor(r.loyalty)+'</small></button>';
+    '<small>Disoccupati '+r.jobless+' · Fedeltà '+Math.floor(r.loyalty)+'</small>'+ 
+    selectionMeter('Fedeltà '+r.culture,r.loyalty)+'</button>';
   }).join('');
   const canRecruit=item.owner===1&&item.pop>4&&available>0&&selectedRace?.loyalty>=30;
   const canTrain=canRecruit&&ownFortLinked&&game.cash>=30&&(item.trainingQueue?.length||0)<10;
@@ -199,8 +200,8 @@ function selectedContent(){
    const ethnicity=workerRaceLabel(person);
    return '<div class="worker-row"><strong>'+esc(who)+'</strong>'+
     '<small>'+esc(role)+' · '+esc(ethnicity)+'</small>'+
-    '<small>'+esc(profile)+'</small><small>HP '+Math.floor(person.hp??100)+
-    ' · ID '+esc(person.personId??person.id)+'</small>'+
+    '<small>'+esc(profile)+'</small><small>ID '+esc(person.personId??person.id)+'</small>'+
+    selectionMeter('Salute '+who,person.hp??100)+' '+
     (item.owner===1?'<button type="button" data-worker-exit="'+esc(person.id)+'">Fai uscire</button>':'')+
     '</div>';
   }).join('');
