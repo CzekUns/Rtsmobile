@@ -23,3 +23,12 @@ Tests added; local `npm test` blocked because the execution container cannot res
 
 ## Next dependency
 Compare town/fort screenshots from the original 7KAA build and replace provisional HUD visual treatment with verified original resources, coordinating with SKH-103 and SKH-101.
+
+## Incremental panel details — 2026-11-11
+- **ID:** SKH-106-DETAILS-01; **status:** DA VERIFICARE.
+- **Reference:** 7KAA `src/OTOWNIF.cpp` town race loyalty; `src/OFIRMIF.cpp` worker hit points. HTML `game.js` selectedContent, `selection-meter.js`.
+- **Objective HTML gap:** each town race was text-only for loyalty, and firm personnel displayed only a raw HP integer. Global town/firm indicators already existed in PR #107.
+- **Implementation:** render bounded per-race loyalty and per-worker health meters directly within existing race-choice/worker rows. Preserve race selection, personnel exit buttons, IDs, existing nation colors, and mobile panel placement. No asset changes.
+- **Commits:** `ab1cb2e6` implementation; `5aec0d6c` regression source/markup tests.
+- **QA:** Node regression added, execution/CI and visual 1×/2×/Android still pending; original bitmap parity **not certified**. Worker health range assumes existing HTML 0–100 model, not an upstream C++ health formula.
+- **Next dependency:** source-verified original panel frame/controls and screenshot comparison; coordinate with UI and Asset streams.
