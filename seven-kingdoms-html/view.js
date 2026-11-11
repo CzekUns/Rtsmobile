@@ -239,6 +239,16 @@ export class WorldView{
   };
   for(const town of g.towns)marker(town,town.size,town.size);
   for(const firm of g.firms)marker(firm,firm.size,firm.size);
+  // Planned construction sites have a visible footprint on the main map,
+  // but are not yet firms. Keep them visible on the strategic minimap too.
+  // Reuse the existing main-map construction outline color (no new palette).
+  for(const site of g.constructionSites||[]){
+   if(site.status!=='walking')continue;
+   const rect=minimapFootprint(site.x,site.y,site.size,site.size,WORLD_W,WORLD_H,c.width,c.height);
+   if(!rect)continue;
+   ctx.strokeStyle='#f4cb63';ctx.lineWidth=1;
+   ctx.strokeRect(rect.x+.5,rect.y+.5,Math.max(0,rect.width-1),Math.max(0,rect.height-1));
+  }
   // Units are drawn last, following the main renderer's layer order.
   for(const unit of g.units)marker(unit,1,1);
   const vw=this.canvas.width/this.tile(),vh=this.canvas.height/this.tile();
