@@ -241,14 +241,14 @@ function selectedContent(){
   return {
    title:item.kind==='soldier'?'Soldato':'Abitante',
    meta:nation.name+' · Livello '+item.level,color,
-   info:'Salute '+item.hp+'/100 · '+esc(item.culture||'Etnia non registrata')+
+   info:selectionMeter('Salute unità',item.hp??100,100)+' · '+esc(item.culture||'Etnia non registrata')+
     '<br>Abilità '+esc(skillLabel(item.skillId,item.skillLevel,item.legacyUnknown))+
     ' · Combattimento '+Math.floor(item.combatLevel||0)+
     '<br>ID '+esc(item.personId??item.id)+
     '<br>'+(activeRepair?'Riparazione '+esc(FIRMS[activeRepair.kind]?.label||activeRepair.kind)+
-      ' · '+Math.floor(activeRepair.hp??100)+'/'+(activeRepair.maxHp??100)+' HP':
+      ' · '+selectionMeter('Integrità riparazione',activeRepair.hp??100,activeRepair.maxHp??100):
      activeSite?'Cantiere '+esc(FIRMS[activeSite.kind]?.label||activeSite.kind)+
-      ' · '+(activeSite.status==='walking'?'In marcia':'Lavori '+Math.floor(activeSite.progress*100)+'%'):
+      ' · '+(activeSite.status==='walking'?'In marcia':selectionMeter('Avanzamento cantiere',activeSite.progress??0,1)):
      assignedTo?'In viaggio verso '+esc(FIRMS[assignedTo.kind]?.label||'edificio'):
            item.target?'In marcia':'Pronto per gli ordini')+
     '<br>Su smartphone usa MOD + tocco per spostarti, oppure scegli un edificio qui sotto. L\'abitante entrerà solo dopo aver raggiunto l\'ingresso.',
