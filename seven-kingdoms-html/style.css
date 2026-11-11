@@ -197,7 +197,10 @@ dialog button{min-height:35px;padding:6px 15px}
  .reports button{min-width:55px;font-size:9px}
  .treasury{flex-basis:145px;gap:1px 3px}
  .treasury span{min-width:55px;font-size:10px}
- .datebox{display:none}
+ /* Keep the in-game date visible in landscape mobile instead of removing it. */
+ .datebox{display:flex;flex:0 0 68px;gap:0;min-width:0}
+ .datebox strong{font-size:10px}
+ .datebox small{font-size:8px}
  .toptools>button{min-width:30px;font-size:15px}
  .toptools #menuBtn{width:49px}
 }
@@ -211,4 +214,20 @@ dialog button{min-height:35px;padding:6px 15px}
 }
 @media(orientation:portrait){
  #stage{visibility:hidden}
+}
+
+/* Compact landscape: the report strip scrolls while the date and menu remain available. */
+@media(max-width:620px) and (orientation:landscape){
+ .topbar{gap:2px}
+ .reports{flex:1 1 0;min-width:48px;scroll-padding-inline:4px}
+ .reports button{min-width:52px}
+ .treasury{flex:0 0 100px;gap:0 2px;padding:0 1px}
+ .treasury span{min-width:46px;padding:0;font-size:9px;gap:2px}
+ .treasury b{font-size:9px}
+ .datebox{flex-basis:58px}
+ .datebox strong{font-size:9px}
+ .datebox small{font-size:8px}
+ .toptools{gap:1px}
+ .toptools>button{min-width:28px;min-height:32px;padding:1px;font-size:14px}
+ .toptools #menuBtn{width:43px;font-size:10px}
 }
