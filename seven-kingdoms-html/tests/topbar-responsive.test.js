@@ -22,3 +22,9 @@ test('report navigation scrolls without hiding focus or trapping vertical gestur
   assert.match(css, /\.reports:focus-within\{scrollbar-width:auto\}/);
   assert.match(css, /@media\(prefers-reduced-motion:reduce\)\{\.reports\{scroll-behavior:auto\}\}/);
 });
+
+test('landscape HUD honors physical left and right safe-area insets', () => {
+  const topbar = css.match(/\.topbar\{\s*position:absolute;z-index:30;[\s\S]*?\n\}/)?.[0];
+  assert.ok(topbar, 'fullscreen topbar rules exist');
+  assert.match(topbar, /padding:2px max\(6px,env\(safe-area-inset-left\)\) 2px max\(6px,env\(safe-area-inset-right\)\)/);
+});
