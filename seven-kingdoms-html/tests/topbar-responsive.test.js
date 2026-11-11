@@ -15,3 +15,10 @@ test('narrow landscape keeps reports scrollable and date/menu accessible', () =>
   assert.match(compact, /\.datebox\{flex-basis:58px/);
   assert.match(compact, /\.toptools #menuBtn\{width:43px/);
 });
+
+test('report navigation scrolls without hiding focus or trapping vertical gestures', () => {
+  assert.match(css, /\.reports\{[^}]*overflow-x:auto;overflow-y:hidden;[^}]*scroll-snap-type:x proximity/);
+  assert.match(css, /\.reports button\{scroll-snap-align:start\}/);
+  assert.match(css, /\.reports:focus-within\{scrollbar-width:auto\}/);
+  assert.match(css, /@media\(prefers-reduced-motion:reduce\)\{\.reports\{scroll-behavior:auto\}\}/);
+});
