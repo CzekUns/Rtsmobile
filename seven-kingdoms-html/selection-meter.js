@@ -9,5 +9,5 @@ export function selectionMeter(label,value,max=100){
  return '<div class="selection-meter" role="progressbar" aria-label="'+name+
   '" aria-valuemin="0" aria-valuemax="'+ceiling+'" aria-valuenow="'+current+'">'+
   '<span class="selection-meter-track"><span class="selection-meter-fill" style="width:'+pct+'%"></span></span>'+
-  '<span class="selection-meter-caption">'+name+' <strong>'+Math.floor(current)+'</strong>/'+Math.floor(ceiling)+'</span></div>';
+  '<span class="selection-meter-caption">'+name+' <strong>'+(ceiling===1?Math.floor(pct)+'%':Math.floor(current)+'/'+Math.floor(ceiling))+'</strong></span></div>';
 }
