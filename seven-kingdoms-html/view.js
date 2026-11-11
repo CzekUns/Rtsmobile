@@ -4,6 +4,7 @@
 import {WORLD_W,WORLD_H,NATIONS,FIRMS,terrain,range} from './rules.js';
 import {OriginalSpritePreview,compassDirection,walkingFrame} from './playtest/original-sprites.js';
 import {OriginalTerrainPreview} from './playtest/original-terrain.js';
+import {minimapFootprint,minimapViewport} from './minimap-geometry.js';
 const COLORS={
   grass:['#81996a','#8aa171','#769367'],forest:['#496d46','#567b4b','#3e6645'],
   hill:['#a59d7f','#aaa487','#8e9077'],dry:['#b6a983','#c1ad86','#a89f7f'],
@@ -228,32 +229,22 @@ export class WorldView{
    const left=Math.floor(x*dx),top=Math.floor(y*dy);
    ctx.fillRect(left,top,Math.floor((x+1)*dx)-left,Math.floor((y+1)*dy)-top);
   }
-  // Use the same tile footprints and nation colors as the world renderer.
-  // Do not offset markers by one tile: that shifts the strategic map.
-  for(const town of g.towns){
-   ctx.fillStyle=NATIONS[town.owner]?.color||'#fff';
-   ctx.fillRect(town.x*dx,town.y*dy,town.size*dx,town.size*dy);
-  }
-  for(const firm of g.firms){
-   ctx.fillStyle=NATIONS[firm.owner]?.color||'#fff';
-   ctx.fillRect(firm.x*dx,firm.y*dy,firm.size*dx,firm.size*dy);
-  }
-  // Units are shown after settlements, matching their draw order on the map.
-  for(const unit of g.units){
-   ctx.fillStyle=NATIONS[unit.owner]?.color||'#fff';
-   ctx.fillRect(unit.x*dx,unit.y*dy,Math.max(1,dx),Math.max(1,dy));
-  }
-  // Clip the camera rectangle to the actual map. At high zoom-out or near
-  // an edge the world view extends beyond the playable area.
+  // Clip and pixel-align every marker, including partially off-map entities.
+  // Fractional world coordinates must never paint beyond the minimap canvas.
+  const marker=(entity,sizeX,sizeY)=>{
+   const rect=minimapFootprint(entity.x,entity.y,sizeX,sizeY,WORLD_W,WORLD_H,c.width,c.height);
+   if(!rect)return;
+   ctx.fillStyle=NATIONS[entity.owner]?.color||'#fff';
+   ctx.fillRect(rect.x,rect.y,rect.width,rect.height);
+  };
+  for(const town of g.towns)marker(town,town.size,town.size);
+  for(const firm of g.firms)marker(firm,firm.size,firm.size);
+  // Units are drawn last, following the main renderer's layer order.
+  for(const unit of g.units)marker(unit,1,1);
   const vw=this.canvas.width/this.tile(),vh=this.canvas.height/this.tile();
-  const left=Math.max(0,(this.cx-vw/2)*dx);
-  const top=Math.max(0,(this.cy-vh/2)*dy);
-  const right=Math.min(c.width,(this.cx+vw/2)*dx);
-  const bottom=Math.min(c.height,(this.cy+vh/2)*dy);
-  if(right>left&&bottom>top){
-   ctx.strokeStyle='#fff0ad';ctx.lineWidth=1.2;
-   ctx.strokeRect(left,top,right-left,bottom-top);
-  }
+  ctx.strokeStyle='#fff0ad';ctx.lineWidth=1.2;
+  const rect=minimapViewport(this.cx,this.cy,vw,vh,WORLD_W,WORLD_H,c.width,c.height,ctx.lineWidth);
+  if(rect)ctx.strokeRect(rect.x,rect.y,rect.width,rect.height);
  }
  minimapAt(px,py){
   this.center(px*WORLD_W/this.mini.width,py*WORLD_H/this.mini.height);
