@@ -10,3 +10,10 @@ export function minimapKeyTarget(key, camera, width, height, step=10) {
   return {x:Math.max(0,Math.min(width,camera.x+delta[0])),
           y:Math.max(0,Math.min(height,camera.y+delta[1]))};
 }
+
+// Do not steal browser/assistive-technology shortcuts such as Alt+Arrow,
+// Ctrl+Home or Meta+Arrow. The minimap handles only plain navigation keys.
+export function minimapKeyboardTarget(event, camera, width, height, step=10) {
+  if (!event || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || event.isComposing) return null;
+  return minimapKeyTarget(event.key,camera,width,height,step);
+}
