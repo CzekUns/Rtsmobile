@@ -82,7 +82,7 @@ function selectGroup(ids){
 function closeReport(){
  if($('reportDialog').open)$('reportDialog').close();
  report=null;
- document.querySelectorAll('[data-report]').forEach(b=>b.classList.remove('active'));
+ document.querySelectorAll('[data-report]').forEach(b=>{b.classList.remove('active');b.setAttribute('aria-pressed','false');});
 }
 function renderReport(){
  if(!report||!$('reportDialog').open)return;
@@ -92,7 +92,7 @@ function renderReport(){
 }
 function setReport(name){
  report=name;
- document.querySelectorAll('[data-report]').forEach(b=>b.classList.toggle('active',b.dataset.report===name));
+ document.querySelectorAll('[data-report]').forEach(b=>{const active=b.dataset.report===name;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});
  if(!$('reportDialog').open)$('reportDialog').showModal();
  renderReport();
 }
