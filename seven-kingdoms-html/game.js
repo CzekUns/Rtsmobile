@@ -608,7 +608,7 @@ document.addEventListener('click',e=>{
 });
 $('reportDialog').addEventListener('close',()=>{
  report=null;
- document.querySelectorAll('[data-report]').forEach(b=>b.classList.remove('active'));
+ document.querySelectorAll('[data-report]').forEach(b=>{b.classList.remove('active');b.setAttribute('aria-pressed','false');});
 });
 $('closeReport').addEventListener('click',closeReport);
 $('menuBtn').addEventListener('click',()=>{
