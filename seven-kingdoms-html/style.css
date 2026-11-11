@@ -109,7 +109,10 @@ dialog button{min-height:35px;padding:6px 15px}
   background:radial-gradient(#67705d20 .8px,transparent 1px) 0 0/4px 4px,linear-gradient(#e3e0cf,#a5a99b);
   box-shadow:0 3px 9px #141612a8;border-bottom:3px ridge #777b6e
 }
-.reports{display:flex;flex:1 1 360px;min-width:90px;max-width:none;min-height:0;gap:2px;padding:1px 1px 2px 0;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:thin}
+.reports{display:flex;flex:1 1 360px;min-width:90px;max-width:none;min-height:0;gap:2px;padding:1px 1px 2px 0;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:thin;scroll-snap-type:x proximity;scroll-padding-inline:4px;-webkit-overflow-scrolling:touch}
+.reports button{scroll-snap-align:start}
+.reports:focus-within{scrollbar-width:auto}
+@media(prefers-reduced-motion:reduce){.reports{scroll-behavior:auto}}
 .reports button{flex:0 0 auto;min-width:60px;padding:3px 5px;font-size:10px;line-height:1.2;min-height:35px}
 .treasury{display:flex;flex:0 1 220px;min-width:0;flex-wrap:wrap;justify-content:center;align-content:center;gap:2px 7px;padding:1px 4px}
 .treasury span{padding:0 2px;gap:4px;min-width:58px;font-size:12px;border-bottom:0}
