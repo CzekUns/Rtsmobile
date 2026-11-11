@@ -27,3 +27,17 @@ test('modifier and composition shortcuts remain available to browser and AT',()=
  assert.equal(minimapKeyboardTarget(null,{x:40,y:30},100,80),null);
  assert.equal(minimapKeyboardTarget({key:'Enter'},{x:40,y:30},100,80),null);
 });
+
+// The focusable canvas is a navigable region, not an actionable button:
+// Enter/Space have no activation handler and must not be advertised as such.
+test('minimap canvas accessibility semantics match arrow/Home navigation',async()=>{
+ const {readFileSync}=await import('node:fs');
+ const {fileURLToPath}=await import('node:url');
+ const html=readFileSync(fileURLToPath(new URL('../../index.html',import.meta.url)),'utf8');
+ const canvas=html.match(/<canvas\b[^>]*\bid="minimap"[^>]*>/)?.[0];
+ assert.ok(canvas,'minimap canvas exists');
+ assert.match(canvas,/\btabindex="0"/);
+ assert.match(canvas,/\brole="region"/);
+ assert.match(canvas,/\baria-label="[^"]*frecce[^"]*Home[^"]*"/);
+ assert.doesNotMatch(canvas,/\brole="button"/);
+});
