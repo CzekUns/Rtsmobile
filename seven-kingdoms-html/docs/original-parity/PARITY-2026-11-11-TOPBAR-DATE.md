@@ -17,3 +17,14 @@
 - **Test:** aggiunta verifica Node statica. Esecuzione della suite completa e browser 1×/2× non attestati in questa esecuzione; CI del nuovo HEAD da controllare.
 - **Fonte originale:** non attestata per queste migliorie di accessibilità; parità grafica originale ancora BLOCCATA da confronto screenshot e asset autorizzati.
 - **Stato:** DA CORREGGERE, fino a test runtime e confronto grafico.
+
+## Aggiornamento: safe area asimmetrica landscape (2026-11-11)
+
+- **ID:** SKH-106-TOPBAR-SAFEAREA.
+- **Fonte HTML:** `style.css`, regola fullscreen `.topbar` con `env(safe-area-inset-*)`; `index.html` dichiara `viewport-fit=cover`.
+- **Differenza oggettiva:** i padding sinistro e destro usavano gli inset del lato opposto. Su telefoni landscape con notch asimmetrico la protezione del contenuto era applicata al bordo sbagliato.
+- **Implementazione:** allineati `padding-left` a `safe-area-inset-left` e `padding-right` a `safe-area-inset-right`, senza modificare dimensioni originali, asset, ORDINI, COMANDI, MOD o selezione multipla.
+- **Commit:** `56e6fcd` (CSS), `8a9baf4` (test); PR #105.
+- **Test:** controllo statico dei sorgenti pubblicati PASS; test Node aggiunto ma suite completa/CI e prova Android landscape con notch a destra e sinistra ancora da verificare. Nessun deploy attestato.
+- **Originale:** questa è una MOD di adattamento smartphone, non una caratteristica rivendicata dell'HUD 7KAA; texture e cornici originali restano in attesa di asset con licenza/provenienza verificata.
+- **Stato:** DA CORREGGERE (test dispositivo e confronto originale mancanti).
