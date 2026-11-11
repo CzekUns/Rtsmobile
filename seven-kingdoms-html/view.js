@@ -218,8 +218,15 @@ export class WorldView{
  drawMini(g){
   const ctx=this.mctx,c=this.mini,dx=c.width/WORLD_W,dy=c.height/WORLD_H;
   ctx.fillStyle='#3a5e49';ctx.fillRect(0,0,c.width,c.height);
-  for(let y=0;y<WORLD_H;y+=2)for(let x=0;x<WORLD_W;x+=2){
-   const type=terrain(g.seed,x,y);ctx.fillStyle=COLORS[type][0];ctx.fillRect(x*dx,y*dy,dx*2+.6,dy*2+.6);
+  // Sample every world tile, using the same deterministic terrain shade as
+  // tileDraw(). The former 2x2 sampling hid narrow water/forest boundaries.
+  // Pixel-aligned cell edges avoid gaps and overlaps at fractional mini scales.
+  for(let y=0;y<WORLD_H;y++)for(let x=0;x<WORLD_W;x++){
+   const type=terrain(g.seed,x,y),shades=COLORS[type];
+   const n=hash(x,y,g.seed);
+   ctx.fillStyle=shades[Math.min(shades.length-1,Math.floor(n*shades.length))];
+   const left=Math.floor(x*dx),top=Math.floor(y*dy);
+   ctx.fillRect(left,top,Math.floor((x+1)*dx)-left,Math.floor((y+1)*dy)-top);
   }
   // Use the same tile footprints and nation colors as the world renderer.
   // Do not offset markers by one tile: that shifts the strategic map.
