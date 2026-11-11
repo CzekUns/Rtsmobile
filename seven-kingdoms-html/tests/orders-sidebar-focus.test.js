@@ -12,7 +12,7 @@ function harness(compact=false){
  const elements=new Map();
  function element(id){
   if(!elements.has(id))elements.set(id,{
-   attributes:{},classList:{values:new Set(),toggle(k,on){on?this.values.add(k):this.values.delete(k);}},
+   attributes:{},classList:{values:new Set(),toggle(k,on){on?this.values.add(k):this.values.delete(k);},contains(k){return this.values.has(k);}},
    setAttribute(k,v){this.attributes[k]=v;},contains(node){return node?.parent===id;},
    focus(){document.activeElement=this;},addEventListener(event,cb){this[event]=cb;}
   });
