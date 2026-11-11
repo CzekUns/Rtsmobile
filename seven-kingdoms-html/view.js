@@ -5,6 +5,7 @@ import {WORLD_W,WORLD_H,NATIONS,FIRMS,terrain,range} from './rules.js';
 import {OriginalSpritePreview,compassDirection,walkingFrame} from './playtest/original-sprites.js';
 import {OriginalTerrainPreview} from './playtest/original-terrain.js';
 import {minimapFootprint,minimapViewport} from './minimap-geometry.js';
+import {createMinimapTerrainLayer} from './minimap-terrain.js';
 const COLORS={
   grass:['#81996a','#8aa171','#769367'],forest:['#496d46','#567b4b','#3e6645'],
   hill:['#a59d7f','#aaa487','#8e9077'],dry:['#b6a983','#c1ad86','#a89f7f'],
@@ -19,6 +20,8 @@ export class WorldView{
   this.originalTerrain=previewOriginalSprites?new OriginalTerrainPreview():null;
   this.spriteMotion=new Map();this.spritePaused=false;
   this.mini=mini;this.mctx=mini.getContext('2d');
+  this.miniTerrain=createMinimapTerrainLayer({worldW:WORLD_W,worldH:WORLD_H,terrain,colors:COLORS,hash,
+   createCanvas:(w,h)=>{const c=mini.ownerDocument?.createElement?.('canvas');if(c){c.width=w;c.height=h;}return c;}});
   this.cx=27;this.cy=27;this.zoom=1;this.tileSize=24;
  }
  tile(){return this.tileSize*this.zoom}
@@ -218,17 +221,7 @@ export class WorldView{
  }
  drawMini(g){
   const ctx=this.mctx,c=this.mini,dx=c.width/WORLD_W,dy=c.height/WORLD_H;
-  ctx.fillStyle='#3a5e49';ctx.fillRect(0,0,c.width,c.height);
-  // Sample every world tile, using the same deterministic terrain shade as
-  // tileDraw(). The former 2x2 sampling hid narrow water/forest boundaries.
-  // Pixel-aligned cell edges avoid gaps and overlaps at fractional mini scales.
-  for(let y=0;y<WORLD_H;y++)for(let x=0;x<WORLD_W;x++){
-   const type=terrain(g.seed,x,y),shades=COLORS[type];
-   const n=hash(x,y,g.seed);
-   ctx.fillStyle=shades[Math.min(shades.length-1,Math.floor(n*shades.length))];
-   const left=Math.floor(x*dx),top=Math.floor(y*dy);
-   ctx.fillRect(left,top,Math.floor((x+1)*dx)-left,Math.floor((y+1)*dy)-top);
-  }
+  this.miniTerrain.draw(ctx,g.seed,c.width,c.height);
   // Clip and pixel-align every marker, including partially off-map entities.
   // Fractional world coordinates must never paint beyond the minimap canvas.
   const marker=(entity,sizeX,sizeY)=>{
