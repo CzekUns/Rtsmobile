@@ -46,16 +46,7 @@ export class WorldView{
   const top=Math.max(0,Math.floor(this.cy-h/(2*t))-1);
   const bottom=Math.min(WORLD_H,Math.ceil(this.cy+h/(2*t))+1);
   for(let y=top;y<bottom;y++)for(let x=l;x<r;x++)this.tileDraw(g,ctx,x,y,t);
-  // Roads and short symbolic paths between settlements and owned firms.
-  ctx.lineWidth=Math.max(1,t*.07);ctx.strokeStyle='#b9ac84b0';ctx.setLineDash([t*.13,t*.18]);
-  for(const f of g.firms){
-   const town=g.nearestTown(f);
-   if(!town||!g.linked(f,town))continue;
-   const a=this.screen(f.x+f.size/2,f.y+f.size/2);
-   const b=this.screen(town.x+town.size/2,town.y+town.size/2);
-   ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
-  }
-  ctx.setLineDash([]);
+  this.drawDemoLinks(g,ctx,t);
   for(const town of g.towns)this.townDraw(ctx,town,selection,t);
   for(const site of g.constructionSites||[]){
    if(site.status!=='walking')continue;
@@ -89,6 +80,20 @@ export class WorldView{
     ctx.setLineDash([6,4]);ctx.strokeRect(x,y,width,height);ctx.setLineDash([]);
    }
    this.drawMini(g);
+ }
+ drawDemoLinks(g,ctx,t){
+  // These straight dashed connections are demo-only navigation hints, not
+  // authentic 7KAA road graphics. Do not paint them over original tiles.
+  if(this.originalTerrain)return;
+  ctx.lineWidth=Math.max(1,t*.07);ctx.strokeStyle='#b9ac84b0';ctx.setLineDash([t*.13,t*.18]);
+  for(const f of g.firms){
+   const town=g.nearestTown(f);
+   if(!town||!g.linked(f,town))continue;
+   const a=this.screen(f.x+f.size/2,f.y+f.size/2);
+   const b=this.screen(town.x+town.size/2,town.y+town.size/2);
+   ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+  }
+  ctx.setLineDash([]);
  }
  tileDraw(g,ctx,x,y,t){
   const p=this.screen(x,y),type=terrain(g.seed,x,y),n=hash(x,y,g.seed);
