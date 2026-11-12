@@ -83,8 +83,9 @@ export class WorldView{
  }
  drawDemoLinks(g,ctx,t){
   // These straight dashed connections are demo-only navigation hints, not
-  // authentic 7KAA road graphics. Do not paint them over original tiles.
-  if(this.originalTerrain)return;
+  // authentic 7KAA road graphics. Suppress them only when the atlas is
+  // actually ready; while it loads or fails, retain the complete demo fallback.
+  if(this.originalTerrain?.isReady())return;
   ctx.lineWidth=Math.max(1,t*.07);ctx.strokeStyle='#b9ac84b0';ctx.setLineDash([t*.13,t*.18]);
   for(const f of g.firms){
    const town=g.nearestTown(f);
