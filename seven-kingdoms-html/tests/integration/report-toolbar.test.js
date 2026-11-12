@@ -51,3 +51,25 @@ test('keyboard handler focuses report and leaves unrelated keys untouched',()=>{
  assert.equal(prevented,1);
  cleanup();
 });
+
+test('vertical wheel navigates clipped reports, respects edges and modifier gestures',()=>{
+ const listeners=new Map();
+ const el=()=>({disabled:false,addEventListener:(k,f)=>listeners.set(k,f),removeEventListener:k=>listeners.delete(k)});
+ const container={...el(),scrollWidth:400,clientWidth:100,scrollLeft:0,querySelectorAll:()=>[]};
+ const cleanup=installReportToolbar(container,el(),el());
+ let prevented=0;
+ const event=(deltaY,extra={})=>({deltaY,deltaX:0,preventDefault(){prevented++;},...extra});
+ listeners.get('wheel')(event(80));
+ assert.equal(container.scrollLeft,80);assert.equal(prevented,1);
+ listeners.get('wheel')(event(500));
+ assert.equal(container.scrollLeft,300);assert.equal(prevented,2);
+ listeners.get('wheel')(event(30));
+ assert.equal(container.scrollLeft,300);assert.equal(prevented,2,'no trapping at far edge');
+ listeners.get('wheel')(event(-50,{ctrlKey:true}));
+ assert.equal(container.scrollLeft,300);assert.equal(prevented,2,'browser zoom gesture untouched');
+ listeners.get('wheel')(event(-50,{deltaX:-100}));
+ assert.equal(container.scrollLeft,300);assert.equal(prevented,2,'horizontal trackpad gesture untouched');
+ listeners.get('wheel')(event(-400));
+ assert.equal(container.scrollLeft,0);assert.equal(prevented,3);
+ cleanup();assert.equal(listeners.size,0);
+});
