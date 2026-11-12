@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "fixtureId": "SKH-P0-TRAIN-CONSTRUCTION-001",
+  "status": "candidate-not-validated-against-wasm",
+  "source": {
+    "repository": "the3dfxdude/7kaa",
+    "commit": "14e6fdfba9481af4dc3a54722614a608776e20bc",
+    "files": ["include/OTOWN.h", "src/OTOWN.cpp", "src/OTOWNIF.cpp"],
+    "manual": "https://www.7kfans.com/downloads/7kaa-manual.pdf",
+    "wasmBuildMatch": "unverified"
+  },
+  "scenario": {
+    "name": "mixed-race town trains construction worker",
+    "preconditions": [
+      "town has at least two distinct race IDs",
+      "selected race has at least one jobless resident",
+      "eligible friendly fort is linked",
+      "treasury is sufficient for the selected training action"
+    ],
+    "actionSequence": [
+      "select race row",
+      "select Train",
+      "select Construction",
+      "enqueue one trainee",
+      "advance original game-day clock until training finishes"
+    ],
+    "expectedCandidate": {
+      "costPerTrainee": 30,
+      "normalTrainingDays": 5,
+      "initialSkillLevel": 20,
+      "skill": "construction",
+      "raceId": "must equal selected race ID",
+      "noCrossRacePopulationDebit": true,
+      "noInstantUnitOnEnqueue": true
+    },
+    "failureCasesToVerify": [
+      "insufficient treasury must not silently discard queued request",
+      "selected race with no jobless residents must not debit another race",
+      "save/load during active training preserves selected race and remaining time"
+    ]
+  },
+  "evidenceRequiredBeforeParityClaim": [
+    "identify exact WASM build commit and checksum",
+    "capture C++/WASM initial state and game-day count",
+    "record observed treasury and race population deltas",
+    "capture construction worker skill/race after completion",
+    "compare HTML outputs with original under same initial state"
+  ],
+  "notes": "Reference candidate only. This is an executable-test input contract, NOT an observed golden output or evidence of parity."
+}
