@@ -29,6 +29,17 @@ export function installReportToolbar(container, back, forward) {
     back.disabled = !state.backward;
     forward.disabled = !state.forward;
   };
+  const wheel = event => {
+    // Translate vertical wheel input only while the report strip can scroll.
+    // Native horizontal trackpad scrolling remains browser-managed.
+    if (event.ctrlKey || event.altKey || event.metaKey || Math.abs(event.deltaX) >= Math.abs(event.deltaY)) return;
+    const state = reportScrollState(container);
+    if ((event.deltaY > 0 && !state.forward) || (event.deltaY < 0 && !state.backward)) return;
+    event.preventDefault();
+    const max = Math.max(0, container.scrollWidth - container.clientWidth);
+    container.scrollLeft = Math.max(0, Math.min(max, container.scrollLeft + event.deltaY));
+    update();
+  };
   const previous = () => scrollReports(container, -1);
   const next = () => scrollReports(container, 1);
   const keyboard = event => {
@@ -42,6 +53,7 @@ export function installReportToolbar(container, back, forward) {
   back.addEventListener('click',previous);
   forward.addEventListener('click',next);
   container.addEventListener('scroll',update,{passive:true});
+  container.addEventListener('wheel',wheel,{passive:false});
   container.addEventListener('keydown',keyboard);
   const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(update);
   observer?.observe(container);
@@ -53,6 +65,7 @@ export function installReportToolbar(container, back, forward) {
     back.removeEventListener('click',previous);
     forward.removeEventListener('click',next);
     container.removeEventListener('scroll',update);
+    container.removeEventListener('wheel',wheel);
     container.removeEventListener('keydown',keyboard);
     observer?.disconnect();
     mutationObserver?.disconnect();
