@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {worldPainterOrder} from '../../world-depth-order.js';
+import {worldPainterOrder} from '../world-depth-order.js';
 test('overlapping world objects paint back to front by world foot position', () => {
  const town={x:1,y:2,size:3}, firm={x:2,y:7,size:2}, unit={x:3,y:6}, site={x:2,y:3,size:2};
  assert.deepEqual(worldPainterOrder([town],[site],[firm],[unit]).map(e=>e.kind),['town','site','unit','firm']);
