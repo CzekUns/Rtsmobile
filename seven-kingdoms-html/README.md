@@ -27,6 +27,10 @@ python3 -m http.server 8000
 
 **Nessuna dipendenza, nessuna compilazione, nessun .wasm.** Richiede un browser moderno con moduli ES e Canvas 2D.
 
+## Orchestrazione persistente e automazione oraria
+
+**[Apri il piano operativo condiviso](./coordination/README.md)** — repository come fonte di verità fra chat e automazioni, con roadmap concordata, ID task, stato e checkpoint da riprendere sul ramo di lavoro. L'incarico attuale è indicato da [`coordination/STATE.json`](./coordination/STATE.json), con dettagli in [`coordination/TASKS.json`](./coordination/TASKS.json). Il solo fatto che esistano file di coordinamento **non avvia nuove automazioni o agenti**.
+
 ## Lavoro parallelo con agenti
 
 **[AGENTS.md](./AGENTS.md)** — regole operative per ogni agente e file vietati/condivisi.

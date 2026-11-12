@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "programRevision": "2026-11-12-orchestrator-v1",
+  "updatedOn": "2026-11-12",
+  "lastObservedMainSha": "413758a15f93ffe2b302d5edfd7561f5d7fba255",
+  "lastVerifiedPagesDeployment": {
+    "sha": "413758a15f93ffe2b302d5edfd7561f5d7fba255",
+    "runId": 43221479622,
+    "result": "success",
+    "url": "https://czekuns.github.io/Rtsmobile/seven-kingdoms-html/",
+    "androidVisualTest": "not_run"
+  },
+  "activeTaskId": "SKH-HUD-001",
+  "activeTaskBranch": null,
+  "currentStep": "Ispezione comparativa delle PR #97, #101, #103, #105 e #107 contro l'ultimo main; poi integrazione e test.",
+  "lastExecution": {
+    "recorded": false,
+    "runId": null,
+    "at": null,
+    "taskId": null,
+    "outcome": null,
+    "commitSha": null,
+    "prNumber": null,
+    "ciRunUrl": null,
+    "blockingReason": null
+  },
+  "awaitingManualValidation": [],
+  "planChangesRequireOwnerApproval": true,
+  "nextTaskAfterActive": "SKH-TERRAIN-001",
+  "notes": "Questa è la fotografia iniziale, non un rapporto di avanzamento. Solo l'orchestratore/integratore aggiorna STATE.json su main; nei lavori non mergiati lo stato tecnico vivo resta sul branch della PR in coordination/checkpoints/<task-id>.md. Non inventare esecuzioni passate."
+}

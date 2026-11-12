@@ -2,6 +2,12 @@
 
 **Ambito: soltanto `seven-kingdoms-html/`.** Questa cartella è la riscrittura nativa di **Seven Kingdoms: Ancient Adversaries**. NON è il progetto Ver Sacrum nella root e NON è il vecchio esperimento `ver-sacrum-7k/`.
 
+## Stato persistente e programma dell'orchestratore (novembre 2026)
+
+Per ogni chat o automazione esecutiva, il programma concordato e lo stato reale sono in [`coordination/README.md`](./coordination/README.md), [`coordination/STATE.json`](./coordination/STATE.json), [`coordination/TASKS.json`](./coordination/TASKS.json) e nel checkpoint dell'incarico sul **branch attivo**. **Leggere questi file prima di ripetere audit o scegliere un incarico.** I ruoli SKH-101–106 non diventano agenti in esecuzione soltanto perché esistono nel piano.
+
+La pianificazione globale `coordination/{ROADMAP.md,TASKS.json,STATE.json,DECISIONS.md,HANDOFF.md}` è di competenza esclusiva dell'orchestratore/integratore (corsia SKH-106), con modifiche tramite PR. Gli altri stream mantengono prove e avanzamento sulle rispettive PR; non sovrascrivono i dati globali. L'integratore/automazione segue **un solo task assegnato** fino a consegna o blocco esterno documentato; la priorità non va reinventata a ogni esecuzione.
+
 ## Istruzioni obbligatorie prima di scrivere codice
 
 1. Leggi `README.md`, `PIANO_DI_SVILUPPO.md`, `PORTING_MAP.md`, `PARALLEL_WORK.md` e `WORKSTREAMS.json`.

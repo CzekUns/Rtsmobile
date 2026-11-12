@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "project": "Seven Kingdoms HTML Edition",
+  "repository": "CzekUns/Rtsmobile",
+  "projectRoot": "seven-kingdoms-html/",
+  "executionPolicy": "single-active-task-orchestrator-approved",
+  "taskOrder": [
+    "SKH-HUD-001",
+    "SKH-TERRAIN-001",
+    "SKH-TERRAIN-002",
+    "SKH-STRUCTURES-001",
+    "SKH-QA-001"
+  ],
+  "tasks": [
+    {
+      "id": "SKH-HUD-001",
+      "title": "Consolidare le cinque PR HUD residue",
+      "priority": 1,
+      "ownerStream": "integration",
+      "status": "ready",
+      "dependsOn": [],
+      "relatedPRs": [
+        97,
+        101,
+        103,
+        105,
+        107
+      ],
+      "workBranch": "agent/skh-integration/hud-backlog-consolidation",
+      "issueId": "SKH-106",
+      "scope": [
+        "HUD e report: stato pulsanti, keyboard, pannello ORDINI, data/velocità, selezione città/forti",
+        "game.js, index.html, style.css e soli moduli/test strettamente pertinenti"
+      ],
+      "nextAction": "Leggere le patch e i CI degli HEAD correnti delle PR #97/#101/#103/#105/#107; scegliere il punto d'integrazione su ultimo main, consolidare prima le modifiche non conflittuali, eseguire test, poi correggere i conflitti sul medesimo ramo. Evitare nuove PR parallele.",
+      "acceptance": [
+        "PR integrativa unica con riferimenti alle cinque PR e nessuna funzione persa",
+        "Test Node, check e CI sull'HEAD finale passati con prova",
+        "Nessun degrado di fullscreen, COMANDI/MOD, joystick, minimappa o salvataggi",
+        "Merge autorizzato su main e deployment GitHub Pages verificato; se Android non disponibile evidenziare QA manuale pendente",
+        "Solo dopo verifica di assorbimento chiudere le PR sostituite con commento"
+      ],
+      "blockingIssue": null
+    },
+    {
+      "id": "SKH-TERRAIN-001",
+      "title": "Coste e transizioni originali 7KAA",
+      "priority": 2,
+      "ownerStream": "integration",
+      "status": "queued",
+      "dependsOn": [
+        "SKH-HUD-001"
+      ],
+      "relatedPRs": [],
+      "workBranch": "agent/skh-integration/original-coast-transitions",
+      "issueId": "SKH-106",
+      "scope": [
+        "Analisi delle regole e dei record del sorgente 7KAA per le transizioni tra acqua e terreno",
+        "Decoder/atlante/manifest da asset GPL con provenienza verificata",
+        "Collegamento al Canvas e test integrati senza mutare simulazione e collisioni"
+      ],
+      "nextAction": "Identificare le varianti di transizione in TERRAIN1.RES, I_TERN1.RES, PAL_STD.RES e il lookup originale in OTERRAIN.cpp; campionare casi riproducibili prima di modificare view.js.",
+      "acceptance": [
+        "Provenienza, licenza e hash delle risorse originali documentati",
+        "Atlante e manifest riproducibili per transizioni acqua/terra e casi d'angolo, senza inventare tessere mancanti",
+        "Scelta delle transizioni fondata su lookup sorgente e almeno coste orizzontali/verticali e angoli testati",
+        "Fallback grafico, zoom, salvataggi, input e collisioni preservati",
+        "CI verde e release/QA documentate; parità visuale non dichiarata senza confronto"
+      ],
+      "blockingIssue": null
+    },
+    {
+      "id": "SKH-TERRAIN-002",
+      "title": "Foreste, rocce e rilievi originali",
+      "priority": 3,
+      "ownerStream": "integration",
+      "status": "queued",
+      "dependsOn": [
+        "SKH-TERRAIN-001"
+      ],
+      "relatedPRs": [],
+      "workBranch": "agent/skh-integration/original-landscape-overlays",
+      "issueId": "SKH-106",
+      "scope": [
+        "Estrarre vegetazione, rocce e rilievi 7KAA con layer corretto",
+        "Ancoraggi, scale e occlusione unità/edifici",
+        "Verifiche visuali a zoom 1x/2x"
+      ],
+      "nextAction": "Ricognizione archive originali e classi di overlay nel renderer upstream; verificare prima composizione e proprietà dei record.",
+      "acceptance": [
+        "Bitmap originali verificabili e manifest con provenienza",
+        "Rendering differenziato e profondità compatibili con unità/edifici",
+        "Test regressione e CI verde, limitazioni documentate"
+      ],
+      "blockingIssue": null
+    },
+    {
+      "id": "SKH-STRUCTURES-001",
+      "title": "Catalogo strutture e sprite unità non dimostrativi",
+      "priority": 4,
+      "ownerStream": "integration",
+      "status": "queued",
+      "dependsOn": [
+        "SKH-TERRAIN-002"
+      ],
+      "relatedPRs": [],
+      "workBranch": "agent/skh-integration/original-buildings-units",
+      "issueId": "SKH-106",
+      "scope": [
+        "Fasi di costruzione e footprint originali per più civiltà",
+        "Atlanti sprite con frame direzionali e palette per nazione",
+        "Integrazione incrementale con fallback e test"
+      ],
+      "nextAction": "Partire dai manifest NORMAN/BASE-NORMAN già pubblicati; creare matrice edifici e sprite mancanti, confermando formato upstream e license.",
+      "acceptance": [
+        "Catalogo con id sorgente/fasi/frame/offset senza geometrie inventate",
+        "Più di una famiglia/civiltà integrata nel gioco",
+        "Test animazioni, recolor, posizionamento, QA e deployment documentati"
+      ],
+      "blockingIssue": null
+    },
+    {
+      "id": "SKH-QA-001",
+      "title": "Audit Android, parità grafica e chiusura release",
+      "priority": 5,
+      "ownerStream": "integration",
+      "status": "queued",
+      "dependsOn": [
+        "SKH-STRUCTURES-001"
+      ],
+      "relatedPRs": [],
+      "workBranch": "agent/skh-integration/fidelity-regression-qa",
+      "issueId": "SKH-106",
+      "scope": [
+        "Confronto schermate originali e HTML",
+        "Gestione asset, transizioni e comandi Android landscape",
+        "Registro limiti e regressioni"
+      ],
+      "nextAction": "Raccogliere screenshot datati e verificabili della stessa scena; pianificare controlli a zoom 1x/2x e Android landscape.",
+      "acceptance": [
+        "Rapporto visivo con evidenze riproducibili e differenze residue",
+        "Test regressione completa e dati prestazionali ove ottenibili",
+        "Release SHA e Pages verificati, QA non effettuabile marcata come tale"
+      ],
+      "blockingIssue": null
+    }
+  ]
+}

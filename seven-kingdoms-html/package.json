@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test",
-    "check": "node --check rules.js && node --check view.js && node --check game.js && node --check tools/check-workstream.mjs"
+    "check": "node --check rules.js && node --check view.js && node --check game.js && node --check tools/check-workstream.mjs",
+    "check:coordination": "node coordination/validate.mjs"
   }
 }
