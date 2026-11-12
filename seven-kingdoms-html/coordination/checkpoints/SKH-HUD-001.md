@@ -1,14 +1,26 @@
 # Checkpoint · SKH-HUD-001 — HUD consolidation
 
-- **State:** IN_PROGRESS, branch only; no merge or Pages deployment.
-- **Branch:** `agent/skh-integration/hud-backlog-consolidation`
-- **Last code/test HEAD:** `ac6381b1ed1a6c40517c5bcec7dc864aa2276768` (checkpoint commit follows).
+- **State:** IN_PROGRESS on task branch; PR #115 draft, not merged; Pages unchanged.
+- **Branch:** `agent/skh-integration/hud-backlog-consolidation`.
+- **Last code/test HEAD before checkpoint:** `b43b257cb22d614d951879abed0bfa0588c500b6` (checkpoint commit follows).
 - **Source PRs:** #97, #101, #103, #105, #107.
-- **Base:** main at branch creation 2026-11-12 (main state file last observed `413758a`; current base SHA not independently returned by create_branch).
-- **Integration code:** `game.js` combines #97 report pressed state, #101 global keyboard focus guard and Escape modal semantics, #103 ORDINI inert/focus/media query. New `playtest/keyboard-focus-guard.js`, tests `tests/keyboard-focus-guard.test.js` and `tests/ui/hud-consolidation.test.js`. Updated existing `tests/fullscreen-layout.test.mjs` to reflect controller change.
-- **Commits:** `6cf5f06` game.js, `e6ed2b4` guard, `02d76d5` guard tests, `34c0316` integration tests, `ac6381b` fullscreen test.
-- **Unintegrated:** #105 responsive topbar CSS/HTML and #107 selection meters CSS/JS/tests. Do not close source PRs.
-- **Collision matrix:** #97/#101/#103/#105/#107 all touch `game.js`; #105/#107 also touch `style.css`; #105 changes `index.html`. #97/#105 overlap report button state; use only one implementation. #101 Escape logic must supersede #97 simple Escape handler. #103 responsive controller changes existing fullscreen source assertion.
-- **Tests:** NOT RUN. Attempted `git ls-remote https://github.com/CzekUns/Rtsmobile.git HEAD` in container; failed `Could not resolve host: github.com`. GitHub connector successfully wrote source and test commits. CI on combined HEAD: NOT VERIFIED. Browser 1x/2x, Android, Pages: NOT RUN.
-- **Original fidelity:** These are HTML interaction corrections, not certified 7KAA bitmap parity. Existing assets preserved.
-- **Single next step:** fetch current branch and source PR #105 diff; integrate its responsive topbar HTML/CSS into this same branch without duplicating report state, then integrate #107 selection meters, fix combined test failures and obtain CI HEAD before any merge.
+- **Previous checkpoint:** `0d1a71f5b159d50c8f7c9374248e64a4ce949d2a`.
+
+## Code integrated on branch
+
+- Previously #97 report button state, #101 keyboard focus guard, #103 ORDINI inert/focus behavior in `game.js`, with tests. Commits `6cf5f06`, `e6ed2b4`, `02d76d5`, `34c0316`, `ac6381b`.
+- **This run:** integrated the #105 responsive topbar CSS without copying its older `game.js` report logic. `style.css` now preserves date/speed below 850px, provides compact 620px landscape layout, corrects physical left/right safe-area padding, and adds keyboard-focus/reduced-motion report-strip behavior. Existing report Prev/Next buttons, fullscreen HUD, ORDINI and mobile touch CSS retained. Commit `39e8bb47a6c82f3b71a66f17c739d4efd12d3e7b`.
+- **This run:** added `tests/topbar-responsive.test.js` with four regression checks for the above, commit `b43b257cb22d614d951879abed0bfa0588c500b6`.
+- **Not yet integrated:** #107 selection meters (JS/CSS/test), #105 original documentation/tests beyond the responsive behavior; source PRs remain open. No independent merge of them.
+
+## Verification and limits
+
+- GitHub connector confirmed both source/test commits on task branch.
+- GitHub Actions query for HEAD `b43b257cb22d614d951879abed0bfa0588c500b6` returned **zero PR-triggered workflow runs** at time of query. CI is NOT VERIFIED.
+- Node `npm --prefix seven-kingdoms-html test` and `run check` NOT RUN in this execution; no full local checkout. Browser 1x/2x, Android landscape, GitHub Pages for this branch: NOT RUN.
+- Static source review only; responsive layout and absence of regressions are NOT CERTIFIED. Original 7KAA graphic parity NOT CLAIMED.
+- Task branch remains draft PR https://github.com/CzekUns/Rtsmobile/pull/115. No merge; main/Pages unchanged by this run.
+
+## Single next step
+
+**Fetch #107 HEAD patch and integrate its selection-meter module, wiring, styles and tests into existing PR #115**, preserving the #97/#101/#103/#105 behavior. Then run combined npm checks/CI and fix failures before promoting or merging.
