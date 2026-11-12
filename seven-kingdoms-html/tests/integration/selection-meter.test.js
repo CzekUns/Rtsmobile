@@ -16,3 +16,17 @@ test('dynamic labels are HTML escaped',()=>{
  assert.doesNotMatch(html,/<script>/);
  assert.match(html,/&lt;script&gt;&quot;&amp;/);
 });
+
+test('decorative race meters do not create nested accessible widgets',()=>{
+ const html=selectionMeter('Fedeltà Greci',62,100,{decorative:true});
+ assert.match(html,/aria-hidden="true"/);
+ assert.doesNotMatch(html,/role="progressbar"|aria-valuenow=/);
+ assert.match(html,/Fedeltà Greci <strong>62\/100<\/strong>/);
+ assert.match(html,/width:62%/);
+});
+test('standalone status meters remain accessible progressbars',()=>{
+ const html=selectionMeter('Salute',45,100);
+ assert.match(html,/role="progressbar"/);
+ assert.match(html,/aria-valuenow="45"/);
+ assert.doesNotMatch(html,/aria-hidden="true"/);
+});
