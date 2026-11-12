@@ -45,6 +45,8 @@ export class WorldView{
   const r=Math.min(WORLD_W,Math.ceil(this.cx+w/(2*t))+1);
   const top=Math.max(0,Math.floor(this.cy-h/(2*t))-1);
   const bottom=Math.min(WORLD_H,Math.ceil(this.cy+h/(2*t))+1);
+  // Read actual atlas success: an apparently decoded image may fail drawImage.
+  this.authenticTilesDrawn=0;
   for(let y=top;y<bottom;y++)for(let x=l;x<r;x++)this.tileDraw(g,ctx,x,y,t);
   this.drawDemoLinks(g,ctx,t);
   for(const town of g.towns)this.townDraw(ctx,town,selection,t);
@@ -85,7 +87,7 @@ export class WorldView{
   // These straight dashed connections are demo-only navigation hints, not
   // authentic 7KAA road graphics. Suppress them only when the atlas is
   // actually ready; while it loads or fails, retain the complete demo fallback.
-  if(this.originalTerrain?.isReady())return;
+  if(this.authenticTilesDrawn>0 || (this.authenticTilesDrawn===undefined && this.originalTerrain?.isReady()))return;
   ctx.lineWidth=Math.max(1,t*.07);ctx.strokeStyle='#b9ac84b0';ctx.setLineDash([t*.13,t*.18]);
   for(const f of g.firms){
    const town=g.nearestTown(f);
@@ -99,6 +101,7 @@ export class WorldView{
  tileDraw(g,ctx,x,y,t){
   const p=this.screen(x,y),type=terrain(g.seed,x,y),n=hash(x,y,g.seed);
   const originalGround=this.originalTerrain?.drawTile(ctx,p.x,p.y,t,type,n)??false;
+  if(originalGround && typeof this.authenticTilesDrawn==='number')this.authenticTilesDrawn++;
   if(!originalGround){
    const arr=COLORS[type];ctx.fillStyle=arr[Math.min(arr.length-1,Math.floor(n*arr.length))];
    ctx.fillRect(Math.floor(p.x),Math.floor(p.y),Math.ceil(t+1),Math.ceil(t+1));
