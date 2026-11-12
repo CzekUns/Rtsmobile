@@ -6,7 +6,7 @@ import {selectionMeter} from '../../selection-meter.js';
 const game=readFileSync(new URL('../../game.js',import.meta.url),'utf8');
 
 test('town racial choices show the original race-specific loyalty beside population and unemployed counts',()=>{
- assert.match(game,/selectionMeter\('Fedeltà '\+r\.culture,r\.loyalty\)/);
+ assert.match(game,/selectionMeter\('Fedeltà '\+r\.culture,r\.loyalty,100,\{decorative:true\}\)/);
  assert.match(game,/Disoccupati '\+r\.jobless/);
  assert.match(game,/aria-pressed="\x27\+active/);
 });
