@@ -97,7 +97,10 @@ export class WorldView{
    const arr=COLORS[type];ctx.fillStyle=arr[Math.min(arr.length-1,Math.floor(n*arr.length))];
    ctx.fillRect(Math.floor(p.x),Math.floor(p.y),Math.ceil(t+1),Math.ceil(t+1));
   }
-  if(t<10)return;
+  // Authentic atlas tiles already contain their own painted ground details.
+  // Never superimpose the demo's procedural trees, hills or water strokes.
+  // Keep those symbols only for the fallback while the verified atlas is unavailable.
+  if(originalGround||t<10)return;
   if(type==='forest'&&n>.12){
    ctx.fillStyle='#273f2b';ctx.beginPath();ctx.moveTo(p.x+t*.52,p.y+t*.07);ctx.lineTo(p.x+t*.14,p.y+t*.75);ctx.lineTo(p.x+t*.87,p.y+t*.75);ctx.closePath();ctx.fill();
    ctx.fillStyle='#315b32';ctx.beginPath();ctx.arc(p.x+t*.52,p.y+t*.45,t*.20,0,Math.PI*2);ctx.fill();
