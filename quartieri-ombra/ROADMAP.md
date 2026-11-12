@@ -436,3 +436,6 @@ Nota: la proiezione isometrica non deve essere confusa con la regolarità urbani
 ### 2026-11-05 — raster terrain pass (parziale)
 - [x] Layer raster ImageGen fango e acciottolato inseriti nel renderer della plancia, ritagliati ai poligoni mondo (commit `f7de871c`). Source PNG invariati.
 - [ ] Convertire in WebP runtime e validare tileability/stacchi con screenshot; browser e Android landscape non ancora collaudati. Non approvato.
+
+### WebGL camera clearance (2026-11-06, PR pending)
+- Implemented clearance against exterior walls and corners, not only inside footprints; tests cover four low camera positions and one rooftop case. Browser/Android and 255° visual verification still pending. Legacy art remains parked.
