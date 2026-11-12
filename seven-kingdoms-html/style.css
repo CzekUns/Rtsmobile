@@ -35,7 +35,7 @@ button:focus-visible{outline:2px solid #e9bc60}
 .build-bar button{min-height:24px}
 .sidebar{width:182px;height:528px;min-height:0;background:#aeb0a1;border-left:4px ridge #818579}
 .minimap-wrap{width:178px;height:142px;padding:2px;border-bottom:4px ridge #d5d1c1;background:#656f61}
-#minimap{width:172px;height:135px;display:block;cursor:crosshair;touch-action:manipulation}
+#minimap{width:172px;height:auto;aspect-ratio:184/137;display:block;cursor:crosshair;touch-action:none}
 .overview{height:386px;display:flex;flex-direction:column;overflow:hidden;border:2px ridge #c8c9b8;background:radial-gradient(#56574716 .75px,transparent 1.2px) 0 0/4px 4px,linear-gradient(#cecebf,#aaa99b)}
 .selection-header{flex:0 0 26px;display:flex;align-items:center;gap:6px;padding:2px 5px;background:#d4d3c5;border-bottom:2px ridge #aaa99b}
 .selection-header h1{margin:0;font:bold 13px Georgia,serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

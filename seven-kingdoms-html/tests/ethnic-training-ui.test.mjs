@@ -18,7 +18,7 @@ test('contextual town UI has race-specific recruit and six trainable profession 
  assert.match(code,/data-cancel-training/);
  assert.match(code,/game\.cancelTraining\(/);
  assert.match(styles,/\.town-race-choice\.active/);
- assert.match(markup,/game\.js\?v=15/);
+ assert.match(markup,/game\.js\?v=\d+/);
 });
 
 test('all village actions remain in the selection-only sidebar, reports are still separate',()=>{

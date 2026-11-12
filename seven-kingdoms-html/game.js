@@ -12,6 +12,7 @@ import {issueWorkOrder,completeWorkArrivals} from './playtest/work-assignments.j
 import {issueBuildOrder,cancelBuildOrder,advanceConstruction,isBuilder,canBuildFirm} from './playtest/construction.js';
 import {issueRepairOrder,cancelRepairOrder,advanceRepairs,canRepair} from './playtest/repairs.js';
 import {WorldView} from './view.js';
+import {installMinimapNavigation} from './playtest/minimap-system.js';
 import {installReportToolbar} from './playtest/report-toolbar.js';
 import {SKILLS,skillLabel,workerRoleLabel,workerRaceLabel,ensureFirmPersonnel} from './playtest/personnel.js';
 import {ensureTownRaces,selectedTownRace,recruitableTownPeople} from './playtest/town-races.js';
@@ -501,10 +502,8 @@ $('world').addEventListener('pointerup',e=>endPointer(e,false));
 $('world').addEventListener('pointercancel',e=>endPointer(e,true));
 $('world').addEventListener('contextmenu',e=>e.preventDefault());
 $('world').addEventListener('wheel',e=>{e.preventDefault();view.scale(e.deltaY<0?1.12:1/1.12)},{passive:false});
-$('minimap').addEventListener('pointerdown',e=>{
- const rect=e.currentTarget.getBoundingClientRect();
- view.center((e.clientX-rect.left)/rect.width*WORLD_W,(e.clientY-rect.top)/rect.height*WORLD_H);
-});
+// Mouse/touch drag and focused keyboard navigation share the same camera.
+installMinimapNavigation($('minimap'),view,WORLD_W,WORLD_H);
 document.addEventListener('click',e=>{
  const menu=e.target.closest('[data-menu]');
  const r=e.target.closest('[data-report]');

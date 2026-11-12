@@ -5,6 +5,7 @@ import {WORLD_W,WORLD_H,NATIONS,FIRMS,terrain,range} from './rules.js';
 import {OriginalSpritePreview,compassDirection,walkingFrame} from './playtest/original-sprites.js';
 import {OriginalTerrainPreview} from './playtest/original-terrain.js';
 import {worldPainterOrder} from './world-depth-order.js';
+import {createMinimapTerrainLayer,minimapFootprint,minimapViewport} from './playtest/minimap-system.js';
 const COLORS={
   grass:['#81996a','#8aa171','#769367'],forest:['#496d46','#567b4b','#3e6645'],
   hill:['#a59d7f','#aaa487','#8e9077'],dry:['#b6a983','#c1ad86','#a89f7f'],
@@ -19,6 +20,9 @@ export class WorldView{
   this.originalTerrain=previewOriginalSprites?new OriginalTerrainPreview():null;
   this.spriteMotion=new Map();this.spritePaused=false;
   this.mini=mini;this.mctx=mini.getContext('2d');
+  this.minimapTerrain=createMinimapTerrainLayer({worldW:WORLD_W,worldH:WORLD_H,terrain,
+   colorFor:type=>COLORS[type]?.[0]||COLORS.grass[0],
+   createCanvas:()=>typeof document!=='undefined'?document.createElement('canvas'):null});
   this.cx=27;this.cy=27;this.zoom=1;this.tileSize=24;
  }
  tile(){return this.tileSize*this.zoom}
@@ -233,20 +237,42 @@ export class WorldView{
  drawMini(g){
   const ctx=this.mctx,c=this.mini,dx=c.width/WORLD_W,dy=c.height/WORLD_H;
   ctx.fillStyle='#3a5e49';ctx.fillRect(0,0,c.width,c.height);
-  for(let y=0;y<WORLD_H;y+=2)for(let x=0;x<WORLD_W;x+=2){
-   const type=terrain(g.seed,x,y);ctx.fillStyle=COLORS[type][0];ctx.fillRect(x*dx,y*dy,dx*2+.6,dy*2+.6);
+  // Cached background is sampled at every world tile; its seed changes
+  // invalidate automatically. Never interpolate over real coastline borders.
+  if(!this.minimapTerrain)this.minimapTerrain=createMinimapTerrainLayer({
+   worldW:WORLD_W,worldH:WORLD_H,terrain,
+   colorFor:type=>COLORS[type]?.[0]||COLORS.grass[0],
+   createCanvas:()=>typeof document!=='undefined'?document.createElement('canvas'):null
+  });
+  this.minimapTerrain.draw(ctx,g.seed,c.width,c.height);
+  // Only the immutable terrain is cached: objects and units move every tick.
+  for(const town of g.towns||[]){
+   const b=minimapFootprint(town.x,town.y,town.size,town.size,WORLD_W,WORLD_H,c.width,c.height);
+   if(!b)continue;
+   ctx.fillStyle=NATIONS[town.owner]?.color||'#fff';ctx.fillRect(b.x,b.y,b.width,b.height);
   }
-  for(const town of g.towns){
-   ctx.fillStyle=NATIONS[town.owner]?.color||'#fff';
-   ctx.fillRect((town.x+1)*dx,(town.y+1)*dy,Math.max(2,2*dx),Math.max(2,2*dy));
+  for(const firm of g.firms||[]){
+   const b=minimapFootprint(firm.x,firm.y,firm.size,firm.size,WORLD_W,WORLD_H,c.width,c.height);
+   if(!b)continue;
+   ctx.fillStyle=NATIONS[firm.owner]?.color||'#fff';ctx.fillRect(b.x,b.y,b.width,b.height);
   }
-  for(const firm of g.firms){
-   ctx.fillStyle=NATIONS[firm.owner]?.color||'#fff';
-   ctx.fillRect((firm.x+1)*dx,(firm.y+1)*dy,dx*1.5,dy*1.5);
+  for(const site of g.constructionSites||[]){
+   if(site.status!=='walking')continue;
+   const b=minimapFootprint(site.x,site.y,site.size,site.size,WORLD_W,WORLD_H,c.width,c.height);
+   if(!b)continue;
+   ctx.strokeStyle='#f4cb63';ctx.lineWidth=1;ctx.strokeRect(b.x+.5,b.y+.5,Math.max(0,b.width-1),Math.max(0,b.height-1));
+  }
+  for(const unit of g.units||[]){
+   const b=minimapFootprint(unit.x,unit.y,1,1,WORLD_W,WORLD_H,c.width,c.height);
+   if(!b)continue;
+   ctx.fillStyle=NATIONS[unit.owner]?.color||'#fff';
+   ctx.fillRect(b.x,b.y,Math.max(2,b.width),Math.max(2,b.height));
   }
   const vw=this.canvas.width/this.tile(),vh=this.canvas.height/this.tile();
-  const left=(this.cx-vw/2)*dx,top=(this.cy-vh/2)*dy;
-  ctx.strokeStyle='#fff0ad';ctx.lineWidth=1.2;ctx.strokeRect(left,top,vw*dx,vh*dy);
+  ctx.strokeStyle='#fff0ad';ctx.lineWidth=1.2;
+  const camera=minimapViewport(this.cx,this.cy,vw,vh,WORLD_W,WORLD_H,c.width,c.height,ctx.lineWidth);
+  if(camera)ctx.strokeRect(camera.x,camera.y,camera.width,camera.height);
  }
- minimapAt(px,py){this.center(px*this.canvas.width/this.canvas.width*WORLD_W/this.mini.width,py*WORLD_H/this.mini.height)}
+
+ minimapAt(px,py){this.center(px*WORLD_W/this.mini.width,py*WORLD_H/this.mini.height)}
 }
