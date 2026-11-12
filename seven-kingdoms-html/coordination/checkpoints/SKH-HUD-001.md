@@ -1,26 +1,14 @@
-# Checkpoint · SKH-HUD-001 — consolidamento HUD
+# Checkpoint · SKH-HUD-001 — HUD consolidation
 
-- **Task:** SKH-HUD-001
-- **Stato:** READY — assegnato, **nessuna modifica HUD ancora prodotta da questo task**.
-- **Owner:** SKH-106 · integration
-- **Data iniziale:** 2026-11-12
-- **Main di partenza noto:** `413758a15f93ffe2b302d5edfd7561f5d7fba255`
-- **Branch previsto:** `agent/skh-integration/hud-backlog-consolidation` (non ancora creato in questo bootstrap)
-- **PR integrativa:** non ancora aperta
-- **PR sorgente:** #97, #101, #103, #105, #107
-- **CI del task combinato:** NOT_RUN
-- **Test browser/Android:** NOT_RUN
-- **Release SHA:** none
-
-## Operazione da eseguire appena si riprende
-1. Verificare HEAD di main e delle 5 PR. Se il branch previsto è già stato creato, leggere **il checkpoint dal suo HEAD** e continuare dal punto registrato; non sovrascrivere i progressi.
-2. Confrontare `game.js`, `index.html` e `style.css` nelle cinque patch. Trascrivere in questa scheda una matrice concreta degli hunk e dei conflitti; riutilizzare gli export e i test pertinenti.
-3. Implementare il primo blocco coerente direttamente nel **medesimo branch**, provare test e CI, correggere le incompatibilità, poi completare le altre funzionalità. Non aprire nuovi branch per ogni hunk.
-4. Prima di chiudere la run, aggiornare **questo file sul branch** con commit, PR, test, errori e il punto esatto di ripresa. Se manca CI non dichiarare successo.
-
-## Resoconto delle esecuzioni
-| Run | Commit/PR | Prova effettuata | Prossimo step |
-|---|---|---|---|
-| Bootstrap 2026-11-12 | solo istituzione del protocollo | piano e 5 PR identificate; nessuna modifica HUD | verificare HEAD, confrontare diff, sviluppare |
-
-**Nota:** Se `STATE.json` su main è indietro ma questo file nel branch contiene un HEAD più recente, la verità tecnica del task in corso è quella del branch, mentre il piano rimane quello su main.
+- **State:** IN_PROGRESS, branch only; no merge or Pages deployment.
+- **Branch:** `agent/skh-integration/hud-backlog-consolidation`
+- **Last code/test HEAD:** `ac6381b1ed1a6c40517c5bcec7dc864aa2276768` (checkpoint commit follows).
+- **Source PRs:** #97, #101, #103, #105, #107.
+- **Base:** main at branch creation 2026-11-12 (main state file last observed `413758a`; current base SHA not independently returned by create_branch).
+- **Integration code:** `game.js` combines #97 report pressed state, #101 global keyboard focus guard and Escape modal semantics, #103 ORDINI inert/focus/media query. New `playtest/keyboard-focus-guard.js`, tests `tests/keyboard-focus-guard.test.js` and `tests/ui/hud-consolidation.test.js`. Updated existing `tests/fullscreen-layout.test.mjs` to reflect controller change.
+- **Commits:** `6cf5f06` game.js, `e6ed2b4` guard, `02d76d5` guard tests, `34c0316` integration tests, `ac6381b` fullscreen test.
+- **Unintegrated:** #105 responsive topbar CSS/HTML and #107 selection meters CSS/JS/tests. Do not close source PRs.
+- **Collision matrix:** #97/#101/#103/#105/#107 all touch `game.js`; #105/#107 also touch `style.css`; #105 changes `index.html`. #97/#105 overlap report button state; use only one implementation. #101 Escape logic must supersede #97 simple Escape handler. #103 responsive controller changes existing fullscreen source assertion.
+- **Tests:** NOT RUN. Attempted `git ls-remote https://github.com/CzekUns/Rtsmobile.git HEAD` in container; failed `Could not resolve host: github.com`. GitHub connector successfully wrote source and test commits. CI on combined HEAD: NOT VERIFIED. Browser 1x/2x, Android, Pages: NOT RUN.
+- **Original fidelity:** These are HTML interaction corrections, not certified 7KAA bitmap parity. Existing assets preserved.
+- **Single next step:** fetch current branch and source PR #105 diff; integrate its responsive topbar HTML/CSS into this same branch without duplicating report state, then integrate #107 selection meters, fix combined test failures and obtain CI HEAD before any merge.
