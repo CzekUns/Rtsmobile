@@ -4,6 +4,7 @@
 import {WORLD_W,WORLD_H,NATIONS,FIRMS,terrain,range} from './rules.js';
 import {OriginalSpritePreview,compassDirection,walkingFrame} from './playtest/original-sprites.js';
 import {OriginalTerrainPreview} from './playtest/original-terrain.js';
+import {worldPainterOrder} from './world-depth-order.js';
 const COLORS={
   grass:['#81996a','#8aa171','#769367'],forest:['#496d46','#567b4b','#3e6645'],
   hill:['#a59d7f','#aaa487','#8e9077'],dry:['#b6a983','#c1ad86','#a89f7f'],
@@ -56,20 +57,22 @@ export class WorldView{
    ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
   }
   ctx.setLineDash([]);
-  for(const town of g.towns)this.townDraw(ctx,town,selection,t);
-  for(const site of g.constructionSites||[]){
-   if(site.status!=='walking')continue;
-   const p=this.screen(site.x,site.y),w=site.size*t;
-   ctx.fillStyle='#d8ba6a52';ctx.fillRect(p.x,p.y,w,w);
-   ctx.strokeStyle='#f4cb63';ctx.lineWidth=Math.max(1,t*.07);
-   ctx.setLineDash([Math.max(3,t*.15),Math.max(3,t*.12)]);
-   ctx.strokeRect(p.x+1,p.y+1,w-2,w-2);ctx.setLineDash([]);
-   this.label(ctx,'Cantiere · in attesa',p.x+w/2,p.y+w/2,t);
-  }
-  for(const firm of g.firms)this.firmDraw(ctx,firm,selection,t);
   const group=new Set(groupIds);
   this.spritePaused=!!g.paused;
-  for(const unit of g.units)this.unitDraw(ctx,unit,selection,t,group.has(unit.id),now);
+  const waitingSites=(g.constructionSites||[]).filter(site=>site.status==='walking');
+  for(const entry of worldPainterOrder(g.towns,waitingSites,g.firms,g.units)){
+   if(entry.kind==='town')this.townDraw(ctx,entry.item,selection,t);
+   else if(entry.kind==='firm')this.firmDraw(ctx,entry.item,selection,t);
+   else if(entry.kind==='unit')this.unitDraw(ctx,entry.item,selection,t,group.has(entry.item.id),now);
+   else {
+    const site=entry.item,p=this.screen(site.x,site.y),width=site.size*t;
+    ctx.fillStyle='#d8ba6a52';ctx.fillRect(p.x,p.y,width,width);
+    ctx.strokeStyle='#f4cb63';ctx.lineWidth=Math.max(1,t*.07);
+    ctx.setLineDash([Math.max(3,t*.15),Math.max(3,t*.12)]);
+    ctx.strokeRect(p.x+1,p.y+1,width-2,width-2);ctx.setLineDash([]);
+    this.label(ctx,'Cantiere · in attesa',p.x+width/2,p.y+width/2,t);
+   }
+  }
   if(this.originalSprites){
    const live=new Set(g.units.map(u=>u.id));
    for(const id of this.spriteMotion.keys())if(!live.has(id))this.spriteMotion.delete(id);
