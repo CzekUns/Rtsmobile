@@ -41,3 +41,11 @@ Compare town/fort screenshots from the original 7KAA build and replace provision
 - **Commits:** `e09243d` implementation; `d7be5e8` regression tests.
 - **Verification:** source-level tests published; local suite blocked by github.com DNS resolution in execution container; CI, original/HTML 1x/2x screenshot, Android and deploy must be checked. **DA VERIFICARE** until CI and visual checks.
 - **Next dependency:** licensed original UI frames/geometry for town/fort cards via Asset #13 and SKH-103; do not invent colors or sprite dimensions.
+
+## Race selector accessibility — 2026-11-12
+- **ID:** SKH-106-RACE-SEMANTICS-03; **state:** DA VERIFICARE.
+- **Source:** HTML `game.js` town race choice buttons and `selection-meter.js`; this is an HTML accessibility correction, not a claim about original C++ graphic parity.
+- **Objective issue:** each selectable race button contained a separate `role=progressbar` widget, although the entire row is already one button. This duplicates/obscures control semantics for assistive technology.
+- **Implementation:** the meter accepts `{decorative:true}` for use inside a race button, removing the nested progressbar role and hiding its duplicated visual caption from the accessibility tree. The enclosing button still exposes race name, population, unemployment and loyalty through its existing visible text; standalone meters retain progressbar semantics. No layout, asset, mobile control or save change.
+- **Commits:** `124c2c48` meter option, `27e61cc5` race integration, `4d8881eb` tests.
+- **Verification:** regression tests added for both contexts; CI/browser screen reader and 1×/2× checks pending. Original artwork still requires verified licensed source via Asset #13.
