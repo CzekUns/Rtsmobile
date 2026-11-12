@@ -1,3 +1,6 @@
+### 2026-11-06 — Sweep geometrico joystick su main 933b5f9
+Branch `agent/qo-sweep-guard-main-1106`: implementato `sweepCameraMovement` in `street-webgl-core.js` con intersezione analitica segmento/lati del lotto, arretramento clearance e risoluzione finale. Collegato `stepStickMovement` nel LAB. Quattro casi eseguiti in JavaScript V8: edificio sottile, passaggio sopra tetto, strada libera, salto molto lungo (4/4 PASS). Test Node permanente creato ma non eseguito tramite Node. Non verificati GPU desktop, Android, screenshot, FPS o deploy. PR concorrente #91 da riconciliare/chiudere se questa versione viene integrata. Nessun file fuori da `quartieri-ombra/` modificato.
+
 ### 2026-11-06 — Streaming geometrico del LAB WebGL
 Corretto `nearbyBuildings`: prima filtrava usando il centro del lotto, quindi un edificio allungato poteva essere rimosso anche con una facciata ancora vicina alla camera. Ora usa distanza minima ai lati del footprint canonico (zero se camera interna); il cap a 120 lotti e la selezione individuale restano invariati. Quattro prove runtime JavaScript eseguite con successo; test Node aggiunto ma non eseguito tramite Node. Browser GPU e Android non verificati. Branch `agent/qo-webgl-footprint-streaming-1106`; demo pubblica non verificata per questa modifica.
 

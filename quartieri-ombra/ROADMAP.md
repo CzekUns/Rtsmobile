@@ -1,3 +1,8 @@
+### 2026-11-06 — P0: collisione continua joystick su main aggiornata
+- [x] Segmento camera→destinazione intersecato analiticamente con i bordi dei poligoni canonici: arresto prima della prima parete, anche per edifici sottili e movimenti molto lunghi.
+- [x] Integrato nel movimento joystick del LAB, senza modificare asset o gameplay; quattro verifiche eseguite nel runtime JavaScript (4/4 PASS), test Node persistente aggiunto ma **non eseguito in Node**.
+- [ ] Prove browser GPU desktop e Android landscape, angolo 255°, FPS, selezione e integrazione grafica ancora da effettuare. Demo prevista: https://czekuns.github.io/Rtsmobile/quartieri-ombra/street-webgl.html; deploy non verificato.
+
 ### 2026-11-06 — Streaming WebGL: evitare palazzi che scompaiono vicino alla camera
 - [x] Selezione dei lotti da disegnare basata sulla distanza minima dal **poligono reale**, non solo dal centro: edifici lunghi visibili sul bordo del raggio non spariscono più prematuramente.
 - [x] Quattro controlli eseguiti in runtime JavaScript (4/4 PASS); aggiunta suite Node persistente, **non eseguita con Node** in questo run.
