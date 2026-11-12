@@ -13,6 +13,15 @@ export function scrollReports(container, direction) {
     : buttons.reverse().find(button => button.getBoundingClientRect().left < viewport.left - 1);
   if (next) next.scrollIntoView({block:'nearest', inline:'nearest', behavior:'smooth'});
 }
+export function reportKeyboardTarget(buttons, current, key) {
+  const index = buttons.indexOf(current);
+  if (index < 0) return null;
+  if (key === 'Home') return buttons[0] || null;
+  if (key === 'End') return buttons[buttons.length - 1] || null;
+  if (key === 'ArrowRight') return buttons[index + 1] || null;
+  if (key === 'ArrowLeft') return buttons[index - 1] || null;
+  return null;
+}
 export function installReportToolbar(container, back, forward) {
   if (!container || !back || !forward) return () => {};
   const update = () => {
@@ -23,11 +32,8 @@ export function installReportToolbar(container, back, forward) {
   const previous = () => scrollReports(container, -1);
   const next = () => scrollReports(container, 1);
   const keyboard = event => {
-    if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
     const buttons = [...container.querySelectorAll('button[data-report]')];
-    const index = buttons.indexOf(event.target);
-    if (index < 0) return;
-    const target = buttons[index + (event.key === 'ArrowRight' ? 1 : -1)];
+    const target = reportKeyboardTarget(buttons, event.target, event.key);
     if (!target) return;
     event.preventDefault();
     target.focus();
@@ -39,6 +45,9 @@ export function installReportToolbar(container, back, forward) {
   container.addEventListener('keydown',keyboard);
   const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(update);
   observer?.observe(container);
+  // Changes to label sizes or the report list can change overflow without resizing the viewport.
+  const mutationObserver = typeof MutationObserver === 'undefined' ? null : new MutationObserver(update);
+  mutationObserver?.observe(container,{childList:true,subtree:true,characterData:true});
   update();
   return () => {
     back.removeEventListener('click',previous);
@@ -46,5 +55,6 @@ export function installReportToolbar(container, back, forward) {
     container.removeEventListener('scroll',update);
     container.removeEventListener('keydown',keyboard);
     observer?.disconnect();
+    mutationObserver?.disconnect();
   };
 }
