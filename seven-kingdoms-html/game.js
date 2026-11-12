@@ -153,7 +153,7 @@ function selectedContent(){
    return '<button type="button" class="town-race-choice'+(active?' active':'')+'" data-town-race="'+esc(r.raceId)+'" aria-pressed="'+active+'">'+
     esc(r.culture)+' · '+r.population+' abitanti'+
     '<small>Disoccupati '+r.jobless+' · Fedeltà '+Math.floor(r.loyalty)+'</small>'+ 
-    selectionMeter('Fedeltà '+r.culture,r.loyalty)+'</button>';
+    selectionMeter('Fedeltà '+r.culture,r.loyalty,100,{decorative:true})+'</button>';
   }).join('');
   const canRecruit=item.owner===1&&item.pop>4&&available>0&&selectedRace?.loyalty>=30;
   const canTrain=canRecruit&&ownFortLinked&&game.cash>=30&&(item.trainingQueue?.length||0)<10;
