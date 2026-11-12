@@ -13,3 +13,11 @@
 **Commit:** `19e5946` (renderer), `25517b0` (test). **Stato: DA CORREGGERE / DA VERIFICARE VISIVAMENTE.** La rimozione delle decorazioni sovrapposte è verificabile nel codice; la parità complessiva della mappa non è certificata.
 
 **Dipendenza successiva precisa:** confronto delle transizioni coste/terreno e delle bitmap originali con screenshot 7KAA, coordinato con la corsia Asset senza modificarne gli archivi o i manifest.
+
+## Estensione: recupero del renderer atlas (12 novembre 2026)
+
+**Differenza HTML verificata nel codice:** `OriginalTerrainPreview.drawTile` chiamava `ctx.save()` e `ctx.drawImage()` senza un `finally`. Se un'immagine apparentemente caricata falliva durante il disegno, il contesto Canvas non veniva ripristinato e il rendering del mondo poteva interrompersi senza fallback. Questa è una correzione di robustezza del renderer, non una nuova pretesa di parità pittorica con 7KAA.
+
+**Implementazione:** `playtest/original-terrain.js` usa `try/catch/finally`: su successo ritorna `true`; su errore ritorna `false` affinché `WorldView.tileDraw` disegni il terreno alternativo; in entrambi i casi ripristina il Canvas. Nessun nuovo asset, palette o dimensione inventata.
+
+**Test aggiunti:** `tests/integration/terrain-atlas-recovery.test.js` verifica il rendering normale, l'eccezione simulata nel vero percorso `WorldView.tileDraw` e le immagini incomplete/con dimensioni scorrette. Commit `33a36d85`, `06e144c9`. **Stato: DA VERIFICARE in CI e visivamente**; la suite locale e il browser non sono disponibili nel runtime di questa esecuzione per l'assenza di checkout GitHub via DNS.
