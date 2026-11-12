@@ -16,6 +16,7 @@ import {installMinimapNavigation} from './playtest/minimap-system.js';
 import {installReportToolbar} from './playtest/report-toolbar.js';
 import {SKILLS,skillLabel,workerRoleLabel,workerRaceLabel,ensureFirmPersonnel} from './playtest/personnel.js';
 import {ensureTownRaces,selectedTownRace,recruitableTownPeople} from './playtest/town-races.js';
+import {shouldIgnoreGlobalShortcut} from './playtest/keyboard-focus-guard.js';
 const $=id=>document.getElementById(id);
 const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const query=new URLSearchParams(location.search);
@@ -45,13 +46,18 @@ window.addEventListener('resize',resizeStage);
 window.addEventListener('orientationchange',resizeStage);
 window.visualViewport?.addEventListener('resize',resizeStage);
 if(typeof ResizeObserver!=='undefined')new ResizeObserver(resizeStage).observe($('world'));
+const compactOrders=window.matchMedia('(max-width:1000px) and (pointer:coarse)');
 function setOrdersVisible(visible){
+ const sidebar=$('orderSidebar');
+ if(!visible&&sidebar.contains(document.activeElement))$('sidebarToggle').focus();
  $('stage').classList.toggle('panel-collapsed',!visible);
  $('sidebarToggle').setAttribute('aria-expanded',String(visible));
  $('sidebarToggle').textContent=visible?'ORDINI ◂':'ORDINI ▸';
- $('orderSidebar').setAttribute('aria-hidden',String(!visible));
+ sidebar.setAttribute('aria-hidden',String(!visible));
+ sidebar.inert=!visible;
 }
-setOrdersVisible(!window.matchMedia('(max-width:1000px) and (pointer:coarse)').matches);
+setOrdersVisible(!compactOrders.matches);
+compactOrders.addEventListener('change',()=>setOrdersVisible(!compactOrders.matches));
 $('sidebarToggle').addEventListener('click',()=>
  setOrdersVisible($('stage').classList.contains('panel-collapsed')));
 function status(message){
@@ -85,7 +91,7 @@ function selectGroup(ids){
 function closeReport(){
  if($('reportDialog').open)$('reportDialog').close();
  report=null;
- document.querySelectorAll('[data-report]').forEach(b=>b.classList.remove('active'));
+ document.querySelectorAll('[data-report]').forEach(b=>{b.classList.remove('active');b.setAttribute('aria-pressed','false');});
 }
 function renderReport(){
  if(!report||!$('reportDialog').open)return;
@@ -95,7 +101,7 @@ function renderReport(){
 }
 function setReport(name){
  report=name;
- document.querySelectorAll('[data-report]').forEach(b=>b.classList.toggle('active',b.dataset.report===name));
+ document.querySelectorAll('[data-report]').forEach(b=>{const active=b.dataset.report===name;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});
  if(!$('reportDialog').open)$('reportDialog').showModal();
  renderReport();
 }
@@ -609,7 +615,7 @@ document.addEventListener('click',e=>{
 });
 $('reportDialog').addEventListener('close',()=>{
  report=null;
- document.querySelectorAll('[data-report]').forEach(b=>b.classList.remove('active'));
+ document.querySelectorAll('[data-report]').forEach(b=>{b.classList.remove('active');b.setAttribute('aria-pressed','false');});
 });
 $('closeReport').addEventListener('click',closeReport);
 $('menuBtn').addEventListener('click',()=>{
@@ -631,8 +637,11 @@ document.addEventListener('fullscreenchange',()=>{
  $('fullscreenBtn').textContent=document.fullscreenElement?'⤢':'⛶';resizeStage();
 });
 document.addEventListener('keydown',e=>{
- if(e.target instanceof HTMLInputElement)return;
- if(e.key==='Escape'){closeReport();cancelBuild();$('gameMenu').hidden=true;return;}
+ if(e.key==='Escape'){
+  if(!$('helpDialog').open&&!$('reportDialog').open){cancelBuild();$('gameMenu').hidden=true;$('menuBtn').setAttribute('aria-expanded','false');}
+  return;
+ }
+ if(shouldIgnoreGlobalShortcut(e.target,$('helpDialog').open||$('reportDialog').open))return;
  if(e.key===' '||e.key==='0'){e.preventDefault();game.paused=!game.paused;renderHud();return;}
  if(/^[1-5]$/.test(e.key)){game.setSpeed(Number(e.key));renderHud();return;}
  if(e.key.toLowerCase()==='s'&&!e.ctrlKey){e.preventDefault();status(game.save(saveKey)?'Partita salvata.':'Errore di salvataggio.');return;}
