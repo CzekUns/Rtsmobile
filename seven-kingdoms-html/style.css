@@ -104,12 +104,12 @@ dialog button{min-height:35px;padding:6px 15px}
 #world{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
 .topbar{
   position:absolute;z-index:30;top:0;left:0;right:0;width:100%;height:var(--hud-height);
-  min-height:0;padding:2px max(6px,env(safe-area-inset-right)) 2px max(6px,env(safe-area-inset-left));
+  min-height:0;padding:2px max(6px,env(safe-area-inset-left)) 2px max(6px,env(safe-area-inset-right));
   display:flex;align-items:stretch;gap:5px;
   background:radial-gradient(#67705d20 .8px,transparent 1px) 0 0/4px 4px,linear-gradient(#e3e0cf,#a5a99b);
   box-shadow:0 3px 9px #141612a8;border-bottom:3px ridge #777b6e
 }
-.reports{display:flex;flex:1 1 360px;min-width:90px;max-width:none;min-height:0;gap:2px;padding:1px 1px 2px 0;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:thin}
+.reports{display:flex;flex:1 1 360px;min-width:90px;max-width:none;min-height:0;gap:2px;padding:1px 1px 2px 0;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:thin;scroll-padding-inline:4px;-webkit-overflow-scrolling:touch}
 .reports button{flex:0 0 auto;min-width:60px;padding:3px 5px;font-size:10px;line-height:1.2;min-height:35px}
 .treasury{display:flex;flex:0 1 220px;min-width:0;flex-wrap:wrap;justify-content:center;align-content:center;gap:2px 7px;padding:1px 4px}
 .treasury span{padding:0 2px;gap:4px;min-width:58px;font-size:12px;border-bottom:0}
@@ -197,7 +197,9 @@ dialog button{min-height:35px;padding:6px 15px}
  .reports button{min-width:55px;font-size:9px}
  .treasury{flex-basis:145px;gap:1px 3px}
  .treasury span{min-width:55px;font-size:10px}
- .datebox{display:none}
+ .datebox{display:flex;flex:0 0 68px;gap:0;min-width:0}
+ .datebox strong{font-size:10px}
+ .datebox small{font-size:8px}
  .toptools>button{min-width:30px;font-size:15px}
  .toptools #menuBtn{width:49px}
 }
@@ -219,3 +221,21 @@ dialog button{min-height:35px;padding:6px 15px}
 .topbar .reports{scroll-behavior:smooth;scroll-snap-type:x proximity}
 .topbar .reports button{scroll-snap-align:start}
 @media (min-width:1250px){.topbar .report-nav:disabled{display:none}}
+
+/* SKH-HUD-001: responsive date, safe-area and report navigation from #105. */
+.topbar .reports:focus-within{scrollbar-width:auto}
+@media(prefers-reduced-motion:reduce){.topbar .reports{scroll-behavior:auto}}
+@media(max-width:620px) and (orientation:landscape){
+ .topbar{gap:2px}
+ .topbar .reports{flex:1 1 0;min-width:48px;scroll-padding-inline:4px}
+ .topbar .reports button{min-width:52px}
+ .treasury{flex:0 0 100px;gap:0 2px;padding:0 1px}
+ .treasury span{min-width:46px;padding:0;font-size:9px;gap:2px}
+ .treasury b{font-size:9px}
+ .datebox{flex-basis:58px}
+ .datebox strong{font-size:9px}
+ .datebox small{font-size:8px}
+ .toptools{gap:1px}
+ .toptools>button{min-width:28px;min-height:32px;padding:1px;font-size:14px}
+ .toptools #menuBtn{width:43px;font-size:10px}
+}
