@@ -12,6 +12,7 @@ import {issueWorkOrder,completeWorkArrivals} from './playtest/work-assignments.j
 import {issueBuildOrder,cancelBuildOrder,advanceConstruction,isBuilder,canBuildFirm} from './playtest/construction.js';
 import {issueRepairOrder,cancelRepairOrder,advanceRepairs,canRepair} from './playtest/repairs.js';
 import {WorldView} from './view.js';
+import {installReportToolbar} from './playtest/report-toolbar.js';
 import {SKILLS,skillLabel,workerRoleLabel,workerRaceLabel,ensureFirmPersonnel} from './playtest/personnel.js';
 import {ensureTownRaces,selectedTownRace,recruitableTownPeople} from './playtest/town-races.js';
 const $=id=>document.getElementById(id);
@@ -23,6 +24,7 @@ const saveKey=playtest?'seven-kingdoms-html-quick-playtest-v1':SAVE_KEY;
 let fixedClock=createFrameAccumulator({tickUs:50000,maxFrameUs:250000});
 let game=SevenGame.load(saveKey)||new SevenGame();
 const view=new WorldView($('world'),$('minimap'),{previewOriginalSprites});
+installReportToolbar(document.querySelector('.reports'),$('reportsPrev'),$('reportsNext'));
 let selection=game.towns.find(t=>t.owner===1)?.id||null;
 let report=null,placing=null,placingBuilderId=null,builderMenuId=null,trainingMenuTownId=null,ghost=null,newsUntil=0,last=0,lastPanel=0,lastSave=0;
 let input=null,gesture=null,selectionBox=null,groupUnitIds=[];const pointers=new Map();
