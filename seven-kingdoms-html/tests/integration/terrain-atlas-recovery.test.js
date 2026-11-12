@@ -40,3 +40,10 @@ test('incomplete or incorrectly sized atlas does not touch canvas',()=>{
   assert.deepEqual(calls,[]);
  }
 });
+
+test('atlas readiness requires decoded image with exact verified dimensions',()=>{
+ const valid=fixture();
+ assert.equal(valid.preview.isReady(),true);
+ assert.equal(fixture({complete:false}).preview.isReady(),false);
+ assert.equal(fixture({width:32}).preview.isReady(),false);
+});
