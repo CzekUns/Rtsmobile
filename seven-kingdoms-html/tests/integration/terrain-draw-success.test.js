@@ -9,7 +9,7 @@ function scenario(drawSuccess){
   stroke(){strokes.push('stroke')},closePath(){},arc(){},fill(){}
  };
  const view={
-  originalTerrain:{isReady(){return true},drawTile(){return drawSuccess}},
+  originalTerrain:{isReady(){return true},drawTile(){return typeof drawSuccess==='function'?drawSuccess():drawSuccess}},
   screen(x,y){return {x,y}},
   authenticTilesDrawn:0
  };
