@@ -17,10 +17,14 @@ export class OriginalTerrainPreview{
   this.image=(imageFactory||(()=>new Image()))();
   this.image.src=new URL(ORIGINAL_TERRAIN.file,import.meta.url).href;
  }
+ isReady(){
+  const info=ORIGINAL_TERRAIN;
+  return !!this.image?.complete&&this.image.naturalWidth===info.width&&
+    this.image.naturalHeight===info.height;
+ }
  drawTile(ctx,x,y,t,type,variant){
   const info=ORIGINAL_TERRAIN,row=terrainAtlasRow(type);
-  if(row<0||!this.image?.complete||this.image.naturalWidth!==info.width||
-     this.image.naturalHeight!==info.height||!Number.isFinite(t)||t<=0)return false;
+  if(row<0||!this.isReady()||!Number.isFinite(t)||t<=0)return false;
   const col=terrainAtlasColumn(variant),dx=Math.floor(x),dy=Math.floor(y);
   const dw=Math.max(1,Math.ceil(x+t)-dx),dh=Math.max(1,Math.ceil(y+t)-dy);
   ctx.save();
