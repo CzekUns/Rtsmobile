@@ -6,12 +6,13 @@
 <meta name="theme-color" content="#777668">
 <title>Seven Kingdoms · HTML Edition (JS nativo)</title>
 <meta name="description" content="Ricostruzione sperimentale del gioco Seven Kingdoms in JavaScript nativo.">
-<link rel="stylesheet" href="style.css?v=6">
+<link rel="stylesheet" href="style.css?v=7">
 </head>
 <body>
 <div id="stage" role="application" aria-label="Seven Kingdoms HTML Edition">
   <header class="topbar">
-    <div class="reports" aria-label="Rapporti">
+    <button id="reportsPrev" class="report-nav" type="button" aria-label="Rapporti precedenti" aria-controls="reportsList" disabled>‹</button>
+    <div class="reports" id="reportsList" role="group" aria-label="Rapporti">
       <button data-report="kingdoms" title="Regni · F1">Regni</button>
       <button data-report="towns" title="Villaggi · F2">Villaggi</button>
       <button data-report="economy" title="Economia · F3">Economia</button>
@@ -22,6 +23,7 @@
       <button data-report="ranking" title="Classifica · F8">Classifica</button>
       <button data-report="news" title="Notizie · F9">Notizie</button>
     </div>
+    <button id="reportsNext" class="report-nav" type="button" aria-label="Rapporti successivi" aria-controls="reportsList">›</button>
     <div class="treasury" aria-label="Risorse del regno">
       <span title="Denaro">◉ <b id="cash">0</b></span>
       <span title="Cibo">❖ <b id="food">0</b></span>
@@ -106,6 +108,6 @@
 <p><strong>PC:</strong> trascina con il sinistro per selezionare un gruppo e usa il tasto destro per spostarlo in formazione. Trascina col destro per scorrere la mappa. F1–F9 per i rapporti, 0 / Spazio per pausa, 1–5 per velocità, S per salvare. La selezione e i movimenti di gruppo sono una prima implementazione mobile, non ancora il sistema di battaglie originale.</p>
 <form method="dialog"><button type="submit">Continua</button></form>
 </dialog>
-<script type="module" src="game.js?v=14"></script>
+<script type="module" src="game.js?v=15"></script>
 </body>
 </html>
