@@ -32,3 +32,12 @@ Compare town/fort screenshots from the original 7KAA build and replace provision
 - **Commits:** `ab1cb2e6` implementation; `5aec0d6c` regression source/markup tests.
 - **QA:** Node regression added, execution/CI and visual 1×/2×/Android still pending; original bitmap parity **not certified**. Worker health range assumes existing HTML 0–100 model, not an upstream C++ health formula.
 - **Next dependency:** source-verified original panel frame/controls and screenshot comparison; coordinate with UI and Asset streams.
+
+## Selected unit health and active work — 2026-11-12
+- **ID:** SKH-106-UNIT-VITALS-02; **state:** DA VERIFICARE.
+- **HTML reference:** `game.js` `selectedContent()` unit branch and `selection-meter.js`; upstream reference `the3dfxdude/7kaa/src/OFIRMIF.cpp` for firm HP/construction concepts. This is an HTML data-display correction; original bitmap parity is **not claimed**.
+- **Objective HTML gap:** selected unit health was raw text, repair progress was raw firm HP text and active construction was an unbounded rounded percentage; town/firm meters in this PR already bounded values.
+- **Implementation:** selected unit health, active repair integrity (using the actual target maximum), and active construction progress now reuse the bounded meter. Walking status and order buttons remain unchanged. No changes to mobile MOD, selection, asset pipeline, or save model.
+- **Commits:** `e09243d` implementation; `d7be5e8` regression tests.
+- **Verification:** source-level tests published; local suite blocked by github.com DNS resolution in execution container; CI, original/HTML 1x/2x screenshot, Android and deploy must be checked. **DA VERIFICARE** until CI and visual checks.
+- **Next dependency:** licensed original UI frames/geometry for town/fort cards via Asset #13 and SKH-103; do not invent colors or sprite dimensions.
