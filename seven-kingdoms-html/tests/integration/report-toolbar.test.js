@@ -12,6 +12,7 @@ test('scrolls to next clipped report and previous clipped report',()=>{
  const items=[button('a',0,60),button('b',60,120),button('c',120,180)];
  const container={querySelectorAll:()=>items,getBoundingClientRect:()=>({left:0,right:100})};
  scrollReports(container,1);assert.equal(selected,'b');
+ selected='';
  scrollReports(container,-1);assert.equal(selected,'','no button clipped at left edge');
 });
 test('keyboard traverses all nine reports including Home and End without wrapping',()=>{
