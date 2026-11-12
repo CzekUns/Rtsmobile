@@ -21,3 +21,11 @@
 **Implementazione:** `playtest/original-terrain.js` usa `try/catch/finally`: su successo ritorna `true`; su errore ritorna `false` affinché `WorldView.tileDraw` disegni il terreno alternativo; in entrambi i casi ripristina il Canvas. Nessun nuovo asset, palette o dimensione inventata.
 
 **Test aggiunti:** `tests/integration/terrain-atlas-recovery.test.js` verifica il rendering normale, l'eccezione simulata nel vero percorso `WorldView.tileDraw` e le immagini incomplete/con dimensioni scorrette. Commit `33a36d85`, `06e144c9`. **Stato: DA VERIFICARE in CI e visivamente**; la suite locale e il browser non sono disponibili nel runtime di questa esecuzione per l'assenza di checkout GitHub via DNS.
+
+## Estensione: collegamenti simbolici demo (12 novembre 2026)
+
+**Differenza HTML:** `WorldView.draw` sovrapponeva linee tratteggiate rettilinee fra forte/edificio e villaggio collegato anche durante l'anteprima delle tessere originali. Sono indicatori inventati della demo, non risorse grafiche 7KAA; non rappresentano le strade originali.
+
+**Modifica:** estratto `WorldView.drawDemoLinks`. In modalità anteprima terreno originale, i collegamenti simbolici non vengono dipinti. Nella demo procedurale rimangono disponibili per indicare i collegamenti. Nessun cambiamento alle regole `linked`, ai salvataggi, alla minimappa o alla pipeline Asset #13.
+
+**Commit:** `133a704a` (renderer), `2490dfbd` (3 test Node in `tests/integration/terrain-demo-links.test.js`). **Stato: DA VERIFICARE** in CI e Chromium 1×/2×; nessuna certificazione pixel-perfect. Prossima dipendenza: ottenere transizioni coste e vere strade dal catalogo Asset verificato, quindi confrontare screenshot originali e HTML.
