@@ -14,7 +14,7 @@ function fixture(originalTerrain){
 }
 
 test('authentic terrain mode never overlays invented straight-line roads',()=>{
- assert.deepEqual(fixture({drawTile(){return true}}),[]);
+ assert.deepEqual(fixture({isReady(){return true}}),[]);
 });
 
 test('procedural demo retains connected-settlement navigation hints',()=>{
@@ -29,4 +29,12 @@ test('unlinked demo firms do not produce road strokes',()=>{
  WorldView.prototype.drawDemoLinks.call({originalTerrain:null,screen(){return {x:0,y:0}}},
   {firms:[{x:0,y:0,size:2}],nearestTown(){return null},linked(){return false}},ctx,24);
  assert.deepEqual(calls,[]);
+});
+
+test('unloaded original atlas keeps demo roads visible until authentic terrain is ready',()=>{
+ assert.equal(fixture({isReady(){return false}}).filter(x=>x[0]==='stroke').length,1);
+});
+
+test('atlas without decoded image dimensions keeps fallback visible',()=>{
+ assert.equal(fixture({isReady(){return false},drawTile(){return false}}).filter(x=>x[0]==='stroke').length,1);
 });
