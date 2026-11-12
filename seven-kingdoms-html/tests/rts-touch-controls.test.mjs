@@ -87,7 +87,7 @@ test('mobile controls are wired to original HTML HUD without adding permanent ri
  assert.match(html,/id="touchJoystick"/);
  assert.match(html,/id="touchJoyThumb"/);
  assert.match(html,/id="touchModifier"/);
- assert.match(html,/game\.js\?v=15/);
+ assert.match(html,/game\.js\?v=\d+/);
  assert.match(js,/installMobileRtsControls/);
  assert.match(js,/selectUnitsInBox\(game\.units/);
  assert.match(js,/issueGroupMove\(game,groupUnitIds/);
@@ -103,7 +103,7 @@ test('COMANDI pop-out keeps joystick and MOD on left, starts closed, does not co
  const html=source('index.html'),css=source('style.css'),touch=source('playtest/mobile-rts-controls.js');
  assert.ok(html.includes('id="touchControlsToggle"'));
  assert.ok(html.includes('aria-expanded="false"'));
- assert.ok(html.includes('style.css?v=7'));
+ assert.ok(/style\.css\?v=\d+/.test(html));
  assert.ok(css.includes('#mobileRtsPad:not(.is-open) #touchJoystick'));
  assert.ok(css.includes('#mobileRtsPad:not(.is-open) #touchModifier'));
  assert.ok(css.includes('right:auto;top:auto;transform:none'));
