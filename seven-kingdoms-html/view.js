@@ -46,17 +46,10 @@ export class WorldView{
   const r=Math.min(WORLD_W,Math.ceil(this.cx+w/(2*t))+1);
   const top=Math.max(0,Math.floor(this.cy-h/(2*t))-1);
   const bottom=Math.min(WORLD_H,Math.ceil(this.cy+h/(2*t))+1);
+  // Read actual atlas success: an apparently decoded image may fail drawImage.
+  this.authenticTilesDrawn=0;
   for(let y=top;y<bottom;y++)for(let x=l;x<r;x++)this.tileDraw(g,ctx,x,y,t);
-  // Roads and short symbolic paths between settlements and owned firms.
-  ctx.lineWidth=Math.max(1,t*.07);ctx.strokeStyle='#b9ac84b0';ctx.setLineDash([t*.13,t*.18]);
-  for(const f of g.firms){
-   const town=g.nearestTown(f);
-   if(!town||!g.linked(f,town))continue;
-   const a=this.screen(f.x+f.size/2,f.y+f.size/2);
-   const b=this.screen(town.x+town.size/2,town.y+town.size/2);
-   ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
-  }
-  ctx.setLineDash([]);
+  this.drawDemoLinks(g,ctx,t);
   const group=new Set(groupIds);
   this.spritePaused=!!g.paused;
   const waitingSites=(g.constructionSites||[]).filter(site=>site.status==='walking');
@@ -93,14 +86,33 @@ export class WorldView{
    }
    this.drawMini(g);
  }
+ drawDemoLinks(g,ctx,t){
+  // These straight dashed connections are demo-only navigation hints, not
+  // authentic 7KAA road graphics. Suppress them only when the atlas is
+  // actually ready; while it loads or fails, retain the complete demo fallback.
+  if(this.authenticTilesDrawn>0 || (this.authenticTilesDrawn===undefined && this.originalTerrain?.isReady()))return;
+  ctx.lineWidth=Math.max(1,t*.07);ctx.strokeStyle='#b9ac84b0';ctx.setLineDash([t*.13,t*.18]);
+  for(const f of g.firms){
+   const town=g.nearestTown(f);
+   if(!town||!g.linked(f,town))continue;
+   const a=this.screen(f.x+f.size/2,f.y+f.size/2);
+   const b=this.screen(town.x+town.size/2,town.y+town.size/2);
+   ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+  }
+  ctx.setLineDash([]);
+ }
  tileDraw(g,ctx,x,y,t){
   const p=this.screen(x,y),type=terrain(g.seed,x,y),n=hash(x,y,g.seed);
   const originalGround=this.originalTerrain?.drawTile(ctx,p.x,p.y,t,type,n)??false;
+  if(originalGround && typeof this.authenticTilesDrawn==='number')this.authenticTilesDrawn++;
   if(!originalGround){
    const arr=COLORS[type];ctx.fillStyle=arr[Math.min(arr.length-1,Math.floor(n*arr.length))];
    ctx.fillRect(Math.floor(p.x),Math.floor(p.y),Math.ceil(t+1),Math.ceil(t+1));
   }
-  if(t<10)return;
+  // Authentic atlas tiles already contain their own painted ground details.
+  // Never superimpose the demo's procedural trees, hills or water strokes.
+  // Keep those symbols only for the fallback while the verified atlas is unavailable.
+  if(originalGround||t<10)return;
   if(type==='forest'&&n>.12){
    ctx.fillStyle='#273f2b';ctx.beginPath();ctx.moveTo(p.x+t*.52,p.y+t*.07);ctx.lineTo(p.x+t*.14,p.y+t*.75);ctx.lineTo(p.x+t*.87,p.y+t*.75);ctx.closePath();ctx.fill();
    ctx.fillStyle='#315b32';ctx.beginPath();ctx.arc(p.x+t*.52,p.y+t*.45,t*.20,0,Math.PI*2);ctx.fill();

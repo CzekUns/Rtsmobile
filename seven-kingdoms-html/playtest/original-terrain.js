@@ -17,15 +17,28 @@ export class OriginalTerrainPreview{
   this.image=(imageFactory||(()=>new Image()))();
   this.image.src=new URL(ORIGINAL_TERRAIN.file,import.meta.url).href;
  }
+ isReady(){
+  const info=ORIGINAL_TERRAIN;
+  return !!this.image?.complete&&this.image.naturalWidth===info.width&&
+    this.image.naturalHeight===info.height;
+ }
  drawTile(ctx,x,y,t,type,variant){
   const info=ORIGINAL_TERRAIN,row=terrainAtlasRow(type);
-  if(row<0||!this.image?.complete||this.image.naturalWidth!==info.width||
-     this.image.naturalHeight!==info.height||!Number.isFinite(t)||t<=0)return false;
+  if(row<0||!this.isReady()||!Number.isFinite(t)||t<=0)return false;
   const col=terrainAtlasColumn(variant),dx=Math.floor(x),dy=Math.floor(y);
   const dw=Math.max(1,Math.ceil(x+t)-dx),dh=Math.max(1,Math.ceil(y+t)-dy);
-  ctx.save();ctx.imageSmoothingEnabled=false;
-  ctx.drawImage(this.image,col*info.tileSize,row*info.tileSize,
-   info.tileSize,info.tileSize,dx,dy,dw,dh);
-  ctx.restore();return true;
+  ctx.save();
+  try {
+   ctx.imageSmoothingEnabled=false;
+   ctx.drawImage(this.image,col*info.tileSize,row*info.tileSize,
+    info.tileSize,info.tileSize,dx,dy,dw,dh);
+   return true;
+  } catch {
+   // A complete image may still be undecodable or invalidated by the browser.
+   // Let WorldView paint its procedural fallback instead of losing the tile.
+   return false;
+  } finally {
+   ctx.restore();
+  }
  }
 }

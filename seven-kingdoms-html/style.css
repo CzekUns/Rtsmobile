@@ -212,3 +212,10 @@ dialog button{min-height:35px;padding:6px 15px}
 @media(orientation:portrait){
  #stage{visibility:hidden}
 }
+
+/* Report strip: all nine commands remain reachable in narrow landscape viewports. */
+.topbar .report-nav{flex:0 0 25px;min-width:25px;min-height:35px;align-self:center;padding:0;font-size:20px}
+.topbar .report-nav:disabled{opacity:.35;cursor:default}
+.topbar .reports{scroll-behavior:smooth;scroll-snap-type:x proximity}
+.topbar .reports button{scroll-snap-align:start}
+@media (min-width:1250px){.topbar .report-nav:disabled{display:none}}
