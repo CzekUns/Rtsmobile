@@ -13,3 +13,12 @@
 
 ## Singolo prossimo passo
 Verificare CI dell'HEAD di questo checkpoint e correggere subito eventuali errori; poi recuperare i byte `I_TERN1.RES` tramite GitHub contents API, calcolare SHA-256 effettivi degli archivi e decodificare il framing bitmap all'offset verificato `0x13668` per produrre la prima fixture grafica autentica, senza collegare Canvas prima della verifica.
+
+
+## Esecuzione 2026-11-13 — framing bitmap autentico
+- Checkpoint precedente: `0b7cd7643c6ee6d5e6892b31514fbaacd1f29195`; CI esatta: https://github.com/CzekUns/Rtsmobile/actions/runs/43421675458 — SUCCESS.
+- Nuovi commit: `9e3bf2a1e18725a7c535c92bb7990d77b9a9990f` (decoder) e `316edb5b0c919004015eab5f5e09a4f7945770a5` (test); branch HEAD codice `316edb5b0c919004015eab5f5e09a4f7945770a5`.
+- Nuovi file: `tools/assets/terrain-bitmap.mjs`, `tests/assets/terrain-bitmap.test.mjs`. Decodifica conservativa: uint32 LE dimensione payload (1028), uint16 LE larghezza/altezza (32×32), 1024 indici di palette; rifiuta encoding diversi senza inventare dati. Byte verificati da `the3dfxdude/7kaa` commit `14e6fdfba9481af4dc3a54722614a608776e20bc`, `data/RESOURCE/I_TERN1.RES` a offset `0x13668`, primi pixel `b8 27 69 b9 28 69 28 69 27 26 28 28 27 b8 28 69`.
+- Test aggiunti ma NON eseguiti localmente. CI nuovo HEAD non ancora verificata. Nessun rendering Canvas, merge, Pages o prova Android.
+- SHA-256 dei due archivi ancora da calcolare sui byte originali; Git blob SHA-1 non è SHA-256. Conservare questo limite. Licenza upstream GPLv2.
+- **Unico prossimo passo:** verificare CI esatta del nuovo HEAD e correggere eventuali errori; poi calcolare SHA-256 degli archivi e generare fixture/manifest riproducibile per SG-028, senza usare una palette presunta.
