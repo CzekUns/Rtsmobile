@@ -88,3 +88,12 @@ Integrated the selection meters from #107 into the existing branch without repla
 - **CI:** immediate workflow lookup for code HEAD `6031231` returned `workflow_runs: []` (may not yet be indexed). **No PASS claimed.** No local npm or Android run, no merge or Pages deployment.
 - **Known risks:** Chrome binary availability on ubuntu-latest, iframe startup timing, report dialog initialization; any failure must be inspected from the actual workflow log. Full MOD+joystick, save/load and fullscreen interaction still require further QA.
 - **Single next step:** **Inspect GitHub Actions for HEAD `6031231` / this checkpoint HEAD; if browser smoke fails, repair the precise failing browser/runner condition on PR #115, rerun until green.** Do not merge on an unverified browser gate.
+
+
+## 2026-11-13 — Chromium gate verified; broadened game interaction smoke
+
+- **Starting checkpoint HEAD:** `ada88cefdcac5fa61b01089bce9265bad26deb0d`.
+- **CI on that exact HEAD:** [GitHub Actions #43368790405](https://github.com/CzekUns/Rtsmobile/actions/runs/43368790405) completed **SUCCESS**. Job `JS tests & stream scope` and steps `Syntax checks for native JS`, `Node unit tests (recursively discovered)`, `Chromium HUD interaction smoke`, `Enforce ownership on agent branches only` each completed SUCCESS. This is a real HTTP-served Chromium smoke, not Android/manual parity evidence.
+- **New code commit:** `70f42910197fc3bf0ab2eb6e6d897ddb1e643b29`, modifying `tests/browser/hud-smoke.html` only. Extended the live iframe browser smoke with game date render, pause/resume click, keyboard `s` save feedback, and game-menu expand/collapse state. The existing ORDINI, reports and COMANDI assertions remain. No game logic altered.
+- **New code HEAD CI:** workflow lookup immediately after commit returned `workflow_runs: []`; **NOT VERIFIED** for `70f4291`. Local npm/browser and Android **NOT RUN**. No merge, no Pages deployment. PR #115 remains draft.
+- **Single next step:** inspect CI for `70f4291` or the resulting checkpoint HEAD, fix any failing browser smoke assertion in PR #115, and only after green assess remaining MOD+joystick/save-load/fullscreen QA before removing draft status.
