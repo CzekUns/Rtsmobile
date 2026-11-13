@@ -60,3 +60,13 @@ Sostituire un gruppo coerente di elementi naturali provvisori con elementi origi
 - **Limitazioni:** non acquisiti PLANT1.RES/PLANTBM1.RES/I_PLANT1.RES/PAL_STD.RES con hash upstream; nessun PNG vegetale autentico, nessuna integrazione Canvas, preview 1×/2×, merge, Pages o Android. L'indice trasparente deve essere verificato contro il decoder 7KAA prima di abilitarlo.
 - **Branch HEAD codice prima del checkpoint:** `e39c5168f81a7d9e98bea8df49d6c42bec70a749`. HEAD finale è il commit di questo checkpoint.
 - **Singolo prossimo passo:** verificare la CI dell'HEAD del checkpoint, correggere se rossa; recuperare gli archivi originali PLANT e PAL_STD dal pinned upstream, calcolare SHA-256, determinare indice trasparente dai sorgenti 7KAA e generare PNG+manifest autentici mediante exporter esistente.
+
+
+## Esecuzione 2026-11-13 21:00 CET — pagina QA 1×/2× per atlante PLANT
+- **Task/PR:** SKH-TERRAIN-002, PR #120 draft; branch `agent/skh-integration/original-landscape-overlays`.
+- **CI checkpoint precedente:** GitHub Actions #43487548236 SUCCESS per HEAD `32e7fb376820d71130cc4728c5a0ee07b31053c9` (verificato via commit workflow runs). **Non** certifica i commit nuovi.
+- **Codice pubblicato:** `ba681f40c0409b4b90630fabdf6f6aa88c918a28` aggiunge `tools/assets/plant-atlas-preview.mjs`, pagina HTML deterministica da manifest dell'exporter, atlas originale a zoom 1×/2× senza interpolazione, tabella bitmap/ancoraggi e dichiarazione esplicita di QA non eseguito; `7c0b83b41c7ecbe10576478c2b2fb165695a8232` aggiunge `tests/assets/plant-atlas-preview.test.mjs` (zoom, limiti geometria, escaping). Non introduce pixel o immagini sintetiche nel gioco.
+- **Verifica:** `git ls-remote https://github.com/CzekUns/Rtsmobile.git HEAD` fallisce `Could not resolve host: github.com`. npm test/check locali NOT_RUN. CI nuovo HEAD ancora non certificato. Nessun merge/Pages/Android o confronto reale 7KAA.
+- **Sorgenti:** interrogato GitHub upstream pinned: `data/RESOURCE/PLANT1.RES` restituisce contenuto DBF, ma il connettore non garantisce byte binari integrali per hashing. Non sono stati calcolati SHA-256 autentici né generati atlas/preview da bitmap originali. Restano mancanti PLANTBM1.RES, I_PLANT1.RES e palette con byte affidabili.
+- **Branch HEAD codice prima del checkpoint:** `7c0b83b41c7ecbe10576478c2b2fb165695a8232`. HEAD finale: commit di questo checkpoint.
+- **Singolo prossimo passo:** verificare CI dell'HEAD checkpoint, correggere eventuali failure; acquisire in modo byte-exact i quattro archivi upstream pinned (PLANT1/PLANTBM1/I_PLANT1/PAL_STD), registrarne SHA-256 e generare atlas PNG, manifest e pagina QA 1×/2× con gli strumenti già pubblicati.
