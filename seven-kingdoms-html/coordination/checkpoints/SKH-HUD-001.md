@@ -78,3 +78,13 @@ Integrated the selection meters from #107 into the existing branch without repla
 - **Alternate browser path attempted:** reproduced the exact `playtest/orders-sidebar.js` controller in an isolated local DOM harness with six assertions (initial compact state, expansion, focus restoration, desktop/mobile media changes, disposal), then invoked `chromium --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --virtual-time-budget=3000 --dump-dom file:///tmp/skh-browser/test.html`. The local command **timed out after 25 seconds**, so **no browser PASS** is claimed. This was an isolated adapter harness, not the entire game.
 - **Checkout remains blocked:** `git ls-remote https://github.com/CzekUns/Rtsmobile.git HEAD` returned `Could not resolve host: github.com`. Full npm suite locally and live-game Chromium/Android regression were **not run**. No code changes, merge, or Pages release in this execution.
 - **Single next step:** establish a working Chromium/browser runner against the actual PR #115 build, verify ORDINI/HUD, fullscreen, MOD+joystick and save/load interactions, and fix any observed regression before removing draft status.
+
+## 2026-11-13 — Browser QA runner added to existing PR #115
+
+- **Starting checkpoint HEAD:** `f8fa4041a6e2188ec60f52850a2bf403f047b0fb`.
+- **New code commits:** `f909512` (real DOM browser smoke page), `8b9099b` (bounded HTTP+Chrome launcher), `6031231` (CI Chrome step). **Code HEAD before this checkpoint:** `6031231bb4b2be922efaf77ce5d3d39afc5b5a91`.
+- **Files:** `tests/browser/hud-smoke.html`, `tests/browser/run-hud-smoke.mjs`, `.github/workflows/seven-kingdoms-html-ci.yml`.
+- **Actual improvement:** CI now attempts a real browser test of the game iframe served over HTTP. Assertions cover ORDINI toggle/ARIA/inert, report opening/closing, COMANDI expansion/collapse and required HUD controls. This replaces repeating the stalled isolated Chrome harness.
+- **CI:** immediate workflow lookup for code HEAD `6031231` returned `workflow_runs: []` (may not yet be indexed). **No PASS claimed.** No local npm or Android run, no merge or Pages deployment.
+- **Known risks:** Chrome binary availability on ubuntu-latest, iframe startup timing, report dialog initialization; any failure must be inspected from the actual workflow log. Full MOD+joystick, save/load and fullscreen interaction still require further QA.
+- **Single next step:** **Inspect GitHub Actions for HEAD `6031231` / this checkpoint HEAD; if browser smoke fails, repair the precise failing browser/runner condition on PR #115, rerun until green.** Do not merge on an unverified browser gate.
