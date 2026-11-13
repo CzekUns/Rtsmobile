@@ -70,3 +70,11 @@ Integrated the selection meters from #107 into the existing branch without repla
 ### Single next step
 
 **Obtain a reproducible browser interaction run for PR #115** (ORDINI focus/ARIA, report toolbar, keyboard guards, fullscreen, left MOD+joystick and save/load) using a viable browser runner or restored checkout; fix any failing interaction on this same branch before marking the PR ready. Do not merge on Node-only evidence.
+
+## 2026-11-13 — Browser runner attempt after CI green
+
+- **Starting checkpoint HEAD:** `73282f13e86dfa296d0d4715fc67b9095f38b5c3`.
+- **Exact HEAD CI:** [GitHub Actions #43355583011](https://github.com/CzekUns/Rtsmobile/actions/runs/43355583011) completed **success** on that SHA (connector returned workflow status and conclusion). This is automated Node/syntax/ownership evidence only.
+- **Alternate browser path attempted:** reproduced the exact `playtest/orders-sidebar.js` controller in an isolated local DOM harness with six assertions (initial compact state, expansion, focus restoration, desktop/mobile media changes, disposal), then invoked `chromium --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --virtual-time-budget=3000 --dump-dom file:///tmp/skh-browser/test.html`. The local command **timed out after 25 seconds**, so **no browser PASS** is claimed. This was an isolated adapter harness, not the entire game.
+- **Checkout remains blocked:** `git ls-remote https://github.com/CzekUns/Rtsmobile.git HEAD` returned `Could not resolve host: github.com`. Full npm suite locally and live-game Chromium/Android regression were **not run**. No code changes, merge, or Pages release in this execution.
+- **Single next step:** establish a working Chromium/browser runner against the actual PR #115 build, verify ORDINI/HUD, fullscreen, MOD+joystick and save/load interactions, and fix any observed regression before removing draft status.
