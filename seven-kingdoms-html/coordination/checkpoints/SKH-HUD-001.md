@@ -30,6 +30,15 @@ Integrated the selection meters from #107 into the existing branch without repla
 - Browser 1×/2×, Android landscape and Pages for this branch **NOT RUN**. No merge, no release, no original 7KAA parity claim.
 - Integration source edits were checked for expected single-match replacements, but full runtime behavior and regressions remain unverified.
 
+## 2026-11-13 — CI gate confirmed on exact integration HEAD
+
+- **PR:** #115 (draft), **verified HEAD:** `2442c33378c51299d07cccb06249357667c63541`; main comparison base in PR: `774c1e0da2895bddc0e98aff389044dbbea57076`.
+- **GitHub Actions:** [run 43334023821](https://github.com/CzekUns/Rtsmobile/actions/runs/43334023821) completed **success** on that exact SHA; job `JS tests & stream scope` completed **success**. Its steps `Syntax checks for native JS`, `Node unit tests (recursively discovered)`, and `Enforce ownership on agent branches only` each report **success**. This is the first verified combined CI gate for the five-source integration.
+- **Local checkout:** `git ls-remote https://github.com/CzekUns/Rtsmobile.git HEAD` again failed `Could not resolve host: github.com`. Therefore separate local `npm --prefix seven-kingdoms-html test` and `npm --prefix seven-kingdoms-html run check` were **not run**; the CI jobs are verified, but do not assert the exact npm command names without the workflow log.
+- **Visual/browser/mobile:** no executable Chromium/Android comparison of this branch obtained; fullscreen, MOD+joystick, drag, save/load, ORDINI focus and selection meters remain **manual/browser QA pending**.
+- **Merge/Pages:** no merge; PR remains draft; no new Pages deployment.
+- **This run's actual change:** resolved the previously unknown CI status through a successful workflow run; checkpoint updated only, no game code changes.
+
 ## Single next step
 
-**Obtain and inspect CI on the exact latest PR #115 HEAD; if no workflow starts, diagnose the workflow trigger and run the complete Node check/test suite using a viable checkout or CI alternative, fixing any failures on this same branch before promoting the draft.**
+**Run a browser interaction regression of PR #115 on a viable checkout/runner (HUD reports, keyboard focus, ORDINI, responsive topbar, selection meters, fullscreen/MOD/joystick and save/load); fix any observed failures on this branch. Once compatibility is evidenced and CI remains green on the resulting HEAD, mark #115 ready and merge, then verify Pages.**
