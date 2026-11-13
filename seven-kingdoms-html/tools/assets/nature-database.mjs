@@ -2,7 +2,7 @@
 // the3dfxdude/7kaa @ 14e6fdfba9481af4dc3a54722614a608776e20bc
 // include/OPLANT.h, include/OROCKRES.h; GPL-2.0-or-later.
 const text=(bytes,start,size)=>String.fromCharCode(...bytes.subarray(start,start+size)).trim();
-const number=(bytes,start,size)=>{const raw=text(bytes,start,size);if(!/^\\d+$/.test(raw))throw Error('invalid numeric field at '+start);return Number(raw)};
+const number=(bytes,start,size)=>{const raw=text(bytes,start,size);if(!/^\d+$/.test(raw))throw Error('invalid numeric field at '+start);return Number(raw)};
 const pointer=(bytes,start)=>new DataView(bytes.buffer,bytes.byteOffset+start,4).getUint32(0,true);
 export const RECORD_SIZES=Object.freeze({PLANT:21,PLANTBM:29,ROCK:18,ROCKBLK:17,ROCKBMP:23,ROCKANI:14});
 export function parseNatureRecord(kind,bytes){
