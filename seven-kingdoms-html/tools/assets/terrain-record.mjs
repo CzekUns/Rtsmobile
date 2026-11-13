@@ -30,14 +30,15 @@ export function parseTerrainRec(bytes) {
     isCoast: (average === 'S') !== (secondary === 'S')
   };
 }
-// Mirrors the four-corner AND-mask matching in TerrainRes::scan; deterministic first match only.
+// Mirrors the four-corner AND-mask and exact special_flag matching in TerrainRes::scan.
+// Upstream load_info normalizes a blank special flag to 0. Deterministic first match only.
 // Actual alternatives and special flags must be resolved from original indexed database records.
 export function firstMatchingTerrain(records, corners, special = 0) {
   if (!Array.isArray(records) || !Array.isArray(corners) || corners.length !== 4) return null;
   const names = ['nw', 'ne', 'sw', 'se'];
   for (let i = 0; i < records.length; i++) {
     const record = records[i];
-    if (!record?.corners || (record.specialFlag !== ' ' && record.specialFlag.charCodeAt(0) !== special)) continue;
+    if (!record?.corners || ((record.specialFlag === ' ' ? 0 : record.specialFlag.charCodeAt(0)) !== special)) continue;
     if (names.every((name, n) => record.corners[name].type === corners[n]?.type &&
       (record.corners[name].mask & corners[n]?.mask) !== 0)) return {terrainId: i + 1, record};
   }
