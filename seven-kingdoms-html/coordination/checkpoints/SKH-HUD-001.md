@@ -97,3 +97,12 @@ Integrated the selection meters from #107 into the existing branch without repla
 - **New code commit:** `70f42910197fc3bf0ab2eb6e6d897ddb1e643b29`, modifying `tests/browser/hud-smoke.html` only. Extended the live iframe browser smoke with game date render, pause/resume click, keyboard `s` save feedback, and game-menu expand/collapse state. The existing ORDINI, reports and COMANDI assertions remain. No game logic altered.
 - **New code HEAD CI:** workflow lookup immediately after commit returned `workflow_runs: []`; **NOT VERIFIED** for `70f4291`. Local npm/browser and Android **NOT RUN**. No merge, no Pages deployment. PR #115 remains draft.
 - **Single next step:** inspect CI for `70f4291` or the resulting checkpoint HEAD, fix any failing browser smoke assertion in PR #115, and only after green assess remaining MOD+joystick/save-load/fullscreen QA before removing draft status.
+
+## 2026-11-13 — Repair failing Chromium keyboard save gate
+
+- **Starting checkpoint HEAD:** `6198c2b5f5b540167de42e0b6cd3233ea2512b9d`.
+- **Exact HEAD CI failure:** [Actions #43376203651](https://github.com/CzekUns/Rtsmobile/actions/runs/43376203651), job `JS tests & stream scope`: syntax SUCCESS, Node SUCCESS (212 pass / 0 fail / 2 skip), Chromium HUD interaction smoke FAILURE, ownership skipped. Log: `Browser smoke: FAIL: keyboard save did not report a result`.
+- **Root cause:** the first-launch instructions dialog is opened by `game.js`, and the global shortcut handler deliberately ignores keys while help/report dialogs are open. The expanded smoke dispatched `s` without first closing that modal. The test had assumed keyboard shortcuts work over an active modal.
+- **Fix commit:** `3c56a413ebfd2f84dc8e841b78b57b582c161b4f`, `tests/browser/hud-smoke.html`: close first-launch help dialog (when open), focus the game document body and dispatch cancelable keydown before asserting save status. This preserves intended modal shortcut guard rather than changing game behavior.
+- **Verification:** failure identified from actual GitHub Actions job log. New HEAD CI **not yet verified** at commit time; local npm and Android **NOT RUN**. No merge, no Pages deployment.
+- **Single next step:** inspect GitHub Actions on the new checkpoint HEAD, repair any remaining Chromium assertion failure in PR #115, then extend browser coverage to fullscreen/MOD+joystick and save-load before ready-for-review/merge.
