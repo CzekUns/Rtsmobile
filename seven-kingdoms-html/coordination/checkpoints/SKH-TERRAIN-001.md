@@ -1,21 +1,15 @@
-# Checkpoint · SKH-TERRAIN-001 — coste e transizioni originali 7KAA
+# Checkpoint · SKH-TERRAIN-001 — coste e transizioni 7KAA
 
-- **Stato:** READY — nessun asset di costa ancora convertito da questo incarico.
-- **Owner:** SKH-106 Integration, con possibili handoff specifici alla corsia Assets SKH-101 nel rispetto di WORKSTREAMS.json.
-- **Data:** 2026-11-13.
-- **Main prodotto verificato prima del rilascio di questo checkpoint:** `ec628a2edf87e0d3d2f46a338d751057fd1ca55a`, integrata la #115.
-- **Branch previsto:** `agent/skh-integration/original-coast-transitions` (non creato qui).
-- **PR:** nessuna aperta per questo task.
-- **CI e asset originali:** NOT_RUN / NOT_YET_ACQUIRED; non dichiarare una costa originale già pronta.
+- Data: 2026-11-13, esecuzione dopo transizione HUD.
+- Stato: IN_PROGRESS, nessun asset costa originale ancora recuperato o renderizzato.
+- Base: main dopo merge #115 (STATE indica ec628a2edf87e0d3d2f46a338d751057fd1ca55a).
+- Branch: `agent/skh-integration/original-coast-transitions`.
+- Ultimo SHA codice prima di questo checkpoint: `0eebe8e7ddf15ee5d91417ed8c0fa5020845976c`.
+- File aggiunti: `tools/assets/coast-manifest.mjs`, `tests/assets/coast-manifest.test.mjs`.
+- Funzione: manifest fail-closed con source URL/commit/licenza/hash, record con offset/length e 4 corner; lookup solo su corrispondenza unica, altrimenti null (fallback). Nessuna modifica al Canvas, collisioni, salvataggi o HUD.
+- Provenienza originale: NON VERIFICATA. Tentativi: `https://github.com/7kfans/7kaa` via connector `src/OTERRAIN.cpp`, `src/OTERRAIN.h`, `COPYING` -> HTTP 404; `git ls-remote https://github.com/7kfans/7kaa.git HEAD` -> `Could not resolve host: github.com`. Nessun record, corner order, hash o licenza di archivio affermato come autentico. URL e hash del test sono fixture fittizie, mai asset.
+- Test: suite npm locale NON ESEGUITA (DNS impedisce checkout); nuovi test Node aggiunti, CI HEAD da verificare. Pages: solo precedente release HUD, nessun deploy terrain.
+- Nota tecnica: lo schema di manifest e l'ordine corner sono provvisori e non sono una prova di formato upstream. Il lookup non va collegato al renderer prima di verificare le convenzioni 7KAA.
 
-## Primo passo concreto
-1. Recuperare `coordination/STATE.json`, `TASKS.json`, questo checkpoint dal branch se già avviato, poi `README.md`, `AGENTS.md`, `PARALLEL_WORK.md` e `WORKSTREAMS.json`.
-2. Verificare nel codice sorgente 7KAA GPL la logica delle transizioni (classe Terrain, nome e indice record, schemi angoli/corner). Individuare commit/archivi reali e attributi palette, senza assumere formati non confermati.
-3. Creare il branch previsto da main e registrare nel checkpoint del branch file/record/commit/hash/licenza originali accertati e differenza rispetto alle 32 tessere già integrate.
-4. Cominciare decoder/manifest/test per un blocco acqua-terra coerente; non alterare le regole di terreno e collisione per fingere grafica fedele.
-5. Prima di terminare, salvare il prossimo step esatto e un commit sul branch. Se accesso agli archivi fallisce, dichiarare URL/errore e trovare alternativa leggibile/licita senza ricominciare audit HUD.
-
-## Esecuzioni
-| Esecuzione | Codice verificato | Prossimo step |
-|---|---|---|
-| Handoff iniziale 2026-11-13 | Nessun codice costa; release HUD verificata e programma aggiornato | catalogo 7KAA transizioni e lookup, poi prima conversione |
+## Singolo prossimo passo
+Recuperare tramite sorgente 7KAA realmente accessibile `OTERRAIN.cpp` e tabelle/archivi terreno con commit, licenza e hash verificabili; confrontare l'ordine dei corner e il layout dei record con lo schema, correggere lo schema e scrivere fixture reali prima di collegare Canvas.
