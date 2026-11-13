@@ -1,15 +1,15 @@
 # Checkpoint · SKH-TERRAIN-001 — coste e transizioni 7KAA
 
-- Data: 2026-11-13, continuazione PR #118 draft.
-- Stato: IN_PROGRESS; nessuna bitmap costa convertita né Canvas modificato.
+- Data: 2026-11-13; PR #118 draft: https://github.com/CzekUns/Rtsmobile/pull/118
+- Stato: IN_PROGRESS; nessuna costa collegata a Canvas, nessun merge.
 - Branch: `agent/skh-integration/original-coast-transitions`.
-- HEAD codice/test prima del checkpoint: `3668b853a3ae409df37c159749e8196efb6b7b70`.
-- PR: https://github.com/CzekUns/Rtsmobile/pull/118
-- Commit codice `ec72d4a0ddd4bd4a90f78963c14ee30976d20aaa`: `tools/assets/terrain-record.mjs`, correzione concreta: `TerrainRes::scan` richiede `special_flag == special`; il vecchio lookup accettava erroneamente tutti i record blank anche durante richieste speciali. Il blank viene ora normalizzato a 0, coerentemente con `TerrainRes::load_info`.
-- Commit test `3668b853a3ae409df37c159749e8196efb6b7b70`: `tests/assets/terrain-record.test.mjs`, regressioni per ricerca normale/speciale e assenza di fallback scorretto.
-- Fonte originale verificata: `the3dfxdude/7kaa` commit `14e6fdfba9481af4dc3a54722614a608776e20bc`, `src/OTERRAIN.cpp` (`TerrainRes::scan`, `load_info`), `include/OTERRAIN.h`, licenza GPLv2. Record da 26 byte e offset bitmap già implementati nella PR.
-- CI precedente sul commit `3866c019493715b1733cdb417e25e0a680d88126`: GitHub Actions run https://github.com/CzekUns/Rtsmobile/actions/runs/43405520065 SUCCESS. **Non è CI del nuovo codice**. Nuovo HEAD `3668b85` da verificare alla prossima esecuzione. `npm --prefix seven-kingdoms-html test` e `npm --prefix seven-kingdoms-html run check` NON eseguiti localmente: `git ls-remote https://github.com/the3dfxdude/7kaa.git HEAD` fallisce con `Could not resolve host: github.com`. Nessuna prova Chromium/Android/Pages nuova.
-- Archivi upstream identificati ma byte non recuperati: `data/RESOURCE/TERRAIN1.RES` e `I_TERN1.RES`. SHA-1 Git precedentemente annotati NON sono SHA-256 dei file. Non assumere che il RES sia un array grezzo di record; framing Database ancora da verificare.
+- HEAD codice/test prima del checkpoint: `eed8a6d9b4c72ea5736f64d6f6c22df0d28e542d`.
+- Commit nuovi: `8b7b75da13cfce0c9427c733b0481a13abee36e2` aggiunge `tools/assets/terrain-database.mjs`; `eed8a6d9b4c72ea5736f64d6f6c22df0d28e542d` aggiunge `tests/assets/terrain-database.test.mjs`.
+- Fonte upstream acquisita con GitHub contents API (base64): `the3dfxdude/7kaa` commit `14e6fdfba9481af4dc3a54722614a608776e20bc`, `data/RESOURCE/TERRAIN1.RES` (20,636 byte, Git blob SHA-1 `8e9c2fc8799d2cfac2b4c531099841dd4e1ae5ac`), `data/RESOURCE/I_TERN1.RES` (Git blob SHA-1 `25bd3189590f7573f0121b28eb120566d411f8ab`); GPLv2 dal repository sorgente. **SHA-256 dei byte non ancora calcolati**: gli SHA-1 Git non sono SHA-256.
+- Risultato verificato sui byte reali: `TERRAIN1.RES` è un database dBASE III (header 385 byte, 750 record, 27 byte per record: marker di cancellazione + 26-byte TerrainRec). 11 campi NW_TYPE, NE_TYPE, SW_TYPE, SE_TYPE, EXTRA, SPECIAL, REP_TYPE, SEC_TYPE, PATTERN_ID, FILENAME, BITMAPPTR. Primo record originale byte 385, record costa originale ID 412 byte 11482, file `SG-028`, bitmap offset `0x13668`. Osservate 180 righe con REP/SEC di cui esattamente una acqua S. Questi sono record autentici, non grafica generata.
+- Nuovo decoder valida versione dBASE, schema, dimensioni, marker e record completi; test usa byte originali di record 1 e 412, con casi negativi. Rimane da verificare CI sul nuovo HEAD; test locali npm NON eseguiti: `git ls-remote https://github.com/the3dfxdude/7kaa.git HEAD` → `Could not resolve host: github.com`.
+- CI precedente sull'HEAD checkpoint `21cbdc8b7cd5263861e275e2093f49256c813d84`: https://github.com/CzekUns/Rtsmobile/actions/runs/43413858994 — SUCCESS. Non è CI del nuovo codice.
+- Browser, Android, Pages e confronto 1x/2x: NOT_RUN. Nessuna dichiarazione di parità grafica.
 
 ## Singolo prossimo passo
-Controllare la CI sull'HEAD del branch dopo questo checkpoint; recuperare tramite percorso binario legittimo `TERRAIN1.RES` e `I_TERN1.RES`, misurare SHA-256 e framing Database, poi creare fixture REALI con offset e ID. Non collegare Canvas finché i record non sono dimostrati.
+Verificare CI dell'HEAD di questo checkpoint e correggere subito eventuali errori; poi recuperare i byte `I_TERN1.RES` tramite GitHub contents API, calcolare SHA-256 effettivi degli archivi e decodificare il framing bitmap all'offset verificato `0x13668` per produrre la prima fixture grafica autentica, senza collegare Canvas prima della verifica.
