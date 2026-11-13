@@ -45,3 +45,26 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           PR_BRANCH: ${{ github.head_ref }}
         run: node seven-kingdoms-html/tools/check-workstream.mjs
+
+  original-plant-atlas:
+    name: Original 7KAA PLANT atlas acquisition
+    if: github.ref == 'refs/heads/agent/skh-integration/original-landscape-overlays' || github.head_ref == 'agent/skh-integration/original-landscape-overlays'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Acquire pinned original PLANT resources and render reproducible atlas
+        run: node seven-kingdoms-html/tools/assets/build-original-plant-atlas.mjs "$RUNNER_TEMP/skh-plant-atlas"
+      - name: Upload original PNG, manifest with SHA-256, and 1x/2x QA preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: skh-terrain-002-original-plant-atlas
+          path: |
+            ${{ runner.temp }}/skh-plant-atlas/plant-original.png
+            ${{ runner.temp }}/skh-plant-atlas/plant-original.json
+            ${{ runner.temp }}/skh-plant-atlas/plant-original-qa.html
+          if-no-files-found: error
+          retention-days: 14
