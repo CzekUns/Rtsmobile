@@ -15,7 +15,15 @@ export function exportPlantAtlas({plantDb,bitmapDb,bitmapArchive,palette,expecte
     if(!(bytes instanceof Uint8Array)||!validHash(expectedHashes?.[name])||hash(bytes)!==expectedHashes[name])
       throw Error('source SHA-256 mismatch or missing: '+name);
   }
-  if(palette.length!==768)throw Error('original RGB palette must contain 768 bytes');
+  // PAL_STD.RES in pinned 7KAA has an 8-byte resource header (0x308 = 776 bytes).
+  // Keep 768-byte raw RGB palettes accepted for existing unit fixtures.
+  let rgbPalette=palette;
+  if(palette.length===776){
+    const view=new DataView(palette.buffer,palette.byteOffset,4);
+    if(view.getUint32(0,true)!==0x308)throw Error('unrecognized original PAL_STD.RES header');
+    rgbPalette=palette.subarray(8);
+  }
+  if(rgbPalette.length!==768)throw Error('original RGB palette must contain 768 bytes');
   const {plants,bitmaps}=linkPlantResources(plantDb,bitmapDb,bitmapArchive);
   if(!bitmaps.length)throw Error('empty original plant atlas');
   // Shelf layout: variable original dimensions, never rescale or interpolate.
@@ -38,7 +46,7 @@ export function exportPlantAtlas({plantDb,bitmapDb,bitmapArchive,palette,expecte
     const b=bitmaps[i].bitmap,p=placements[i];
     for(let row=0;row<b.height;row++)pixels.set(b.pixels.subarray(row*b.width,(row+1)*b.width),(p.y+row)*usedWidth+p.x);
   }
-  return {png:encodeIndexedPng(usedWidth,height,pixels,palette,{transparentIndex}),
+  return {png:encodeIndexedPng(usedWidth,height,pixels,rgbPalette,{transparentIndex}),
     manifest:{schemaVersion:1,source:'the3dfxdude/7kaa',license:'GPL-2.0-or-later',
       sourceCommit,sha256:expectedHashes,width:usedWidth,height,plantCount:plants.length,
       bitmaps:placements,transparentIndex:transparentIndex??'unverified',visualParity:'not_certified'}};
