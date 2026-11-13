@@ -7,3 +7,10 @@ test('plant bitmap preserves signed anchors and little-endian pointer',()=>{cons
 test('rock bitmap record retains original frame and offset',()=>{const r=parseNatureRecord('ROCKBMP',row('ROCKBMP',[[0,'STONE'],[5,'00'],[7,'01'],[9,'02'],[11,'ROCK001'],[19,4096]]));assert.equal(r.frame,2);assert.equal(r.bitmapOffset,4096)});
 test('DBF framing rejects truncated or deleted records',()=>{const b=Buffer.alloc(33+22);b[0]=3;b.writeUInt32LE(1,4);b.writeUInt16LE(33,8);b.writeUInt16LE(22,10);b[32]=13;b[33]=42;assert.throws(()=>parseNatureDatabase('PLANT',b),/deleted/);b[33]=32;b.set(row('PLANT',[[0,'OAK'],[8,'2'],[9,'G '],[11,'  '],[13,'  '],[15,'001'],[18,'000']]),34);assert.equal(parseNatureDatabase('PLANT',b).count,1);b.writeUInt32LE(2,4);assert.throws(()=>parseNatureDatabase('PLANT',b),/framing/)});
 test('unknown and truncated record rejected',()=>{assert.throws(()=>parseNatureRecord('TREE',new Uint8Array(3)),/length/);assert.throws(()=>parseNatureRecord('ROCK',new Uint8Array(17)),/length/)});
+
+test('numeric DBF fields accept ASCII digits and reject nonnumeric input',()=>{
+ const valid=row('PLANT',[[0,'OAK'],[8,'2'],[9,'G '],[11,'  '],[13,'  '],[15,'001'],[18,'000']]);
+ assert.equal(parseNatureRecord('PLANT',valid).firstBitmap,1);
+ const invalid=Buffer.from(valid);invalid.write('0A1',15,'ascii');
+ assert.throws(()=>parseNatureRecord('PLANT',invalid),/invalid numeric field/);
+});
