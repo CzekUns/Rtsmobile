@@ -1,24 +1,23 @@
-# Handoff esecutivo — Seven Kingdoms
+# Handoff esecutivo — Seven Kingdoms HTML Edition
 
-## Stato iniziale (registrato il 12 novembre 2026)
+## 13 novembre 2026 — Nuovo incarico attivo: SKH-TERRAIN-001
 
-**Incarico attivo:** `SKH-HUD-001` · consolidamento HUD. **Questo è un handoff iniziale, non una run eseguita.**
+**L'ultimo giro di integrazione ha completato tecnicamente SKH-HUD-001** su main mediante [PR #115](https://github.com/CzekUns/Rtsmobile/pull/115). Il programma passa ora alle **coste e transizioni originali 7KAA**. Il collaudo fisico Android/fullscreen rimane registrato come `awaiting_manual_qa` per il task HUD; non equivale a bug aperto noto.
 
-- Ultimo main verificato in fase di bootstrap: `413758a15f93ffe2b302d5edfd7561f5d7fba255`, con minimappa integrata, tasti MOD+levetta a sinistra, sprite normanni e 32 tasselli originali.
-- Ultimo Pages deployment noto: workflow `43221479622` successo sullo SHA sopra, senza conferma Android reale.
-- **Cinque PR non draft in sospeso**, tutte con interventi in `game.js`: #97 (stato report ed Escape), #101 (tastiera HUD), #103 (sidebar e focus), #105 (data e velocità landscape), #107 (stato selezione di villaggi/forti). #105 e #107 modificano anche CSS.
-- #97/#101/#103/#105 avevano una CI GitHub associata all'HEAD verde al controllo precedente; la #107 è stata aggiornata e ha una CI push verde sul commit `d7962a79...`, ma i test di integrazione sull'HEAD combinato **non sono stati eseguiti**. Controllare di nuovo gli HEAD all'avvio.
-- Non riaprire #98/#99/#100/#104/#106/#111: funzionalità minimappa consolidate e archiviate dopo PR #112/#113.
-- Niente nuove transizioni di costa o vegetazione pubblicate in questo bootstrap.
+### Dati di rilascio verificati
+- **Main prodotto:** `ec628a2edf87e0d3d2f46a338d751057fd1ca55a` — HUD consolidata da #97, #101, #103, #105, #107.
+- **Test PR:** [GitHub Actions #43391166870](https://github.com/CzekUns/Rtsmobile/actions/runs/43391166870): 212 Node PASS, 0 FAIL, 2 SKIP e Chromium HTTP smoke **PASS** con ORDINI, report, indicatori, MOD, levetta, invocazione fullscreen tramite stub e ciclo reale di salvataggio/ricaricamento.
+- **Test main:** [Actions #43391451648](https://github.com/CzekUns/Rtsmobile/actions/runs/43391451648) SUCCESS.
+- **GitHub Pages:** [deploy #43391451601](https://github.com/CzekUns/Rtsmobile/actions/runs/43391451601) SUCCESS sullo SHA di prodotto indicato. Il sito statico è `https://czekuns.github.io/Rtsmobile/seven-kingdoms-html/`.
+- **Fonte PR arretrati:** #97, #101, #103, #105, #107 chiuse con note di sostituzione. Non ripubblicarle individualmente.
+- **Limiti:** Android fisico e fullscreen immersivo **non testati**; il browser ha verificato la chiamata API, non il comportamento hardware. Nessuna parità grafica originale certificata.
 
-## Prima operazione concreta dell'esecutore
+### Prossima azione concreta, senza ripetere gli audit HUD
 
-1. Aprire `STATE.json` e `TASKS.json`: task attivo `SKH-HUD-001`.
-2. Prima di creare un branch nuovo, controllare l'eventuale branch `agent/skh-integration/hud-backlog-consolidation`; se esiste, leggere **prima** il suo `coordination/checkpoints/SKH-HUD-001.md` e l'eventuale PR. Se manca, crearlo da ultimo main.
-3. Leggere patch di #97/#101/#103/#105/#107 **una sola volta**, salvare la matrice conflitti nel checkpoint; fare una sequenza di modifiche integrative su un unico ramo.
-4. Testare il prodotto combinato (`npm --prefix seven-kingdoms-html test` e `npm --prefix seven-kingdoms-html run check`), correggere le regressioni e verificare la CI sull'HEAD. Non scambiare i test verdi dei branch singoli per test dell'integrazione.
-5. Fare merge della PR verificata, controllare main/Pages ed annotare limiti Android; chiudere solo le vecchie PR dimostrabilmente assorbite e con commento. Aggiornare lo stato persistente e attivare `SKH-TERRAIN-001`.
+1. Leggere `coordination/STATE.json`, `TASKS.json` e `coordination/checkpoints/SKH-TERRAIN-001.md` su main oppure, se esiste, sul suo branch più recente.
+2. Cercare le definizioni reali delle transizioni di costa nei sorgenti 7KAA (in particolare `OTERRAIN.cpp`, resource naming/record e tavole tile); recuperare ove legittimo `TERRAIN1.RES`, `I_TERN1.RES` e i metadati palette dal repository originale/base 7KAA. Non assumere che un nome indicato sia certamente presente: verificarlo nei file effettivamente accessibili.
+3. Creare il branch `agent/skh-integration/original-coast-transitions` da ultimo main se non esiste. Scrivere sul branch un checkpoint con **sorgente esatta, hash/licenza verificati, record di angoli identificati e singolo prossimo step**.
+4. Implementare un gruppo coerente di tasselli/mapping acqua-terra, test e anteprima riproducibile. Conservare fallback, unità, input e salvataggi. Test/CI e Pages dopo integrazione.
+5. Non cambiare incarico né creare una PR di report quando un punto tecnico può avanzare sul branch attivo.
 
-## Se un passaggio fallisce
-
-Scrivere in `coordination/checkpoints/SKH-HUD-001.md` sul **branch**: errore esatto, comando/URL, HEAD, file interessati, correzione provata e singola prossima operazione. Preferire fix direttamente nello stesso PR. Se DNS del checkout manca, usare i dati GitHub/CI per preparare un cambio reale e non ripetere all'infinito l'audit. Niente marker `completed` senza prova.
+**Regola di conflitto:** prima di ogni push controllare gli HEAD del branch e di `main`; se un altro esecutore ha avanzato lo stesso task, ripartire dal suo checkpoint. Nessun force push o merge di PR draft.

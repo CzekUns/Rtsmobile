@@ -1,31 +1,37 @@
 {
   "schemaVersion": 1,
   "programRevision": "2026-11-12-orchestrator-v1",
-  "updatedOn": "2026-11-12",
-  "lastObservedMainSha": "413758a15f93ffe2b302d5edfd7561f5d7fba255",
+  "updatedOn": "2026-11-13",
+  "lastObservedMainSha": "ec628a2edf87e0d3d2f46a338d751057fd1ca55a",
   "lastVerifiedPagesDeployment": {
-    "sha": "413758a15f93ffe2b302d5edfd7561f5d7fba255",
-    "runId": 43221479622,
+    "sha": "ec628a2edf87e0d3d2f46a338d751057fd1ca55a",
+    "runId": 43391451601,
     "result": "success",
     "url": "https://czekuns.github.io/Rtsmobile/seven-kingdoms-html/",
     "androidVisualTest": "not_run"
   },
-  "activeTaskId": "SKH-HUD-001",
+  "activeTaskId": "SKH-TERRAIN-001",
   "activeTaskBranch": null,
-  "currentStep": "Ispezione comparativa delle PR #97, #101, #103, #105 e #107 contro l'ultimo main; poi integrazione e test.",
+  "currentStep": "Coste 7KAA: individuare nella sorgente e negli archivi ufficiali lookup dei corner e record di transizione, prova licenza/manifest, poi conversione Canvas.",
   "lastExecution": {
-    "recorded": false,
-    "runId": null,
-    "at": null,
-    "taskId": null,
-    "outcome": null,
-    "commitSha": null,
-    "prNumber": null,
-    "ciRunUrl": null,
+    "recorded": true,
+    "runId": "manual-integration-2026-11-13-SKH-HUD-001",
+    "at": "2026-11-13",
+    "taskId": "SKH-HUD-001",
+    "outcome": "merged-and-pages-deployed-awaiting-manual-qa",
+    "commitSha": "ec628a2edf87e0d3d2f46a338d751057fd1ca55a",
+    "prNumber": 115,
+    "ciRunUrl": "https://github.com/CzekUns/Rtsmobile/actions/runs/43391451648",
     "blockingReason": null
   },
-  "awaitingManualValidation": [],
+  "awaitingManualValidation": [
+    {
+      "taskId": "SKH-HUD-001",
+      "scope": "Android landscape UI, touchscreen MOD+joystick and true fullscreen, baseline 7KAA visual comparison",
+      "releaseSha": "ec628a2edf87e0d3d2f46a338d751057fd1ca55a"
+    }
+  ],
   "planChangesRequireOwnerApproval": true,
-  "nextTaskAfterActive": "SKH-TERRAIN-001",
-  "notes": "Questa è la fotografia iniziale, non un rapporto di avanzamento. Solo l'orchestratore/integratore aggiorna STATE.json su main; nei lavori non mergiati lo stato tecnico vivo resta sul branch della PR in coordination/checkpoints/<task-id>.md. Non inventare esecuzioni passate."
+  "nextTaskAfterActive": "SKH-TERRAIN-002",
+  "notes": "Consolidamento HUD verificato con Node, Chromium HTTP, merge #115 e Pages. PR #97/#101/#103/#105/#107 chiuse come superseded con commenti. Prova fisica Android resta aperta; l'esecutore riprende task coste con checkpoint separato. Il main potrebbe avanzare dopo questo snapshot: sempre leggere HEAD live."
 }
