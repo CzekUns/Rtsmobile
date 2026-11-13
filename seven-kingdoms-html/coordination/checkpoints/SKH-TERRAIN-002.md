@@ -50,3 +50,13 @@ Sostituire un gruppo coerente di elementi naturali provvisori con elementi origi
 - **HEAD codice prima del checkpoint:** `42a3074c63233ba97263ef8ffab59f34ccba1a38`; HEAD finale è il commit che aggiorna questo checkpoint.
 - **Limiti:** recupero archivi originali e SHA reali non completato; nessun atlante autentico, Canvas, preview 1x/2x, merge, Pages o prova Android. DNS checkout `Could not resolve host: github.com` già riprodotto. `npm test`/`npm run check` locali NOT_RUN; CI del nuovo HEAD non ancora certificata.
 - **Singolo prossimo passo:** verificare CI dell'HEAD checkpoint, correggere eventuali errori; acquisire PLANT1.RES, PLANTBM1.RES, I_PLANT1.RES e PAL_STD.RES dall'upstream pinned, calcolare SHA-256 reali e usare l'exporter per produrre il primo PNG e manifest autentici sullo stesso branch.
+
+
+## Esecuzione 2026-11-13 20:00 CET — trasparenza indicizzata e limiti memoria
+- **Task/PR:** SKH-TERRAIN-002, [#120](https://github.com/CzekUns/Rtsmobile/pull/120) draft; branch `agent/skh-integration/original-landscape-overlays`.
+- **CI checkpoint precedente:** [Actions #43478190361](https://github.com/CzekUns/Rtsmobile/actions/runs/43478190361) SUCCESS per `914a53277965d4e527ea0a04fe370b3d3891c285`.
+- **Codice pubblicato:** `81fb2f222fc71d2a24820468cabdb563fcad8291` aggiunge supporto PNG tRNS con indice trasparente esplicito (nessun indice inventato), preservando output preesistente quando non fornito; `f49d37721a7e4878c55791b0f83a36da9a2b8e53` collega la trasparenza opzionale all'export/manifest e rifiuta atlas oltre 10M pixel prima di allocare; `e39c5168f81a7d9e98bea8df49d6c42bec70a749` aggiunge test su tRNS, indice invalido e archivio 4096×4096.
+- **Verifica:** Actions interrogate per commit codice `e39c5168f81a7d9e98bea8df49d6c42bec70a749`: nessuna run associata al momento del controllo. npm test/check locale **NOT_RUN** perché `git ls-remote https://github.com/the3dfxdude/7kaa.git HEAD` restituisce `Could not resolve host: github.com`. Non attribuire PASS ai nuovi commit.
+- **Limitazioni:** non acquisiti PLANT1.RES/PLANTBM1.RES/I_PLANT1.RES/PAL_STD.RES con hash upstream; nessun PNG vegetale autentico, nessuna integrazione Canvas, preview 1×/2×, merge, Pages o Android. L'indice trasparente deve essere verificato contro il decoder 7KAA prima di abilitarlo.
+- **Branch HEAD codice prima del checkpoint:** `e39c5168f81a7d9e98bea8df49d6c42bec70a749`. HEAD finale è il commit di questo checkpoint.
+- **Singolo prossimo passo:** verificare la CI dell'HEAD del checkpoint, correggere se rossa; recuperare gli archivi originali PLANT e PAL_STD dal pinned upstream, calcolare SHA-256, determinare indice trasparente dai sorgenti 7KAA e generare PNG+manifest autentici mediante exporter esistente.
