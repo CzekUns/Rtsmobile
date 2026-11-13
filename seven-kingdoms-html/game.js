@@ -12,10 +12,13 @@ import {issueWorkOrder,completeWorkArrivals} from './playtest/work-assignments.j
 import {issueBuildOrder,cancelBuildOrder,advanceConstruction,isBuilder,canBuildFirm} from './playtest/construction.js';
 import {issueRepairOrder,cancelRepairOrder,advanceRepairs,canRepair} from './playtest/repairs.js';
 import {WorldView} from './view.js';
+import {selectionMeter} from './selection-meter.js';
+import {installOrdersSidebar} from './playtest/orders-sidebar.js';
 import {installMinimapNavigation} from './playtest/minimap-system.js';
 import {installReportToolbar} from './playtest/report-toolbar.js';
 import {SKILLS,skillLabel,workerRoleLabel,workerRaceLabel,ensureFirmPersonnel} from './playtest/personnel.js';
 import {ensureTownRaces,selectedTownRace,recruitableTownPeople} from './playtest/town-races.js';
+import {shouldIgnoreGlobalShortcut} from './playtest/keyboard-focus-guard.js';
 const $=id=>document.getElementById(id);
 const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const query=new URLSearchParams(location.search);
@@ -45,15 +48,10 @@ window.addEventListener('resize',resizeStage);
 window.addEventListener('orientationchange',resizeStage);
 window.visualViewport?.addEventListener('resize',resizeStage);
 if(typeof ResizeObserver!=='undefined')new ResizeObserver(resizeStage).observe($('world'));
-function setOrdersVisible(visible){
- $('stage').classList.toggle('panel-collapsed',!visible);
- $('sidebarToggle').setAttribute('aria-expanded',String(visible));
- $('sidebarToggle').textContent=visible?'ORDINI ◂':'ORDINI ▸';
- $('orderSidebar').setAttribute('aria-hidden',String(!visible));
-}
-setOrdersVisible(!window.matchMedia('(max-width:1000px) and (pointer:coarse)').matches);
-$('sidebarToggle').addEventListener('click',()=>
- setOrdersVisible($('stage').classList.contains('panel-collapsed')));
+installOrdersSidebar({
+ sidebar:$('orderSidebar'),stage:$('stage'),toggle:$('sidebarToggle'),
+ media:window.matchMedia('(max-width:1000px) and (pointer:coarse)')
+});
 function status(message){
  $('ticker').textContent=message;newsUntil=Date.now()+6000;
 }
@@ -85,7 +83,7 @@ function selectGroup(ids){
 function closeReport(){
  if($('reportDialog').open)$('reportDialog').close();
  report=null;
- document.querySelectorAll('[data-report]').forEach(b=>b.classList.remove('active'));
+ document.querySelectorAll('[data-report]').forEach(b=>{b.classList.remove('active');b.setAttribute('aria-pressed','false');});
 }
 function renderReport(){
  if(!report||!$('reportDialog').open)return;
@@ -95,7 +93,7 @@ function renderReport(){
 }
 function setReport(name){
  report=name;
- document.querySelectorAll('[data-report]').forEach(b=>b.classList.toggle('active',b.dataset.report===name));
+ document.querySelectorAll('[data-report]').forEach(b=>{const active=b.dataset.report===name;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});
  if(!$('reportDialog').open)$('reportDialog').showModal();
  renderReport();
 }
@@ -145,8 +143,7 @@ function selectedContent(){
   const selectedRace=selectedTownRace(item);
   const available=selectedRace?recruitableTownPeople(item,selectedRace.raceId):0;
   const info='Popolazione <strong>'+item.pop+'</strong> · '+races.length+' etnie'+
-    '<br>'+(independent?'Resistenza <strong>'+Math.floor(item.resistance)+'</strong>/100':
-                   'Fedeltà media <strong>'+Math.floor(item.loyalty)+'</strong>/100')+
+    '<br>'+selectionMeter(independent?'Resistenza':'Fedeltà media',independent?item.resistance:item.loyalty)+
     '<br>Regno: '+esc(nation.name)+
     (selectedRace?'<br>Selezionata: <strong>'+esc(selectedRace.culture)+'</strong> · liberi '+available:'')+
     (item.trainingQueue?.length?'<br>In addestramento: '+item.trainingQueue.length+'/10':'');
@@ -155,7 +152,8 @@ function selectedContent(){
    const active=r.raceId===item.selectedRaceId;
    return '<button type="button" class="town-race-choice'+(active?' active':'')+'" data-town-race="'+esc(r.raceId)+'" aria-pressed="'+active+'">'+
     esc(r.culture)+' · '+r.population+' abitanti'+
-    '<small>Disoccupati '+r.jobless+' · Fedeltà '+Math.floor(r.loyalty)+'</small></button>';
+    '<small>Disoccupati '+r.jobless+' · Fedeltà '+Math.floor(r.loyalty)+'</small>'+ 
+    selectionMeter('Fedeltà '+r.culture,r.loyalty,100,{decorative:true})+'</button>';
   }).join('');
   const canRecruit=item.owner===1&&item.pop>4&&available>0&&selectedRace?.loyalty>=30;
   const canTrain=canRecruit&&ownFortLinked&&game.cash>=30&&(item.trainingQueue?.length||0)<10;
@@ -202,16 +200,16 @@ function selectedContent(){
    const ethnicity=workerRaceLabel(person);
    return '<div class="worker-row"><strong>'+esc(who)+'</strong>'+
     '<small>'+esc(role)+' · '+esc(ethnicity)+'</small>'+
-    '<small>'+esc(profile)+'</small><small>HP '+Math.floor(person.hp??100)+
-    ' · ID '+esc(person.personId??person.id)+'</small>'+
+    '<small>'+esc(profile)+'</small><small>ID '+esc(person.personId??person.id)+'</small>'+ 
+    selectionMeter('Salute '+who,person.hp??100)+' '+ 
     (item.owner===1?'<button type="button" data-worker-exit="'+esc(person.id)+'">Fai uscire</button>':'')+
     '</div>';
   }).join('');
   return {
    title:rule.label,meta:'Edificio · '+nation.name,color,
    info:'Lavoratori <strong>'+staff.length+'</strong>/8'+
-    '<br>Integrità edificio <strong>'+Math.floor(item.hp??100)+'</strong>/'+(item.maxHp??100)+' HP'+
-    (item.underConstruction?'<br><strong>IN COSTRUZIONE '+Math.floor((item.buildProgress||0)*100)+'%</strong>':'')+
+    '<br>'+selectionMeter('Integrità edificio',item.hp??100,item.maxHp??100)+
+    (item.underConstruction?'<br>'+selectionMeter('In costruzione',item.buildProgress||0,1):'')+
     '<br>Esperienza '+Math.floor(item.experience)+
     (item.kind==='fort'?'<br>Il forte influenza i villaggi collegati.':
       item.kind==='mine'?'<br>Produce minerali grezzi.':
@@ -243,14 +241,14 @@ function selectedContent(){
   return {
    title:item.kind==='soldier'?'Soldato':'Abitante',
    meta:nation.name+' · Livello '+item.level,color,
-   info:'Salute '+item.hp+'/100 · '+esc(item.culture||'Etnia non registrata')+
+   info:selectionMeter('Salute unità',item.hp??100,100)+' · '+esc(item.culture||'Etnia non registrata')+
     '<br>Abilità '+esc(skillLabel(item.skillId,item.skillLevel,item.legacyUnknown))+
     ' · Combattimento '+Math.floor(item.combatLevel||0)+
     '<br>ID '+esc(item.personId??item.id)+
     '<br>'+(activeRepair?'Riparazione '+esc(FIRMS[activeRepair.kind]?.label||activeRepair.kind)+
-      ' · '+Math.floor(activeRepair.hp??100)+'/'+(activeRepair.maxHp??100)+' HP':
+      ' · '+selectionMeter('Integrità riparazione',activeRepair.hp??100,activeRepair.maxHp??100):
      activeSite?'Cantiere '+esc(FIRMS[activeSite.kind]?.label||activeSite.kind)+
-      ' · '+(activeSite.status==='walking'?'In marcia':'Lavori '+Math.floor(activeSite.progress*100)+'%'):
+      ' · '+(activeSite.status==='walking'?'In marcia':selectionMeter('Avanzamento cantiere',activeSite.progress??0,1)):
      assignedTo?'In viaggio verso '+esc(FIRMS[assignedTo.kind]?.label||'edificio'):
            item.target?'In marcia':'Pronto per gli ordini')+
     '<br>Su smartphone usa MOD + tocco per spostarti, oppure scegli un edificio qui sotto. L\'abitante entrerà solo dopo aver raggiunto l\'ingresso.',
@@ -609,7 +607,7 @@ document.addEventListener('click',e=>{
 });
 $('reportDialog').addEventListener('close',()=>{
  report=null;
- document.querySelectorAll('[data-report]').forEach(b=>b.classList.remove('active'));
+ document.querySelectorAll('[data-report]').forEach(b=>{b.classList.remove('active');b.setAttribute('aria-pressed','false');});
 });
 $('closeReport').addEventListener('click',closeReport);
 $('menuBtn').addEventListener('click',()=>{
@@ -631,8 +629,11 @@ document.addEventListener('fullscreenchange',()=>{
  $('fullscreenBtn').textContent=document.fullscreenElement?'⤢':'⛶';resizeStage();
 });
 document.addEventListener('keydown',e=>{
- if(e.target instanceof HTMLInputElement)return;
- if(e.key==='Escape'){closeReport();cancelBuild();$('gameMenu').hidden=true;return;}
+ if(e.key==='Escape'){
+  if(!$('helpDialog').open&&!$('reportDialog').open){cancelBuild();$('gameMenu').hidden=true;$('menuBtn').setAttribute('aria-expanded','false');}
+  return;
+ }
+ if(shouldIgnoreGlobalShortcut(e.target,$('helpDialog').open||$('reportDialog').open))return;
  if(e.key===' '||e.key==='0'){e.preventDefault();game.paused=!game.paused;renderHud();return;}
  if(/^[1-5]$/.test(e.key)){game.setSpeed(Number(e.key));renderHud();return;}
  if(e.key.toLowerCase()==='s'&&!e.ctrlKey){e.preventDefault();status(game.save(saveKey)?'Partita salvata.':'Errore di salvataggio.');return;}

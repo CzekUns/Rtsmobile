@@ -35,6 +35,10 @@ jobs:
         run: npm --prefix seven-kingdoms-html run check
       - name: Node unit tests (recursively discovered)
         run: npm --prefix seven-kingdoms-html test
+      - name: Chromium HUD interaction smoke
+        env:
+          CHROME_BIN: google-chrome
+        run: node seven-kingdoms-html/tests/browser/run-hud-smoke.mjs
       - name: Enforce ownership on agent branches only
         if: github.event_name == 'pull_request'
         env:

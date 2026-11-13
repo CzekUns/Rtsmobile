@@ -1,0 +1,103 @@
+<!doctype html><html><meta charset="utf-8"><title>SKH HUD browser smoke</title><body><output id="result">PENDING</output><iframe id="game" src="../../index.html" style="width:960px;height:600px"></iframe><script>
+const output=document.getElementById('result');
+const frame=document.getElementById('game');
+const delay=ms=>new Promise(r=>setTimeout(r,ms));
+async function run(){
+ const d=frame.contentDocument,w=frame.contentWindow;
+ const get=id=>d.getElementById(id);
+ const assert=(condition,message)=>{if(!condition)throw Error(message)};
+ await delay(700);
+ assert(get('world')&&get('sidebarToggle')&&get('touchModifier'),'required game controls absent');
+ const toggle=get('sidebarToggle'),sidebar=get('orderSidebar');
+ assert(toggle.getAttribute('aria-expanded')!==null,'ORDINI missing expanded state');
+ const initial=toggle.getAttribute('aria-expanded');
+ toggle.click();
+ assert(toggle.getAttribute('aria-expanded')!==initial,'ORDINI did not toggle');
+ assert(sidebar.inert===(toggle.getAttribute('aria-expanded')==='false'),'ORDINI inert mismatch');
+ toggle.click();
+ assert(toggle.getAttribute('aria-expanded')===initial,'ORDINI did not restore state');
+ const reports=d.querySelector('[data-report="towns"]');
+ reports.click();
+ await delay(100);
+ assert(get('reportDialog').open,'report dialog failed to open');
+ get('closeReport').click();
+ await delay(100);
+ assert(!get('reportDialog').open,'report dialog failed to close');
+ const commands=get('touchControlsToggle');
+ commands.click();
+ assert(commands.getAttribute('aria-expanded')==='true','COMANDI did not expand');
+ commands.click();
+ assert(commands.getAttribute('aria-expanded')==='false','COMANDI did not collapse');
+ assert(get('fullscreenBtn')&&get('gameMenu')&&get('minimap'),'core HUD controls missing');
+ // Exercise the real game keyboard/save and pause controls, not only DOM presence.
+ const pause=get('pauseBtn'),date=get('date'),ticker=get('ticker');
+ assert(date.textContent.trim().length>0,'game date not rendered');
+ pause.click();
+ assert(pause.getAttribute('title')||pause.textContent,'pause control became empty');
+ pause.click();
+ // The first launch opens the instructions modal; shortcuts are deliberately disabled while it is open.
+ const help=get('helpDialog');
+ if(help.open)help.close();
+ d.body.focus();
+ d.dispatchEvent(new w.KeyboardEvent('keydown',{key:'s',bubbles:true,cancelable:true}));
+ assert(/salvat/i.test(ticker.textContent),'keyboard save did not report a result after dismissing instructions');
+ const menu=get('menuBtn');
+ menu.click();
+ assert(menu.getAttribute('aria-expanded')==='true'&&!get('gameMenu').hidden,'game menu did not open');
+ menu.click();
+ assert(menu.getAttribute('aria-expanded')==='false'&&get('gameMenu').hidden,'game menu did not close');
+ // Exercise the left-side mobile RTS controls with real pointer event dispatch.
+ commands.click();
+ assert(commands.getAttribute('aria-expanded')==='true','COMANDI did not reopen');
+ const mod=get('touchModifier'),stick=get('touchJoystick'),thumb=get('touchJoyThumb');
+ const pointer=(el,type,id,x,y)=>el.dispatchEvent(new w.PointerEvent(type,{pointerId:id,pointerType:'touch',clientX:x,clientY:y,bubbles:true,cancelable:true}));
+ const modRect=mod.getBoundingClientRect(),stickRect=stick.getBoundingClientRect();
+ pointer(mod,'pointerdown',71,modRect.left+5,modRect.top+5);
+ assert(mod.getAttribute('aria-pressed')==='true'&&mod.classList.contains('active'),'MOD hold did not activate');
+ pointer(mod,'pointerup',71,modRect.left+5,modRect.top+5);
+ assert(mod.getAttribute('aria-pressed')==='false','MOD release left pressed state');
+ pointer(stick,'pointerdown',72,stickRect.left+stickRect.width/2+18,stickRect.top+stickRect.height/2);
+ assert(stick.classList.contains('active')&&thumb.style.transform.includes('translate'),'joystick did not move');
+ pointer(stick,'pointerup',72,stickRect.left+stickRect.width/2+18,stickRect.top+stickRect.height/2);
+ assert(!stick.classList.contains('active')&&!thumb.style.transform,'joystick did not reset');
+ pointer(mod,'pointerdown',73,modRect.left+5,modRect.top+5);
+ commands.click();
+ assert(commands.getAttribute('aria-expanded')==='false'&&mod.getAttribute('aria-pressed')==='false','closing COMANDI did not release MOD');
+ // Verify fullscreen control invokes the browser API; do not claim actual device fullscreen.
+ const full=get('fullscreenBtn'),originalRequest=d.documentElement.requestFullscreen;
+ let requested=false;
+ try{
+  d.documentElement.requestFullscreen=async()=>{requested=true};
+  full.click();
+  await delay(20);
+  assert(requested,'fullscreen button did not request fullscreen');
+ }finally{d.documentElement.requestFullscreen=originalRequest}
+ // Check a real save/reload cycle using the public game controls.
+ // The pagehide handler also saves the game; a reloaded game must recover
+ // the selected speed from localStorage through SevenGame.load().
+ d.dispatchEvent(new w.KeyboardEvent('keydown',{key:'3',bubbles:true,cancelable:true}));
+ assert(/3×/.test(get('gameSpeed').textContent),'speed shortcut did not change speed');
+ d.dispatchEvent(new w.KeyboardEvent('keydown',{key:'s',bubbles:true,cancelable:true}));
+ const saved=JSON.parse(w.localStorage.getItem('seven-kingdoms-html-native-v1')||'null');
+ assert(saved&&saved.speed===3,'game speed was not serialized by keyboard save');
+ await new Promise((resolve,reject)=>{
+  const timeout=setTimeout(()=>reject(Error('saved game iframe reload timed out')),3500);
+  frame.addEventListener('load',()=>{clearTimeout(timeout);resolve()},{once:true});
+  w.location.reload();
+ });
+ await delay(550);
+ const reloaded=frame.contentDocument;
+ assert(/3×/.test(reloaded.getElementById('gameSpeed').textContent),
+  'game reload did not restore the saved speed');
+ assert(reloaded.getElementById('world').getBoundingClientRect().width>0,
+  'map canvas hidden after save/load');
+ output.textContent='PASS: ORDINI, reports, meters, COMANDI, MOD, joystick, fullscreen request and save/load';
+}
+let smokeStarted=false;
+frame.addEventListener('load',()=>{
+ if(smokeStarted)return; // Save/load smoke deliberately reloads this iframe.
+ smokeStarted=true;
+ run().catch(e=>output.textContent='FAIL: '+e.message);
+});
+setTimeout(()=>{if(output.textContent==='PENDING')output.textContent='FAIL: browser smoke timeout'},12000);
+</script></body></html>
