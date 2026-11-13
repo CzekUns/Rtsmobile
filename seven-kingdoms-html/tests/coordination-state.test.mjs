@@ -10,11 +10,15 @@ const state=JSON.parse(readFileSync(new URL('STATE.json',root),'utf8'));
 test('saved Seven Kingdoms orchestrator program and checkpoint are consistent',async()=>{
  const result=await verifyFiles();
  assert.equal(result.ok,true,result.errors.join('; '));
- assert.equal(result.activeTaskId,'SKH-HUD-001');
- assert.equal(result.taskCount,5);
+ assert.equal(result.activeTaskId,state.activeTaskId);
+ assert.equal(result.taskCount,tasks.tasks.length);
+ assert.ok(tasks.tasks.some(t=>t.id===state.activeTaskId),'active task must be in program');
 });
 test('cannot accidentally declare a task complete without real CI/main proof',()=>{
- const mutated=structuredClone(tasks);mutated.tasks[0].status='done';
+ const mutated=structuredClone(tasks);
+ const active=mutated.tasks.find(t=>t.id===state.activeTaskId);
+ assert.ok(active,'expected an executable active task');
+ active.status='done';delete active.completion;
  assert.ok(validateProgram(mutated,state).some(e=>e.includes('without main commit')));
 });
 test('cannot skip program or silently reassign dependent tasks',()=>{
