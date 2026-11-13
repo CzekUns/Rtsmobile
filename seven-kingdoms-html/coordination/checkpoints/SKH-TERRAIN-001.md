@@ -31,3 +31,13 @@ Verificare CI dell'HEAD di questo checkpoint e correggere subito eventuali error
 - **Limitazioni:** world generation, altezza angoli, biome non SG e Android fisico ancora non portati. Le 32 pure restano fallback. Il testo relativo al futuro del progetto è aggiornato nel README.
 - **CI:** da verificare sull'HEAD del nuovo commit integrativo; nessun PASS dichiarato qui prima dei workflow GitHub.
 - **Prossimo passo:** verificare Node/Chromium sull'HEAD, correggere gli errori in questa PR, chiudere il gate solo se il rendering originale costa è stabile e il deploy Pages risulta success. Marcare QA Android/manual originale ancora da eseguire.
+
+## CHIUSURA DELLA TRANCHE COSTIERA — 2026-11-13 (ultimo stato, prevale sui checkpoint storici sopra)
+
+- **PR #118:** MERGED; commit di release **`c1a9afb39f4cd52e4a39f94addc4a5efe55444c2`**.
+- **Originale verificato:** 180 record SG, bitmap 32×32, palette PAL_STD.RES e SHA-256 reali dei tre archivi originali nel manifest `assets/manifests/TERRAIN1-SG-coast-16x12.json`.
+- **Raster reale nel gioco:** `view.js` collegato a `playtest/original-coast.js`, fallback 32 tessere pure; 14 maschere di costa coperte; `?coasts=0` per confronto senza l'overlay SG.
+- **Test PR:** [Actions #43438890792](https://github.com/CzekUns/Rtsmobile/actions/runs/43438890792) SUCCESS, 232 Node PASS, 0 FAIL, 2 SKIP, PNG e manifest caricati in Chromium HTTP.
+- **Test main:** [Actions #43439241900](https://github.com/CzekUns/Rtsmobile/actions/runs/43439241900) SUCCESS. **Pages:** [#43439241935](https://github.com/CzekUns/Rtsmobile/actions/runs/43439241935) SUCCESS.
+- **Stato:** `awaiting_manual_qa`: display Android/zoom e scene originali 1×/2× non verificati; 7KAA height corner generator non portato. Non dichiarare totale parità 7KAA.
+- **Prossimo task attivo:** `SKH-TERRAIN-002`, leggere checkpoint relativo e procedere con natura/rocce/rilievi; non duplicare la costa e non riaprire #118.
