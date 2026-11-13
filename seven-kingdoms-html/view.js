@@ -4,6 +4,7 @@
 import {WORLD_W,WORLD_H,NATIONS,FIRMS,terrain,range} from './rules.js';
 import {OriginalSpritePreview,compassDirection,walkingFrame} from './playtest/original-sprites.js';
 import {OriginalTerrainPreview} from './playtest/original-terrain.js';
+import {OriginalCoastPreview} from './playtest/original-coast.js';
 import {worldPainterOrder} from './world-depth-order.js';
 import {createMinimapTerrainLayer,minimapFootprint,minimapViewport} from './playtest/minimap-system.js';
 const COLORS={
@@ -14,10 +15,11 @@ const COLORS={
 const hash=(x,y,s)=>Math.abs(Math.sin(x*13.37+y*42.17+s*.13)*7867.3481)%1;
 const lim=(v,a,b)=>Math.max(a,Math.min(b,v));
 export class WorldView{
- constructor(world,mini,{previewOriginalSprites=false}={}){
+ constructor(world,mini,{previewOriginalSprites=false,previewOriginalCoasts=true}={}){
   this.canvas=world;this.ctx=world.getContext('2d');
   this.originalSprites=previewOriginalSprites?new OriginalSpritePreview():null;
   this.originalTerrain=previewOriginalSprites?new OriginalTerrainPreview():null;
+  this.originalCoast=previewOriginalSprites&&previewOriginalCoasts?new OriginalCoastPreview():null;
   this.spriteMotion=new Map();this.spritePaused=false;
   this.mini=mini;this.mctx=mini.getContext('2d');
   this.minimapTerrain=createMinimapTerrainLayer({worldW:WORLD_W,worldH:WORLD_H,terrain,
@@ -107,7 +109,15 @@ export class WorldView{
  }
  tileDraw(g,ctx,x,y,t){
   const p=this.screen(x,y),type=terrain(g.seed,x,y),n=hash(x,y,g.seed);
-  const originalGround=this.originalTerrain?.drawTile(ctx,p.x,p.y,t,type,n)??false;
+  // SG source bitmaps use four terrain corners. Until the C++ world
+  // generator is ported, sample DEMO grass/water at shared grid vertices.
+  // Other biome combinations and missing atlas records retain original
+  // pure tiles (or procedural fallback when assets are unavailable).
+  const cornerTypes=this.originalCoast&&x+1<WORLD_W&&y+1<WORLD_H?
+   [terrain(g.seed,x,y),terrain(g.seed,x+1,y),
+    terrain(g.seed,x,y+1),terrain(g.seed,x+1,y+1)]:null;
+  const coastDrawn=cornerTypes?this.originalCoast.drawTile(ctx,p.x,p.y,t,cornerTypes):false;
+  const originalGround=coastDrawn||(this.originalTerrain?.drawTile(ctx,p.x,p.y,t,type,n)??false);
   if(originalGround && typeof this.authenticTilesDrawn==='number')this.authenticTilesDrawn++;
   if(!originalGround){
    const arr=COLORS[type];ctx.fillStyle=arr[Math.min(arr.length-1,Math.floor(n*arr.length))];

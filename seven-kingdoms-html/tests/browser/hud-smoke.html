@@ -8,6 +8,20 @@ async function run(){
  const assert=(condition,message)=>{if(!condition)throw Error(message)};
  await delay(700);
  assert(get('world')&&get('sidebarToggle')&&get('touchModifier'),'required game controls absent');
+ // Source-backed landscape assets are shipped together: check manifest and
+ // actually decode the new PNG in the real HTTP-served Chromium page.
+ const coastRes=await w.fetch(new URL('assets/manifests/TERRAIN1-SG-coast-16x12.json',w.location.href));
+ assert(coastRes.ok,'authentic coast manifest missing from build');
+ const coastManifest=await coastRes.json();
+ assert(coastManifest.count===180&&coastManifest.records[0].id===412,'authentic SG coast records inconsistent');
+ const coastImg=new w.Image();
+ await new Promise((resolve,reject)=>{
+  const deadline=setTimeout(()=>reject(Error('SG coast atlas image timed out')),2500);
+  coastImg.onload=()=>{clearTimeout(deadline);resolve()};
+  coastImg.onerror=()=>{clearTimeout(deadline);reject(Error('SG coast atlas cannot decode'))};
+  coastImg.src=new URL('assets/previews/TERRAIN1-SG-coast-16x12.png',w.location.href).href;
+ });
+ assert(coastImg.naturalWidth===512&&coastImg.naturalHeight===384,'SG coast atlas dimensions changed');
  const toggle=get('sidebarToggle'),sidebar=get('orderSidebar');
  assert(toggle.getAttribute('aria-expanded')!==null,'ORDINI missing expanded state');
  const initial=toggle.getAttribute('aria-expanded');
