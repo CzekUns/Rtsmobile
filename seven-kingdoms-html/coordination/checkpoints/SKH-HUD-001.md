@@ -1,26 +1,35 @@
 # Checkpoint · SKH-HUD-001 — HUD consolidation
 
-- **State:** IN_PROGRESS on task branch; PR #115 draft, not merged; Pages unchanged.
-- **Branch:** `agent/skh-integration/hud-backlog-consolidation`.
-- **Last code/test HEAD before checkpoint:** `b43b257cb22d614d951879abed0bfa0588c500b6` (checkpoint commit follows).
-- **Source PRs:** #97, #101, #103, #105, #107.
-- **Previous checkpoint:** `0d1a71f5b159d50c8f7c9374248e64a4ce949d2a`.
+- **State:** IN_PROGRESS; PR [#115](https://github.com/CzekUns/Rtsmobile/pull/115) remains draft, not merged.
+- **Branch:** `agent/skh-integration/hud-backlog-consolidation`
+- **Latest code/docs HEAD before checkpoint:** `e2132ec4ac55a32f48f75e0f4584cc7891292ea0`.
+- **Previous checkpoint HEAD:** `7d6232982e14c1edb6993f78e5db27dae0c437fa`.
+- **Task:** consolidate #97, #101, #103, #105, #107 without overwriting existing mobile controls.
 
-## Code integrated on branch
+## Work carried forward
 
-- Previously #97 report button state, #101 keyboard focus guard, #103 ORDINI inert/focus behavior in `game.js`, with tests. Commits `6cf5f06`, `e6ed2b4`, `02d76d5`, `34c0316`, `ac6381b`.
-- **This run:** integrated the #105 responsive topbar CSS without copying its older `game.js` report logic. `style.css` now preserves date/speed below 850px, provides compact 620px landscape layout, corrects physical left/right safe-area padding, and adds keyboard-focus/reduced-motion report-strip behavior. Existing report Prev/Next buttons, fullscreen HUD, ORDINI and mobile touch CSS retained. Commit `39e8bb47a6c82f3b71a66f17c739d4efd12d3e7b`.
-- **This run:** added `tests/topbar-responsive.test.js` with four regression checks for the above, commit `b43b257cb22d614d951879abed0bfa0588c500b6`.
-- **Not yet integrated:** #107 selection meters (JS/CSS/test), #105 original documentation/tests beyond the responsive behavior; source PRs remain open. No independent merge of them.
+Earlier checkpoint integrated report button ARIA state (#97), keyboard focus guard (#101), ORDINI inert/focus behavior (#103) and responsive topbar CSS (#105). These remain in PR #115.
 
-## Verification and limits
+## This execution: #107 integration
 
-- GitHub connector confirmed both source/test commits on task branch.
-- GitHub Actions query for HEAD `b43b257cb22d614d951879abed0bfa0588c500b6` returned **zero PR-triggered workflow runs** at time of query. CI is NOT VERIFIED.
-- Node `npm --prefix seven-kingdoms-html test` and `run check` NOT RUN in this execution; no full local checkout. Browser 1x/2x, Android landscape, GitHub Pages for this branch: NOT RUN.
-- Static source review only; responsive layout and absence of regressions are NOT CERTIFIED. Original 7KAA graphic parity NOT CLAIMED.
-- Task branch remains draft PR https://github.com/CzekUns/Rtsmobile/pull/115. No merge; main/Pages unchanged by this run.
+Integrated the selection meters from #107 into the existing branch without replacing the already consolidated HUD logic:
+
+- `selection-meter.js` from source #107: numeric bounds, HTML escaping, accessible progressbar and decorative nested race indicator.
+- `game.js`: town loyalty/resistance, per-race loyalty, worker health, firm integrity/construction, selected unit health, repair integrity and site progress.
+- `style.css`: selection meter track/fill/caption rules, retaining the responsive topbar.
+- `tests/integration/selection-{details,meter,unit-vitals}.test.js`: source PR #107 regression tests.
+- `docs/original-parity/SKH-106-selection-vitals.md`: original reference and known limitations.
+- **Commits:** `5c7f7e6`, `8fe74f5`, `507afb3`, `88df373`, `645bf70`, `0293d5a`, `e2132ec`.
+- **Source:** #107 HEAD `d7962a7`. Its old `game.js` and `style.css` were **not** copied wholesale: only selection-meter changes were applied to current #115 files.
+
+## Verification and blocking evidence
+
+- GitHub connector confirmed the seven commits on the assigned task branch and comparison against `main` `774c1e0da2895bddc0e98aff389044dbbea57076`.
+- GitHub Actions lookup on code HEAD `e2132ec4ac55a32f48f75e0f4584cc7891292ea0` returned `workflow_runs: []` (PR-triggered runs only). **CI NOT VERIFIED**.
+- Local command `git ls-remote https://github.com/CzekUns/Rtsmobile.git HEAD` failed with `Could not resolve host: github.com`. Full checkout and `npm --prefix seven-kingdoms-html test` / `run check` **NOT RUN**.
+- Browser 1×/2×, Android landscape and Pages for this branch **NOT RUN**. No merge, no release, no original 7KAA parity claim.
+- Integration source edits were checked for expected single-match replacements, but full runtime behavior and regressions remain unverified.
 
 ## Single next step
 
-**Fetch #107 HEAD patch and integrate its selection-meter module, wiring, styles and tests into existing PR #115**, preserving the #97/#101/#103/#105 behavior. Then run combined npm checks/CI and fix failures before promoting or merging.
+**Obtain and inspect CI on the exact latest PR #115 HEAD; if no workflow starts, diagnose the workflow trigger and run the complete Node check/test suite using a viable checkout or CI alternative, fixing any failures on this same branch before promoting the draft.**
