@@ -58,3 +58,15 @@ Integrated the selection meters from #107 into the existing branch without repla
 - **Fix commits:** `6c4d48f` updates the HUD test to exercise the exported controller directly with fake DOM and focus behavior; `b216d37` updates fullscreen wiring assertion to the new adapter. Actual module/entrypoint implementation unchanged after `5cf76a0`.
 - **Latest code HEAD before checkpoint:** `b216d370fa2c7939161ce4e00c4fa6d647bd75a9`. CI for this exact SHA must be checked; no PASS claimed yet. No browser/Android or Pages QA; no merge.
 - **Single next step:** inspect the latest CI on this checkpoint HEAD and fix any remaining failed job. Only if green, perform interactive browser QA for ORDINI/HUD, fullscreen, MOD+joystick and save/load before making #115 non-draft.
+
+## 2026-11-13 — Exact HEAD CI after ORDINI regression repair
+
+- **Checkpoint branch HEAD before this update:** `df766c737b002b321e53ebb594bfea4bb98552d4` (code fix `b216d370fa2c7939161ce4e00c4fa6d647bd75a9`).
+- **CI on exact checkpoint HEAD:** [GitHub Actions #43348908018](https://github.com/CzekUns/Rtsmobile/actions/runs/43348908018) completed **SUCCESS**. Job `JS tests & stream scope` (id `131634921077`) completed SUCCESS; steps `Syntax checks for native JS`, `Node unit tests (recursively discovered)`, and `Enforce ownership on agent branches only` each SUCCESS. This confirms the previously failed source-assumption tests were repaired on the integrated branch.
+- **Earlier code SHA CI:** [#43348887631](https://github.com/CzekUns/Rtsmobile/actions/runs/43348887631) was **CANCELLED** (superseded by checkpoint HEAD), not a pass.
+- **Local checkout retry:** `git ls-remote https://github.com/CzekUns/Rtsmobile.git HEAD` returned `Could not resolve host: github.com`; npm commands and Chromium browser QA **NOT RUN** locally. The GitHub Actions job covers its own native JS syntax and Node tests, not Android/browser interaction. No merge, no Pages release, no original parity claim.
+- **This run:** verified the exact latest CI gate and the ORDINI adapter/test files on the task branch; no game code change or browser QA evidence was produced. PR #115 remains draft.
+
+### Single next step
+
+**Obtain a reproducible browser interaction run for PR #115** (ORDINI focus/ARIA, report toolbar, keyboard guards, fullscreen, left MOD+joystick and save/load) using a viable browser runner or restored checkout; fix any failing interaction on this same branch before marking the PR ready. Do not merge on Node-only evidence.
