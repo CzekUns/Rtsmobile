@@ -42,3 +42,12 @@ Integrated the selection meters from #107 into the existing branch without repla
 ## Single next step
 
 **Run a browser interaction regression of PR #115 on a viable checkout/runner (HUD reports, keyboard focus, ORDINI, responsive topbar, selection meters, fullscreen/MOD/joystick and save/load); fix any observed failures on this branch. Once compatibility is evidenced and CI remains green on the resulting HEAD, mark #115 ready and merge, then verify Pages.**
+
+## 2026-11-13 — ORDINI interaction regression (continuation)
+
+- **Starting branch HEAD:** `e11b26440a025d47306e54ab75e2ee9d2c6eb9b6`; no re-audit of old source PRs.
+- **New code HEAD before checkpoint:** `5cf76a0040dfe0d58f4d1ea49561fbd08f158c65`.
+- **Commits:** `4c5907b` (extracted `playtest/orders-sidebar.js`), `4a0144a` (added `tests/integration/orders-sidebar-interaction.test.js`), `5cf76a0` (wired adapter in `game.js`).
+- **Actual code change:** replaced inline ORDINI controller with testable DOM adapter; preserved media query, collapsed class, ARIA expanded/hidden, `inert`, click and responsive change behavior. New interaction tests exercise initial compact state, click expansion, focus restoration on collapse, viewport transitions and listener cleanup.
+- **Verification:** prior exact HEAD `e11b264` has CI SUCCESS [43340994200](https://github.com/CzekUns/Rtsmobile/actions/runs/43340994200). GitHub Actions was in progress for intermediate `4a0144a` ([43348773623](https://github.com/CzekUns/Rtsmobile/actions/runs/43348773623)); no PASS claim for the new code HEAD `5cf76a0` until its own run completes. Local `git ls-remote` returned `Could not resolve host: github.com`; local npm and Chromium/Android NOT RUN. No merge/Pages.
+- **Single next step:** inspect GitHub Actions on the **latest checkpoint HEAD**; if red, repair the failing test/code in PR #115; if green, obtain browser interaction QA for ORDINI, report toolbar, keyboard focus, fullscreen/MOD+joystick and save/load, then review merge readiness.
