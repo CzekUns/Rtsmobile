@@ -7,7 +7,7 @@ import {linkPlantResources} from './nature-bitmap.mjs';
 import {encodeIndexedPng} from './indexed-png.mjs';
 const hash=b=>createHash('sha256').update(b).digest('hex');
 const validHash=s=>typeof s==='string'&&/^[a-f0-9]{64}$/.test(s);
-export function exportPlantAtlas({plantDb,bitmapDb,bitmapArchive,palette,expectedHashes,sourceCommit}) {
+export function exportPlantAtlas({plantDb,bitmapDb,bitmapArchive,palette,expectedHashes,sourceCommit,transparentIndex}) {
   const sources={PLANT1:plantDb,PLANTBM1:bitmapDb,I_PLANT1:bitmapArchive,PAL_STD:palette};
   if(sourceCommit!=='14e6fdfba9481af4dc3a54722614a608776e20bc')
     throw Error('unpinned 7KAA source commit');
@@ -19,8 +19,10 @@ export function exportPlantAtlas({plantDb,bitmapDb,bitmapArchive,palette,expecte
   const {plants,bitmaps}=linkPlantResources(plantDb,bitmapDb,bitmapArchive);
   if(!bitmaps.length)throw Error('empty original plant atlas');
   // Shelf layout: variable original dimensions, never rescale or interpolate.
-  const maxWidth=Math.max(...bitmaps.map(b=>b.bitmap.width));
-  const targetWidth=Math.max(maxWidth,Math.ceil(Math.sqrt(bitmaps.reduce((n,b)=>n+b.bitmap.width*b.bitmap.height,0))));
+  const maxWidth=bitmaps.reduce((max,b)=>Math.max(max,b.bitmap.width),0);
+  const totalPixels=bitmaps.reduce((n,b)=>n+b.bitmap.width*b.bitmap.height,0);
+  if(totalPixels>10000000)throw Error('atlas exceeds safe pixel limit');
+  const targetWidth=Math.max(maxWidth,Math.ceil(Math.sqrt(totalPixels)));
   let x=0,y=0,rowHeight=0,usedWidth=0;
   const placements=[];
   for(const b of bitmaps){
@@ -36,10 +38,10 @@ export function exportPlantAtlas({plantDb,bitmapDb,bitmapArchive,palette,expecte
     const b=bitmaps[i].bitmap,p=placements[i];
     for(let row=0;row<b.height;row++)pixels.set(b.pixels.subarray(row*b.width,(row+1)*b.width),(p.y+row)*usedWidth+p.x);
   }
-  return {png:encodeIndexedPng(usedWidth,height,pixels,palette),
+  return {png:encodeIndexedPng(usedWidth,height,pixels,palette,{transparentIndex}),
     manifest:{schemaVersion:1,source:'the3dfxdude/7kaa',license:'GPL-2.0-or-later',
       sourceCommit,sha256:expectedHashes,width:usedWidth,height,plantCount:plants.length,
-      bitmaps:placements,transparentIndex:'unverified',visualParity:'not_certified'}};
+      bitmaps:placements,transparentIndex:transparentIndex??'unverified',visualParity:'not_certified'}};
 }
 if(process.argv[1]&&import.meta.url===new URL('file://'+process.argv[1]).href){
   const [, ,configPath]=process.argv;
@@ -47,7 +49,7 @@ if(process.argv[1]&&import.meta.url===new URL('file://'+process.argv[1]).href){
   const cfg=JSON.parse(readFileSync(configPath,'utf8'));
   const required=['plantDb','bitmapDb','bitmapArchive','palette'];
   const inputs=Object.fromEntries(required.map(k=>[k,readFileSync(cfg.files[k])]));
-  const result=exportPlantAtlas({...inputs,expectedHashes:cfg.expectedHashes,sourceCommit:cfg.sourceCommit});
+  const result=exportPlantAtlas({...inputs,expectedHashes:cfg.expectedHashes,sourceCommit:cfg.sourceCommit,transparentIndex:cfg.transparentIndex});
   for(const file of [cfg.outputPng,cfg.outputManifest])mkdirSync(dirname(file),{recursive:true});
   writeFileSync(cfg.outputPng,result.png);
   writeFileSync(cfg.outputManifest,JSON.stringify(result.manifest,null,2)+'\n');
