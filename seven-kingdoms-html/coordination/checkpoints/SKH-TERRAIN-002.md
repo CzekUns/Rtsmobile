@@ -87,3 +87,12 @@ Sostituire un gruppo coerente di elementi naturali provvisori con elementi origi
 - **Verifica:** CI sul nuovo HEAD NON ANCORA CERTIFICATA; npm test/check locali NOT_RUN, checkout non disponibile. Nessun download originale o PNG eseguito in questa run, nessun merge/Pages/Android. Il codice non è ancora integrato in Canvas.
 - **HEAD codice prima del checkpoint:** `a524e04df357ec91129692c03616edcfb91e6f9e`. Il commit del checkpoint è il nuovo HEAD finale del branch.
 - **Singolo prossimo passo:** verificare la CI esatta del nuovo HEAD e correggere qualsiasi failure; poi eseguire `node seven-kingdoms-html/tools/assets/build-original-plant-atlas.mjs <directory-temporanea>` su runner con rete, controllare hash e pixel originali, pubblicare PNG/manifest/preview nella stessa PR.
+
+
+## Esecuzione 2026-11-13 23:58 CET — esecuzione pipeline su runner CI
+- **Task/PR:** SKH-TERRAIN-002, PR #120 draft, branch `agent/skh-integration/original-landscape-overlays`.
+- **Stato iniziale:** checkpoint `588e4524858afd6fd6600bccc411b7255162c992`; pipeline originale PLANT già codificata ma mai eseguita su byte autentici.
+- **Codice pubblicato:** `a386b0af5fc6e723b353cb2b7298f302cae8dc02` modifica `.github/workflows/seven-kingdoms-html-ci.yml`: nuovo job `original-plant-atlas` limitato al branch/PR di questo task. Esegue davvero `build-original-plant-atlas.mjs` sul runner Ubuntu con Node 22 e pubblica PNG, manifest SHA-256 e preview QA 1×/2× come artefatto Actions (retention 14 giorni). Il job fallisce esplicitamente se download/decoder/export non riesce; non maschera gli errori. Il test/check preesistente resta invariato.
+- **Verifica locale:** `git ls-remote https://github.com/CzekUns/Rtsmobile.git HEAD` → `Could not resolve host: github.com`; `npm test` e `npm run check` NON eseguiti localmente. La query commit status per `588e4524858afd6fd6600bccc411b7255162c992` non ha restituito statuses; nessuna CI nuova certificata. Il workflow appena pubblicato deve ancora produrre una run verificabile. Nessun PNG, hash o preview autentici certificati in questa esecuzione; nessun merge/Pages/Android.
+- **HEAD codice prima del checkpoint:** `a386b0af5fc6e723b353cb2b7298f302cae8dc02`. HEAD finale è il commit di questo checkpoint.
+- **Singolo prossimo passo:** controllare il job `original-plant-atlas` sul nuovo HEAD della PR #120; se fallisce, leggere il log e correggere precisamente download/decoder/export nel branch. Se riesce, recuperare l'artefatto PNG+manifest+preview con SHA-256 verificati e integrarli nella PR e poi nel Canvas con layering e test.
