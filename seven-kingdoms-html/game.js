@@ -12,6 +12,7 @@ import {issueWorkOrder,completeWorkArrivals} from './playtest/work-assignments.j
 import {issueBuildOrder,cancelBuildOrder,advanceConstruction,isBuilder,canBuildFirm} from './playtest/construction.js';
 import {issueRepairOrder,cancelRepairOrder,advanceRepairs,canRepair} from './playtest/repairs.js';
 import {WorldView} from './view.js';
+import {selectionMeter} from './selection-meter.js';
 import {installMinimapNavigation} from './playtest/minimap-system.js';
 import {installReportToolbar} from './playtest/report-toolbar.js';
 import {SKILLS,skillLabel,workerRoleLabel,workerRaceLabel,ensureFirmPersonnel} from './playtest/personnel.js';
@@ -151,8 +152,7 @@ function selectedContent(){
   const selectedRace=selectedTownRace(item);
   const available=selectedRace?recruitableTownPeople(item,selectedRace.raceId):0;
   const info='Popolazione <strong>'+item.pop+'</strong> · '+races.length+' etnie'+
-    '<br>'+(independent?'Resistenza <strong>'+Math.floor(item.resistance)+'</strong>/100':
-                   'Fedeltà media <strong>'+Math.floor(item.loyalty)+'</strong>/100')+
+    '<br>'+selectionMeter(independent?'Resistenza':'Fedeltà media',independent?item.resistance:item.loyalty)+
     '<br>Regno: '+esc(nation.name)+
     (selectedRace?'<br>Selezionata: <strong>'+esc(selectedRace.culture)+'</strong> · liberi '+available:'')+
     (item.trainingQueue?.length?'<br>In addestramento: '+item.trainingQueue.length+'/10':'');
@@ -161,7 +161,8 @@ function selectedContent(){
    const active=r.raceId===item.selectedRaceId;
    return '<button type="button" class="town-race-choice'+(active?' active':'')+'" data-town-race="'+esc(r.raceId)+'" aria-pressed="'+active+'">'+
     esc(r.culture)+' · '+r.population+' abitanti'+
-    '<small>Disoccupati '+r.jobless+' · Fedeltà '+Math.floor(r.loyalty)+'</small></button>';
+    '<small>Disoccupati '+r.jobless+' · Fedeltà '+Math.floor(r.loyalty)+'</small>'+ 
+    selectionMeter('Fedeltà '+r.culture,r.loyalty,100,{decorative:true})+'</button>';
   }).join('');
   const canRecruit=item.owner===1&&item.pop>4&&available>0&&selectedRace?.loyalty>=30;
   const canTrain=canRecruit&&ownFortLinked&&game.cash>=30&&(item.trainingQueue?.length||0)<10;
@@ -208,16 +209,16 @@ function selectedContent(){
    const ethnicity=workerRaceLabel(person);
    return '<div class="worker-row"><strong>'+esc(who)+'</strong>'+
     '<small>'+esc(role)+' · '+esc(ethnicity)+'</small>'+
-    '<small>'+esc(profile)+'</small><small>HP '+Math.floor(person.hp??100)+
-    ' · ID '+esc(person.personId??person.id)+'</small>'+
+    '<small>'+esc(profile)+'</small><small>ID '+esc(person.personId??person.id)+'</small>'+ 
+    selectionMeter('Salute '+who,person.hp??100)+' '+ 
     (item.owner===1?'<button type="button" data-worker-exit="'+esc(person.id)+'">Fai uscire</button>':'')+
     '</div>';
   }).join('');
   return {
    title:rule.label,meta:'Edificio · '+nation.name,color,
    info:'Lavoratori <strong>'+staff.length+'</strong>/8'+
-    '<br>Integrità edificio <strong>'+Math.floor(item.hp??100)+'</strong>/'+(item.maxHp??100)+' HP'+
-    (item.underConstruction?'<br><strong>IN COSTRUZIONE '+Math.floor((item.buildProgress||0)*100)+'%</strong>':'')+
+    '<br>'+selectionMeter('Integrità edificio',item.hp??100,item.maxHp??100)+
+    (item.underConstruction?'<br>'+selectionMeter('In costruzione',item.buildProgress||0,1):'')+
     '<br>Esperienza '+Math.floor(item.experience)+
     (item.kind==='fort'?'<br>Il forte influenza i villaggi collegati.':
       item.kind==='mine'?'<br>Produce minerali grezzi.':
@@ -249,14 +250,14 @@ function selectedContent(){
   return {
    title:item.kind==='soldier'?'Soldato':'Abitante',
    meta:nation.name+' · Livello '+item.level,color,
-   info:'Salute '+item.hp+'/100 · '+esc(item.culture||'Etnia non registrata')+
+   info:selectionMeter('Salute unità',item.hp??100,100)+' · '+esc(item.culture||'Etnia non registrata')+
     '<br>Abilità '+esc(skillLabel(item.skillId,item.skillLevel,item.legacyUnknown))+
     ' · Combattimento '+Math.floor(item.combatLevel||0)+
     '<br>ID '+esc(item.personId??item.id)+
     '<br>'+(activeRepair?'Riparazione '+esc(FIRMS[activeRepair.kind]?.label||activeRepair.kind)+
-      ' · '+Math.floor(activeRepair.hp??100)+'/'+(activeRepair.maxHp??100)+' HP':
+      ' · '+selectionMeter('Integrità riparazione',activeRepair.hp??100,activeRepair.maxHp??100):
      activeSite?'Cantiere '+esc(FIRMS[activeSite.kind]?.label||activeSite.kind)+
-      ' · '+(activeSite.status==='walking'?'In marcia':'Lavori '+Math.floor(activeSite.progress*100)+'%'):
+      ' · '+(activeSite.status==='walking'?'In marcia':selectionMeter('Avanzamento cantiere',activeSite.progress??0,1)):
      assignedTo?'In viaggio verso '+esc(FIRMS[assignedTo.kind]?.label||'edificio'):
            item.target?'In marcia':'Pronto per gli ordini')+
     '<br>Su smartphone usa MOD + tocco per spostarti, oppure scegli un edificio qui sotto. L\'abitante entrerà solo dopo aver raggiunto l\'ingresso.',
