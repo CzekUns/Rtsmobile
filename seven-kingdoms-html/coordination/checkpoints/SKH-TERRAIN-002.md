@@ -19,3 +19,10 @@ Sostituire un gruppo coerente di elementi naturali provvisori con elementi origi
 | Esecuzione | Prova | Passaggio successivo |
 |---|---|---|
 | Handoff 2026-11-13 | Nessun codice naturale nuovo; PR #118 coast pubblicata | individuare risorse originali e caratteristiche layering |
+
+## Esecuzione 2026-11-13 16:00 CET — primo decoder originale
+- **Branch:** `agent/skh-integration/original-landscape-overlays` creato da main; ultimo commit codice `d435eeaa105424db7350680ca366150531338261`.
+- **Modifiche:** `tools/assets/nature-database.mjs` e `tests/assets/nature-database.test.mjs`. Decoder record packed + framing dBASE III per PLANT/PLANTBM e ROCK/ROCKBLK/ROCKBMP/ROCKANI, test per offset signed, puntatori little endian, limiti e marker DBF.
+- **Provenienza verificata nei sorgenti:** `the3dfxdude/7kaa@14e6fdfba9481af4dc3a54722614a608776e20bc`, `include/OPLANT.h`, `src/OPLANT.cpp`, `include/OROCKRES.h`, `src/OROCKRES.cpp`; GPL-2.0-or-later. Le risorse si chiamano `PLANT1.RES`, `PLANTBM1.RES`, `I_PLANT1.RES`, `ROCK1.RES`, `ROCKBMP1.RES`, `ROCKBLK1.RES`, `ROCKANI1.RES`, `I_ROCK1.RES` quando terrain_set=1. I byte originali e i rispettivi SHA-256 **non sono ancora verificati**.
+- **Test:** npm locale NOT_RUN: checkout Git fallito con `Could not resolve host: github.com`. CI del branch non ancora verificata; nessuna dichiarazione PASS. Nessuna immagine/atlas originale prodotta, nessun rendering modificato e nessun merge/Pages.
+- **Prossimo passo unico:** verificare CI sul nuovo HEAD e correggere errori; poi recuperare gli archivi originali PLANT1/PLANTBM1/I_PLANT1 con hash SHA-256, decodificare un record bitmap reale e generare un primo atlante di vegetazione con palette originale e test pixel, mantenendo il medesimo branch/PR.
