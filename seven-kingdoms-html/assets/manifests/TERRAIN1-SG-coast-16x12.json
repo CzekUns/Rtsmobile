@@ -1,0 +1,4185 @@
+{
+  "schemaVersion": 1,
+  "category": "original-coast-transitions",
+  "status": "7kaa-indexed-original-source-not-generative-world-parity",
+  "atlas": "TERRAIN1-SG-coast-16x12.png",
+  "tileSize": 32,
+  "columns": 16,
+  "rows": 12,
+  "count": 180,
+  "source": {
+    "url": "https://github.com/the3dfxdude/7kaa/tree/14e6fdfba9481af4dc3a54722614a608776e20bc/data/RESOURCE",
+    "repository": "the3dfxdude/7kaa",
+    "commit": "14e6fdfba9481af4dc3a54722614a608776e20bc",
+    "license": "GPL-2.0-or-later",
+    "sha256": "791745a1bbaed1eeb3582725cf05f90918fd0733682b32eec697b6e297f45774",
+    "files": [
+      {
+        "path": "data/RESOURCE/TERRAIN1.RES",
+        "bytes": 20636,
+        "gitBlobSha": "8e9c2fc8799d2cfac2b4c531099841dd4e1ae5ac",
+        "sha256": "67b445d86916393c00e3b88466b7fa354701ef33b1c372e06fc463e0ba8a613a"
+      },
+      {
+        "path": "data/RESOURCE/I_TERN1.RES",
+        "bytes": 577920,
+        "gitBlobSha": "25bd3189590f7573f0121b28eb120566d411f8ab",
+        "sha256": "791745a1bbaed1eeb3582725cf05f90918fd0733682b32eec697b6e297f45774"
+      },
+      {
+        "path": "data/RESOURCE/PAL_STD.RES",
+        "bytes": 776,
+        "gitBlobSha": "8535b2b54b9be8f39580489b54a783fb81785979",
+        "sha256": "8bda65c749340446edb6debe73a5b0f67b1a4af8dd0fdb1fa0222a69848b6ef7"
+      }
+    ]
+  },
+  "notes": [
+    "Original indexed bitmap pixels from I_TERN1.RES with PAL_STD.RES; 180 SG database records, each 32x32",
+    "Lookup approximates source mask-based TerrainRes::scan when on a demo grass/water vertex grid; demo map generator and pathfinding are unchanged",
+    "Original 7KAA corner height/mask and random pattern choice not ported; do not claim visual 1:1 parity",
+    "PNG uses indexed 8-bit PLTE with uncompressed zlib blocks and no alpha; this form can be regenerated from the checked upstream files"
+  ],
+  "records": [
+    {
+      "id": 412,
+      "offset": 79464,
+      "length": 1032,
+      "fileName": "SG-028",
+      "cornerCodes": [
+        "G*",
+        "G*",
+        "G*",
+        "SB"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 0,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 413,
+      "offset": 78432,
+      "length": 1032,
+      "fileName": "SG-027",
+      "cornerCodes": [
+        "G*",
+        "G*",
+        "SB",
+        "G*"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 1,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 418,
+      "offset": 79464,
+      "length": 1032,
+      "fileName": "SG-028",
+      "cornerCodes": [
+        "G*",
+        "G-",
+        "G-",
+        "S+"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 2,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 419,
+      "offset": 87720,
+      "length": 1032,
+      "fileName": "SG-036",
+      "cornerCodes": [
+        "G*",
+        "G-",
+        "GA",
+        "S+"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 3,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 420,
+      "offset": 83592,
+      "length": 1032,
+      "fileName": "SG-032",
+      "cornerCodes": [
+        "G*",
+        "GA",
+        "G-",
+        "S+"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 4,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 421,
+      "offset": 65016,
+      "length": 1032,
+      "fileName": "SG-040",
+      "cornerCodes": [
+        "G*",
+        "GA",
+        "GA",
+        "S+"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 5,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 426,
+      "offset": 77400,
+      "length": 1032,
+      "fileName": "SG-026",
+      "cornerCodes": [
+        "G*",
+        "SB",
+        "G*",
+        "G*"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 6,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 427,
+      "offset": 75336,
+      "length": 1032,
+      "fileName": "SG-050",
+      "cornerCodes": [
+        "G*",
+        "SB",
+        "SB",
+        "G*"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 7,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 488,
+      "offset": 78432,
+      "length": 1032,
+      "fileName": "SG-027",
+      "cornerCodes": [
+        "G-",
+        "G*",
+        "S+",
+        "G-"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 8,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 489,
+      "offset": 86688,
+      "length": 1032,
+      "fileName": "SG-035",
+      "cornerCodes": [
+        "G-",
+        "G*",
+        "S+",
+        "GA"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 9,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 512,
+      "offset": 28896,
+      "length": 1032,
+      "fileName": "SG-011",
+      "cornerCodes": [
+        "G-",
+        "G-",
+        "S*",
+        "S*"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 10,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 513,
+      "offset": 29928,
+      "length": 1032,
+      "fileName": "SG-011A",
+      "cornerCodes": [
+        "G-",
+        "G-",
+        "S*",
+        "S*"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 11,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 514,
+      "offset": 30960,
+      "length": 1032,
+      "fileName": "SG-011B",
+      "cornerCodes": [
+        "G-",
+        "G-",
+        "S*",
+        "S*"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 12,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 515,
+      "offset": 31992,
+      "length": 1032,
+      "fileName": "SG-011C",
+      "cornerCodes": [
+        "G-",
+        "G-",
+        "S*",
+        "S*"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 13,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 525,
+      "offset": 49536,
+      "length": 1032,
+      "fileName": "SG-019",
+      "cornerCodes": [
+        "G-",
+        "GA",
+        "S*",
+        "S+"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 14,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 526,
+      "offset": 50568,
+      "length": 1032,
+      "fileName": "SG-019A",
+      "cornerCodes": [
+        "G-",
+        "GA",
+        "S*",
+        "S+"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 15,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 527,
+      "offset": 28896,
+      "length": 1032,
+      "fileName": "SG-011",
+      "cornerCodes": [
+        "G-",
+        "GA",
+        "S*",
+        "SB"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 16,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 528,
+      "offset": 29928,
+      "length": 1032,
+      "fileName": "SG-011A",
+      "cornerCodes": [
+        "G-",
+        "GA",
+        "S*",
+        "SB"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 17,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 529,
+      "offset": 30960,
+      "length": 1032,
+      "fileName": "SG-011B",
+      "cornerCodes": [
+        "G-",
+        "GA",
+        "S*",
+        "SB"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 18,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 530,
+      "offset": 31992,
+      "length": 1032,
+      "fileName": "SG-011C",
+      "cornerCodes": [
+        "G-",
+        "GA",
+        "S*",
+        "SB"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 19,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 531,
+      "offset": 77400,
+      "length": 1032,
+      "fileName": "SG-026",
+      "cornerCodes": [
+        "G-",
+        "S*",
+        "G*",
+        "G-"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 20,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 532,
+      "offset": 24768,
+      "length": 1032,
+      "fileName": "SG-010",
+      "cornerCodes": [
+        "G-",
+        "S*",
+        "G-",
+        "S*"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 21,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 533,
+      "offset": 25800,
+      "length": 1032,
+      "fileName": "SG-010A",
+      "cornerCodes": [
+        "G-",
+        "S*",
+        "G-",
+        "S*"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 22,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 534,
+      "offset": 26832,
+      "length": 1032,
+      "fileName": "SG-010B",
+      "cornerCodes": [
+        "G-",
+        "S*",
+        "G-",
+        "S*"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 23,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 535,
+      "offset": 27864,
+      "length": 1032,
+      "fileName": "SG-010C",
+      "cornerCodes": [
+        "G-",
+        "S*",
+        "G-",
+        "S*"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 24,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 536,
+      "offset": 47472,
+      "length": 1032,
+      "fileName": "SG-018",
+      "cornerCodes": [
+        "G-",
+        "S*",
+        "GA",
+        "S+"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 25,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 537,
+      "offset": 48504,
+      "length": 1032,
+      "fileName": "SG-018A",
+      "cornerCodes": [
+        "G-",
+        "S*",
+        "GA",
+        "S+"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 26,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 538,
+      "offset": 24768,
+      "length": 1032,
+      "fileName": "SG-010",
+      "cornerCodes": [
+        "G-",
+        "S*",
+        "GA",
+        "SB"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 27,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 539,
+      "offset": 25800,
+      "length": 1032,
+      "fileName": "SG-010A",
+      "cornerCodes": [
+        "G-",
+        "S*",
+        "GA",
+        "SB"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 28,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 540,
+      "offset": 26832,
+      "length": 1032,
+      "fileName": "SG-010B",
+      "cornerCodes": [
+        "G-",
+        "S*",
+        "GA",
+        "SB"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 29,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 541,
+      "offset": 27864,
+      "length": 1032,
+      "fileName": "SG-010C",
+      "cornerCodes": [
+        "G-",
+        "S*",
+        "GA",
+        "SB"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 30,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 542,
+      "offset": 14448,
+      "length": 1032,
+      "fileName": "SG-004",
+      "cornerCodes": [
+        "G-",
+        "S*",
+        "S*",
+        "S*"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 31,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 543,
+      "offset": 15480,
+      "length": 1032,
+      "fileName": "SG-004A",
+      "cornerCodes": [
+        "G-",
+        "S*",
+        "S*",
+        "S*"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 32,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 544,
+      "offset": 85656,
+      "length": 1032,
+      "fileName": "SG-034",
+      "cornerCodes": [
+        "G-",
+        "S+",
+        "G*",
+        "GA"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 33,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 545,
+      "offset": 75336,
+      "length": 1032,
+      "fileName": "SG-050",
+      "cornerCodes": [
+        "G-",
+        "S+",
+        "S+",
+        "G-"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 34,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 546,
+      "offset": 102168,
+      "length": 1032,
+      "fileName": "SG-064",
+      "cornerCodes": [
+        "G-",
+        "S+",
+        "S+",
+        "GA"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 35,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 547,
+      "offset": 106296,
+      "length": 1032,
+      "fileName": "SG-068",
+      "cornerCodes": [
+        "G-",
+        "S+",
+        "S+",
+        "GA"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 36,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 548,
+      "offset": 75336,
+      "length": 1032,
+      "fileName": "SG-050",
+      "cornerCodes": [
+        "G-",
+        "S+",
+        "SB",
+        "G-"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 37,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 549,
+      "offset": 91848,
+      "length": 1032,
+      "fileName": "SG-054",
+      "cornerCodes": [
+        "G-",
+        "S+",
+        "SB",
+        "GA"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 38,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 550,
+      "offset": 75336,
+      "length": 1032,
+      "fileName": "SG-050",
+      "cornerCodes": [
+        "G-",
+        "SB",
+        "S+",
+        "G-"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 39,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 551,
+      "offset": 108360,
+      "length": 1032,
+      "fileName": "SG-070",
+      "cornerCodes": [
+        "G-",
+        "SB",
+        "S+",
+        "GA"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 40,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 583,
+      "offset": 82560,
+      "length": 1032,
+      "fileName": "SG-031",
+      "cornerCodes": [
+        "GA",
+        "G*",
+        "S+",
+        "G-"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 41,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 584,
+      "offset": 63984,
+      "length": 1032,
+      "fileName": "SG-039",
+      "cornerCodes": [
+        "GA",
+        "G*",
+        "S+",
+        "GA"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 42,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 585,
+      "offset": 57792,
+      "length": 1032,
+      "fileName": "SG-023",
+      "cornerCodes": [
+        "GA",
+        "G-",
+        "S+",
+        "S*"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 43,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 586,
+      "offset": 58824,
+      "length": 1032,
+      "fileName": "SG-023A",
+      "cornerCodes": [
+        "GA",
+        "G-",
+        "S+",
+        "S*"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 44,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 587,
+      "offset": 28896,
+      "length": 1032,
+      "fileName": "SG-011",
+      "cornerCodes": [
+        "GA",
+        "G-",
+        "SB",
+        "S*"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 45,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 588,
+      "offset": 29928,
+      "length": 1032,
+      "fileName": "SG-011A",
+      "cornerCodes": [
+        "GA",
+        "G-",
+        "SB",
+        "S*"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 46,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 589,
+      "offset": 30960,
+      "length": 1032,
+      "fileName": "SG-011B",
+      "cornerCodes": [
+        "GA",
+        "G-",
+        "SB",
+        "S*"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 47,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 590,
+      "offset": 31992,
+      "length": 1032,
+      "fileName": "SG-011C",
+      "cornerCodes": [
+        "GA",
+        "G-",
+        "SB",
+        "S*"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 48,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 591,
+      "offset": 41280,
+      "length": 1032,
+      "fileName": "SG-015",
+      "cornerCodes": [
+        "GA",
+        "GA",
+        "S+",
+        "S+"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 49,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 592,
+      "offset": 42312,
+      "length": 1032,
+      "fileName": "SG-015A",
+      "cornerCodes": [
+        "GA",
+        "GA",
+        "S+",
+        "S+"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 50,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 593,
+      "offset": 57792,
+      "length": 1032,
+      "fileName": "SG-023",
+      "cornerCodes": [
+        "GA",
+        "GA",
+        "S+",
+        "SB"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 51,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 594,
+      "offset": 58824,
+      "length": 1032,
+      "fileName": "SG-023A",
+      "cornerCodes": [
+        "GA",
+        "GA",
+        "S+",
+        "SB"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 52,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 595,
+      "offset": 49536,
+      "length": 1032,
+      "fileName": "SG-019",
+      "cornerCodes": [
+        "GA",
+        "GA",
+        "SB",
+        "S+"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 53,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 596,
+      "offset": 50568,
+      "length": 1032,
+      "fileName": "SG-019A",
+      "cornerCodes": [
+        "GA",
+        "GA",
+        "SB",
+        "S+"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 54,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 597,
+      "offset": 28896,
+      "length": 1032,
+      "fileName": "SG-011",
+      "cornerCodes": [
+        "GA",
+        "GA",
+        "SB",
+        "SB"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 55,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 598,
+      "offset": 29928,
+      "length": 1032,
+      "fileName": "SG-011A",
+      "cornerCodes": [
+        "GA",
+        "GA",
+        "SB",
+        "SB"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 56,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 599,
+      "offset": 30960,
+      "length": 1032,
+      "fileName": "SG-011B",
+      "cornerCodes": [
+        "GA",
+        "GA",
+        "SB",
+        "SB"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 57,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 600,
+      "offset": 31992,
+      "length": 1032,
+      "fileName": "SG-011C",
+      "cornerCodes": [
+        "GA",
+        "GA",
+        "SB",
+        "SB"
+      ],
+      "corners": [
+        "land",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 58,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 601,
+      "offset": 81528,
+      "length": 1032,
+      "fileName": "SG-030",
+      "cornerCodes": [
+        "GA",
+        "S+",
+        "G*",
+        "G-"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 59,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 602,
+      "offset": 62952,
+      "length": 1032,
+      "fileName": "SG-038",
+      "cornerCodes": [
+        "GA",
+        "S+",
+        "G*",
+        "GA"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 60,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 603,
+      "offset": 55728,
+      "length": 1032,
+      "fileName": "SG-022",
+      "cornerCodes": [
+        "GA",
+        "S+",
+        "G-",
+        "S*"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 61,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 604,
+      "offset": 56760,
+      "length": 1032,
+      "fileName": "SG-022A",
+      "cornerCodes": [
+        "GA",
+        "S+",
+        "G-",
+        "S*"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 62,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 605,
+      "offset": 39216,
+      "length": 1032,
+      "fileName": "SG-014",
+      "cornerCodes": [
+        "GA",
+        "S+",
+        "GA",
+        "S+"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 63,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 606,
+      "offset": 40248,
+      "length": 1032,
+      "fileName": "SG-014A",
+      "cornerCodes": [
+        "GA",
+        "S+",
+        "GA",
+        "S+"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 64,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 607,
+      "offset": 55728,
+      "length": 1032,
+      "fileName": "SG-022",
+      "cornerCodes": [
+        "GA",
+        "S+",
+        "GA",
+        "SB"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 65,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 608,
+      "offset": 56760,
+      "length": 1032,
+      "fileName": "SG-022A",
+      "cornerCodes": [
+        "GA",
+        "S+",
+        "GA",
+        "SB"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 66,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 609,
+      "offset": 98040,
+      "length": 1032,
+      "fileName": "SG-060",
+      "cornerCodes": [
+        "GA",
+        "S+",
+        "S+",
+        "G-"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 67,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 610,
+      "offset": 104232,
+      "length": 1032,
+      "fileName": "SG-066",
+      "cornerCodes": [
+        "GA",
+        "S+",
+        "S+",
+        "GA"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 68,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 611,
+      "offset": 19608,
+      "length": 1032,
+      "fileName": "SG-008",
+      "cornerCodes": [
+        "GA",
+        "S+",
+        "S+",
+        "S*"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 69,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 612,
+      "offset": 89784,
+      "length": 1032,
+      "fileName": "SG-052",
+      "cornerCodes": [
+        "GA",
+        "S+",
+        "SB",
+        "G-"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 70,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 613,
+      "offset": 93912,
+      "length": 1032,
+      "fileName": "SG-056",
+      "cornerCodes": [
+        "GA",
+        "S+",
+        "SB",
+        "GA"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 71,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 614,
+      "offset": 69144,
+      "length": 1032,
+      "fileName": "SG-044",
+      "cornerCodes": [
+        "GA",
+        "S+",
+        "SB",
+        "S*"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 72,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 615,
+      "offset": 24768,
+      "length": 1032,
+      "fileName": "SG-010",
+      "cornerCodes": [
+        "GA",
+        "SB",
+        "G-",
+        "S*"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 73,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 616,
+      "offset": 25800,
+      "length": 1032,
+      "fileName": "SG-010A",
+      "cornerCodes": [
+        "GA",
+        "SB",
+        "G-",
+        "S*"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 74,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 617,
+      "offset": 26832,
+      "length": 1032,
+      "fileName": "SG-010B",
+      "cornerCodes": [
+        "GA",
+        "SB",
+        "G-",
+        "S*"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 75,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 618,
+      "offset": 27864,
+      "length": 1032,
+      "fileName": "SG-010C",
+      "cornerCodes": [
+        "GA",
+        "SB",
+        "G-",
+        "S*"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 76,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 619,
+      "offset": 47472,
+      "length": 1032,
+      "fileName": "SG-018",
+      "cornerCodes": [
+        "GA",
+        "SB",
+        "GA",
+        "S+"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 77,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 620,
+      "offset": 48504,
+      "length": 1032,
+      "fileName": "SG-018A",
+      "cornerCodes": [
+        "GA",
+        "SB",
+        "GA",
+        "S+"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 78,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 621,
+      "offset": 24768,
+      "length": 1032,
+      "fileName": "SG-010",
+      "cornerCodes": [
+        "GA",
+        "SB",
+        "GA",
+        "SB"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 79,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 622,
+      "offset": 25800,
+      "length": 1032,
+      "fileName": "SG-010A",
+      "cornerCodes": [
+        "GA",
+        "SB",
+        "GA",
+        "SB"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 80,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 623,
+      "offset": 26832,
+      "length": 1032,
+      "fileName": "SG-010B",
+      "cornerCodes": [
+        "GA",
+        "SB",
+        "GA",
+        "SB"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 81,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 624,
+      "offset": 27864,
+      "length": 1032,
+      "fileName": "SG-010C",
+      "cornerCodes": [
+        "GA",
+        "SB",
+        "GA",
+        "SB"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 82,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 625,
+      "offset": 95976,
+      "length": 1032,
+      "fileName": "SG-058",
+      "cornerCodes": [
+        "GA",
+        "SB",
+        "S+",
+        "G-"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 83,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 626,
+      "offset": 100104,
+      "length": 1032,
+      "fileName": "SG-062",
+      "cornerCodes": [
+        "GA",
+        "SB",
+        "S+",
+        "GA"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 84,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 627,
+      "offset": 73272,
+      "length": 1032,
+      "fileName": "SG-048",
+      "cornerCodes": [
+        "GA",
+        "SB",
+        "S+",
+        "S*"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 85,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 628,
+      "offset": 14448,
+      "length": 1032,
+      "fileName": "SG-004",
+      "cornerCodes": [
+        "GA",
+        "SB",
+        "SB",
+        "S*"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 86,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 629,
+      "offset": 15480,
+      "length": 1032,
+      "fileName": "SG-004A",
+      "cornerCodes": [
+        "GA",
+        "SB",
+        "SB",
+        "S*"
+      ],
+      "corners": [
+        "land",
+        "water",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 87,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 652,
+      "offset": 20640,
+      "length": 1032,
+      "fileName": "SG-009",
+      "cornerCodes": [
+        "S*",
+        "G-",
+        "S*",
+        "G-"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 88,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 653,
+      "offset": 21672,
+      "length": 1032,
+      "fileName": "SG-009A",
+      "cornerCodes": [
+        "S*",
+        "G-",
+        "S*",
+        "G-"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 89,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 654,
+      "offset": 22704,
+      "length": 1032,
+      "fileName": "SG-009B",
+      "cornerCodes": [
+        "S*",
+        "G-",
+        "S*",
+        "G-"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 90,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 655,
+      "offset": 23736,
+      "length": 1032,
+      "fileName": "SG-009C",
+      "cornerCodes": [
+        "S*",
+        "G-",
+        "S*",
+        "G-"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 91,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 656,
+      "offset": 12384,
+      "length": 1032,
+      "fileName": "SG-003",
+      "cornerCodes": [
+        "S*",
+        "G-",
+        "S*",
+        "S*"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 92,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 657,
+      "offset": 13416,
+      "length": 1032,
+      "fileName": "SG-003A",
+      "cornerCodes": [
+        "S*",
+        "G-",
+        "S*",
+        "S*"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 93,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 658,
+      "offset": 45408,
+      "length": 1032,
+      "fileName": "SG-017",
+      "cornerCodes": [
+        "S*",
+        "G-",
+        "S+",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 94,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 659,
+      "offset": 46440,
+      "length": 1032,
+      "fileName": "SG-017A",
+      "cornerCodes": [
+        "S*",
+        "G-",
+        "S+",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 95,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 660,
+      "offset": 20640,
+      "length": 1032,
+      "fileName": "SG-009",
+      "cornerCodes": [
+        "S*",
+        "G-",
+        "SB",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 96,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 661,
+      "offset": 21672,
+      "length": 1032,
+      "fileName": "SG-009A",
+      "cornerCodes": [
+        "S*",
+        "G-",
+        "SB",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 97,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 662,
+      "offset": 22704,
+      "length": 1032,
+      "fileName": "SG-009B",
+      "cornerCodes": [
+        "S*",
+        "G-",
+        "SB",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 98,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 663,
+      "offset": 23736,
+      "length": 1032,
+      "fileName": "SG-009C",
+      "cornerCodes": [
+        "S*",
+        "G-",
+        "SB",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 99,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 664,
+      "offset": 33024,
+      "length": 1032,
+      "fileName": "SG-012",
+      "cornerCodes": [
+        "S*",
+        "S*",
+        "G-",
+        "G-"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 100,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 665,
+      "offset": 34056,
+      "length": 1032,
+      "fileName": "SG-012A",
+      "cornerCodes": [
+        "S*",
+        "S*",
+        "G-",
+        "G-"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 101,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 666,
+      "offset": 35088,
+      "length": 1032,
+      "fileName": "SG-012B",
+      "cornerCodes": [
+        "S*",
+        "S*",
+        "G-",
+        "G-"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 102,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 667,
+      "offset": 36120,
+      "length": 1032,
+      "fileName": "SG-012C",
+      "cornerCodes": [
+        "S*",
+        "S*",
+        "G-",
+        "G-"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 103,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 668,
+      "offset": 10320,
+      "length": 1032,
+      "fileName": "SG-002",
+      "cornerCodes": [
+        "S*",
+        "S*",
+        "G-",
+        "S*"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 104,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 669,
+      "offset": 11352,
+      "length": 1032,
+      "fileName": "SG-002A",
+      "cornerCodes": [
+        "S*",
+        "S*",
+        "G-",
+        "S*"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 105,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 670,
+      "offset": 8256,
+      "length": 1032,
+      "fileName": "SG-001",
+      "cornerCodes": [
+        "S*",
+        "S*",
+        "S*",
+        "G-"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 106,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 671,
+      "offset": 9288,
+      "length": 1032,
+      "fileName": "SG-001A",
+      "cornerCodes": [
+        "S*",
+        "S*",
+        "S*",
+        "G-"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 107,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 679,
+      "offset": 59856,
+      "length": 1032,
+      "fileName": "SG-024",
+      "cornerCodes": [
+        "S*",
+        "S+",
+        "G-",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 108,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 680,
+      "offset": 60888,
+      "length": 1032,
+      "fileName": "SG-024A",
+      "cornerCodes": [
+        "S*",
+        "S+",
+        "G-",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 109,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 681,
+      "offset": 16512,
+      "length": 1032,
+      "fileName": "SG-005",
+      "cornerCodes": [
+        "S*",
+        "S+",
+        "S+",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 110,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 682,
+      "offset": 70176,
+      "length": 1032,
+      "fileName": "SG-045",
+      "cornerCodes": [
+        "S*",
+        "S+",
+        "SB",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 111,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 683,
+      "offset": 33024,
+      "length": 1032,
+      "fileName": "SG-012",
+      "cornerCodes": [
+        "S*",
+        "SB",
+        "G-",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 112,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 684,
+      "offset": 34056,
+      "length": 1032,
+      "fileName": "SG-012A",
+      "cornerCodes": [
+        "S*",
+        "SB",
+        "G-",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 113,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 685,
+      "offset": 35088,
+      "length": 1032,
+      "fileName": "SG-012B",
+      "cornerCodes": [
+        "S*",
+        "SB",
+        "G-",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 114,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 686,
+      "offset": 36120,
+      "length": 1032,
+      "fileName": "SG-012C",
+      "cornerCodes": [
+        "S*",
+        "SB",
+        "G-",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 115,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 687,
+      "offset": 66048,
+      "length": 1032,
+      "fileName": "SG-041",
+      "cornerCodes": [
+        "S*",
+        "SB",
+        "S+",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 116,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 688,
+      "offset": 8256,
+      "length": 1032,
+      "fileName": "SG-001",
+      "cornerCodes": [
+        "S*",
+        "SB",
+        "SB",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 117,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 689,
+      "offset": 9288,
+      "length": 1032,
+      "fileName": "SG-001A",
+      "cornerCodes": [
+        "S*",
+        "SB",
+        "SB",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 118,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 690,
+      "offset": 76368,
+      "length": 1032,
+      "fileName": "SG-025",
+      "cornerCodes": [
+        "S+",
+        "G-",
+        "G-",
+        "G*"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 119,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 691,
+      "offset": 74304,
+      "length": 1032,
+      "fileName": "SG-049",
+      "cornerCodes": [
+        "S+",
+        "G-",
+        "G-",
+        "S+"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 120,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 692,
+      "offset": 74304,
+      "length": 1032,
+      "fileName": "SG-049",
+      "cornerCodes": [
+        "S+",
+        "G-",
+        "G-",
+        "SB"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 121,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 693,
+      "offset": 84624,
+      "length": 1032,
+      "fileName": "SG-033",
+      "cornerCodes": [
+        "S+",
+        "G-",
+        "GA",
+        "G*"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 122,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 694,
+      "offset": 101136,
+      "length": 1032,
+      "fileName": "SG-063",
+      "cornerCodes": [
+        "S+",
+        "G-",
+        "GA",
+        "S+"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 123,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 695,
+      "offset": 105264,
+      "length": 1032,
+      "fileName": "SG-067",
+      "cornerCodes": [
+        "S+",
+        "G-",
+        "GA",
+        "S+"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 124,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 696,
+      "offset": 90816,
+      "length": 1032,
+      "fileName": "SG-053",
+      "cornerCodes": [
+        "S+",
+        "G-",
+        "GA",
+        "SB"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 125,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 697,
+      "offset": 80496,
+      "length": 1032,
+      "fileName": "SG-029",
+      "cornerCodes": [
+        "S+",
+        "GA",
+        "G-",
+        "G*"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 126,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 698,
+      "offset": 97008,
+      "length": 1032,
+      "fileName": "SG-059",
+      "cornerCodes": [
+        "S+",
+        "GA",
+        "G-",
+        "S+"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 127,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 699,
+      "offset": 88752,
+      "length": 1032,
+      "fileName": "SG-051",
+      "cornerCodes": [
+        "S+",
+        "GA",
+        "G-",
+        "SB"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 128,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 700,
+      "offset": 61920,
+      "length": 1032,
+      "fileName": "SG-037",
+      "cornerCodes": [
+        "S+",
+        "GA",
+        "GA",
+        "G*"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 129,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 701,
+      "offset": 103200,
+      "length": 1032,
+      "fileName": "SG-065",
+      "cornerCodes": [
+        "S+",
+        "GA",
+        "GA",
+        "S+"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 130,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 702,
+      "offset": 92880,
+      "length": 1032,
+      "fileName": "SG-055",
+      "cornerCodes": [
+        "S+",
+        "GA",
+        "GA",
+        "SB"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 131,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 703,
+      "offset": 53664,
+      "length": 1032,
+      "fileName": "SG-021",
+      "cornerCodes": [
+        "S+",
+        "GA",
+        "S*",
+        "G-"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 132,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 704,
+      "offset": 54696,
+      "length": 1032,
+      "fileName": "SG-021A",
+      "cornerCodes": [
+        "S+",
+        "GA",
+        "S*",
+        "G-"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 133,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 705,
+      "offset": 18576,
+      "length": 1032,
+      "fileName": "SG-007",
+      "cornerCodes": [
+        "S+",
+        "GA",
+        "S*",
+        "S+"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 134,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 706,
+      "offset": 68112,
+      "length": 1032,
+      "fileName": "SG-043",
+      "cornerCodes": [
+        "S+",
+        "GA",
+        "S*",
+        "SB"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 135,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 707,
+      "offset": 37152,
+      "length": 1032,
+      "fileName": "SG-013",
+      "cornerCodes": [
+        "S+",
+        "GA",
+        "S+",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 136,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 708,
+      "offset": 38184,
+      "length": 1032,
+      "fileName": "SG-013A",
+      "cornerCodes": [
+        "S+",
+        "GA",
+        "S+",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 137,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 709,
+      "offset": 53664,
+      "length": 1032,
+      "fileName": "SG-021",
+      "cornerCodes": [
+        "S+",
+        "GA",
+        "SB",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 138,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 710,
+      "offset": 54696,
+      "length": 1032,
+      "fileName": "SG-021A",
+      "cornerCodes": [
+        "S+",
+        "GA",
+        "SB",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 139,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 711,
+      "offset": 51600,
+      "length": 1032,
+      "fileName": "SG-020",
+      "cornerCodes": [
+        "S+",
+        "S*",
+        "GA",
+        "G-"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 140,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 712,
+      "offset": 52632,
+      "length": 1032,
+      "fileName": "SG-020A",
+      "cornerCodes": [
+        "S+",
+        "S*",
+        "GA",
+        "G-"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 141,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 713,
+      "offset": 17544,
+      "length": 1032,
+      "fileName": "SG-006",
+      "cornerCodes": [
+        "S+",
+        "S*",
+        "GA",
+        "S+"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 142,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 714,
+      "offset": 71208,
+      "length": 1032,
+      "fileName": "SG-046",
+      "cornerCodes": [
+        "S+",
+        "S*",
+        "GA",
+        "SB"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 143,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 715,
+      "offset": 43344,
+      "length": 1032,
+      "fileName": "SG-016",
+      "cornerCodes": [
+        "S+",
+        "S+",
+        "GA",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 144,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 716,
+      "offset": 44376,
+      "length": 1032,
+      "fileName": "SG-016A",
+      "cornerCodes": [
+        "S+",
+        "S+",
+        "GA",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 145,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 717,
+      "offset": 51600,
+      "length": 1032,
+      "fileName": "SG-020",
+      "cornerCodes": [
+        "S+",
+        "SB",
+        "GA",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 146,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 718,
+      "offset": 52632,
+      "length": 1032,
+      "fileName": "SG-020A",
+      "cornerCodes": [
+        "S+",
+        "SB",
+        "GA",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 147,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 719,
+      "offset": 76368,
+      "length": 1032,
+      "fileName": "SG-025",
+      "cornerCodes": [
+        "SB",
+        "G*",
+        "G*",
+        "G*"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 148,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 720,
+      "offset": 74304,
+      "length": 1032,
+      "fileName": "SG-049",
+      "cornerCodes": [
+        "SB",
+        "G*",
+        "G*",
+        "SB"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 149,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 721,
+      "offset": 74304,
+      "length": 1032,
+      "fileName": "SG-049",
+      "cornerCodes": [
+        "SB",
+        "G-",
+        "G-",
+        "S+"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 150,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 722,
+      "offset": 107328,
+      "length": 1032,
+      "fileName": "SG-069",
+      "cornerCodes": [
+        "SB",
+        "G-",
+        "GA",
+        "S+"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 151,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 723,
+      "offset": 94944,
+      "length": 1032,
+      "fileName": "SG-057",
+      "cornerCodes": [
+        "SB",
+        "GA",
+        "G-",
+        "S+"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 152,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 724,
+      "offset": 99072,
+      "length": 1032,
+      "fileName": "SG-061",
+      "cornerCodes": [
+        "SB",
+        "GA",
+        "GA",
+        "S+"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 153,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 725,
+      "offset": 20640,
+      "length": 1032,
+      "fileName": "SG-009",
+      "cornerCodes": [
+        "SB",
+        "GA",
+        "S*",
+        "G-"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 154,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 726,
+      "offset": 21672,
+      "length": 1032,
+      "fileName": "SG-009A",
+      "cornerCodes": [
+        "SB",
+        "GA",
+        "S*",
+        "G-"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 155,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 727,
+      "offset": 22704,
+      "length": 1032,
+      "fileName": "SG-009B",
+      "cornerCodes": [
+        "SB",
+        "GA",
+        "S*",
+        "G-"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 156,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 728,
+      "offset": 23736,
+      "length": 1032,
+      "fileName": "SG-009C",
+      "cornerCodes": [
+        "SB",
+        "GA",
+        "S*",
+        "G-"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 157,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 729,
+      "offset": 72240,
+      "length": 1032,
+      "fileName": "SG-047",
+      "cornerCodes": [
+        "SB",
+        "GA",
+        "S*",
+        "S+"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 158,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 730,
+      "offset": 12384,
+      "length": 1032,
+      "fileName": "SG-003",
+      "cornerCodes": [
+        "SB",
+        "GA",
+        "S*",
+        "SB"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 159,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 731,
+      "offset": 13416,
+      "length": 1032,
+      "fileName": "SG-003A",
+      "cornerCodes": [
+        "SB",
+        "GA",
+        "S*",
+        "SB"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 160,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 732,
+      "offset": 45408,
+      "length": 1032,
+      "fileName": "SG-017",
+      "cornerCodes": [
+        "SB",
+        "GA",
+        "S+",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 161,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 733,
+      "offset": 46440,
+      "length": 1032,
+      "fileName": "SG-017A",
+      "cornerCodes": [
+        "SB",
+        "GA",
+        "S+",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 162,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 734,
+      "offset": 20640,
+      "length": 1032,
+      "fileName": "SG-009",
+      "cornerCodes": [
+        "SB",
+        "GA",
+        "SB",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 163,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 735,
+      "offset": 21672,
+      "length": 1032,
+      "fileName": "SG-009A",
+      "cornerCodes": [
+        "SB",
+        "GA",
+        "SB",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 164,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 736,
+      "offset": 22704,
+      "length": 1032,
+      "fileName": "SG-009B",
+      "cornerCodes": [
+        "SB",
+        "GA",
+        "SB",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 165,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 737,
+      "offset": 23736,
+      "length": 1032,
+      "fileName": "SG-009C",
+      "cornerCodes": [
+        "SB",
+        "GA",
+        "SB",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "land",
+        "water",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 166,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 738,
+      "offset": 33024,
+      "length": 1032,
+      "fileName": "SG-012",
+      "cornerCodes": [
+        "SB",
+        "S*",
+        "GA",
+        "G-"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 167,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 739,
+      "offset": 34056,
+      "length": 1032,
+      "fileName": "SG-012A",
+      "cornerCodes": [
+        "SB",
+        "S*",
+        "GA",
+        "G-"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 168,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 740,
+      "offset": 35088,
+      "length": 1032,
+      "fileName": "SG-012B",
+      "cornerCodes": [
+        "SB",
+        "S*",
+        "GA",
+        "G-"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 169,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 741,
+      "offset": 36120,
+      "length": 1032,
+      "fileName": "SG-012C",
+      "cornerCodes": [
+        "SB",
+        "S*",
+        "GA",
+        "G-"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 170,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 742,
+      "offset": 67080,
+      "length": 1032,
+      "fileName": "SG-042",
+      "cornerCodes": [
+        "SB",
+        "S*",
+        "GA",
+        "S+"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 171,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 743,
+      "offset": 10320,
+      "length": 1032,
+      "fileName": "SG-002",
+      "cornerCodes": [
+        "SB",
+        "S*",
+        "GA",
+        "SB"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 172,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 744,
+      "offset": 11352,
+      "length": 1032,
+      "fileName": "SG-002A",
+      "cornerCodes": [
+        "SB",
+        "S*",
+        "GA",
+        "SB"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "water"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 173,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 745,
+      "offset": 59856,
+      "length": 1032,
+      "fileName": "SG-024",
+      "cornerCodes": [
+        "SB",
+        "S+",
+        "GA",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 174,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 746,
+      "offset": 60888,
+      "length": 1032,
+      "fileName": "SG-024A",
+      "cornerCodes": [
+        "SB",
+        "S+",
+        "GA",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "G",
+      "secondaryType": "S",
+      "atlasIndex": 175,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 747,
+      "offset": 33024,
+      "length": 1032,
+      "fileName": "SG-012",
+      "cornerCodes": [
+        "SB",
+        "SB",
+        "GA",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 176,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 748,
+      "offset": 34056,
+      "length": 1032,
+      "fileName": "SG-012A",
+      "cornerCodes": [
+        "SB",
+        "SB",
+        "GA",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 177,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 749,
+      "offset": 35088,
+      "length": 1032,
+      "fileName": "SG-012B",
+      "cornerCodes": [
+        "SB",
+        "SB",
+        "GA",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 178,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    },
+    {
+      "id": 750,
+      "offset": 36120,
+      "length": 1032,
+      "fileName": "SG-012C",
+      "cornerCodes": [
+        "SB",
+        "SB",
+        "GA",
+        "GA"
+      ],
+      "corners": [
+        "water",
+        "water",
+        "land",
+        "land"
+      ],
+      "specialFlag": "",
+      "representativeType": "S",
+      "secondaryType": "G",
+      "atlasIndex": 179,
+      "upstreamLookup": "TerrainRes::scan (src/OTERRAIN.cpp)"
+    }
+  ]
+}

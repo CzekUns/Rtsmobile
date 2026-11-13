@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>7KAA originale — 180 tessere costa SG</title>
+<style>
+body{background:#1e2926;color:#f6edd4;margin:0;padding:18px;font-family:system-ui,sans-serif}
+main{max-width:1050px;margin:auto}h1{margin:0;font-size:22px}.sub{color:#b9c8b9;font-size:14px}
+section{margin:20px 0;padding:16px;background:#2b3d35;border:1px solid #566d5f;border-radius:10px}
+img{width:512px;max-width:100%;height:auto;image-rendering:pixelated;border:2px solid #788f71}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(126px,1fr));gap:12px}
+figure{margin:0;text-align:center;background:#162821;border-radius:6px;padding:8px}
+canvas{width:96px;height:96px;image-rendering:pixelated}
+figcaption{font-size:12px;color:#d2d8c5}
+a{color:#e1ce89}code{font-size:12px}
+</style></head><body><main>
+<h1>Seven Kingdoms: Ancient Adversaries — coste SG originali</h1>
+<p class="sub">180 tasselli 32×32 indicizzati originali · PAL_STD.RES · 7KAA GPLv2 · pixel sorgente, mappa JS dimostrativa.</p>
+<section><h2>Atlas originale · scala 1×</h2>
+<img id="atlas" src="./TERRAIN1-SG-coast-16x12.png" width="512" height="384" alt="Atlante originale SG con 180 tasselli">
+<p class="sub">Tutti i record di TERRAIN1.RES con tipologie rappresentante e secondaria mare/erba. Ordinati per ID originale.</p></section>
+<section><h2>Quattordici forme di costa · scala 3×</h2><div class="grid" id="samples"></div>
+<p class="sub">Le forme vengono selezionate dagli effettivi codici NW/NE/SW/SE. Questo dimostra la disponibilità dei pixel originali, non il matching con le quote e con il generatore 7KAA.</p></section>
+<p><a href="../../index.html?coasts=1">Apri il gioco con coste</a> · <a href="../../index.html?coasts=0">Confronta senza coste</a> · <a href="../manifests/TERRAIN1-SG-coast-16x12.json">Manifest sorgente</a></p>
+</main><script type="module">
+import {findCoastRecord} from '../../playtest/original-coast.js';
+const image=document.querySelector('#atlas'),gallery=document.querySelector('#samples');
+try{
+ const data=await (await fetch('../manifests/TERRAIN1-SG-coast-16x12.json')).json();
+ await image.decode();
+ for(let mask=1;mask<=14;mask++){
+  const rec=findCoastRecord(data.records,mask);
+  const fig=document.createElement('figure'),canvas=document.createElement('canvas'),label=document.createElement('figcaption');
+  canvas.width=canvas.height=96;
+  const ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=false;
+  if(rec){const col=rec.atlasIndex%16,row=Math.floor(rec.atlasIndex/16);ctx.drawImage(image,col*32,row*32,32,32,0,0,96,96)}
+  label.textContent=rec?'#'+rec.id+' · '+rec.fileName+' · '+rec.cornerCodes.join('/'):'Forma '+mask+' non trovata';
+  fig.append(canvas,label);gallery.append(fig);
+ }
+}catch(e){gallery.textContent='Anteprima non disponibile: '+String(e)}
+</script></body></html>

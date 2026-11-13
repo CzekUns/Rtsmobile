@@ -11,7 +11,7 @@ import {syncFullscreenCanvas} from './playtest/fullscreen-layout.js';
 import {issueWorkOrder,completeWorkArrivals} from './playtest/work-assignments.js';
 import {issueBuildOrder,cancelBuildOrder,advanceConstruction,isBuilder,canBuildFirm} from './playtest/construction.js';
 import {issueRepairOrder,cancelRepairOrder,advanceRepairs,canRepair} from './playtest/repairs.js';
-import {WorldView} from './view.js';
+import {WorldView} from './view.js?v=coast1';
 import {selectionMeter} from './selection-meter.js';
 import {installOrdersSidebar} from './playtest/orders-sidebar.js';
 import {installMinimapNavigation} from './playtest/minimap-system.js';
@@ -27,7 +27,7 @@ const previewOriginalSprites=query.get('sprites')!=='0';
 const saveKey=playtest?'seven-kingdoms-html-quick-playtest-v1':SAVE_KEY;
 let fixedClock=createFrameAccumulator({tickUs:50000,maxFrameUs:250000});
 let game=SevenGame.load(saveKey)||new SevenGame();
-const view=new WorldView($('world'),$('minimap'),{previewOriginalSprites});
+const view=new WorldView($('world'),$('minimap'),{previewOriginalSprites,previewOriginalCoasts:query.get('coasts')!=='0'});
 installReportToolbar(document.querySelector('.reports'),$('reportsPrev'),$('reportsNext'));
 let selection=game.towns.find(t=>t.owner===1)?.id||null;
 let report=null,placing=null,placingBuilderId=null,builderMenuId=null,trainingMenuTownId=null,ghost=null,newsUntil=0,last=0,lastPanel=0,lastSave=0;
@@ -675,7 +675,7 @@ function tick(t){
 }
 renderPanel();renderHud();
 if(playtest)status('MODALITÀ TEST · percorsi attorno ad acqua ed edifici · salvataggio separato.');
-if(previewOriginalSprites)status('ASSET ORIGINALI · Normanni blu a Eboracum; premi N per raggiungerli. Terreno originale di prova; coste e vegetazione in lavorazione.');
+if(previewOriginalSprites)status('ASSET ORIGINALI · Normanni blu a Eboracum; premi N per raggiungerli. Costa SG originale in anteprima su terreno demo; altri biomi e vegetazione da convertire.');
 if(!localStorage.getItem('seven-kingdoms-html-instructions-v1')){
  localStorage.setItem('seven-kingdoms-html-instructions-v1','1');
  try{$('helpDialog').showModal()}catch(_){}

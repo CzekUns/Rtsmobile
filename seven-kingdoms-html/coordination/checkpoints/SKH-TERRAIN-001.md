@@ -22,3 +22,12 @@ Verificare CI dell'HEAD di questo checkpoint e correggere subito eventuali error
 - Test aggiunti ma NON eseguiti localmente. CI nuovo HEAD non ancora verificata. Nessun rendering Canvas, merge, Pages o prova Android.
 - SHA-256 dei due archivi ancora da calcolare sui byte originali; Git blob SHA-1 non è SHA-256. Conservare questo limite. Licenza upstream GPLv2.
 - **Unico prossimo passo:** verificare CI esatta del nuovo HEAD e correggere eventuali errori; poi calcolare SHA-256 degli archivi e generare fixture/manifest riproducibile per SG-028, senza usare una palette presunta.
+
+
+## Giro di integrazione manuale 2026-11-13 · nuova tranche costa SG
+- **Sorgenti lette e hash verificati:** TERRAIN1.RES 20.636 byte SHA-256 `67b445d86916393c00e3b88466b7fa354701ef33b1c372e06fc463e0ba8a613a`; I_TERN1.RES 577.920 byte SHA-256 `791745a1bbaed1eeb3582725cf05f90918fd0733682b32eec697b6e297f45774`; PAL_STD.RES 776 byte SHA-256 `8bda65c749340446edb6debe73a5b0f67b1a4af8dd0fdb1fa0222a69848b6ef7`.
+- **Nuovi asset prodotti:** 180 bitmap SG da 32×32 dell'originale con offset e cornerCodes nel manifest; atlas indicizzato 16×12 (512×384), nessuna palette o pixel sintetici.
+- **Wiring proposto sul branch:** codec PNG rigenerabile, generatore da archivi originali, lookup SG, view.js originale con fallback in altre regioni, game.js con `?coasts=0`, QA HTML 1×/3×, test Node e Chromium HTTP per risorsa PNG.
+- **Limitazioni:** world generation, altezza angoli, biome non SG e Android fisico ancora non portati. Le 32 pure restano fallback. Il testo relativo al futuro del progetto è aggiornato nel README.
+- **CI:** da verificare sull'HEAD del nuovo commit integrativo; nessun PASS dichiarato qui prima dei workflow GitHub.
+- **Prossimo passo:** verificare Node/Chromium sull'HEAD, correggere gli errori in questa PR, chiudere il gate solo se il rendering originale costa è stabile e il deploy Pages risulta success. Marcare QA Android/manual originale ancora da eseguire.
