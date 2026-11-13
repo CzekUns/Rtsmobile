@@ -1,0 +1,36 @@
+<!doctype html><html><meta charset="utf-8"><title>SKH HUD browser smoke</title><body><output id="result">PENDING</output><iframe id="game" src="../../index.html" style="width:960px;height:600px"></iframe><script>
+const output=document.getElementById('result');
+const frame=document.getElementById('game');
+const delay=ms=>new Promise(r=>setTimeout(r,ms));
+async function run(){
+ const d=frame.contentDocument,w=frame.contentWindow;
+ const get=id=>d.getElementById(id);
+ const assert=(condition,message)=>{if(!condition)throw Error(message)};
+ await delay(700);
+ assert(get('world')&&get('sidebarToggle')&&get('touchModifier'),'required game controls absent');
+ const toggle=get('sidebarToggle'),sidebar=get('orderSidebar');
+ assert(toggle.getAttribute('aria-expanded')!==null,'ORDINI missing expanded state');
+ const initial=toggle.getAttribute('aria-expanded');
+ toggle.click();
+ assert(toggle.getAttribute('aria-expanded')!==initial,'ORDINI did not toggle');
+ assert(sidebar.inert===(toggle.getAttribute('aria-expanded')==='false'),'ORDINI inert mismatch');
+ toggle.click();
+ assert(toggle.getAttribute('aria-expanded')===initial,'ORDINI did not restore state');
+ const reports=d.querySelector('[data-report="towns"]');
+ reports.click();
+ await delay(100);
+ assert(get('reportDialog').open,'report dialog failed to open');
+ get('closeReport').click();
+ await delay(100);
+ assert(!get('reportDialog').open,'report dialog failed to close');
+ const commands=get('touchControlsToggle');
+ commands.click();
+ assert(commands.getAttribute('aria-expanded')==='true','COMANDI did not expand');
+ commands.click();
+ assert(commands.getAttribute('aria-expanded')==='false','COMANDI did not collapse');
+ assert(get('fullscreenBtn')&&get('gameMenu')&&get('minimap'),'core HUD controls missing');
+ output.textContent='PASS: ORDINI, report dialog, COMANDI and core HUD';
+}
+frame.addEventListener('load',()=>run().catch(e=>output.textContent='FAIL: '+e.message));
+setTimeout(()=>{if(output.textContent==='PENDING')output.textContent='FAIL: browser smoke timeout'},12000);
+</script></body></html>
