@@ -239,3 +239,10 @@ dialog button{min-height:35px;padding:6px 15px}
  .toptools>button{min-width:28px;min-height:32px;padding:1px;font-size:14px}
  .toptools #menuBtn{width:43px;font-size:10px}
 }
+
+/* Selection indicators from source PR #107. */
+.selection-meter{display:flex;flex-direction:column;gap:2px;margin:3px 0 5px;min-width:0}
+.selection-meter-track{display:block;height:9px;border:1px solid #676b5d;background:#a7a99a;overflow:hidden}
+.selection-meter-fill{display:block;height:100%;background:#a18e61;max-width:100%;min-width:0}
+.selection-meter-caption{font:11px/1.2 Georgia,serif;color:#242922;overflow-wrap:anywhere}
+.selection-meter-caption strong{font-variant-numeric:tabular-nums}
