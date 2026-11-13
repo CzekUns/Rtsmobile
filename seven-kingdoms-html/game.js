@@ -13,6 +13,7 @@ import {issueBuildOrder,cancelBuildOrder,advanceConstruction,isBuilder,canBuildF
 import {issueRepairOrder,cancelRepairOrder,advanceRepairs,canRepair} from './playtest/repairs.js';
 import {WorldView} from './view.js';
 import {selectionMeter} from './selection-meter.js';
+import {installOrdersSidebar} from './playtest/orders-sidebar.js';
 import {installMinimapNavigation} from './playtest/minimap-system.js';
 import {installReportToolbar} from './playtest/report-toolbar.js';
 import {SKILLS,skillLabel,workerRoleLabel,workerRaceLabel,ensureFirmPersonnel} from './playtest/personnel.js';
@@ -47,20 +48,10 @@ window.addEventListener('resize',resizeStage);
 window.addEventListener('orientationchange',resizeStage);
 window.visualViewport?.addEventListener('resize',resizeStage);
 if(typeof ResizeObserver!=='undefined')new ResizeObserver(resizeStage).observe($('world'));
-const compactOrders=window.matchMedia('(max-width:1000px) and (pointer:coarse)');
-function setOrdersVisible(visible){
- const sidebar=$('orderSidebar');
- if(!visible&&sidebar.contains(document.activeElement))$('sidebarToggle').focus();
- $('stage').classList.toggle('panel-collapsed',!visible);
- $('sidebarToggle').setAttribute('aria-expanded',String(visible));
- $('sidebarToggle').textContent=visible?'ORDINI ◂':'ORDINI ▸';
- sidebar.setAttribute('aria-hidden',String(!visible));
- sidebar.inert=!visible;
-}
-setOrdersVisible(!compactOrders.matches);
-compactOrders.addEventListener('change',()=>setOrdersVisible(!compactOrders.matches));
-$('sidebarToggle').addEventListener('click',()=>
- setOrdersVisible($('stage').classList.contains('panel-collapsed')));
+installOrdersSidebar({
+ sidebar:$('orderSidebar'),stage:$('stage'),toggle:$('sidebarToggle'),
+ media:window.matchMedia('(max-width:1000px) and (pointer:coarse)')
+});
 function status(message){
  $('ticker').textContent=message;newsUntil=Date.now()+6000;
 }
