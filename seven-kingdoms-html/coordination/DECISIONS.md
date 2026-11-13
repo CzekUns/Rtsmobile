@@ -11,3 +11,11 @@
 **Eccezioni consentite:** fix urgenti per impedire regressioni/rotture su main, fermando e registrando la deviazione; nuove priorità su ordine e scope richiedono istruzione del proprietario. I collaudi device impossibili possono rimanere come `awaiting_manual_qa` documentati.
 
 **Stato:** decisione iniziale; nessun task di prodotto è dichiarato completato dall'aggiunta di questo protocollo.
+
+## DEC-002 — 2026-11-13 · SKH-HUD-001 consegnato tecnicamente; transizione alle coste
+
+**Autorizzazione:** mandato del proprietario di fare il giro di integrazione periodico e programma già concordato in DEC-001. Non è una nuova priorità discrezionale.
+
+**Evidenza:** #115 mergiata su main `ec628a2edf87e0d3d2f46a338d751057fd1ca55a`, CI #43391451648 e Pages #43391451601 success, primo smoke completo Node/Chromium della combinazione con save/reload. Vecchie PR #97/#101/#103/#105/#107 chiuse dopo consolidamento verificato.
+
+**Decisione:** marcare `SKH-HUD-001` `awaiting_manual_qa` (Android reale e vera richiesta fullscreen non testati) e attivare `SKH-TERRAIN-001` in sequenza. Nessun bug software noto blocca l'avvio del task coste. La memoria operativa di questa lavorazione deve stare nel checkpoint del branch del nuovo incarico, non in report ripetitivi.

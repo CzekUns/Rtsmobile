@@ -30,3 +30,12 @@
 - PR HUD arretrate #97/#101/#103/#105/#107 **non** ancora consolidate su main al momento di questa fotografia.
 
 Questo documento definisce criteri; **non** sostituisce log reali, CI, artefatti o review.
+
+## Release HUD consolidata — giro di integrazione 13 novembre 2026
+
+- **PR #115:** MERGED con squash su main `ec628a2edf87e0d3d2f46a338d751057fd1ca55a`.
+- **PR HEAD CI:** [#43391166870](https://github.com/CzekUns/Rtsmobile/actions/runs/43391166870) SUCCESS — Node **212 PASS / 0 FAIL / 2 SKIP**, Chromium HTTP PASS con test DOM reali e save/load effettivo.
+- **Main CI:** [#43391451648](https://github.com/CzekUns/Rtsmobile/actions/runs/43391451648) SUCCESS.
+- **Pages:** [#43391451601](https://github.com/CzekUns/Rtsmobile/actions/runs/43391451601) SUCCESS sullo SHA di prodotto.
+- **PR #97/#101/#103/#105/#107:** chiuse con nota di integrazione/sostituzione.
+- **Still manual:** test fisico Android landscape, fullscreen reale (nel test Chromium l'API è stub), confronto pixel/scene con 7KAA. Stato task `awaiting_manual_qa`. Il nuovo incarico sul terreno può procedere senza dichiarare concluse queste prove.

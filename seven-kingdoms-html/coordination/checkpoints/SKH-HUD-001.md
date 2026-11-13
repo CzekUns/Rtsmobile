@@ -117,3 +117,12 @@ Integrated the selection meters from #107 into the existing branch without repla
 - **New code CI:** workflow lookup immediately after commit: [{"id":43390722904,"status":"in_progress","conclusion":null}]; **no success claimed for new code HEAD**.
 - **Local npm/Android/Pages:** not run in this execution; no merge, no new Pages deployment or 7KAA visual-parity claim.
 - **Single next step:** inspect the GitHub Actions Chromium job on the new checkpoint HEAD, repair any precise failing pointer/fullscreen assertion in the existing PR #115, then verify save/load and responsive fullscreen behavior before removing draft status.
+
+## CHIUSURA INTEGRAZIONE — 2026-11-13 (ultimo stato, prevale sulle note storiche sopra)
+
+- **Stato:** `awaiting_manual_qa`, **PR #115 MERGED**, SHA main `ec628a2edf87e0d3d2f46a338d751057fd1ca55a`.
+- **Verifica HEAD integrativo:** commit `42d4fbf5ec2f58798f3bd17ff1e192537e4881cf`, [CI #43391166870](https://github.com/CzekUns/Rtsmobile/actions/runs/43391166870) **SUCCESS**, 212 test Node PASS, 0 FAIL, 2 SKIP; Chromium HTTP PASS su ORDINI, report, selection meter, MOD+levetta, richiesta fullscreen e save/reload reale.
+- **Main/Pages:** [main CI #43391451648](https://github.com/CzekUns/Rtsmobile/actions/runs/43391451648) SUCCESS; [deploy #43391451601](https://github.com/CzekUns/Rtsmobile/actions/runs/43391451601) SUCCESS.
+- **Sorgenti PR #97/#101/#103/#105/#107:** chiuse e annotate come supersedute dopo merge, NON da riaprire.
+- **Pending manual QA:** Android fisico/landscape, reale fullscreen e confronto con 7KAA. Sono verifiche non esercitate da Chrome headless, nessun PASS inventato.
+- **Prossimo task del programma, confermato:** `SKH-TERRAIN-001`; leggere `coordination/checkpoints/SKH-TERRAIN-001.md`, poi sviluppare coste/transizioni sorgente 7KAA. Non riaprire l'arretrato HUD.

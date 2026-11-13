@@ -17,7 +17,7 @@
       "title": "Consolidare le cinque PR HUD residue",
       "priority": 1,
       "ownerStream": "integration",
-      "status": "ready",
+      "status": "awaiting_manual_qa",
       "dependsOn": [],
       "relatedPRs": [
         97,
@@ -32,7 +32,7 @@
         "HUD e report: stato pulsanti, keyboard, pannello ORDINI, data/velocità, selezione città/forti",
         "game.js, index.html, style.css e soli moduli/test strettamente pertinenti"
       ],
-      "nextAction": "Leggere le patch e i CI degli HEAD correnti delle PR #97/#101/#103/#105/#107; scegliere il punto d'integrazione su ultimo main, consolidare prima le modifiche non conflittuali, eseguire test, poi correggere i conflitti sul medesimo ramo. Evitare nuove PR parallele.",
+      "nextAction": "Release already merged at ec628a2edf87e0d3d2f46a338d751057fd1ca55a; complete manual Android landscape/fullscreen and graphics QA when device evidence becomes available. Avoid re-opening old source PRs.",
       "acceptance": [
         "PR integrativa unica con riferimenti alle cinque PR e nessuna funzione persa",
         "Test Node, check e CI sull'HEAD finale passati con prova",
@@ -40,14 +40,42 @@
         "Merge autorizzato su main e deployment GitHub Pages verificato; se Android non disponibile evidenziare QA manuale pendente",
         "Solo dopo verifica di assorbimento chiudere le PR sostituite con commento"
       ],
-      "blockingIssue": null
+      "blockingIssue": null,
+      "completion": {
+        "mainSha": "ec628a2edf87e0d3d2f46a338d751057fd1ca55a",
+        "ciUrl": "https://github.com/CzekUns/Rtsmobile/actions/runs/43391451648",
+        "prNumber": 115,
+        "merged": true,
+        "sourcePRsClosed": [
+          97,
+          101,
+          103,
+          105,
+          107
+        ],
+        "pagesRunId": 43391451601,
+        "pagesUrl": "https://czekuns.github.io/Rtsmobile/seven-kingdoms-html/",
+        "acceptanceVerified": false,
+        "verified": [
+          "Source PR functionality consolidated on branch",
+          "212 Node tests PASS, 0 FAIL, 2 SKIP",
+          "Chromium HTTP smoke PASS: HUD/ORDINI/report/meter/MOD/joystick/fullscreen API request/save/reload",
+          "main CI success",
+          "GitHub Pages deployment workflow success"
+        ],
+        "pending": [
+          "Physical Android landscape test",
+          "Physical fullscreen behavior and genuine multi-touch/pointer ergonomic QA",
+          "Pixel comparison versus original 7KAA"
+        ]
+      }
     },
     {
       "id": "SKH-TERRAIN-001",
       "title": "Coste e transizioni originali 7KAA",
       "priority": 2,
       "ownerStream": "integration",
-      "status": "queued",
+      "status": "ready",
       "dependsOn": [
         "SKH-HUD-001"
       ],
@@ -59,7 +87,7 @@
         "Decoder/atlante/manifest da asset GPL con provenienza verificata",
         "Collegamento al Canvas e test integrati senza mutare simulazione e collisioni"
       ],
-      "nextAction": "Identificare le varianti di transizione in TERRAIN1.RES, I_TERN1.RES, PAL_STD.RES e il lookup originale in OTERRAIN.cpp; campionare casi riproducibili prima di modificare view.js.",
+      "nextAction": "Leggere l'ultimo commit di main e il checkpoint SKH-TERRAIN-001; individuare in sorgente 7KAA i record e le regole costa/angoli, controllare licenza e risorse recuperabili, avviare decoder/manifest riproducibile sul branch assegnato. Non inventare transizioni o modificare il terreno prima del lookup verificato.",
       "acceptance": [
         "Provenienza, licenza e hash delle risorse originali documentati",
         "Atlante e manifest riproducibili per transizioni acqua/terra e casi d'angolo, senza inventare tessere mancanti",
