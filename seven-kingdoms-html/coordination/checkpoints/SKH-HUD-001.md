@@ -106,3 +106,14 @@ Integrated the selection meters from #107 into the existing branch without repla
 - **Fix commit:** `3c56a413ebfd2f84dc8e841b78b57b582c161b4f`, `tests/browser/hud-smoke.html`: close first-launch help dialog (when open), focus the game document body and dispatch cancelable keydown before asserting save status. This preserves intended modal shortcut guard rather than changing game behavior.
 - **Verification:** failure identified from actual GitHub Actions job log. New HEAD CI **not yet verified** at commit time; local npm and Android **NOT RUN**. No merge, no Pages deployment.
 - **Single next step:** inspect GitHub Actions on the new checkpoint HEAD, repair any remaining Chromium assertion failure in PR #115, then extend browser coverage to fullscreen/MOD+joystick and save-load before ready-for-review/merge.
+
+
+## 2026-11-13 — Chromium mobile controls and fullscreen request smoke
+
+- **Starting checkpoint HEAD:** `c1722fef62898ff8415d3c4429b2d24271948648`.
+- **Previous HEAD CI:** [GitHub Actions #43382981535](https://github.com/CzekUns/Rtsmobile/actions/runs/43382981535) completed **SUCCESS** on `c1722fe`, confirming the keyboard-save smoke fix.
+- **New code commit:** `9137ff37f6a468578744e97f6e87c27964dc370e`, modifying `tests/browser/hud-smoke.html` in existing draft PR #115.
+- **What changed:** the actual HTTP-served game iframe browser smoke now exercises MOD pointerdown/up and aria-pressed, joystick pointerdown/up and thumb reset, closing COMANDI while MOD held, and fullscreen-button invocation through a controlled requestFullscreen stub. It does **not** assert physical fullscreen or Android support. Existing HUD/report/save smoke remains.
+- **New code CI:** workflow lookup immediately after commit: [{"id":43390722904,"status":"in_progress","conclusion":null}]; **no success claimed for new code HEAD**.
+- **Local npm/Android/Pages:** not run in this execution; no merge, no new Pages deployment or 7KAA visual-parity claim.
+- **Single next step:** inspect the GitHub Actions Chromium job on the new checkpoint HEAD, repair any precise failing pointer/fullscreen assertion in the existing PR #115, then verify save/load and responsive fullscreen behavior before removing draft status.
