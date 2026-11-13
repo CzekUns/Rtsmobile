@@ -2,26 +2,26 @@
   "schemaVersion": 1,
   "programRevision": "2026-11-12-orchestrator-v1",
   "updatedOn": "2026-11-13",
-  "lastObservedMainSha": "ec628a2edf87e0d3d2f46a338d751057fd1ca55a",
+  "lastObservedMainSha": "c1a9afb39f4cd52e4a39f94addc4a5efe55444c2",
   "lastVerifiedPagesDeployment": {
-    "sha": "ec628a2edf87e0d3d2f46a338d751057fd1ca55a",
-    "runId": 43391451601,
+    "sha": "c1a9afb39f4cd52e4a39f94addc4a5efe55444c2",
+    "runId": 43439241935,
     "result": "success",
     "url": "https://czekuns.github.io/Rtsmobile/seven-kingdoms-html/",
     "androidVisualTest": "not_run"
   },
-  "activeTaskId": "SKH-TERRAIN-001",
+  "activeTaskId": "SKH-TERRAIN-002",
   "activeTaskBranch": null,
-  "currentStep": "Coste 7KAA: individuare nella sorgente e negli archivi ufficiali lookup dei corner e record di transizione, prova licenza/manifest, poi conversione Canvas.",
+  "currentStep": "Foreste/rocce/rilievi 7KAA: catalogo risorse originali e layering Canvas, un blocco coerente di asset, test e preview 1x/2x.",
   "lastExecution": {
     "recorded": true,
-    "runId": "manual-integration-2026-11-13-SKH-HUD-001",
+    "runId": "manual-integration-2026-11-13-SKH-TERRAIN-001",
     "at": "2026-11-13",
-    "taskId": "SKH-HUD-001",
+    "taskId": "SKH-TERRAIN-001",
     "outcome": "merged-and-pages-deployed-awaiting-manual-qa",
-    "commitSha": "ec628a2edf87e0d3d2f46a338d751057fd1ca55a",
-    "prNumber": 115,
-    "ciRunUrl": "https://github.com/CzekUns/Rtsmobile/actions/runs/43391451648",
+    "commitSha": "c1a9afb39f4cd52e4a39f94addc4a5efe55444c2",
+    "prNumber": 118,
+    "ciRunUrl": "https://github.com/CzekUns/Rtsmobile/actions/runs/43439241900",
     "blockingReason": null
   },
   "awaitingManualValidation": [
@@ -29,9 +29,14 @@
       "taskId": "SKH-HUD-001",
       "scope": "Android landscape UI, touchscreen MOD+joystick and true fullscreen, baseline 7KAA visual comparison",
       "releaseSha": "ec628a2edf87e0d3d2f46a338d751057fd1ca55a"
+    },
+    {
+      "taskId": "SKH-TERRAIN-001",
+      "scope": "Original sea-grass coast image comparison 1x/2x against 7KAA, real Android landscape pixel/zoom check, geometry alignment, true original-world generator not yet ported",
+      "releaseSha": "c1a9afb39f4cd52e4a39f94addc4a5efe55444c2"
     }
   ],
   "planChangesRequireOwnerApproval": true,
-  "nextTaskAfterActive": "SKH-TERRAIN-002",
-  "notes": "Consolidamento HUD verificato con Node, Chromium HTTP, merge #115 e Pages. PR #97/#101/#103/#105/#107 chiuse come superseded con commenti. Prova fisica Android resta aperta; l'esecutore riprende task coste con checkpoint separato. Il main potrebbe avanzare dopo questo snapshot: sempre leggere HEAD live."
+  "nextTaskAfterActive": "SKH-STRUCTURES-001",
+  "notes": "SKH-TERRAIN-001 PR #118 integrated source-verified 180 SG coast 32x32 tiles, indexed palette and manifest with live Canvas fallback. CI #43439241900 and Pages #43439241935 successful. Original world generator and device visual parity still outstanding. Begin SKH-TERRAIN-002 with checkpoint; orchestration docs are main source of truth."
 }

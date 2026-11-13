@@ -39,3 +39,12 @@ Questo documento definisce criteri; **non** sostituisce log reali, CI, artefatti
 - **Pages:** [#43391451601](https://github.com/CzekUns/Rtsmobile/actions/runs/43391451601) SUCCESS sullo SHA di prodotto.
 - **PR #97/#101/#103/#105/#107:** chiuse con nota di integrazione/sostituzione.
 - **Still manual:** test fisico Android landscape, fullscreen reale (nel test Chromium l'API è stub), confronto pixel/scene con 7KAA. Stato task `awaiting_manual_qa`. Il nuovo incarico sul terreno può procedere senza dichiarare concluse queste prove.
+
+## Release original SG coasts — 13 novembre 2026
+
+- **PR #118 MERGED:** main `c1a9afb39f4cd52e4a39f94addc4a5efe55444c2`.
+- **Fonte licenziata verificata:** 7KAA `the3dfxdude/7kaa` commit `14e6fdfba9481af4dc3a54722614a608776e20bc`, TERRAIN1 DBF 750 righe, I_TERN1 577.920 byte, PAL_STD palette originale; SHA-256 attestati in `docs/original-parity/SKH-TERRAIN-001-coast-20261113.md`.
+- **Rilasciati:** 180 record SG 32×32, atlas indicizzato 512×384, 14/14 corner patterns, manifest e generatore originale, rendering su Canvas con fallback. QA galleria `assets/previews/terrain-coast-qa.html`.
+- **CI HEAD PR #43438890792:** 232 PASS / 0 FAIL / 2 SKIP, Chromium HTTP carica PNG 512×384 + manifest JSON e test HUD.
+- **CI post-merge #43439241900:** SUCCESS; **Pages #43439241935:** SUCCESS su `c1a9afb39f4cd52e4a39f94addc4a5efe55444c2`.
+- **Pending manual QA:** screenshot in-game 1×/2× vs stesso punto originale, confronto su telefono Android, regole di quote/corner generator 7KAA non ancora portate. Stato `awaiting_manual_qa`, non parità integrale certificata.

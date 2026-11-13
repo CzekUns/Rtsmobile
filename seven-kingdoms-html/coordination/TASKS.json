@@ -75,7 +75,7 @@
       "title": "Coste e transizioni originali 7KAA",
       "priority": 2,
       "ownerStream": "integration",
-      "status": "ready",
+      "status": "awaiting_manual_qa",
       "dependsOn": [
         "SKH-HUD-001"
       ],
@@ -87,7 +87,7 @@
         "Decoder/atlante/manifest da asset GPL con provenienza verificata",
         "Collegamento al Canvas e test integrati senza mutare simulazione e collisioni"
       ],
-      "nextAction": "Leggere l'ultimo commit di main e il checkpoint SKH-TERRAIN-001; individuare in sorgente 7KAA i record e le regole costa/angoli, controllare licenza e risorse recuperabili, avviare decoder/manifest riproducibile sul branch assegnato. Non inventare transizioni o modificare il terreno prima del lookup verificato.",
+      "nextAction": "Released on main c1a9afb39f4cd52e4a39f94addc4a5efe55444c2. Maintain manual Android and original scene QA as pending. Do not reopen #118; only follow-up if a reproducible regression appears.",
       "acceptance": [
         "Provenienza, licenza e hash delle risorse originali documentati",
         "Atlante e manifest riproducibili per transizioni acqua/terra e casi d'angolo, senza inventare tessere mancanti",
@@ -95,14 +95,36 @@
         "Fallback grafico, zoom, salvataggi, input e collisioni preservati",
         "CI verde e release/QA documentate; parità visuale non dichiarata senza confronto"
       ],
-      "blockingIssue": null
+      "blockingIssue": null,
+      "completion": {
+        "mainSha": "c1a9afb39f4cd52e4a39f94addc4a5efe55444c2",
+        "ciUrl": "https://github.com/CzekUns/Rtsmobile/actions/runs/43439241900",
+        "prNumber": 118,
+        "merged": true,
+        "sourceCommit": "14e6fdfba9481af4dc3a54722614a608776e20bc",
+        "pagesRunId": 43439241935,
+        "pagesUrl": "https://czekuns.github.io/Rtsmobile/seven-kingdoms-html/",
+        "acceptanceVerified": false,
+        "verified": [
+          "750 Terrain DBF entries inspected; 180 original SG coast entries decoded, all 14 mixed corner masks available",
+          "SHA-256 original TERRAIN1.RES, I_TERN1.RES, PAL_STD.RES matched pinned sources",
+          "512x384 indexed PNG and 180-record manifest, reproducible converter, live Canvas wiring and fallback",
+          "Node 232 PASS / 0 FAIL / 2 SKIP on PR #118, Chromium HTTP image/manifest smoke PASS",
+          "PR #118 squash merge on main, main Actions success, Pages deployment success"
+        ],
+        "pending": [
+          "Physical Android landscape test and actual map-side pixel screenshot comparisons at zoom 1x/2x",
+          "Original 7KAA terrain corner heights/subtypes and random original pattern selection not yet ported",
+          "Shorelines of demo biome categories beyond SG are not certified as original transitions"
+        ]
+      }
     },
     {
       "id": "SKH-TERRAIN-002",
       "title": "Foreste, rocce e rilievi originali",
       "priority": 3,
       "ownerStream": "integration",
-      "status": "queued",
+      "status": "ready",
       "dependsOn": [
         "SKH-TERRAIN-001"
       ],
@@ -114,7 +136,7 @@
         "Ancoraggi, scale e occlusione unità/edifici",
         "Verifiche visuali a zoom 1x/2x"
       ],
-      "nextAction": "Ricognizione archive originali e classi di overlay nel renderer upstream; verificare prima composizione e proprietà dei record.",
+      "nextAction": "Dal checkpoint SKH-TERRAIN-002, catalogare gli originali overlay di alberi/foreste, rocce e rilievi nei sorgenti e RESOURCE del commit 7KAA pinned; verificare DBF/frame/offset/palette/licenza e rendere un insieme grafico coerente. Poi collegare il layering canvas e provare QA visiva/test, senza alterare la demo pathfinding. Evitare microfix non visibili.",
       "acceptance": [
         "Bitmap originali verificabili e manifest con provenienza",
         "Rendering differenziato e profondità compatibili con unità/edifici",
