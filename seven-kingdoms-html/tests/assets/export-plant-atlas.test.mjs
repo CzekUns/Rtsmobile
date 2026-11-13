@@ -48,3 +48,14 @@ test('large original bitmap archive is rejected before atlas allocation',()=>{
  const inputs={...f,bitmapArchive:huge,expectedHashes:{...f.expectedHashes,I_PLANT1:hash(huge)}};
  assert.throws(()=>exportPlantAtlas(inputs),/safe pixel limit/);
 });
+
+test('accepts authentic PAL_STD.RES resource header and rejects malformed header',()=>{
+ const f=fixture(),wrapped=new Uint8Array(776);
+ new DataView(wrapped.buffer).setUint32(0,0x308,true);
+ wrapped.set(f.palette,8);
+ const ok={...f,palette:wrapped,expectedHashes:{...f.expectedHashes,PAL_STD:hash(wrapped)}};
+ assert.deepEqual(exportPlantAtlas(ok).png,exportPlantAtlas(f).png);
+ const malformed=wrapped.slice();
+ malformed[0]=0;
+ assert.throws(()=>exportPlantAtlas({...ok,palette:malformed,expectedHashes:{...ok.expectedHashes,PAL_STD:hash(malformed)}}),/PAL_STD.RES header/);
+});
