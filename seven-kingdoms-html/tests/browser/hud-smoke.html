@@ -29,7 +29,20 @@ async function run(){
  commands.click();
  assert(commands.getAttribute('aria-expanded')==='false','COMANDI did not collapse');
  assert(get('fullscreenBtn')&&get('gameMenu')&&get('minimap'),'core HUD controls missing');
- output.textContent='PASS: ORDINI, report dialog, COMANDI and core HUD';
+ // Exercise the real game keyboard/save and pause controls, not only DOM presence.
+ const pause=get('pauseBtn'),date=get('date'),ticker=get('ticker');
+ assert(date.textContent.trim().length>0,'game date not rendered');
+ pause.click();
+ assert(pause.getAttribute('title')||pause.textContent,'pause control became empty');
+ pause.click();
+ d.dispatchEvent(new w.KeyboardEvent('keydown',{key:'s',bubbles:true}));
+ assert(/salvat/i.test(ticker.textContent),'keyboard save did not report a result');
+ const menu=get('menuBtn');
+ menu.click();
+ assert(menu.getAttribute('aria-expanded')==='true'&&!get('gameMenu').hidden,'game menu did not open');
+ menu.click();
+ assert(menu.getAttribute('aria-expanded')==='false'&&get('gameMenu').hidden,'game menu did not close');
+ output.textContent='PASS: ORDINI, reports, COMANDI, menu, pause, save and core HUD';
 }
 frame.addEventListener('load',()=>run().catch(e=>output.textContent='FAIL: '+e.message));
 setTimeout(()=>{if(output.textContent==='PENDING')output.textContent='FAIL: browser smoke timeout'},12000);
