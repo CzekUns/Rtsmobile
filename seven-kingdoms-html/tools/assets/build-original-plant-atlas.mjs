@@ -1,6 +1,6 @@
 // SKH-TERRAIN-002: one reproducible acquisition -> verified atlas -> QA pipeline.
 // Original 7KAA GPL-2.0-or-later bytes only; never manufacture missing assets.
-import {mkdir,writeFile,readFile} from 'node:fs/promises';
+import {mkdir,writeFile} from 'node:fs/promises';
 import {join} from 'node:path';
 import {acquirePlantResources,SOURCE_COMMIT} from './fetch-plant-resources.mjs';
 import {exportPlantAtlas} from './export-plant-atlas.mjs';
