@@ -29,3 +29,22 @@ test('refuses missing or mismatched provenance, palette and upstream commit',()=
  assert.throws(()=>exportPlantAtlas({...f,sourceCommit:'unknown'}),/unpinned/);
  assert.throws(()=>exportPlantAtlas({...f,palette:new Uint8Array(3)}),/SHA-256|palette/);
 });
+
+test('transparent palette entry is explicit and yields PNG tRNS, without changing indexed pixels',()=>{
+ const f=fixture();
+ const opaque=exportPlantAtlas(f),transparent=exportPlantAtlas({...f,transparentIndex:7});
+ assert.equal(transparent.manifest.transparentIndex,7);
+ assert.equal(opaque.png.includes(Buffer.from('tRNS')),false);
+ assert.equal(transparent.png.includes(Buffer.from('tRNS')),true);
+ const start=transparent.png.indexOf(Buffer.from('tRNS'))+4;
+ assert.equal(transparent.png[start+7],0);
+ assert.deepEqual([...transparent.png.subarray(start,start+7)],Array(7).fill(255));
+ for(const invalid of [-1,256,2.5,'7'])assert.throws(()=>exportPlantAtlas({...f,transparentIndex:invalid}),/transparent index/);
+});
+test('large original bitmap archive is rejected before atlas allocation',()=>{
+ const f=fixture();
+ const huge=new Uint8Array(4+4096*4096);
+ huge[0]=0;huge[1]=16;huge[2]=0;huge[3]=16;
+ const inputs={...f,bitmapArchive:huge,expectedHashes:{...f.expectedHashes,I_PLANT1:hash(huge)}};
+ assert.throws(()=>exportPlantAtlas(inputs),/safe pixel limit/);
+});
