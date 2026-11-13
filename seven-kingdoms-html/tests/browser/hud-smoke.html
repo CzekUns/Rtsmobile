@@ -35,8 +35,12 @@ async function run(){
  pause.click();
  assert(pause.getAttribute('title')||pause.textContent,'pause control became empty');
  pause.click();
- d.dispatchEvent(new w.KeyboardEvent('keydown',{key:'s',bubbles:true}));
- assert(/salvat/i.test(ticker.textContent),'keyboard save did not report a result');
+ // The first launch opens the instructions modal; shortcuts are deliberately disabled while it is open.
+ const help=get('helpDialog');
+ if(help.open)help.close();
+ d.body.focus();
+ d.dispatchEvent(new w.KeyboardEvent('keydown',{key:'s',bubbles:true,cancelable:true}));
+ assert(/salvat/i.test(ticker.textContent),'keyboard save did not report a result after dismissing instructions');
  const menu=get('menuBtn');
  menu.click();
  assert(menu.getAttribute('aria-expanded')==='true'&&!get('gameMenu').hidden,'game menu did not open');
