@@ -32,3 +32,14 @@ test('invalid sizes and unknown codes fail closed',()=>{
   assert.throws(()=>parseTerrainRec(new Uint8Array(25)),RangeError);
   assert.throws(()=>parseTerrainRec(fixture(['X0','S0','G0','G0'])),/corner/);
 });
+
+test('upstream scan requires exact special flag; blank maps only to zero',()=>{
+  const normal=parseTerrainRec(fixture(['S*','G*','S*','G*']));
+  const special=parseTerrainRec(fixture(['S*','G*','S*','G*']));
+  special.specialFlag='X';
+  const corners=[{type:1,mask:2},{type:2,mask:2},{type:1,mask:2},{type:2,mask:2}];
+  assert.equal(firstMatchingTerrain([normal,special],corners,0)?.terrainId,1);
+  assert.equal(firstMatchingTerrain([normal,special],corners,'X'.charCodeAt(0))?.terrainId,2);
+  assert.equal(firstMatchingTerrain([normal],corners,'X'.charCodeAt(0)),null);
+  assert.equal(firstMatchingTerrain([special],corners,0),null);
+});
