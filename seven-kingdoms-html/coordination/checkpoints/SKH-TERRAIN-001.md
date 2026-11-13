@@ -1,15 +1,16 @@
 # Checkpoint · SKH-TERRAIN-001 — coste e transizioni 7KAA
 
-- Data: 2026-11-13, esecuzione dopo transizione HUD.
-- Stato: IN_PROGRESS, nessun asset costa originale ancora recuperato o renderizzato.
-- Base: main dopo merge #115 (STATE indica ec628a2edf87e0d3d2f46a338d751057fd1ca55a).
+- Data: 2026-11-13, continuazione del task attivo da PR #118.
+- Stato: IN_PROGRESS. Nessuna bitmap originale costa ancora convertita o collegata al Canvas.
 - Branch: `agent/skh-integration/original-coast-transitions`.
-- Ultimo SHA codice prima di questo checkpoint: `0eebe8e7ddf15ee5d91417ed8c0fa5020845976c`.
-- File aggiunti: `tools/assets/coast-manifest.mjs`, `tests/assets/coast-manifest.test.mjs`.
-- Funzione: manifest fail-closed con source URL/commit/licenza/hash, record con offset/length e 4 corner; lookup solo su corrispondenza unica, altrimenti null (fallback). Nessuna modifica al Canvas, collisioni, salvataggi o HUD.
-- Provenienza originale: NON VERIFICATA. Tentativi: `https://github.com/7kfans/7kaa` via connector `src/OTERRAIN.cpp`, `src/OTERRAIN.h`, `COPYING` -> HTTP 404; `git ls-remote https://github.com/7kfans/7kaa.git HEAD` -> `Could not resolve host: github.com`. Nessun record, corner order, hash o licenza di archivio affermato come autentico. URL e hash del test sono fixture fittizie, mai asset.
-- Test: suite npm locale NON ESEGUITA (DNS impedisce checkout); nuovi test Node aggiunti, CI HEAD da verificare. Pages: solo precedente release HUD, nessun deploy terrain.
-- Nota tecnica: lo schema di manifest e l'ordine corner sono provvisori e non sono una prova di formato upstream. Il lookup non va collegato al renderer prima di verificare le convenzioni 7KAA.
+- HEAD codice prima del checkpoint: `684f9d0a01abc95ecca9ee59f773065bda0c2c0d`.
+- PR: https://github.com/CzekUns/Rtsmobile/pull/118 (draft).
+- Nuovi file: `tools/assets/terrain-record.mjs`, `tests/assets/terrain-record.test.mjs`. Decoder di record TERRAIN a 26 byte, ordine angoli NW/NE/SW/SE, tipo S/G/F/D, sottotipo -,0,+,A,B,*, bitmap offset little-endian e classificazione costa. Lookup deterministico di primo record con maschere, senza simulare alternative casuali o decodificare ancora l'involucro .RES. Test di struttura, coast flag, maschere e input non valido.
+- Correzione della ricerca precedente: `7kfans/7kaa` non esiste su GitHub (404). Mirror upstream verificato: https://github.com/the3dfxdude/7kaa, commit `14e6fdfba9481af4dc3a54722614a608776e20bc` (archiviato; README rimanda al SourceForge attuale).
+- Sorgenti originali: `include/OTERRAIN.h` blob Git SHA-1 `9d45dd521bd5575ec0c7841074f7babed97f3af9`; `src/OTERRAIN.cpp` blob Git SHA-1 `431d253821b42d6b7efb13e99d8684a61c9099f5`. Definiscono TerrainRec, TerrainRes::scan, terrain_code, terrain_mask, nomi risorse. `COPYING` blob Git SHA-1 `1ccdf0d7944e56490c15f8f9d8d159e2f2e577d2` dichiara GPL v2 per codice e dati.
+- Archivi upstream presenti in `data/RESOURCE/`: `TERRAIN1.RES` (20636 byte, Git blob SHA-1 `8e9c2fc8799d2cfac2b4c531099841dd4e1ae5ac`), `I_TERN1.RES` (577920 byte, Git blob SHA-1 `25bd3189590f7573f0121b28eb120566d411f8ab`), `I_TERA1.RES` (223023 byte). **Questi sono SHA-1 Git dei blob, NON SHA-256 dei byte degli archivi**; non usarli nel campo source.sha256. Non è stata estratta nessuna risorsa binaria, nessuna fixture reale. `TERRAIN1.RES` non è ancora dimostrato essere una sequenza nuda di record da 26 byte: non applicare il decoder direttamente al file senza analizzare l'intestazione DB.
+- Test: file Node aggiunti, `npm --prefix seven-kingdoms-html test` e `npm --prefix seven-kingdoms-html run check` NON eseguiti localmente (checkout GitHub non disponibile); workflow associati a HEAD `684f9d0`: nessuno al momento della consultazione. Nessuna CI verde dichiarata. Pages non modificato; nessun Android o QA visivo.
+- Rischio tecnico: il manifest `coast-manifest.mjs` precedente usa corner semplificati land/water e necessita adeguamento a tipi/mask autentici prima di wiring. Il nuovo decoder non inventa record o sprite.
 
 ## Singolo prossimo passo
-Recuperare tramite sorgente 7KAA realmente accessibile `OTERRAIN.cpp` e tabelle/archivi terreno con commit, licenza e hash verificabili; confrontare l'ordine dei corner e il layout dei record con lo schema, correggere lo schema e scrivere fixture reali prima di collegare Canvas.
+Controllare la CI sull'HEAD aggiornato della PR #118; quindi recuperare i byte di `data/RESOURCE/TERRAIN1.RES` e `I_TERN1.RES` dal mirror 7KAA GPL, verificare SHA-256 e framing del database/resource, estrarre i primi record REALI e scrivere fixture con id/offset prima di collegare il Canvas.
