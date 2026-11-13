@@ -47,7 +47,8 @@ test('fullscreen HTML and HUD overlays are layered above the map, not cutting it
  assert.ok(html.includes('id="orderSidebar"'));
  assert.ok(game.includes('syncFullscreenCanvas(view,rect.width,rect.height,window.devicePixelRatio||1)'));
  assert.ok(game.includes("new ResizeObserver(resizeStage).observe($('world'))"));
- assert.ok(game.includes("setOrdersVisible(!compactOrders.matches"));
+ assert.ok(game.includes("installOrdersSidebar({"));
+ assert.ok(game.includes("media:window.matchMedia('(max-width:1000px) and (pointer:coarse)')"));
  assert.ok(/style\.css\?v=\d+/.test(html)&&/game\.js\?v=\d+/.test(html));
 });
 test('classic pop-out is accessible and starts collapsed, with controls on the lower left',()=>{
