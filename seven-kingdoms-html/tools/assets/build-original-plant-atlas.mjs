@@ -9,7 +9,7 @@ import {renderPlantAtlasPreview} from './plant-atlas-preview.mjs';
 export async function buildOriginalPlantAtlas({fetcher=fetch,outputDir,transparentIndex}={}){
   if(!outputDir)throw Error('outputDir is required');
   const acquired=await acquirePlantResources({fetcher});
-  const hashes=Object.fromEntries(acquired.manifest.resources.map(r=>[r.name.replace(/\\.RES$/,'') ,r.sha256]));
+  const hashes=Object.fromEntries(acquired.manifest.resources.map(r=>[r.name.replace(/\.RES$/,'') ,r.sha256]));
   const result=exportPlantAtlas({
     plantDb:acquired.files['PLANT1.RES'],
     bitmapDb:acquired.files['PLANTBM1.RES'],
@@ -23,7 +23,7 @@ export async function buildOriginalPlantAtlas({fetcher=fetch,outputDir,transpare
   await mkdir(outputDir,{recursive:true});
   // Only publish after all four downloads, integrity checks, decode and preview succeed.
   await writeFile(join(outputDir,'plant-original.png'),result.png,{flag:'wx'});
-  await writeFile(join(outputDir,'plant-original.json'),JSON.stringify({...result.manifest,upstreamResources:acquired.manifest.resources},null,2)+'\\n',{flag:'wx'});
+  await writeFile(join(outputDir,'plant-original.json'),JSON.stringify({...result.manifest,upstreamResources:acquired.manifest.resources},null,2)+'\n',{flag:'wx'});
   await writeFile(join(outputDir,'plant-original-qa.html'),preview,{flag:'wx'});
   return {manifest:result.manifest,resources:acquired.manifest.resources};
 }
