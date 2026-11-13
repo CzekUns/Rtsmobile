@@ -72,8 +72,32 @@ async function run(){
   await delay(20);
   assert(requested,'fullscreen button did not request fullscreen');
  }finally{d.documentElement.requestFullscreen=originalRequest}
- output.textContent='PASS: ORDINI, reports, COMANDI, menu, pause, save, MOD, joystick and fullscreen request';
+ // Check a real save/reload cycle using the public game controls.
+ // The pagehide handler also saves the game; a reloaded game must recover
+ // the selected speed from localStorage through SevenGame.load().
+ d.dispatchEvent(new w.KeyboardEvent('keydown',{key:'3',bubbles:true,cancelable:true}));
+ assert(/3×/.test(get('gameSpeed').textContent),'speed shortcut did not change speed');
+ d.dispatchEvent(new w.KeyboardEvent('keydown',{key:'s',bubbles:true,cancelable:true}));
+ const saved=JSON.parse(w.localStorage.getItem('seven-kingdoms-html-native-v1')||'null');
+ assert(saved&&saved.speed===3,'game speed was not serialized by keyboard save');
+ await new Promise((resolve,reject)=>{
+  const timeout=setTimeout(()=>reject(Error('saved game iframe reload timed out')),3500);
+  frame.addEventListener('load',()=>{clearTimeout(timeout);resolve()},{once:true});
+  w.location.reload();
+ });
+ await delay(550);
+ const reloaded=frame.contentDocument;
+ assert(/3×/.test(reloaded.getElementById('gameSpeed').textContent),
+  'game reload did not restore the saved speed');
+ assert(reloaded.getElementById('world').getBoundingClientRect().width>0,
+  'map canvas hidden after save/load');
+ output.textContent='PASS: ORDINI, reports, meters, COMANDI, MOD, joystick, fullscreen request and save/load';
 }
-frame.addEventListener('load',()=>run().catch(e=>output.textContent='FAIL: '+e.message));
+let smokeStarted=false;
+frame.addEventListener('load',()=>{
+ if(smokeStarted)return; // Save/load smoke deliberately reloads this iframe.
+ smokeStarted=true;
+ run().catch(e=>output.textContent='FAIL: '+e.message);
+});
 setTimeout(()=>{if(output.textContent==='PENDING')output.textContent='FAIL: browser smoke timeout'},12000);
 </script></body></html>
