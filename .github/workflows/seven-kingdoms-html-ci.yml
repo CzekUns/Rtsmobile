@@ -56,6 +56,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Capture bounded original PLANT compressed-record diagnostics
+        run: |
+          node seven-kingdoms-html/tools/assets/fetch-plant-resources.mjs "$RUNNER_TEMP/skh-plant-source"
+          node seven-kingdoms-html/tools/assets/inspect-plant-compression.mjs "$RUNNER_TEMP/skh-plant-source/PLANTBM1.RES" "$RUNNER_TEMP/skh-plant-source/I_PLANT1.RES" "$RUNNER_TEMP/skh-plant-source/plant-compression-diagnostics.json"
+      - name: Upload compressed PLANT record diagnostics even if atlas export fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: skh-terrain-002-compression-diagnostics
+          path: ${{ runner.temp }}/skh-plant-source/plant-compression-diagnostics.json
+          if-no-files-found: warn
+          retention-days: 14
       - name: Acquire pinned original PLANT resources and render reproducible atlas
         run: node seven-kingdoms-html/tools/assets/build-original-plant-atlas.mjs "$RUNNER_TEMP/skh-plant-atlas"
       - name: Upload original PNG, manifest with SHA-256, and 1x/2x QA preview
