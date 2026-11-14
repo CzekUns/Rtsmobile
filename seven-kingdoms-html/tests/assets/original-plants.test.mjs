@@ -32,3 +32,28 @@ test('unavailable PLANT atlas preserves fallback',async()=>{
  await p.loading;
  assert.equal(p.draw({},0,0,24,1,0,0),false);
 });
+
+test('published original PLANT PNG matches pinned manifest and has transparency',async()=>{
+ const {readFile} = await import('node:fs/promises');
+ const {fileURLToPath} = await import('node:url');
+ const png=await readFile(fileURLToPath(new URL('../../assets/previews/plant-original.png',import.meta.url)));
+ const data=JSON.parse(await readFile(fileURLToPath(new URL('../../assets/manifests/plant-original.json',import.meta.url)),'utf8'));
+ assert.equal(validatePlantManifest(data),true);
+ assert.equal(data.plantCount,data.bitmaps.length);
+ assert.deepEqual([...png.subarray(0,8)],[137,80,78,71,13,10,26,10]);
+ assert.equal(png.toString('ascii',12,16),'IHDR');
+ assert.equal(png.readUInt32BE(16),data.width);
+ assert.equal(png.readUInt32BE(20),data.height);
+ let cursor=8,hasTransparency=false,hasImageData=false;
+ while(cursor+12<=png.length){
+  const size=png.readUInt32BE(cursor),type=png.toString('ascii',cursor+4,cursor+8);
+  assert.ok(size<=png.length-cursor-12,'PNG chunk must fit file');
+  if(type==='tRNS')hasTransparency=true;
+  if(type==='IDAT')hasImageData=true;
+  cursor+=size+12;
+  if(type==='IEND')break;
+ }
+ assert.equal(hasTransparency,true,'indexed original atlas must declare transparent index');
+ assert.equal(hasImageData,true);
+ assert.equal(cursor,png.length,'no trailing or truncated PNG chunks');
+});
