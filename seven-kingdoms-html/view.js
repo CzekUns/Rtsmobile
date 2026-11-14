@@ -5,6 +5,7 @@ import {WORLD_W,WORLD_H,NATIONS,FIRMS,terrain,range} from './rules.js';
 import {OriginalSpritePreview,compassDirection,walkingFrame} from './playtest/original-sprites.js';
 import {OriginalTerrainPreview} from './playtest/original-terrain.js';
 import {OriginalCoastPreview} from './playtest/original-coast.js';
+import {OriginalPlantPreview} from './playtest/original-plants.js';
 import {worldPainterOrder} from './world-depth-order.js';
 import {createMinimapTerrainLayer,minimapFootprint,minimapViewport} from './playtest/minimap-system.js';
 const COLORS={
@@ -20,6 +21,7 @@ export class WorldView{
   this.originalSprites=previewOriginalSprites?new OriginalSpritePreview():null;
   this.originalTerrain=previewOriginalSprites?new OriginalTerrainPreview():null;
   this.originalCoast=previewOriginalSprites&&previewOriginalCoasts?new OriginalCoastPreview():null;
+  this.originalPlants=previewOriginalSprites?new OriginalPlantPreview():null;
   this.spriteMotion=new Map();this.spritePaused=false;
   this.mini=mini;this.mctx=mini.getContext('2d');
   this.minimapTerrain=createMinimapTerrainLayer({worldW:WORLD_W,worldH:WORLD_H,terrain,
@@ -54,7 +56,15 @@ export class WorldView{
   const bottom=Math.min(WORLD_H,Math.ceil(this.cy+h/(2*t))+1);
   // Read actual atlas success: an apparently decoded image may fail drawImage.
   this.authenticTilesDrawn=0;
+  this.authenticPlantsDrawn=0;
   for(let y=top;y<bottom;y++)for(let x=l;x<r;x++)this.tileDraw(g,ctx,x,y,t);
+  // Landscape overlays are visual-only: keep them below the existing
+  // world painter order so unit, town and firm interaction stays unchanged.
+  if(this.originalPlants?.isReady())for(let y=top;y<bottom;y++)for(let x=l;x<r;x++){
+   if(terrain(g.seed,x,y)!=='forest')continue;
+   const p=this.screen(x,y);
+   if(this.originalPlants.draw(ctx,p.x,p.y,t,g.seed,x,y))this.authenticPlantsDrawn++;
+  }
   this.drawDemoLinks(g,ctx,t);
   const group=new Set(groupIds);
   this.spritePaused=!!g.paused;
@@ -126,7 +136,7 @@ export class WorldView{
   // Authentic atlas tiles already contain their own painted ground details.
   // Never superimpose the demo's procedural trees, hills or water strokes.
   // Keep those symbols only for the fallback while the verified atlas is unavailable.
-  if(originalGround||t<10)return;
+  if(originalGround||t<10||type==='forest'&&this.originalPlants?.isReady())return;
   if(type==='forest'&&n>.12){
    ctx.fillStyle='#273f2b';ctx.beginPath();ctx.moveTo(p.x+t*.52,p.y+t*.07);ctx.lineTo(p.x+t*.14,p.y+t*.75);ctx.lineTo(p.x+t*.87,p.y+t*.75);ctx.closePath();ctx.fill();
    ctx.fillStyle='#315b32';ctx.beginPath();ctx.arc(p.x+t*.52,p.y+t*.45,t*.20,0,Math.PI*2);ctx.fill();

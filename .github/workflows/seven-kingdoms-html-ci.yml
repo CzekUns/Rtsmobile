@@ -39,9 +39,88 @@ jobs:
         env:
           CHROME_BIN: google-chrome
         run: node seven-kingdoms-html/tests/browser/run-hud-smoke.mjs
+      - name: Chromium original PLANT gallery HTTP and screenshot 1x/2x
+        env:
+          CHROME_BIN: google-chrome
+          PLANT_QA_SCREENSHOT: ${{ runner.temp }}/plant-1x-2x.png
+          PLANT_QA_SCENE_SCREENSHOT: ${{ runner.temp }}/plant-worldview-1x-2x.png
+        run: |
+          if test -f seven-kingdoms-html/assets/previews/plant-original.png; then
+            node seven-kingdoms-html/tests/browser/run-plant-visual-smoke.mjs
+          else
+            echo "PLANT asset not present on this branch; gallery QA skipped."
+          fi
+      - name: Upload real Chromium PLANT gallery screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: skh-terrain-002-chromium-plant-1x-2x
+          path: |
+            ${{ runner.temp }}/plant-1x-2x.png
+            ${{ runner.temp }}/plant-worldview-1x-2x.png
+          if-no-files-found: warn
+          retention-days: 14
       - name: Enforce ownership on agent branches only
         if: github.event_name == 'pull_request'
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           PR_BRANCH: ${{ github.head_ref }}
         run: node seven-kingdoms-html/tools/check-workstream.mjs
+
+  original-plant-atlas:
+    name: Original 7KAA PLANT atlas acquisition
+    if: github.ref == 'refs/heads/agent/skh-integration/original-landscape-overlays' || github.head_ref == 'agent/skh-integration/original-landscape-overlays'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Capture bounded original PLANT compressed-record diagnostics
+        run: |
+          node seven-kingdoms-html/tools/assets/fetch-plant-resources.mjs "$RUNNER_TEMP/skh-plant-source"
+          node seven-kingdoms-html/tools/assets/inspect-plant-compression.mjs "$RUNNER_TEMP/skh-plant-source/PLANTBM1.RES" "$RUNNER_TEMP/skh-plant-source/I_PLANT1.RES" "$RUNNER_TEMP/skh-plant-source/plant-compression-diagnostics.json"
+      - name: Upload compressed PLANT record diagnostics even if atlas export fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: skh-terrain-002-compression-diagnostics
+          path: ${{ runner.temp }}/skh-plant-source/plant-compression-diagnostics.json
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Acquire pinned original PLANT resources and render reproducible atlas
+        run: node seven-kingdoms-html/tools/assets/build-original-plant-atlas.mjs "$RUNNER_TEMP/skh-plant-atlas"
+      - name: Upload original PNG, manifest with SHA-256, and 1x/2x QA preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: skh-terrain-002-original-plant-atlas
+          path: |
+            ${{ runner.temp }}/skh-plant-atlas/plant-original.png
+            ${{ runner.temp }}/skh-plant-atlas/plant-original.json
+            ${{ runner.temp }}/skh-plant-atlas/plant-original-qa.html
+          if-no-files-found: error
+          retention-days: 14
+      - name: Publish source-verified PLANT atlas to task branch
+        # The export is deterministic. Only the task branch push may write.
+        # No PR/fork token is granted write access.
+        if: github.event_name == 'push' && github.ref == 'refs/heads/agent/skh-integration/original-landscape-overlays'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          mkdir -p seven-kingdoms-html/assets/previews seven-kingdoms-html/assets/manifests
+          cp "$RUNNER_TEMP/skh-plant-atlas/plant-original.png" seven-kingdoms-html/assets/previews/plant-original.png
+          cp "$RUNNER_TEMP/skh-plant-atlas/plant-original.json" seven-kingdoms-html/assets/manifests/plant-original.json
+          git add seven-kingdoms-html/assets/previews/plant-original.png seven-kingdoms-html/assets/manifests/plant-original.json
+          if git diff --cached --quiet; then
+            echo "Original PLANT atlas already matches committed bytes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "assets(7kaa): publish verified original PLANT atlas"
+          # Never force-push or overwrite concurrent work.
+          git push origin "HEAD:refs/heads/agent/skh-integration/original-landscape-overlays"

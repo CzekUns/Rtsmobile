@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>7KAA PLANT — verifica originale 1× / 2×</title>
+<style>
+body{background:#1d2923;color:#f2ebd5;font:15px system-ui,sans-serif;margin:20px}
+main{max-width:1100px;margin:auto}a{color:#e9d391}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+section{background:#2b3b31;border:1px solid #627563;padding:15px;border-radius:8px;overflow:auto}
+canvas{display:block;image-rendering:pixelated;background:#263c30;max-width:none}
+small{color:#c7d2c3}code{overflow-wrap:anywhere}
+</style></head><body><main>
+<h1>PLANT originale 7KAA — confronto 1× / 2×</h1>
+<p>Atlante e manifest pubblicati dal decoder GPL. Le posizioni sono una scena dimostrativa deterministica: non certificano il generatore originale, le occlusioni con edifici o la parità pixel del gioco.</p>
+<p id="status" role="status">Caricamento asset originali…</p>
+<div class="grid"><section><h2>1× · tessera 32 px</h2><canvas id="one" width="320" height="256"></canvas></section>
+<section><h2>2× · tessera 64 px</h2><canvas id="two" width="640" height="512"></canvas></section></div>
+<p><small id="source"></small></p>
+<p><a href="../../index.html">Gioco</a> · <a href="../manifests/plant-original.json">Manifest PLANT</a></p>
+</main><script type="module">
+import {OriginalPlantPreview} from '../../playtest/original-plants.js';
+const status=document.querySelector('#status');
+const preview=new OriginalPlantPreview();
+await preview.loading;
+const image=preview.image;
+if(!image.complete||!image.naturalWidth){
+ await new Promise(resolve=>{image.addEventListener('load',resolve,{once:true});image.addEventListener('error',resolve,{once:true});});
+}
+if(!preview.isReady()){
+ status.textContent='ERRORE: PNG o manifest originale mancante/non valido. Nessuna grafica sostitutiva.';
+}else{
+ const manifest=preview.manifest;
+ document.querySelector('#source').textContent='Fonte: '+manifest.source+' @ '+manifest.sourceCommit+' · '+manifest.bitmaps.length+' frame bitmap';
+ let failures=0,drawn=0;
+ for(const [id,tile] of [['one',32],['two',64]]){
+  const canvas=document.getElementById(id),ctx=canvas.getContext('2d');
+  ctx.imageSmoothingEnabled=false;
+  // Stesse coordinate di griglia a due scale; il renderer applica gli offset originali.
+  for(let y=0;y<8;y++)for(let x=0;x<10;x++){
+   if((x+3*y)%3!==0)continue;
+   const ok=preview.draw(ctx,x*tile,y*tile,tile,19,x,y);
+   if(ok)drawn++;else failures++;
+  }
+ }
+ status.textContent=failures?'ERRORE: '+failures+' sprite non disegnati':'OK: '+drawn+' disegni a scala nativa 1×/2× (QA visiva manuale ancora richiesta)';
+}
+</script></body></html>
