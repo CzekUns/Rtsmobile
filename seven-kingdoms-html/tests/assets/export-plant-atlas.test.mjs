@@ -13,7 +13,7 @@ function put(b,start,length,s){b.set(enc.encode(String(s).padEnd(length,' ')),st
 function fixture(){
  const p=new Uint8Array(21);put(p,0,8,'TREE');put(p,8,1,'2');put(p,9,2,'  ');put(p,11,2,'  ');put(p,13,2,'  ');put(p,15,3,'001');put(p,18,3,'000');
  const b=new Uint8Array(29);put(b,0,8,'TREE');put(b,8,2,'01');put(b,10,3,'000');put(b,13,3,'000');put(b,16,1,'1');put(b,17,8,'TREE');
- const sources={PLANT1:dbf(21,[p]),PLANTBM1:dbf(29,[b]),I_PLANT1:Uint8Array.from([2,0,1,0,7,8]),PAL_STD:new Uint8Array(768)};
+ const sources={PLANT1:dbf(21,[p]),PLANTBM1:dbf(29,[b]),I_PLANT1:Uint8Array.from([6,0,0,0,2,0,1,0,7,8]),PAL_STD:new Uint8Array(768)};
  return {plantDb:sources.PLANT1,bitmapDb:sources.PLANTBM1,bitmapArchive:sources.I_PLANT1,palette:sources.PAL_STD,expectedHashes:Object.fromEntries(Object.entries(sources).map(([k,v])=>[k,hash(v)])),sourceCommit:'14e6fdfba9481af4dc3a54722614a608776e20bc'};
 }
 test('exports byte-preserving indexed PNG and deterministic manifest from hash-locked fixtures',()=>{
@@ -43,8 +43,8 @@ test('transparent palette entry is explicit and yields PNG tRNS, without changin
 });
 test('large original bitmap archive is rejected before atlas allocation',()=>{
  const f=fixture();
- const huge=new Uint8Array(4+4096*4096);
- huge[0]=0;huge[1]=16;huge[2]=0;huge[3]=16;
+ const huge=new Uint8Array(8+4096*4096);
+ new DataView(huge.buffer).setUint32(0,4+4096*4096,true);\n huge[4]=0;huge[5]=16;huge[6]=0;huge[7]=16;
  const inputs={...f,bitmapArchive:huge,expectedHashes:{...f.expectedHashes,I_PLANT1:hash(huge)}};
  assert.throws(()=>exportPlantAtlas(inputs),/safe pixel limit/);
 });
