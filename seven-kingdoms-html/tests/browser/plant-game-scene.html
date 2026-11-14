@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><title>SKH-TERRAIN-002 actual WorldView scene</title>
+<style>body{margin:0;background:#222;color:#fff;font:14px monospace}canvas{display:block;image-rendering:pixelated}#world{width:960px;height:600px}#minimap{display:none}</style>
+<p id="status" role="status">Loading original landscape…</p>
+<canvas id="world" width="960" height="600"></canvas><canvas id="minimap" width="184" height="137"></canvas>
+<script type="module">
+import {SevenGame,terrain,WORLD_W,WORLD_H} from '../../rules.js';
+import {WorldView} from '../../view.js';
+const status=document.getElementById('status');
+try{
+ const g=new SevenGame();
+ const view=new WorldView(document.getElementById('world'),document.getElementById('minimap'),{previewOriginalSprites:true});
+ await view.originalPlants.loading;
+ await Promise.all([view.originalPlants.image.decode(),view.originalTerrain?.image?.decode?.().catch(()=>{})].filter(Boolean));
+ if(!view.originalPlants.isReady())throw Error('Original PLANT image/manifest not ready');
+ let found=null;
+ for(let y=5;y<WORLD_H-5&&!found;y++)for(let x=5;x<WORLD_W-5;x++){
+  if(terrain(g.seed,x,y)==='forest'){found={x,y};break}
+ }
+ if(!found)throw Error('No forest tile in actual demo terrain');
+ view.center(found.x,found.y);
+ view.zoom=1;view.draw(g,null);
+ const count1=view.authenticPlantsDrawn;
+ if(count1<1)throw Error('No original PLANT pixels rendered at 1x');
+ const canvas=document.getElementById('world');
+ const first=document.createElement('canvas');first.width=canvas.width;first.height=canvas.height;
+ first.getContext('2d').drawImage(canvas,0,0);
+ view.zoom=2;view.draw(g,null);
+ const count2=view.authenticPlantsDrawn;
+ if(count2<1)throw Error('No original PLANT pixels rendered at 2x');
+ const second=document.createElement('canvas');second.width=canvas.width;second.height=canvas.height;
+ second.getContext('2d').drawImage(canvas,0,0);
+ canvas.replaceWith(first,second);
+ status.textContent='PASS: WorldView actual scene PLANT 1x='+count1+' 2x='+count2+'; towns='+g.towns.length+' firms='+g.firms.length+' units='+g.units.length;
+}catch(e){status.textContent='FAIL: '+e.message;document.body.dataset.failed='true'}
+</script></html>
