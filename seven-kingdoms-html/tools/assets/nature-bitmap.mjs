@@ -5,7 +5,10 @@ import {parseNatureDatabase} from './nature-database.mjs';
 export function readPlantBitmap(archive, offset) {
   if (!(archive instanceof Uint8Array) || !Number.isSafeInteger(offset) || offset < 0 || offset + 8 > archive.length)
     throw Error('plant bitmap offset outside archive');
-  const recordLength = new DataView(archive.buffer, archive.byteOffset + offset, 4).getUint32(0, true);\n  if (recordLength < 4 || recordLength > archive.length - offset - 4) throw Error('invalid plant resource record length');\n  const start = offset + 4;\n  const view = new DataView(archive.buffer, archive.byteOffset + start, 4);
+  const recordLength = new DataView(archive.buffer, archive.byteOffset + offset, 4).getUint32(0, true);
+  if (recordLength < 4 || recordLength > archive.length - offset - 4) throw Error('invalid plant resource record length');
+  const start = offset + 4;
+  const view = new DataView(archive.buffer, archive.byteOffset + start, 4);
   const width = view.getInt16(0, true), height = view.getInt16(2, true);
   if (width <= 0 || height <= 0 || width > 4096 || height > 4096)
     throw Error('invalid plant bitmap dimensions');
