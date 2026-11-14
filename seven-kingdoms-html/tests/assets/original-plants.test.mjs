@@ -39,7 +39,8 @@ test('published original PLANT PNG matches pinned manifest and has transparency'
  const png=await readFile(fileURLToPath(new URL('../../assets/previews/plant-original.png',import.meta.url)));
  const data=JSON.parse(await readFile(fileURLToPath(new URL('../../assets/manifests/plant-original.json',import.meta.url)),'utf8'));
  assert.equal(validatePlantManifest(data),true);
- assert.equal(data.plantCount,data.bitmaps.length);
+ assert.equal(data.plantCount,new Set(data.bitmaps.map(bitmap=>bitmap.plant)).size,'PLANT DBF records count distinct plant families, not individual bitmap frames');
+ assert.ok(data.bitmaps.length>=data.plantCount,'atlas includes one or more original frames per plant family');
  assert.deepEqual([...png.subarray(0,8)],[137,80,78,71,13,10,26,10]);
  assert.equal(png.toString('ascii',12,16),'IHDR');
  assert.equal(png.readUInt32BE(16),data.width);
