@@ -78,3 +78,27 @@ test('published original PLANT PNG matches pinned manifest and has transparency'
  assert.equal(hasImageData,true);
  assert.equal(cursor,png.length,'no trailing or truncated PNG chunks');
 });
+
+test('PLANT 1x/2x Canvas geometry keeps original offsets and crisp pixels',async()=>{
+ const img={complete:true,naturalWidth:16,naturalHeight:16};
+ const p=new OriginalPlantPreview({imageFactory:()=>img,fetcher:async()=>({ok:true,json:async()=>manifest})});
+ await p.loading;
+ for(const [tile,expected] of [[32,[101,196,12,14]],[64,[102,192,24,28]]]){
+  const calls=[];
+  const ctx={imageSmoothingEnabled:true,save(){calls.push('save')},restore(){calls.push('restore')},drawImage(...args){calls.push(['draw',...args,this.imageSmoothingEnabled])}};
+  const scaled={...manifest,bitmaps:[{...record,offsetX:1}]};
+  p.manifest=scaled;
+  assert.equal(p.draw(ctx,100,200,tile,7,1,1),true);
+  assert.deepEqual(calls[1].slice(6,10),expected);
+  assert.equal(calls[1].at(-1),false,'atlas pixels must remain unsmoothed at both zooms');
+  assert.deepEqual([calls[0],calls[2]],['save','restore']);
+ }
+});
+test('PLANT drawing failures restore context and preserve fallback',async()=>{
+ const p=new OriginalPlantPreview({imageFactory:()=>({complete:true,naturalWidth:16,naturalHeight:16}),fetcher:async()=>({ok:true,json:async()=>manifest})});
+ await p.loading;
+ let restored=0;
+ const ctx={save(){},restore(){restored++},drawImage(){throw Error('GPU draw unavailable')}};
+ assert.equal(p.draw(ctx,0,0,32,1,0,0),false);
+ assert.equal(restored,1);
+});
