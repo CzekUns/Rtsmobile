@@ -21,7 +21,7 @@ test('exports byte-preserving indexed PNG and deterministic manifest from hash-l
  assert.deepEqual(a.png,b.png);assert.deepEqual(a.manifest,b.manifest);
  assert.equal(a.png.subarray(0,8).toString('hex'),'89504e470d0a1a0a');
  assert.equal(a.manifest.bitmaps[0].width,2);assert.equal(a.manifest.bitmaps[0].height,1);
- assert.equal(a.manifest.transparentIndex,'unverified');
+ assert.equal(a.manifest.transparentIndex,255);
 });
 test('refuses missing or mismatched provenance, palette and upstream commit',()=>{
  const f=fixture();
@@ -30,11 +30,12 @@ test('refuses missing or mismatched provenance, palette and upstream commit',()=
  assert.throws(()=>exportPlantAtlas({...f,palette:new Uint8Array(3)}),/SHA-256|palette/);
 });
 
-test('transparent palette entry is explicit and yields PNG tRNS, without changing indexed pixels',()=>{
+test('default transparent padding and explicit override yield PNG tRNS without changing indexed pixels',()=>{
  const f=fixture();
  const opaque=exportPlantAtlas(f),transparent=exportPlantAtlas({...f,transparentIndex:7});
  assert.equal(transparent.manifest.transparentIndex,7);
- assert.equal(opaque.png.includes(Buffer.from('tRNS')),false);
+ assert.equal(opaque.manifest.transparentIndex,255);
+ assert.equal(opaque.png.includes(Buffer.from('tRNS')),true);
  assert.equal(transparent.png.includes(Buffer.from('tRNS')),true);
  const start=transparent.png.indexOf(Buffer.from('tRNS'))+4;
  assert.equal(transparent.png[start+7],0);
