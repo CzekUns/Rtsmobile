@@ -12,9 +12,29 @@ export function readPlantBitmap(archive, offset) {
   const width = view.getInt16(0, true), height = view.getInt16(2, true);
   if (width <= 0 || height <= 0 || width > 4096 || height > 4096)
     throw Error('invalid plant bitmap dimensions');
+  // Original GPL codec: unavowed/7kaa src/imgfun/IB_TD.cpp and include/COLCODE.h.
+  // 0xF8 + count skips count transparent pixels; 0xF9..0xFF skip 7..1.
+  // All other bytes are literal palette indices. Preserve transparency as 255.
   const size = width * height;
-  if (4 + size > recordLength) throw Error('compressed or truncated PLANT bitmap: 7KAA uses put_bitmap_trans_decompress; indexed pixels require original RLE decoding');
-  return {width, height, pixels:archive.subarray(start+4, start+4+size)};
+  if (size > 10_000_000) throw Error('plant bitmap exceeds pixel limit');
+  const end = start + recordLength;
+  const pixels = new Uint8Array(size).fill(255);
+  let source = start + 4, target = 0;
+  while (target < size) {
+    if (source >= end) throw Error('truncated PLANT compressed bitmap');
+    const code = archive[source++];
+    if (code < 0xf8) { pixels[target++] = code; continue; }
+    let skip;
+    if (code === 0xf8) {
+      if (source >= end) throw Error('truncated PLANT transparent run');
+      skip = archive[source++];
+      if (skip <= 0) throw Error('invalid PLANT transparent run');
+    } else skip = 256 - code;
+    if (skip > size - target) throw Error('PLANT transparent run exceeds bitmap');
+    target += skip;
+  }
+  if (source !== end) throw Error('PLANT bitmap trailing compressed data');
+  return {width, height, pixels};
 }
 
 export function linkPlantResources(plantDb, bitmapDb, bitmapArchive) {
