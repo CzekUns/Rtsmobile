@@ -40,7 +40,7 @@ test('ResourceDb imported offsets skip length prefix and respect record boundari
 
 test('7KAA compressed transparent runs: short codes and extended F8 across rows',()=>{
  // 4x3: [1,transparent x3] [transparent x4] [transparent x2, 9,10]
- const compressed=Uint8Array.from([9,0,0,0,4,0,3,0,1,0xfe,0xf8,7,9,10]);
+ const compressed=Uint8Array.from([10,0,0,0,4,0,3,0,1,0xfe,0xf8,7,9,10]);
  // 1 literal + 2 short + 7 long + 2 literals = 12 pixels
  const b=readPlantBitmap(compressed,0);
  assert.deepEqual([...b.pixels],[1,255,255,255,255,255,255,255,255,255,9,10]);
