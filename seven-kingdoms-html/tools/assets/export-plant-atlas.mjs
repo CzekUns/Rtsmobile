@@ -49,7 +49,7 @@ export function exportPlantAtlas({plantDb,bitmapDb,bitmapArchive,palette,expecte
   return {png:encodeIndexedPng(usedWidth,height,pixels,rgbPalette,{transparentIndex:transparentIndex??255}),
     manifest:{schemaVersion:1,source:'the3dfxdude/7kaa',license:'GPL-2.0-or-later',
       sourceCommit,sha256:expectedHashes,width:usedWidth,height,plantCount:plants.length,
-      bitmaps:placements,transparentIndex:transparentIndex??'unverified',visualParity:'not_certified'}};
+      bitmaps:placements,transparentIndex:transparentIndex??255,visualParity:'not_certified'}};
 }
 if(process.argv[1]&&import.meta.url===new URL('file://'+process.argv[1]).href){
   const [, ,configPath]=process.argv;
