@@ -116,3 +116,13 @@ Sostituire un gruppo coerente di elementi naturali provvisori con elementi origi
 - **Verifica:** log CI precedente verificato e causa identificata; test npm locali **NOT_RUN** (checkout repository non disponibile). CI per il nuovo HEAD ancora da verificare; nessun PNG originale, merge, Pages o Android certificato in questa esecuzione.
 - **HEAD codice prima del checkpoint:** `52ca13be64b91a14cedbd8549322b540507cc76a`. HEAD finale è il commit di questo checkpoint.
 - **Singolo prossimo passo:** controllare la CI esatta sul nuovo HEAD, leggere il log del job PLANT se ancora rosso e correggere quel fallimento; se verde scaricare artefatto PNG+manifest+preview originale, verificarne SHA e preparare l'integrazione Canvas sullo stesso branch.
+
+
+## Esecuzione 2026-11-14 03:03 CET — riparazione sintassi PLANT e regressioni
+- **Task/PR:** SKH-TERRAIN-002, PR #120 draft, branch `agent/skh-integration/original-landscape-overlays`.
+- **Stato iniziale:** checkpoint `a1afad07078e8e933534a7187f9f825afb0f32a0`. [Actions #43538366846](https://github.com/CzekUns/Rtsmobile/actions/runs/43538366846) FAILURE. Job PLANT 132272817652: `SyntaxError: Invalid or unexpected token` in `nature-bitmap.mjs:8`; job JS 132272817993: 243 PASS, 2 FAIL, 2 SKIP, Chromium skipped.
+- **Causa riproducibile:** commit precedente conteneva sequenze letterali `\\n` nel codice JS anziché vere interruzioni di riga, sia in `tools/assets/nature-bitmap.mjs` sia in `tests/assets/nature-bitmap.test.mjs`. Questo impediva il parsing e l'esecuzione della pipeline.
+- **Codice pubblicato:** `b091a0bd36baffb0bc126705566d306c2d512774` corregge il modulo; `4a20caaae28830ae1de796d87741c699e41623db` corregge il test di regressione. Nessuna modifica agli asset o al gameplay.
+- **Prova:** log autentici della CI precedente analizzati. npm test/check locali NON ESEGUITI; CI sul nuovo HEAD ancora da certificare. Nessun PNG/manifest/preview acquisito, merge, Pages o QA Android.
+- **HEAD codice prima del checkpoint:** `4a20caaae28830ae1de796d87741c699e41623db`; HEAD finale sarà il commit di questo checkpoint.
+- **Singolo prossimo passo:** verificare la CI sul nuovo HEAD e, se PLANT è ancora rosso, correggere il primo errore effettivo del job; se verde, scaricare e verificare PNG, manifest SHA-256 e anteprima 1×/2× autentici prima di collegare Canvas.
