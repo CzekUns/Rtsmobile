@@ -126,3 +126,12 @@ Sostituire un gruppo coerente di elementi naturali provvisori con elementi origi
 - **Prova:** log autentici della CI precedente analizzati. npm test/check locali NON ESEGUITI; CI sul nuovo HEAD ancora da certificare. Nessun PNG/manifest/preview acquisito, merge, Pages o QA Android.
 - **HEAD codice prima del checkpoint:** `4a20caaae28830ae1de796d87741c699e41623db`; HEAD finale sarà il commit di questo checkpoint.
 - **Singolo prossimo passo:** verificare la CI sul nuovo HEAD e, se PLANT è ancora rosso, correggere il primo errore effettivo del job; se verde, scaricare e verificare PNG, manifest SHA-256 e anteprima 1×/2× autentici prima di collegare Canvas.
+
+
+## Esecuzione 2026-11-14 04:00 CET — CI rossa: test syntax riparato, bitmap compressa da implementare
+- **Task/PR:** SKH-TERRAIN-002, PR #120 draft, branch `agent/skh-integration/original-landscape-overlays`.
+- **Stato iniziale:** branch HEAD `dc3593c20212599052ebe4a7c5dfddd634f1c47f`; [Actions #43549078506](https://github.com/CzekUns/Rtsmobile/actions/runs/43549078506) FAILURE sul medesimo SHA (checkout PR merge sintetico `77b8e19ebaf6627bc29a8a9dbc901f113bb38208`).
+- **Log verificati:** job PLANT `132307116678` fallisce con `compressed or truncated PLANT bitmap: 7KAA uses put_bitmap_trans_decompress; indexed pixels require original RLE decoding` in `nature-bitmap.mjs:16`. Il record originale è compresso: **non** trattare payload come pixel indicizzati grezzi e non inventare decoder. Job JS `132307116901`: 248 PASS / 1 FAIL / 2 SKIP, causa del FAIL `SyntaxError: Invalid or unexpected token` in `tests/assets/export-plant-atlas.test.mjs:47`, sequenza letterale `\\n`.
+- **Codice pubblicato:** [`f2e9014886d05b4811c420cc8c36b3898fbaacdd`](https://github.com/CzekUns/Rtsmobile/commit/f2e9014886d05b4811c420cc8c36b3898fbaacdd) sostituisce il `\\n` letterale nel test con una vera interruzione di riga. Nessun cambio al runtime o alla palette.
+- **Test:** log della CI precedente effettivamente letti. `npm test` e `npm run check` locali NON ESEGUITI; nuova CI HEAD non ancora certificata. Nessun PNG, manifest o preview originali, nessun merge/Pages/Android.
+- **Singolo prossimo passo:** verificare CI del nuovo HEAD; poi leggere l'implementazione **esatta** di `put_bitmap_trans_decompress` e il formato compresso PLANT nel sorgente 7KAA pinned, implementare decoder trasparenza/RLE fedele con fixture reali e test di byte, quindi rieseguire job PLANT sullo stesso branch. Non bypassare il controllo di lunghezza.
