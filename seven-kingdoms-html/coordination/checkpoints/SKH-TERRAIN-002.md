@@ -226,3 +226,12 @@ Sostituire un gruppo coerente di elementi naturali provvisori con elementi origi
 - **Test:** npm test/check locali NOT_RUN (checkout non disponibile in questa esecuzione). CI del nuovo commit **NOT_VERIFIED**: non attribuire il verde precedente al nuovo HEAD. Nessun merge, Pages nuovo, screenshot 1×/2× o Android QA.
 - **HEAD codice prima del checkpoint:** `e6e466f60c48fba7176ffa64930bd6e968e3c515`; HEAD finale è il commit checkpoint.
 - **Singolo prossimo passo:** verificare la CI esatta del nuovo HEAD; se il nuovo test CRC/tRNS fallisce, correggere in base al log; se verde, ottenere screenshot HTTP Canvas a zoom 1×/2× e verificare ancoraggi e occlusione degli sprite PLANT rispetto a unità/edifici prima di affrontare rocce/rilievi.
+
+
+## Esecuzione 2026-11-14 15:04 CET — CI HEAD verde, test geometria Canvas 1×/2×
+- **Task/PR:** SKH-TERRAIN-002, [PR #120](https://github.com/CzekUns/Rtsmobile/pull/120) ancora draft, branch `agent/skh-integration/original-landscape-overlays`. HEAD iniziale `53b9af4fabe09b88bae1e7eb7fcc96af7378f5d5`.
+- **CI verificata sull'HEAD iniziale esatto:** [Actions #43597994220](https://github.com/CzekUns/Rtsmobile/actions/runs/43597994220) SUCCESS; entrambi i job `JS tests & stream scope` e `Original 7KAA PLANT atlas acquisition` SUCCESS. Non attribuire questo risultato al nuovo codice.
+- **Codice pubblicato:** [f627aafcaaf7ce12de9a3b33f202002560546697](https://github.com/CzekUns/Rtsmobile/commit/f627aafcaaf7ce12de9a3b33f202002560546697) estende `tests/assets/original-plants.test.mjs` con geometria di disegno Canvas a scala originale 32 px e 2× 64 px, offset, dimensioni, disabilitazione smoothing, restore e fallback su eccezione GPU. Nessuna modifica a sprite, simulazione o controlli.
+- **Prove non eseguite:** npm locale test/check NOT_RUN (checkout locale non disponibile); CI del nuovo HEAD NON_VERIFIED. Screenshot HTTP del Canvas 1×/2×, verifica ancoraggi/occlusione su scena reale, Android e Pages post-merge NOT_RUN. Il test mock non è una certificazione visiva. Nessun merge.
+- **HEAD codice prima del checkpoint:** `f627aafcaaf7ce12de9a3b33f202002560546697`; HEAD finale è il commit di questo checkpoint.
+- **Singolo prossimo passo:** verificare la CI esatta dell'HEAD checkpoint e correggere immediatamente eventuali test falliti; se verde, ottenere screenshot HTTP Canvas 1×/2× con gli asset PLANT reali e verificare visivamente ancoraggi e occlusioni prima di completare rocce/rilievi.
