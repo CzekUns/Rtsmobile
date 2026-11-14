@@ -31,8 +31,8 @@ try{
  if(!png.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])))throw Error('Screenshot is not PNG');
  const sceneUrl=`http://127.0.0.1:${port}/tests/browser/plant-game-scene.html`;
  const sceneDom=await chrome(['--dump-dom'],sceneUrl);
- const sceneStatus=sceneDom.match(/<p id="status" role="status">([^<]*)<\\/p>/)?.[1];
- if(!sceneStatus?.startsWith('PASS: WorldView actual scene PLANT 1x='))throw Error('WorldView scene HTTP smoke failed: '+(sceneStatus||'status missing'));
+ const sceneStatus=sceneDom.match(/<p id="status" role="status">([^<]*)<\/p>/)?.[1];
+ if(!sceneStatus?.startsWith('PASS: WorldView actual scene PLANT 1x='))throw Error('WorldView scene HTTP smoke failed: '+(sceneStatus||'status missing')+'; body='+sceneDom.slice(-1500));
  const sceneScreenshot=process.env.PLANT_QA_SCENE_SCREENSHOT||join(dir,'plant-worldview-1x-2x.png');
  await chrome(['--screenshot='+sceneScreenshot],sceneUrl);
  const scenePng=await readFile(sceneScreenshot);
