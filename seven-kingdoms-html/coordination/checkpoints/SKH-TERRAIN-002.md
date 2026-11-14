@@ -217,3 +217,12 @@ Sostituire un gruppo coerente di elementi naturali provvisori con elementi origi
 - **Verifica:** npm test/check locali **NOT_RUN** (nessun checkout locale del repository). La CI del nuovo commit e del checkpoint **NON ANCORA CERTIFICATA**; nessun merge/Pages nuovo o QA Android. PNG e manifest restano sul branch; nessuna screenshot 1×/2× acquisita in questa esecuzione.
 - **HEAD codice prima del checkpoint:** `94eb7bc203b7e3f51ccb11433cf9df6f5931d5dd`; HEAD finale è il commit di questo checkpoint, recuperabile dalla cronologia del branch.
 - **Singolo prossimo passo:** verificare CI del nuovo HEAD; se verde, eseguire screenshot browser HTTP del Canvas con PLANT originale a 1×/2× e verificare ancoraggi/occlusione rispetto a unità ed edifici; se rossa, correggere il primo errore esatto del log senza cambiare task.
+
+
+## Esecuzione 2026-11-14 14:03 CET — CI verde e integrità PNG rafforzata
+- **Task/PR:** SKH-TERRAIN-002, PR #120 draft, branch `agent/skh-integration/original-landscape-overlays`; checkpoint precedente `5db452548e2f13bccd6e08054380afadecec98a7`.
+- **CI HEAD iniziale:** [Actions #43592963770](https://github.com/CzekUns/Rtsmobile/actions/runs/43592963770) SUCCESS, job JS/Chromium `132441465948` e PLANT exporter `132441465638` entrambi SUCCESS. Step di pubblicazione asset skipped su evento PR (asset già pubblicati sul branch). Nessuna prova browser screenshot/Android acquisita.
+- **Codice pubblicato:** [e6e466f60c48fba7176ffa64930bd6e968e3c515](https://github.com/CzekUns/Rtsmobile/commit/e6e466f60c48fba7176ffa64930bd6e968e3c515) aggiorna `tests/assets/original-plants.test.mjs`: verifica CRC32 di ogni chunk PNG reale, presenza PLTE, color type indicizzato, indice 255 completamente trasparente, IEND e controlli di integrità preesistenti. Non altera runtime o asset originali.
+- **Test:** npm test/check locali NOT_RUN (checkout non disponibile in questa esecuzione). CI del nuovo commit **NOT_VERIFIED**: non attribuire il verde precedente al nuovo HEAD. Nessun merge, Pages nuovo, screenshot 1×/2× o Android QA.
+- **HEAD codice prima del checkpoint:** `e6e466f60c48fba7176ffa64930bd6e968e3c515`; HEAD finale è il commit checkpoint.
+- **Singolo prossimo passo:** verificare la CI esatta del nuovo HEAD; se il nuovo test CRC/tRNS fallisce, correggere in base al log; se verde, ottenere screenshot HTTP Canvas a zoom 1×/2× e verificare ancoraggi e occlusione degli sprite PLANT rispetto a unità/edifici prima di affrontare rocce/rilievi.
