@@ -39,6 +39,24 @@ jobs:
         env:
           CHROME_BIN: google-chrome
         run: node seven-kingdoms-html/tests/browser/run-hud-smoke.mjs
+      - name: Chromium original PLANT gallery HTTP and screenshot 1x/2x
+        env:
+          CHROME_BIN: google-chrome
+          PLANT_QA_SCREENSHOT: ${{ runner.temp }}/plant-1x-2x.png
+        run: |
+          if test -f seven-kingdoms-html/assets/previews/plant-original.png; then
+            node seven-kingdoms-html/tests/browser/run-plant-visual-smoke.mjs
+          else
+            echo "PLANT asset not present on this branch; gallery QA skipped."
+          fi
+      - name: Upload real Chromium PLANT gallery screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: skh-terrain-002-chromium-plant-1x-2x
+          path: ${{ runner.temp }}/plant-1x-2x.png
+          if-no-files-found: warn
+          retention-days: 14
       - name: Enforce ownership on agent branches only
         if: github.event_name == 'pull_request'
         env:
