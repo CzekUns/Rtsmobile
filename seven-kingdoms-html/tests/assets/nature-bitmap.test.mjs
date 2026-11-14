@@ -26,9 +26,9 @@ test('links original PLANT bitmap recno (1-based) and bitmap payload',()=>{
  assert.equal(out.plants[0].code,'TREE');assert.deepEqual([...out.bitmaps[0].bitmap.pixels],[42]);
 });
 test('rejects mismatched plant code and out-of-range bitmap reference',()=>{
- assert.throws(()=>linkPlantResources(plant(),plantbm('ROCK'),Uint8Array.from([1,0,1,0,42])),/mismatch/);
+ assert.throws(()=>linkPlantResources(plant(),plantbm('ROCK'),Uint8Array.from([5,0,0,0,1,0,1,0,42])),/mismatch/);
  const p=plant();p[33+1+15]=48;p[33+1+16]=48;p[33+1+17]=50;
- assert.throws(()=>linkPlantResources(p,plantbm(),Uint8Array.from([1,0,1,0,42])),/out of range/);
+ assert.throws(()=>linkPlantResources(p,plantbm(),Uint8Array.from([5,0,0,0,1,0,1,0,42])),/out of range/);
 });
 
 test('ResourceDb imported offsets skip length prefix and respect record boundaries',()=>{
