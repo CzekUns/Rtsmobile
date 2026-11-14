@@ -41,7 +41,7 @@ export function exportPlantAtlas({plantDb,bitmapDb,bitmapArchive,palette,expecte
   }
   const height=y+rowHeight;
   if(usedWidth*height>10000000)throw Error('atlas exceeds safe pixel limit');
-  const pixels=new Uint8Array(usedWidth*height);
+  const pixels=new Uint8Array(usedWidth*height).fill(255);
   for(let i=0;i<bitmaps.length;i++){
     const b=bitmaps[i].bitmap,p=placements[i];
     for(let row=0;row<b.height;row++)pixels.set(b.pixels.subarray(row*b.width,(row+1)*b.width),(p.y+row)*usedWidth+p.x);
