@@ -46,7 +46,7 @@ export function exportPlantAtlas({plantDb,bitmapDb,bitmapArchive,palette,expecte
     const b=bitmaps[i].bitmap,p=placements[i];
     for(let row=0;row<b.height;row++)pixels.set(b.pixels.subarray(row*b.width,(row+1)*b.width),(p.y+row)*usedWidth+p.x);
   }
-  return {png:encodeIndexedPng(usedWidth,height,pixels,rgbPalette,{transparentIndex}),
+  return {png:encodeIndexedPng(usedWidth,height,pixels,rgbPalette,{transparentIndex:transparentIndex??255}),
     manifest:{schemaVersion:1,source:'the3dfxdude/7kaa',license:'GPL-2.0-or-later',
       sourceCommit,sha256:expectedHashes,width:usedWidth,height,plantCount:plants.length,
       bitmaps:placements,transparentIndex:transparentIndex??'unverified',visualParity:'not_certified'}};
