@@ -280,3 +280,12 @@ Sostituire un gruppo coerente di elementi naturali provvisori con elementi origi
 - **Test:** npm test/check locali NOT_RUN (checkout completo non disponibile); CI sul nuovo SHA non ancora certificata. La CI precedente prova solo il fallimento e il job exporter riuscito; nessuna prova screenshot scena, Pages, merge o Android.
 - **HEAD codice prima del checkpoint:** `f4173b3f01262ac1889ef68e9416f40595cb1b66`. HEAD finale: commit del presente checkpoint (consultare cronologia branch).
 - **Singolo prossimo passo:** verificare la CI sul nuovo HEAD; se lo smoke Chromium fallisce ancora, leggere il messaggio `WorldView scene HTTP smoke failed` con DOM e correggere il problema concreto; se verde, recuperare e ispezionare `plant-worldview-1x-2x.png` per ancoraggi/occlusioni, poi procedere con ROCK.
+
+
+## Esecuzione 2026-11-14 20:58 CET — prova pixel effettivi tra zoom 1×/2×
+- **Task/PR:** SKH-TERRAIN-002, [#120](https://github.com/CzekUns/Rtsmobile/pull/120) draft; branch `agent/skh-integration/original-landscape-overlays`; checkpoint precedente `01094b009a8b3b4867d3d2be0fad2bad85e6ac56`.
+- **CI verificata del checkpoint precedente:** [Actions #43629472582](https://github.com/CzekUns/Rtsmobile/actions/runs/43629472582) SUCCESS associata a `01094b0`; non certifica il codice appena pubblicato.
+- **Codice:** [8ba7c395ec21a97c25c67c1bd9125f8da78e9145](https://github.com/CzekUns/Rtsmobile/commit/8ba7c395ec21a97c25c67c1bd9125f8da78e9145) modifica `tests/browser/plant-game-scene.html`: legge i pixel dei due Canvas WorldView realmente disegnati, rifiuta frame entrambi trasparenti o quasi identici (<100 pixel differenti) e registra `changedPixels`. Prima il test controllava solo il contatore di chiamate di disegno, che poteva essere positivo anche per due immagini uguali. Nessuna modifica a gameplay o risorse.
+- **Test:** npm test/check locali NOT_RUN (checkout non disponibile in questa esecuzione); CI per il nuovo HEAD NOT_VERIFIED. Screenshot e occlusione visiva con unità/edifici NOT_VERIFIED; nessun merge, Pages o Android. Il controllo differenza pixel non dimostra parità con 7KAA.
+- **HEAD codice prima del checkpoint:** `8ba7c395ec21a97c25c67c1bd9125f8da78e9145`. HEAD finale è il commit di questo checkpoint.
+- **Singolo prossimo passo:** verificare CI sul nuovo HEAD; se fallisce, correggere lo step WorldView specifico. Se verde, recuperare e ispezionare lo screenshot `plant-worldview-1x-2x.png` per profondità/ancoraggi; poi iniziare l'export ROCK originale.
