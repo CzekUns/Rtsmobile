@@ -45,16 +45,36 @@ test('published original PLANT PNG matches pinned manifest and has transparency'
  assert.equal(png.toString('ascii',12,16),'IHDR');
  assert.equal(png.readUInt32BE(16),data.width);
  assert.equal(png.readUInt32BE(20),data.height);
- let cursor=8,hasTransparency=false,hasImageData=false;
+ // Validate every PNG chunk CRC, not merely lengths: catches corrupted source atlases.
+ const crcTable=Array.from({length:256},(_,n)=>{
+  let c=n;
+  for(let k=0;k<8;k++)c=(c&1)?(0xedb88320^(c>>>1)):(c>>>1);
+  return c>>>0;
+ });
+ const crc32=bytes=>{
+  let c=0xffffffff;
+  for(const byte of bytes)c=crcTable[(c^byte)&255]^(c>>>8);
+  return (c^0xffffffff)>>>0;
+ };
+ let cursor=8,hasTransparency=false,hasImageData=false,hasPalette=false,hasEnd=false;
  while(cursor+12<=png.length){
   const size=png.readUInt32BE(cursor),type=png.toString('ascii',cursor+4,cursor+8);
   assert.ok(size<=png.length-cursor-12,'PNG chunk must fit file');
-  if(type==='tRNS')hasTransparency=true;
+  const payloadEnd=cursor+8+size;
+  assert.equal(png.readUInt32BE(payloadEnd),crc32(png.subarray(cursor+4,payloadEnd)),`PNG ${type} CRC must match`);
+  if(type==='PLTE')hasPalette=true;
+  if(type==='tRNS'){
+   hasTransparency=true;
+   assert.equal(png[cursor+8+255],0,'palette index 255 must be fully transparent');
+  }
   if(type==='IDAT')hasImageData=true;
   cursor+=size+12;
-  if(type==='IEND')break;
+  if(type==='IEND'){hasEnd=true;break;}
  }
+ assert.equal(png[25],3,'PLANT atlas must be indexed-color PNG');
+ assert.equal(hasPalette,true,'indexed atlas requires a palette');
  assert.equal(hasTransparency,true,'indexed original atlas must declare transparent index');
+ assert.equal(hasEnd,true,'PNG must end with IEND');
  assert.equal(hasImageData,true);
  assert.equal(cursor,png.length,'no trailing or truncated PNG chunks');
 });
