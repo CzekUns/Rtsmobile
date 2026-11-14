@@ -13,7 +13,7 @@ export function readPlantBitmap(archive, offset) {
   if (width <= 0 || height <= 0 || width > 4096 || height > 4096)
     throw Error('invalid plant bitmap dimensions');
   const size = width * height;
-  if (4 + size > recordLength) throw Error('truncated plant bitmap pixels');
+  if (4 + size > recordLength) throw Error('compressed or truncated PLANT bitmap: 7KAA uses put_bitmap_trans_decompress; indexed pixels require original RLE decoding');
   return {width, height, pixels:archive.subarray(start+4, start+4+size)};
 }
 
