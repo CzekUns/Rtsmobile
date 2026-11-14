@@ -31,4 +31,9 @@ test('rejects mismatched plant code and out-of-range bitmap reference',()=>{
  assert.throws(()=>linkPlantResources(p,plantbm(),Uint8Array.from([1,0,1,0,42])),/out of range/);
 });
 
-test('ResourceDb imported offsets skip length prefix and respect record boundaries',()=>{\n const archive=Uint8Array.from([5,0,0,0,1,0,1,0,42, 5,0,0,0,1,0,1,0,99]);\n assert.deepEqual([...readPlantBitmap(archive,9).pixels],[99]);\n assert.throws(()=>readPlantBitmap(Uint8Array.from([4,0,0,0,1,0,1,0]),0),/truncated/);\n assert.throws(()=>readPlantBitmap(Uint8Array.from([255,255,255,127,1,0,1,0,42]),0),/record length/);\n});\n
+test('ResourceDb imported offsets skip length prefix and respect record boundaries',()=>{
+ const archive=Uint8Array.from([5,0,0,0,1,0,1,0,42, 5,0,0,0,1,0,1,0,99]);
+ assert.deepEqual([...readPlantBitmap(archive,9).pixels],[99]);
+ assert.throws(()=>readPlantBitmap(Uint8Array.from([4,0,0,0,1,0,1,0]),0),/truncated/);
+ assert.throws(()=>readPlantBitmap(Uint8Array.from([255,255,255,127,1,0,1,0,42]),0),/record length/);
+});
