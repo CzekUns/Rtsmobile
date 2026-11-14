@@ -44,7 +44,8 @@ test('transparent palette entry is explicit and yields PNG tRNS, without changin
 test('large original bitmap archive is rejected before atlas allocation',()=>{
  const f=fixture();
  const huge=new Uint8Array(8+4096*4096);
- new DataView(huge.buffer).setUint32(0,4+4096*4096,true);\n huge[4]=0;huge[5]=16;huge[6]=0;huge[7]=16;
+ new DataView(huge.buffer).setUint32(0,4+4096*4096,true);
+ huge[4]=0;huge[5]=16;huge[6]=0;huge[7]=16;
  const inputs={...f,bitmapArchive:huge,expectedHashes:{...f.expectedHashes,I_PLANT1:hash(huge)}};
  assert.throws(()=>exportPlantAtlas(inputs),/safe pixel limit/);
 });
