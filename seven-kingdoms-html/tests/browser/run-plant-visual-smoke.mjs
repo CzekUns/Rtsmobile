@@ -10,8 +10,8 @@ const dir=await mkdtemp(join(tmpdir(),'skh-plant-qa-'));
 const screenshot=process.env.PLANT_QA_SCREENSHOT||join(dir,'plant-1x-2x.png');
 const server=spawn('python3',['-m','http.server',String(port),'--bind','127.0.0.1'],{cwd:'seven-kingdoms-html',stdio:'ignore'});
 const url=`http://127.0.0.1:${port}/assets/previews/plant-original-qa.html`;
-async function chrome(args){
- const child=spawn(browser,['--headless','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--disable-background-networking','--hide-scrollbars','--window-size=1400,1000','--virtual-time-budget=12000',...args,url],{stdio:['ignore','pipe','pipe']});
+async function chrome(args,page=url){
+ const child=spawn(browser,['--headless','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--disable-background-networking','--hide-scrollbars','--window-size=1400,1000','--virtual-time-budget=12000',...args,page],{stdio:['ignore','pipe','pipe']});
  let stdout='',stderr='';
  child.stdout.on('data',d=>stdout+=d);
  child.stderr.on('data',d=>stderr+=d);
@@ -29,7 +29,15 @@ try{
  await chrome(['--screenshot='+screenshot]);
  const png=await readFile(screenshot);
  if(!png.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])))throw Error('Screenshot is not PNG');
- console.log('PASS: PLANT HTTP gallery 1x/2x, '+match[1]+'; screenshot '+screenshot+' ('+png.length+' bytes)');
+ const sceneUrl=`http://127.0.0.1:${port}/tests/browser/plant-game-scene.html`;
+ const sceneDom=await chrome(['--dump-dom'],sceneUrl);
+ const sceneStatus=sceneDom.match(/<p id="status" role="status">([^<]*)<\\/p>/)?.[1];
+ if(!sceneStatus?.startsWith('PASS: WorldView actual scene PLANT 1x='))throw Error('WorldView scene HTTP smoke failed: '+(sceneStatus||'status missing'));
+ const sceneScreenshot=process.env.PLANT_QA_SCENE_SCREENSHOT||join(dir,'plant-worldview-1x-2x.png');
+ await chrome(['--screenshot='+sceneScreenshot],sceneUrl);
+ const scenePng=await readFile(sceneScreenshot);
+ if(!scenePng.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])))throw Error('WorldView screenshot is not PNG');
+ console.log('PASS: PLANT HTTP gallery 1x/2x '+match[1]+'; WorldView '+sceneStatus+'; screenshots '+screenshot+' and '+sceneScreenshot);
 }finally{
  server.kill('SIGTERM');
  if(!process.env.PLANT_QA_SCREENSHOT)await rm(dir,{recursive:true,force:true});
