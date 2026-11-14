@@ -47,7 +47,7 @@ test('large original bitmap archive is rejected before atlas allocation',()=>{
  new DataView(huge.buffer).setUint32(0,4+4096*4096,true);
  huge[4]=0;huge[5]=16;huge[6]=0;huge[7]=16;
  const inputs={...f,bitmapArchive:huge,expectedHashes:{...f.expectedHashes,I_PLANT1:hash(huge)}};
- assert.throws(()=>exportPlantAtlas(inputs),/safe pixel limit/);
+ assert.throws(()=>exportPlantAtlas(inputs),/plant bitmap exceeds pixel limit/);
 });
 
 test('accepts authentic PAL_STD.RES resource header and rejects malformed header',()=>{
