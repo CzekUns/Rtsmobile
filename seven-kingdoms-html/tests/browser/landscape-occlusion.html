@@ -22,6 +22,7 @@ try {
  if(!places.plant||!places.rock)throw Error('Forest or hill missing from demo world');
  const output=document.getElementById('frames');
  let frames=0;
+ const signatures=new Map();
  for(const kind of ['plant','rock']){
   const pos=places[kind];
   for(const zoom of [1,2]){
@@ -50,8 +51,27 @@ try {
    if((kind==='plant'?view.authenticPlantsDrawn:view.authenticRocksDrawn)<1)throw Error(kind+' original bitmap not drawn');
    const copy=document.createElement('canvas');copy.width=view.canvas.width;copy.height=view.canvas.height;
    copy.getContext('2d').drawImage(view.canvas,0,0);
-   copy.dataset.scene=kind+'-'+zoom+'x';output.append(copy);frames++;
+   // Inspect rendered pixels, not only painter callbacks. Sample the full
+   // world canvas on a fixed grid so empty/identical zoom captures fail.
+   const pixels=copy.getContext('2d').getImageData(0,0,copy.width,copy.height).data;
+   let hash=2166136261, colored=0, opaque=0;
+   for(let i=0;i<pixels.length;i+=4*17){
+    const r=pixels[i],g=pixels[i+1],b=pixels[i+2],a=pixels[i+3];
+    hash=Math.imul(hash^r,16777619)>>>0;
+    hash=Math.imul(hash^g,16777619)>>>0;
+    hash=Math.imul(hash^b,16777619)>>>0;
+    hash=Math.imul(hash^a,16777619)>>>0;
+    if(a>0)opaque++;
+    if(a>0&&(r!==g||g!==b))colored++;
+   }
+   if(opaque<100||colored<100)throw Error(kind+' '+zoom+'x empty/monochrome canvas: opaque='+opaque+' colored='+colored);
+   signatures.set(kind+'-'+zoom,hash);
+   copy.dataset.scene=kind+'-'+zoom+'x';copy.dataset.pixelHash=hash.toString(16);
+   output.append(copy);frames++;
   }
+ }
+ for(const kind of ['plant','rock']){
+  if(signatures.get(kind+'-1')===signatures.get(kind+'-2'))throw Error(kind+' zoom 1x/2x identical pixel signatures');
  }
  status.textContent='PASS: WorldView original PLANT/ROCK occlusion, building and units, 1x/2x; frames='+frames;
 }catch(e){status.textContent='FAIL: '+e.message;document.body.dataset.failed='true'}
