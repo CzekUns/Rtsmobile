@@ -21,7 +21,7 @@ try{
  const dom=await chrome(['--dump-dom']);
  const status=dom.match(/<p id="status" role="status">([^<]*)<\/p>/)?.[1];
  if(!status?.startsWith('PASS: WorldView original PLANT/ROCK occlusion'))throw Error('Landscape occlusion: '+(status||'status missing')+' '+dom.slice(-1200));
- const captures=[...dom.matchAll(/<canvas\\b[^>]*data-scene="(plant|rock)-(1|2)x"[^>]*data-pixel-hash="([0-9a-f]+)"/g)];
+ const captures=[...dom.matchAll(/<canvas\b[^>]*data-scene="(plant|rock)-(1|2)x"[^>]*data-pixel-hash="([0-9a-f]+)"/g)];
  if(captures.length!==4)throw Error('Expected four canvas captures with pixel hashes, got '+captures.length);
  const sceneKeys=captures.map(m=>m[1]+'-'+m[2]);
  if(new Set(sceneKeys).size!==4)throw Error('Duplicate or missing PLANT/ROCK zoom captures: '+sceneKeys.join(','));
