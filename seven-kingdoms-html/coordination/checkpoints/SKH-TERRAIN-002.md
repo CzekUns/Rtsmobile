@@ -500,3 +500,12 @@ Sostituire un gruppo coerente di elementi naturali provvisori con elementi origi
 - **Test:** la CI su `86dbf1a` non è ancora verificata; `npm --prefix seven-kingdoms-html test` e `npm --prefix seven-kingdoms-html run check` locali NOT_RUN (checkout locale non disponibile). Nessun merge, nuovo Pages, test Android o parità 7KAA certificata.
 - **HEAD codice prima del checkpoint:** `86dbf1a975c0af9ad3f4f1b9cba741bb6825e814`. HEAD finale = commit del checkpoint nella cronologia del branch.
 - **Singolo prossimo passo:** verificare CI sull'HEAD del checkpoint; se rossa correggere il log Chromium specifico, se verde recuperare e ispezionare le immagini diagnostiche ROCK 1×/2× per clipping, pivot e alpha prima della promozione della PR #120.
+
+
+## Esecuzione 2026-11-15 21:01 CET — timeout Chromium della diagnostica ROCK
+- **Task/PR/branch:** SKH-TERRAIN-002, PR #120 draft, `agent/skh-integration/original-landscape-overlays`. Checkpoint precedente `f20ab4fa63218a104e1e5bb6b1f7a952ade1ea7a`.
+- **CI esatta:** [Actions #43755396423](https://github.com/CzekUns/Rtsmobile/actions/runs/43755396423) FAILURE su `f20ab4f`; job `132938346419`, step `Chromium original landscape depth and occlusion 1x/2x`. Il DOM registra `landscape initialization timed out at decoding PLANT/ROCK PNG`; acquisizione atlanti PLANT/ROCK SUCCESS. La cattura diagnostica nuova non ha prodotto artefatto. Questo indica timeout della fixture, non prova di errore nei pixel ROCK.
+- **Codice pubblicato:** [9fe8c35](https://github.com/CzekUns/Rtsmobile/commit/9fe8c3500ecd05158186b73412b43da85601845c) modifica `tests/browser/run-landscape-occlusion.mjs`: budget virtuale Chromium da 15s a 45s e limite processo da 35s a 75s, per permettere decoding e cattura diagnostica; nessun runtime/asset alterato. Il watchdog HTML a 10s rimane un possibile limite ulteriore: questa correzione non è ancora provata.
+- **Test:** npm test/check locali NOT_RUN (nessun checkout locale). CI nuovo HEAD NOT_VERIFIED. Nessun merge, Pages o Android; parità originale NOT_CERTIFIED.
+- **HEAD codice prima del checkpoint:** `9fe8c3500ecd05158186b73412b43da85601845c`. HEAD finale è il commit del checkpoint.
+- **Singolo prossimo passo:** controllare CI HEAD di questo checkpoint; se ancora timeout in `decoding PLANT/ROCK PNG`, correggere il watchdog HTML e il caricamento asincrono sulla base del log; se verde scaricare e ispezionare crop ROCK 1×/2× prima di promuovere PR #120.
