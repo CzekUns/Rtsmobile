@@ -31,6 +31,38 @@ try {
   if(kind==='hill'&&!places.rock)places.rock={x,y};
  }
  if(!places.plant||!places.rock)throw Error('Forest or hill missing from demo world');
+ // Select ROCK positions by actual nontransparent pixel overlap, rather than
+ // assuming that adjacent tile coordinates intersect the visible bitmap.
+ function opaqueMask(draw){
+  const c=document.createElement('canvas');c.width=view.canvas.width;c.height=view.canvas.height;
+  const ctx=c.getContext('2d',{willReadFrequently:true});draw(ctx);
+  const rgba=ctx.getImageData(0,0,c.width,c.height).data;
+  const mask=new Uint8Array(c.width*c.height);
+  for(let p=0;p<mask.length;p++)mask[p]=rgba[p*4+3]>0?1:0;
+  return mask;
+ }
+ function overlapCount(a,b){
+  let count=0;for(let p=0;p<a.length;p++)if(a[p]&&b[p])count++;
+  return count;
+ }
+ function rockStraddle(pos,zoom){
+  const t=view.tile(),p=view.screen(pos.x,pos.y),rock=view.originalRocks;
+  const mask=opaqueMask(ctx=>rock.draw(ctx,p.x,p.y,t,game.seed,pos.x,pos.y));
+  if(!mask.some(Boolean))throw Error('ROCK selected bitmap has no opaque pixels');
+  const selected=[];
+  for(const side of [-1,1]){
+   let best=null;
+   for(const dy of [.25,.5,.75,1,1.25])for(const dx of [-1,-.5,0,.5,1]){
+    const u={id:side<0?'qa-behind':'qa-front',x:pos.x+dx,y:pos.y+side*dy,owner:0,kind:'soldier'};
+    const unitMask=opaqueMask(ctx=>view.unitDraw(ctx,u,null,t,false,0));
+    const pixels=overlapCount(mask,unitMask);
+    if(pixels>0&&(!best||pixels>best.pixels))best={u,pixels};
+   }
+   if(!best)throw Error('ROCK '+zoom+'x no opaque intersection for '+(side<0?'behind':'front')+' unit');
+   selected.push(best);
+  }
+  return selected;
+ }
  const output=document.getElementById('frames');
  let frames=0;
  const signatures=new Map();
@@ -42,10 +74,10 @@ try {
    // firm drawn through WorldView. These objects never enter a saved game.
    // ROCK gets a deliberately tight depth-straddling pair: adjacent tile
    // baselines exercise overlap instead of merely testing distant entities.
-   const separation=kind==='rock'?1:2;
-   const behind={id:'qa-behind',x:pos.x,y:pos.y-separation,owner:0,kind:'soldier'};
-   const front={id:'qa-front',x:pos.x,y:pos.y+separation,owner:0,kind:'soldier'};
-   if(kind==='rock'&&!(behind.y<pos.y&&front.y>pos.y&&front.y-behind.y===2))throw Error('ROCK depth-straddle fixture invalid');
+   const pair=kind==='rock'?rockStraddle(pos,zoom):null;
+   const behind=pair?pair[0].u:{id:'qa-behind',x:pos.x,y:pos.y-2,owner:0,kind:'soldier'};
+   const front=pair?pair[1].u:{id:'qa-front',x:pos.x,y:pos.y+2,owner:0,kind:'soldier'};
+   if(kind==='rock'&&!(behind.y<pos.y&&front.y>pos.y&&pair.every(v=>v.pixels>0)))throw Error('ROCK alpha-straddle fixture invalid');
    const firm={id:'qa-firm',x:pos.x+3,y:pos.y-3,size:2,owner:0,kind:'fort',hp:100,maxHp:100};
    const originalUnits=game.units,originalFirms=game.firms;
    game.units=[behind,front];game.firms=[firm];
