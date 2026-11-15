@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><meta charset="utf-8"><title>SKH-TERRAIN-002 occlusion QA</title>
-<style>body{margin:0;background:#202326;color:white;font:13px monospace}#mini{display:none}.grid{display:grid;grid-template-columns:repeat(2,640px);gap:8px}canvas{image-rendering:pixelated}#world{display:none}</style>
+<style>body{margin:0;background:#202326;color:white;font:13px monospace}#mini{display:none}.grid{display:grid;grid-template-columns:repeat(2,640px);gap:8px}canvas{image-rendering:pixelated}.rock-detail{display:block;width:640px;height:320px;image-rendering:pixelated;border:1px solid #e7cc68}.rock-detail-label{font:12px monospace;color:#e7cc68;margin:3px 0 10px}#world{display:none}</style>
 <p id="status" role="status">Loading original landscape…</p>
 <canvas id="world" width="640" height="420"></canvas><canvas id="mini" width="160" height="120"></canvas><div class="grid" id="frames"></div>
 <script type="module">
@@ -130,6 +130,38 @@ try {
    signatures.set(kind+'-'+zoom,hash);
    copy.dataset.scene=kind+'-'+zoom+'x';copy.dataset.pixelHash=hash.toString(16);
    output.append(copy);frames++;
+   if(kind==='rock'){
+    // Diagnostic crops are IMG elements, not extra scene canvases: the
+    // Chromium capture contract still requires exactly four scene canvases.
+    // Mark the actual pixel-overlap region, not just unit tile coordinates.
+    const tile=view.tile(),anchor=view.screen(pos.x,pos.y);
+    const rockMask=opaqueMask(ctx=>view.originalRocks.draw(ctx,anchor.x,anchor.y,tile,game.seed,pos.x,pos.y));
+    const detail=document.createElement('canvas');detail.width=320;detail.height=160;
+    const dc=detail.getContext('2d');dc.imageSmoothingEnabled=false;
+    const sx=Math.max(0,Math.min(copy.width-160,Math.round(anchor.x-80)));
+    const sy=Math.max(0,Math.min(copy.height-80,Math.round(anchor.y-40)));
+    dc.drawImage(copy,sx,sy,160,80,0,0,320,160);
+    const marks=[];
+    for(const [index,entry] of pair.entries()){
+     const unitMask=opaqueMask(ctx=>view.unitDraw(ctx,entry.u,null,tile,false,0));
+     let count=0,sumX=0,sumY=0;
+     for(let y=sy;y<Math.min(sy+80,copy.height);y++)for(let x=sx;x<Math.min(sx+160,copy.width);x++){
+      const i=y*copy.width+x;
+      if(rockMask[i]&&unitMask[i]){count++;sumX+=x;sumY+=y;}
+     }
+     if(!count)throw Error('ROCK '+zoom+'x intersection outside diagnostic crop: '+entry.u.id);
+     const mx=2*(sumX/count-sx),my=2*(sumY/count-sy);
+     dc.strokeStyle=index===0?'#00ffff':'#ff00ff';dc.lineWidth=1;
+     dc.beginPath();dc.moveTo(mx-8,my);dc.lineTo(mx+8,my);dc.moveTo(mx,my-8);dc.lineTo(mx,my+8);dc.stroke();
+     marks.push(entry.u.id+': '+count+' overlapping opaque pixels, centroid ('+Math.round(sumX/count)+','+Math.round(sumY/count)+')');
+    }
+    const img=document.createElement('img');img.className='rock-detail';
+    img.alt='ROCK '+zoom+'x enlarged pixel crop; cyan behind, magenta front; '+marks.join('; ');
+    img.src=detail.toDataURL('image/png');img.dataset.rockDiagnostic=zoom+'x';
+    const label=document.createElement('p');label.className='rock-detail-label';
+    label.textContent='ROCK '+zoom+'x crop at '+sx+','+sy+' | '+marks.join(' | ');
+    output.append(img,label);
+   }
   }
  }
  for(const kind of ['plant','rock']){
