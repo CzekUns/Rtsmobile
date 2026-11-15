@@ -459,3 +459,12 @@ Sostituire un gruppo coerente di elementi naturali provvisori con elementi origi
 - **Test:** `git ls-remote https://github.com/CzekUns/Rtsmobile.git HEAD` locale fallisce `Could not resolve host: github.com`; npm test/check locali **NOT_RUN**. Nuova CI HEAD **NOT_VERIFIED**. Nessun merge, Pages o Android; parità originale NON CERTIFICATA.
 - **HEAD codice prima del checkpoint:** `b3b8404ab6fa2f293d51fa2cf1d28c546eef1347`; HEAD finale è il commit di questo checkpoint.
 - **Singolo prossimo passo:** controllare la CI del nuovo HEAD; se rossa recuperare la diagnostica Chromium e correggere la selezione ROCK o la maschera; se verde scaricare e ispezionare screenshot ROCK 1×/2× per clipping, pivot e trasparenze prima di promuovere PR #120.
+
+
+## Esecuzione 2026-11-15 16:56 CET — fix profondità ROCK dalla CI reale
+- **Task/branch/PR:** SKH-TERRAIN-002, `agent/skh-integration/original-landscape-overlays`, [PR #120](https://github.com/CzekUns/Rtsmobile/pull/120) draft. Checkpoint precedente `94d0ffc4bc021923c167ba87b6f7628d3e36eddc`.
+- **CI verificata:** [Actions #43727398534](https://github.com/CzekUns/Rtsmobile/actions/runs/43727398534) FAILURE su `94d0ffc`. Log reale job `132852250873`: `rock 1x depth failure: qa-firm,qa-behind,qa-front,rock`. Acquisizione PLANT/ROCK SUCCESS, Chromium occlusion FAILURE. La fixture posizionava il front con `y > rock.y`, ma `landscapePainterOrder` ordina ROCK a `rock.y+1`: quindi il front veniva dipinto prima di ROCK, coerentemente col renderer.
+- **Correzione pubblicata:** [fd3e988](https://github.com/CzekUns/Rtsmobile/commit/fd3e988857acedc9c7780b2610aba13e8a6570de) in `tests/browser/landscape-occlusion.html`: campionamento front soltanto con `dy > 1` (1.25–2), verifica di profondità coerente con `rock.y+1`, mantenendo test di sovrapposizione dei pixel alpha. Nessun cambiamento a runtime, asset, input o salvataggi.
+- **Verifiche:** CI nuova HEAD NON ANCORA VERIFICATA; npm test/check locali NON ESEGUITI (nessun checkout locale). Nessun merge, nuovo Pages o Android. QA visiva ROCK 1×/2× ancora pendente.
+- **HEAD codice prima del checkpoint:** `fd3e988857acedc9c7780b2610aba13e8a6570de`; HEAD finale è il commit checkpoint.
+- **Singolo prossimo passo:** controllare la CI sul nuovo HEAD; se fallisce leggere il log esatto Chromium e correggere la selezione alpha/front; se verde recuperare e ispezionare lo screenshot ROCK 1×/2× prima di promuovere PR #120.
