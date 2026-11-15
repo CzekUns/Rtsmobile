@@ -60,6 +60,20 @@ jobs:
             ${{ runner.temp }}/plant-worldview-1x-2x.png
           if-no-files-found: warn
           retention-days: 14
+      - name: Chromium original landscape depth and occlusion 1x/2x
+        if: github.head_ref == 'agent/skh-integration/original-landscape-overlays' || github.ref == 'refs/heads/agent/skh-integration/original-landscape-overlays'
+        env:
+          CHROME_BIN: google-chrome
+          LANDSCAPE_QA_SCREENSHOT: ${{ runner.temp }}/landscape-occlusion-1x-2x.png
+        run: node seven-kingdoms-html/tests/browser/run-landscape-occlusion.mjs
+      - name: Upload landscape occlusion screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: skh-terrain-002-landscape-occlusion-1x-2x
+          path: ${{ runner.temp }}/landscape-occlusion-1x-2x.png
+          if-no-files-found: warn
+          retention-days: 14
       - name: Enforce ownership on agent branches only
         if: github.event_name == 'pull_request'
         env:
