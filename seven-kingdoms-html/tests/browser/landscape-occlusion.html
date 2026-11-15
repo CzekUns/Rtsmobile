@@ -7,12 +7,23 @@
 import {SevenGame,terrain,WORLD_W,WORLD_H} from '../../rules.js';
 import {WorldView} from '../../view.js';
 const status=document.getElementById('status');
+// Bound asynchronous atlas readiness: a stalled fetch/decode must fail with a
+// reproducible stage instead of leaving Chromium's DOM at "Loading" forever.
+let stage='initializing';
+const watchdog=setTimeout(()=>{
+ status.textContent='FAIL: landscape initialization timed out at '+stage;
+ document.body.dataset.failed='true';
+},10000);
 try {
  const game=new SevenGame();
  const view=new WorldView(document.getElementById('world'),document.getElementById('mini'),{previewOriginalSprites:true});
+ stage='loading PLANT/ROCK manifests';
  await Promise.all([view.originalPlants.loading,view.originalRocks.loading]);
+ stage='decoding PLANT/ROCK PNG';
  await Promise.all([view.originalPlants.image?.decode?.(),view.originalRocks.image?.decode?.()].filter(Boolean));
+ stage='validating atlas readiness';
  if(!view.originalPlants.isReady()||!view.originalRocks.isReady())throw Error('PLANT/ROCK original atlas unavailable');
+ stage='rendering four occlusion scenes';
  const places={};
  for(let y=12;y<WORLD_H-12;y++)for(let x=12;x<WORLD_W-12;x++){
   const kind=terrain(game.seed,x,y);
@@ -73,6 +84,7 @@ try {
  for(const kind of ['plant','rock']){
   if(signatures.get(kind+'-1')===signatures.get(kind+'-2'))throw Error(kind+' zoom 1x/2x identical pixel signatures');
  }
+ clearTimeout(watchdog);
  status.textContent='PASS: WorldView original PLANT/ROCK occlusion, building and units, 1x/2x; frames='+frames;
-}catch(e){status.textContent='FAIL: '+e.message;document.body.dataset.failed='true'}
+}catch(e){clearTimeout(watchdog);status.textContent='FAIL: '+stage+': '+e.message;document.body.dataset.failed='true'}
 </script></html>
