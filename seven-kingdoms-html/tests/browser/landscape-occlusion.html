@@ -24,10 +24,11 @@ try {
  stage='validating atlas readiness';
  if(!view.originalPlants.isReady()||!view.originalRocks.isReady())throw Error('PLANT/ROCK original atlas unavailable');
  stage='rendering four occlusion scenes';
- const places={};
+ const places={};const rockCandidates=[];
  for(let y=12;y<WORLD_H-12;y++)for(let x=12;x<WORLD_W-12;x++){
   const kind=terrain(game.seed,x,y);
   if(kind==='forest'&&!places.plant)places.plant={x,y};
+  if(kind==='hill'&&rockCandidates.length<32)rockCandidates.push({x,y});
   if(kind==='hill'&&!places.rock)places.rock={x,y};
  }
  if(!places.plant||!places.rock)throw Error('Forest or hill missing from demo world');
@@ -63,6 +64,17 @@ try {
   }
   return selected;
  }
+ // The first hill can select a ROCK bitmap with no usable front-side alpha.
+ // Choose a real hill whose original ROCK pixels intersect both unit masks;
+ // retain a reproducible failure if none of the sampled hills qualifies.
+ let rockChoice=null,rockFailures=[];
+ for(const candidate of rockCandidates){
+  view.center(candidate.x,candidate.y);view.zoom=1;
+  try{const pair=rockStraddle(candidate,1);rockChoice=candidate;break;}
+  catch(error){rockFailures.push(candidate.x+','+candidate.y+': '+error.message);}
+ }
+ if(!rockChoice)throw Error('ROCK no valid alpha-straddle among '+rockCandidates.length+' hills; '+rockFailures.slice(0,4).join(' | '));
+ places.rock=rockChoice;
  const output=document.getElementById('frames');
  let frames=0;
  const signatures=new Map();
