@@ -40,8 +40,12 @@ try {
    view.center(pos.x,pos.y);view.zoom=zoom;
    // Two entities straddle the overlay baseline; a third is an actual
    // firm drawn through WorldView. These objects never enter a saved game.
-   const behind={id:'qa-behind',x:pos.x,y:pos.y-2,owner:0,kind:'soldier'};
-   const front={id:'qa-front',x:pos.x,y:pos.y+2,owner:0,kind:'soldier'};
+   // ROCK gets a deliberately tight depth-straddling pair: adjacent tile
+   // baselines exercise overlap instead of merely testing distant entities.
+   const separation=kind==='rock'?1:2;
+   const behind={id:'qa-behind',x:pos.x,y:pos.y-separation,owner:0,kind:'soldier'};
+   const front={id:'qa-front',x:pos.x,y:pos.y+separation,owner:0,kind:'soldier'};
+   if(kind==='rock'&&!(behind.y<pos.y&&front.y>pos.y&&front.y-behind.y===2))throw Error('ROCK depth-straddle fixture invalid');
    const firm={id:'qa-firm',x:pos.x+3,y:pos.y-3,size:2,owner:0,kind:'fort',hp:100,maxHp:100};
    const originalUnits=game.units,originalFirms=game.firms;
    game.units=[behind,front];game.firms=[firm];
