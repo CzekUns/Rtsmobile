@@ -7,7 +7,7 @@ import {OriginalTerrainPreview} from './playtest/original-terrain.js';
 import {OriginalCoastPreview} from './playtest/original-coast.js';
 import {OriginalPlantPreview} from './playtest/original-plants.js';
 import {OriginalRockPreview} from './playtest/original-rock.js';
-import {worldPainterOrder} from './world-depth-order.js';
+import {worldPainterOrder,landscapePainterOrder} from './world-depth-order.js';
 import {createMinimapTerrainLayer,minimapFootprint,minimapViewport} from './playtest/minimap-system.js';
 const COLORS={
   grass:['#81996a','#8aa171','#769367'],forest:['#496d46','#567b4b','#3e6645'],
@@ -67,8 +67,8 @@ export class WorldView{
   if(this.originalPlants?.isReady()||this.originalRocks?.isReady()){
    for(let y=top;y<bottom;y++)for(let x=l;x<r;x++){
     const type=terrain(g.seed,x,y);
-    if(type==='forest'&&this.originalPlants?.isReady())landscape.push({kind:'plant',x,y,depth:y+1});
-    else if(type==='hill'&&this.originalRocks?.isReady())landscape.push({kind:'rock',x,y,depth:y+1});
+    if(type==='forest'&&this.originalPlants?.isReady())landscape.push({kind:'plant',x,y});
+    else if(type==='hill'&&this.originalRocks?.isReady())landscape.push({kind:'rock',x,y});
    }
   }
   this.drawDemoLinks(g,ctx,t);
@@ -78,7 +78,7 @@ export class WorldView{
   const ordered=worldPainterOrder(g.towns,waitingSites,g.firms,g.units);
   // Landscape wins equal-depth ties so entities standing at the same base
   // remain visible; an overlay in a later row occludes an entity behind it.
-  const painter=[...landscape,...ordered].sort((a,b)=>a.depth-b.depth);
+  const painter=landscapePainterOrder(landscape,ordered);
   for(const entry of painter){
    if(entry.kind==='plant'||entry.kind==='rock'){
     const p=this.screen(entry.x,entry.y);
