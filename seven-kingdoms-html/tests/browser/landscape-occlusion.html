@@ -51,6 +51,7 @@ try {
   let count=0;for(let p=0;p<a.length;p++)if(a[p]&&b[p])count++;
   return count;
  }
+ const MIN_ROCK_OVERLAP={1:8,2:24};
  function rockStraddle(pos,zoom){
   const t=view.tile(),p=view.screen(pos.x,pos.y),rock=view.originalRocks;
   const mask=opaqueMask(ctx=>rock.draw(ctx,p.x,p.y,t,game.seed,pos.x,pos.y));
@@ -60,14 +61,14 @@ try {
    let best=null;
    // ROCK painter depth is pos.y+1, not pos.y: a front unit must
    // have y > pos.y+1 or the renderer correctly draws it behind ROCK.
-   const distances=side<0?[.25,.5,.75,1,1.25]:[1.25,1.5,1.75,2];
-   for(const dy of distances)for(const dx of [-1,-.5,0,.5,1]){
+   const distances=side<0?[.125,.25,.375,.5,.625,.75,.875,1,1.125,1.25]:[1.125,1.25,1.375,1.5,1.625,1.75,1.875,2];
+   for(const dy of distances)for(const dx of [-1.5,-1.25,-1,-.75,-.5,-.25,0,.25,.5,.75,1,1.25,1.5]){
     const u={id:side<0?'qa-behind':'qa-front',x:pos.x+dx,y:pos.y+side*dy,owner:0,kind:'soldier'};
     const unitMask=opaqueMask(ctx=>view.unitDraw(ctx,u,null,t,false,0));
     const pixels=overlapCount(mask,unitMask);
     if(pixels>0&&(!best||pixels>best.pixels))best={u,pixels};
    }
-   if(!best)throw Error('ROCK '+zoom+'x no opaque intersection for '+(side<0?'behind':'front')+' unit');
+   if(!best||best.pixels<MIN_ROCK_OVERLAP[zoom])throw Error('ROCK '+zoom+'x insufficient opaque intersection for '+(side<0?'behind':'front')+' unit: best='+ (best?.pixels??0)+' required='+MIN_ROCK_OVERLAP[zoom]);
    selected.push(best);
   }
   return selected;
@@ -78,7 +79,7 @@ try {
  let rockChoice=null,rockFailures=[];
  for(const candidate of rockCandidates){
   view.center(candidate.x,candidate.y);view.zoom=1;
-  try{const pair=rockStraddle(candidate,1);rockChoice=candidate;break;}
+  try{rockStraddle(candidate,1);view.zoom=2;rockStraddle(candidate,2);rockChoice=candidate;break;}
   catch(error){rockFailures.push(candidate.x+','+candidate.y+': '+error.message);}
  }
  if(!rockChoice)throw Error('ROCK no valid alpha-straddle among '+rockCandidates.length+' hills; '+rockFailures.slice(0,4).join(' | '));
@@ -97,7 +98,7 @@ try {
    const pair=kind==='rock'?rockStraddle(pos,zoom):null;
    const behind=pair?pair[0].u:{id:'qa-behind',x:pos.x,y:pos.y-2,owner:0,kind:'soldier'};
    const front=pair?pair[1].u:{id:'qa-front',x:pos.x,y:pos.y+2,owner:0,kind:'soldier'};
-   if(kind==='rock'&&!(behind.y<pos.y+1&&front.y>pos.y+1&&pair.every(v=>v.pixels>0)))throw Error('ROCK alpha-straddle fixture invalid');
+   if(kind==='rock'&&!(behind.y<pos.y+1&&front.y>pos.y+1&&pair.every(v=>v.pixels>=MIN_ROCK_OVERLAP[zoom])))throw Error('ROCK alpha-straddle fixture invalid');
    const firm={id:'qa-firm',x:pos.x+3,y:pos.y-3,size:2,owner:0,kind:'fort',hp:100,maxHp:100};
    const originalUnits=game.units,originalFirms=game.firms;
    game.units=[behind,front];game.firms=[firm];
@@ -155,7 +156,7 @@ try {
        maxX=Math.max(maxX,x);maxY=Math.max(maxY,y);
       }
      }
-     if(!count)throw Error('ROCK '+zoom+'x missing full-frame alpha intersection: '+entry.u.id);
+     if(count<MIN_ROCK_OVERLAP[zoom])throw Error('ROCK '+zoom+'x insufficient full-frame alpha intersection: '+entry.u.id+' got='+count+' required='+MIN_ROCK_OVERLAP[zoom]);
      intersections.push({index,entry,count,cx:sumX/count,cy:sumY/count,minX,minY,maxX,maxY});
     }
     const left=Math.min(...intersections.map(v=>v.minX));
