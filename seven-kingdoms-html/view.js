@@ -6,6 +6,7 @@ import {OriginalSpritePreview,compassDirection,walkingFrame} from './playtest/or
 import {OriginalTerrainPreview} from './playtest/original-terrain.js';
 import {OriginalCoastPreview} from './playtest/original-coast.js';
 import {OriginalPlantPreview} from './playtest/original-plants.js';
+import {OriginalRockPreview} from './playtest/original-rock.js';
 import {worldPainterOrder} from './world-depth-order.js';
 import {createMinimapTerrainLayer,minimapFootprint,minimapViewport} from './playtest/minimap-system.js';
 const COLORS={
@@ -22,6 +23,7 @@ export class WorldView{
   this.originalTerrain=previewOriginalSprites?new OriginalTerrainPreview():null;
   this.originalCoast=previewOriginalSprites&&previewOriginalCoasts?new OriginalCoastPreview():null;
   this.originalPlants=previewOriginalSprites?new OriginalPlantPreview():null;
+  this.originalRocks=previewOriginalSprites?new OriginalRockPreview():null;
   this.spriteMotion=new Map();this.spritePaused=false;
   this.mini=mini;this.mctx=mini.getContext('2d');
   this.minimapTerrain=createMinimapTerrainLayer({worldW:WORLD_W,worldH:WORLD_H,terrain,
@@ -57,19 +59,34 @@ export class WorldView{
   // Read actual atlas success: an apparently decoded image may fail drawImage.
   this.authenticTilesDrawn=0;
   this.authenticPlantsDrawn=0;
+  this.authenticRocksDrawn=0;
   for(let y=top;y<bottom;y++)for(let x=l;x<r;x++)this.tileDraw(g,ctx,x,y,t);
-  // Landscape overlays are visual-only: keep them below the existing
-  // world painter order so unit, town and firm interaction stays unchanged.
-  if(this.originalPlants?.isReady())for(let y=top;y<bottom;y++)for(let x=l;x<r;x++){
-   if(terrain(g.seed,x,y)!=='forest')continue;
-   const p=this.screen(x,y);
-   if(this.originalPlants.draw(ctx,p.x,p.y,t,g.seed,x,y))this.authenticPlantsDrawn++;
+  // Depth-sort authentic landscape overlays with world objects by their
+  // tile-base Y. Demo placement changes no simulation state or hit testing.
+  const landscape=[];
+  if(this.originalPlants?.isReady()||this.originalRocks?.isReady()){
+   for(let y=top;y<bottom;y++)for(let x=l;x<r;x++){
+    const type=terrain(g.seed,x,y);
+    if(type==='forest'&&this.originalPlants?.isReady())landscape.push({kind:'plant',x,y,depth:y+1});
+    else if(type==='hill'&&this.originalRocks?.isReady())landscape.push({kind:'rock',x,y,depth:y+1});
+   }
   }
   this.drawDemoLinks(g,ctx,t);
   const group=new Set(groupIds);
   this.spritePaused=!!g.paused;
   const waitingSites=(g.constructionSites||[]).filter(site=>site.status==='walking');
-  for(const entry of worldPainterOrder(g.towns,waitingSites,g.firms,g.units)){
+  const ordered=worldPainterOrder(g.towns,waitingSites,g.firms,g.units);
+  // Landscape wins equal-depth ties so entities standing at the same base
+  // remain visible; an overlay in a later row occludes an entity behind it.
+  const painter=[...landscape,...ordered].sort((a,b)=>a.depth-b.depth);
+  for(const entry of painter){
+   if(entry.kind==='plant'||entry.kind==='rock'){
+    const p=this.screen(entry.x,entry.y);
+    if(entry.kind==='plant'){
+     if(this.originalPlants.draw(ctx,p.x,p.y,t,g.seed,entry.x,entry.y))this.authenticPlantsDrawn++;
+    }else if(this.originalRocks.draw(ctx,p.x,p.y,t,g.seed,entry.x,entry.y))this.authenticRocksDrawn++;
+    continue;
+   }
    if(entry.kind==='town')this.townDraw(ctx,entry.item,selection,t);
    else if(entry.kind==='firm')this.firmDraw(ctx,entry.item,selection,t);
    else if(entry.kind==='unit')this.unitDraw(ctx,entry.item,selection,t,group.has(entry.item.id),now);
