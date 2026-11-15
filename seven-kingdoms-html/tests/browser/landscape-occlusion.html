@@ -13,16 +13,21 @@ let stage='initializing';
 const watchdog=setTimeout(()=>{
  status.textContent='FAIL: landscape initialization timed out at '+stage;
  document.body.dataset.failed='true';
-},10000);
+},30000);
 try {
  const game=new SevenGame();
  const view=new WorldView(document.getElementById('world'),document.getElementById('mini'),{previewOriginalSprites:true});
  stage='loading PLANT/ROCK manifests';
  await Promise.all([view.originalPlants.loading,view.originalRocks.loading]);
- stage='decoding PLANT/ROCK PNG';
- await Promise.all([view.originalPlants.image?.decode?.(),view.originalRocks.image?.decode?.()].filter(Boolean));
+ // Avoid Image.decode() under headless virtual-time: its promise can
+ // remain pending while the image is already decoded and drawable.
+ // isReady() checks the actual renderer contract (complete + dimensions).
+ stage='waiting for PLANT/ROCK image readiness';
+ for(let attempt=0;attempt<120&&(!view.originalPlants.isReady()||!view.originalRocks.isReady());attempt++){
+  await new Promise(resolve=>setTimeout(resolve,100));
+ }
  stage='validating atlas readiness';
- if(!view.originalPlants.isReady()||!view.originalRocks.isReady())throw Error('PLANT/ROCK original atlas unavailable');
+ if(!view.originalPlants.isReady()||!view.originalRocks.isReady())throw Error('PLANT/ROCK images unavailable after manifest load; plant='+view.originalPlants.image.complete+'/'+view.originalPlants.image.naturalWidth+' rock='+view.originalRocks.image.complete+'/'+view.originalRocks.image.naturalWidth);
  stage='rendering four occlusion scenes';
  const places={};const rockCandidates=[];
  for(let y=12;y<WORLD_H-12;y++)for(let x=12;x<WORLD_W-12;x++){
