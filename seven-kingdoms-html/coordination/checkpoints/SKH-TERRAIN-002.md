@@ -509,3 +509,12 @@ Sostituire un gruppo coerente di elementi naturali provvisori con elementi origi
 - **Test:** npm test/check locali NOT_RUN (nessun checkout locale). CI nuovo HEAD NOT_VERIFIED. Nessun merge, Pages o Android; parità originale NOT_CERTIFIED.
 - **HEAD codice prima del checkpoint:** `9fe8c3500ecd05158186b73412b43da85601845c`. HEAD finale è il commit del checkpoint.
 - **Singolo prossimo passo:** controllare CI HEAD di questo checkpoint; se ancora timeout in `decoding PLANT/ROCK PNG`, correggere il watchdog HTML e il caricamento asincrono sulla base del log; se verde scaricare e ispezionare crop ROCK 1×/2× prima di promuovere PR #120.
+
+
+## Esecuzione 2026-11-15 22:04 CET — CI timeout PNG e fix attesa readiness
+- **Task/PR/branch:** SKH-TERRAIN-002, [PR #120](https://github.com/CzekUns/Rtsmobile/pull/120) draft, `agent/skh-integration/original-landscape-overlays`. Checkpoint precedente `ed80e5dc9d2ced599cd239128c06aea53f8d0678`.
+- **CI esatta:** [Actions #43755727653](https://github.com/CzekUns/Rtsmobile/actions/runs/43755727653) FAILURE su `ed80e5d`, job `132939305055`, step Chromium landscape. Log reale: `FAIL: landscape initialization timed out at decoding PLANT/ROCK PNG`; atlas PLANT e ROCK acquisition SUCCESS, screenshot landscape non prodotto. Il budget Chrome esteso non ha risolto l'attesa di `Image.decode()`.
+- **Codice pubblicato:** [a795dc7](https://github.com/CzekUns/Rtsmobile/commit/a795dc72268ec85848f6d36e62a60f8f802fd42a) modifica `tests/browser/landscape-occlusion.html`: sostituisce la Promise di `Image.decode()` con polling limitato di `isReady()` (condizione effettiva del renderer: `complete` e dimensioni), aggiunge diagnostica delle dimensioni e amplia il watchdog HTML a 30s. Nessun runtime, asset, input, salvataggi alterato. È una correzione specifica **ancora non validata**.
+- **Test:** query Actions per `a795dc7` senza run al momento del controllo; CI HEAD **NOT_VERIFIED**. npm test/check locali **NOT_RUN** (nessun checkout). Nessun merge, Pages nuovo, Android o parità 7KAA certificata.
+- **HEAD codice prima del checkpoint:** `a795dc72268ec85848f6d36e62a60f8f802fd42a`. HEAD finale = commit di questo checkpoint.
+- **Singolo prossimo passo:** verificare la CI dell'HEAD del checkpoint; se fallisce leggere il log Chromium esatto e correggere l'attesa immagini, se verde recuperare l'artefatto ROCK 1×/2× con crop diagnostici, ispezionare clipping/pivot/alpha e valutare i gate della PR #120.
