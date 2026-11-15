@@ -468,3 +468,10 @@ Sostituire un gruppo coerente di elementi naturali provvisori con elementi origi
 - **Verifiche:** CI nuova HEAD NON ANCORA VERIFICATA; npm test/check locali NON ESEGUITI (nessun checkout locale). Nessun merge, nuovo Pages o Android. QA visiva ROCK 1×/2× ancora pendente.
 - **HEAD codice prima del checkpoint:** `fd3e988857acedc9c7780b2610aba13e8a6570de`; HEAD finale è il commit checkpoint.
 - **Singolo prossimo passo:** controllare la CI sul nuovo HEAD; se fallisce leggere il log esatto Chromium e correggere la selezione alpha/front; se verde recuperare e ispezionare lo screenshot ROCK 1×/2× prima di promuovere PR #120.
+
+
+## Esecuzione 2026-11-15 18:03 CET — CI depth ROCK verde, artefatto disponibile
+- **Task/PR/branch:** SKH-TERRAIN-002, PR #120 draft, `agent/skh-integration/original-landscape-overlays`. Checkpoint precedente `d6e5c3df77b08f5442b97ccedefa0083d3374894`.
+- **CI verificata:** [Actions #43732751688](https://github.com/CzekUns/Rtsmobile/actions/runs/43732751688) **SUCCESS** associata esattamente a `d6e5c3df77b08f5442b97ccedefa0083d3374894`. La correzione `fd3e988` del test di profondità ROCK supera dunque il gate automatico. Disponibile artefatto `skh-terrain-002-landscape-occlusion-1x-2x` ID `14169033312` (1019697 byte, non scaduto); PLANT e ROCK atlas presenti, rispettivamente `14169187694` e `14168119887`.
+- **Limite:** nessuna ispezione pixel dell'ultimo screenshot eseguita; il connettore restituisce metadata/ZIP reference, non una immagine visualizzata in questa sessione. Checkout locale `git ls-remote https://github.com/CzekUns/Rtsmobile.git HEAD` fallito con `Could not resolve host: github.com`. `npm test`/`npm run check` locali NOT_RUN; CI SUCCESS non sostituisce QA visiva, Android o parità 7KAA. Nessun nuovo codice runtime/test e nessun merge/Pages in questa esecuzione.
+- **Singolo prossimo passo:** recuperare e aprire realmente `landscape-occlusion-1x-2x.png` dall'artefatto `14169033312`, verificare ROCK davanti/dietro l'unità a 1×/2×, pivot e alpha; se la prova è soddisfacente, effettuare review completa dei gate della PR #120 per promozione non-draft e merge, altrimenti correggere il difetto riproducibile.
