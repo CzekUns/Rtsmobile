@@ -53,7 +53,10 @@ try {
   const selected=[];
   for(const side of [-1,1]){
    let best=null;
-   for(const dy of [.25,.5,.75,1,1.25])for(const dx of [-1,-.5,0,.5,1]){
+   // ROCK painter depth is pos.y+1, not pos.y: a front unit must
+   // have y > pos.y+1 or the renderer correctly draws it behind ROCK.
+   const distances=side<0?[.25,.5,.75,1,1.25]:[1.25,1.5,1.75,2];
+   for(const dy of distances)for(const dx of [-1,-.5,0,.5,1]){
     const u={id:side<0?'qa-behind':'qa-front',x:pos.x+dx,y:pos.y+side*dy,owner:0,kind:'soldier'};
     const unitMask=opaqueMask(ctx=>view.unitDraw(ctx,u,null,t,false,0));
     const pixels=overlapCount(mask,unitMask);
@@ -89,7 +92,7 @@ try {
    const pair=kind==='rock'?rockStraddle(pos,zoom):null;
    const behind=pair?pair[0].u:{id:'qa-behind',x:pos.x,y:pos.y-2,owner:0,kind:'soldier'};
    const front=pair?pair[1].u:{id:'qa-front',x:pos.x,y:pos.y+2,owner:0,kind:'soldier'};
-   if(kind==='rock'&&!(behind.y<pos.y&&front.y>pos.y&&pair.every(v=>v.pixels>0)))throw Error('ROCK alpha-straddle fixture invalid');
+   if(kind==='rock'&&!(behind.y<pos.y+1&&front.y>pos.y+1&&pair.every(v=>v.pixels>0)))throw Error('ROCK alpha-straddle fixture invalid');
    const firm={id:'qa-firm',x:pos.x+3,y:pos.y-3,size:2,owner:0,kind:'fort',hp:100,maxHp:100};
    const originalUnits=game.units,originalFirms=game.firms;
    game.units=[behind,front];game.firms=[firm];
