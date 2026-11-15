@@ -518,3 +518,11 @@ Sostituire un gruppo coerente di elementi naturali provvisori con elementi origi
 - **Test:** query Actions per `a795dc7` senza run al momento del controllo; CI HEAD **NOT_VERIFIED**. npm test/check locali **NOT_RUN** (nessun checkout). Nessun merge, Pages nuovo, Android o parità 7KAA certificata.
 - **HEAD codice prima del checkpoint:** `a795dc72268ec85848f6d36e62a60f8f802fd42a`. HEAD finale = commit di questo checkpoint.
 - **Singolo prossimo passo:** verificare la CI dell'HEAD del checkpoint; se fallisce leggere il log Chromium esatto e correggere l'attesa immagini, se verde recuperare l'artefatto ROCK 1×/2× con crop diagnostici, ispezionare clipping/pivot/alpha e valutare i gate della PR #120.
+
+
+## Esecuzione 2026-11-15 22:56 CET — CI HEAD verde, screenshot ROCK diagnostico aperto
+- **Task/branch/PR:** SKH-TERRAIN-002, `agent/skh-integration/original-landscape-overlays`, PR #120. Checkpoint precedente `c9db65f43c4f7602df12d95d57112fffaa34318f`.
+- **CI HEAD esatta:** [Actions #43761744332](https://github.com/CzekUns/Rtsmobile/actions/runs/43761744332) SUCCESS su `c9db65f43c4f7602df12d95d57112fffaa34318f`. Artefatto `skh-terrain-002-landscape-occlusion-1x-2x` ID `14180119749` scaricato ed estratto, PNG `landscape-occlusion-1x-2x.png` aperto realmente.
+- **QA osservata:** intestazione PASS, quattro scene popolate e crop ROCK con croci ciano/magenta. La diagnostica riporta `ROCK 1x crop at 248,182 | qa-behind: 1 overlapping opaque pixels, centroid (323,211) | qa-front: 3 overlapping opaque pixels, centroid (331,232)`. Intersezione alpha presente ma di **soli 1 e 3 pixel**, troppo esigua per certificare visivamente occlusione robusta, pivot o clipping. Terreno ancora visibilmente a tasselli rettangolari; non attribuire a questo task senza riproduzione. Non dichiarare parità 7KAA.
+- **Codice:** nessuna modifica a runtime, fixture o asset in questa run; pubblicato solo questo checkpoint QA. `npm --prefix seven-kingdoms-html test` e `run check` locali NOT_RUN; CI GitHub HEAD SUCCESS. Nessun merge, Pages nuovo, Android o prova fisica.
+- **Singolo prossimo passo:** modificare la fixture ROCK per richiedere una sovrapposizione alpha significativa (soglia parametrica, non solo >=1 pixel) per entrambe le unità, con diagnostica di area e screenshot 1×/2×, poi rieseguire CI e ispezionare la prova prima di promuovere PR #120.
