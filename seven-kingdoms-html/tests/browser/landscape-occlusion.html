@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><title>SKH-TERRAIN-002 occlusion QA</title>
+<style>body{margin:0;background:#202326;color:white;font:13px monospace}#mini{display:none}.grid{display:grid;grid-template-columns:repeat(2,640px);gap:8px}canvas{image-rendering:pixelated}#world{display:none}</style>
+<p id="status" role="status">Loading original landscape…</p>
+<canvas id="world" width="640" height="420"></canvas><canvas id="mini" width="160" height="120"></canvas><div class="grid" id="frames"></div>
+<script type="module">
+import {SevenGame,terrain,WORLD_W,WORLD_H} from '../../rules.js';
+import {WorldView} from '../../view.js';
+const status=document.getElementById('status');
+try {
+ const game=new SevenGame();
+ const view=new WorldView(document.getElementById('world'),document.getElementById('mini'),{previewOriginalSprites:true});
+ await Promise.all([view.originalPlants.loading,view.originalRocks.loading]);
+ await Promise.all([view.originalPlants.image?.decode?.(),view.originalRocks.image?.decode?.()].filter(Boolean));
+ if(!view.originalPlants.isReady()||!view.originalRocks.isReady())throw Error('PLANT/ROCK original atlas unavailable');
+ const places={};
+ for(let y=12;y<WORLD_H-12;y++)for(let x=12;x<WORLD_W-12;x++){
+  const kind=terrain(game.seed,x,y);
+  if(kind==='forest'&&!places.plant)places.plant={x,y};
+  if(kind==='hill'&&!places.rock)places.rock={x,y};
+ }
+ if(!places.plant||!places.rock)throw Error('Forest or hill missing from demo world');
+ const output=document.getElementById('frames');
+ let frames=0;
+ for(const kind of ['plant','rock']){
+  const pos=places[kind];
+  for(const zoom of [1,2]){
+   view.center(pos.x,pos.y);view.zoom=zoom;
+   // Two entities straddle the overlay baseline; a third is an actual
+   // firm drawn through WorldView. These objects never enter a saved game.
+   const behind={id:'qa-behind',x:pos.x,y:pos.y-2,owner:0,kind:'soldier'};
+   const front={id:'qa-front',x:pos.x,y:pos.y+2,owner:0,kind:'soldier'};
+   const firm={id:'qa-firm',x:pos.x+3,y:pos.y-3,size:2,owner:0,kind:'fort',hp:100,maxHp:100};
+   const originalUnits=game.units,originalFirms=game.firms;
+   game.units=[behind,front];game.firms=[firm];
+   const calls=[];
+   const originalUnitDraw=view.unitDraw,originalFirmDraw=view.firmDraw;
+   const overlay=kind==='plant'?view.originalPlants:view.originalRocks;
+   const originalOverlayDraw=overlay.draw;
+   view.unitDraw=function(ctx,u,...rest){if(u.id.startsWith('qa-'))calls.push(u.id);return originalUnitDraw.call(this,ctx,u,...rest)};
+   view.firmDraw=function(ctx,f,...rest){if(f.id==='qa-firm')calls.push(f.id);return originalFirmDraw.call(this,ctx,f,...rest)};
+   overlay.draw=function(ctx,x,y,...rest){if(Math.abs(x-view.screen(pos.x,pos.y).x)<1&&Math.abs(y-view.screen(pos.x,pos.y).y)<1)calls.push(kind);return originalOverlayDraw.call(this,ctx,x,y,...rest)};
+   try{view.draw(game,null)}finally{
+    game.units=originalUnits;game.firms=originalFirms;
+    view.unitDraw=originalUnitDraw;view.firmDraw=originalFirmDraw;overlay.draw=originalOverlayDraw;
+   }
+   const a=calls.indexOf('qa-behind'),b=calls.indexOf(kind),c=calls.indexOf('qa-front');
+   if(a<0||b<0||c<0||!(a<b&&b<c))throw Error(kind+' '+zoom+'x depth failure: '+calls.join(','));
+   if(!calls.includes('qa-firm'))throw Error('Building missing from painter queue');
+   if((kind==='plant'?view.authenticPlantsDrawn:view.authenticRocksDrawn)<1)throw Error(kind+' original bitmap not drawn');
+   const copy=document.createElement('canvas');copy.width=view.canvas.width;copy.height=view.canvas.height;
+   copy.getContext('2d').drawImage(view.canvas,0,0);
+   copy.dataset.scene=kind+'-'+zoom+'x';output.append(copy);frames++;
+  }
+ }
+ status.textContent='PASS: WorldView original PLANT/ROCK occlusion, building and units, 1x/2x; frames='+frames;
+}catch(e){status.textContent='FAIL: '+e.message;document.body.dataset.failed='true'}
+</script></html>
