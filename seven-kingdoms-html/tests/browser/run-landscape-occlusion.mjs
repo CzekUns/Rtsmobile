@@ -21,11 +21,16 @@ try{
  const dom=await chrome(['--dump-dom']);
  const status=dom.match(/<p id="status" role="status">([^<]*)<\/p>/)?.[1];
  if(!status?.startsWith('PASS: WorldView original PLANT/ROCK occlusion'))throw Error('Landscape occlusion: '+(status||'status missing')+' '+dom.slice(-1200));
- const captures=[...dom.matchAll(/<canvas\b[^>]*data-scene="(plant|rock)-(1|2)x"[^>]*data-pixel-hash="([0-9a-f]+)"/g)];
- if(captures.length!==4)throw Error('Expected four canvas captures with pixel hashes, got '+captures.length);
- const sceneKeys=captures.map(m=>m[1]+'-'+m[2]);
+ // Chromium serializes DOM attributes in implementation-dependent order.
+ // Parse each canvas tag independently, rather than assuming data-scene precedes data-pixel-hash.
+ const captures=[...dom.matchAll(/<canvas\\b[^>]*>/g)].map(([tag])=>({
+  scene:tag.match(/\\bdata-scene="(plant|rock)-(1|2)x"/),
+  hash:tag.match(/\\bdata-pixel-hash="([0-9a-f]+)"/)
+ })).filter(c=>c.scene&&c.hash);
+ if(captures.length!==4)throw Error('Expected four canvas captures with pixel hashes, got '+captures.length+'; status='+status+'; canvas tags='+[...dom.matchAll(/<canvas\\b[^>]*>/g)].map(m=>m[0].slice(0,240)).join(' | '));
+ const sceneKeys=captures.map(c=>c.scene[1]+'-'+c.scene[2]);
  if(new Set(sceneKeys).size!==4)throw Error('Duplicate or missing PLANT/ROCK zoom captures: '+sceneKeys.join(','));
- if(new Set(captures.map(m=>m[3])).size!==4)throw Error('Identical rendered pixel signatures across distinct landscape captures');
+ if(new Set(captures.map(c=>c.hash[1])).size!==4)throw Error('Identical rendered pixel signatures across distinct landscape captures: '+captures.map(c=>c.scene[0]+'='+c.hash[1]).join(','));
  await chrome(['--screenshot='+screenshot]);
  const png=await readFile(screenshot);
  if(!png.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])))throw Error('Invalid PNG screenshot');
