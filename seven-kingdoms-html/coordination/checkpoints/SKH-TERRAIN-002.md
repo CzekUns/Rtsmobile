@@ -392,3 +392,12 @@ Sostituire un gruppo coerente di elementi naturali provvisori con elementi origi
 - **Test:** npm test/check locali NOT_RUN: `git ls-remote https://github.com/CzekUns/Rtsmobile.git HEAD` → `Could not resolve host: github.com`. CI del commit `cde6259` NON VERIFICATA. Nessun merge, Pages o Android. Screenshot non ispezionato.
 - **HEAD codice prima del checkpoint:** `cde6259317c906bdf688fd7cafce25288e8b3339`; HEAD finale = commit di aggiornamento di questo checkpoint.
 - **Singolo prossimo passo:** verificare CI dell'HEAD checkpoint; se rossa leggere la diagnostica dello step Chromium e correggere l'errore concreto; se verde recuperare e ispezionare visivamente screenshot 1×/2× per clipping/trasparenze prima della promozione PR #120.
+
+
+## Esecuzione 2026-11-15 08:55 CET — watchdog diagnostico per stallo Chromium
+- **Task/PR/branch:** SKH-TERRAIN-002, PR #120 draft, `agent/skh-integration/original-landscape-overlays`. Checkpoint precedente `79ba047bb96afb2330e61df51d8ed13f2863c90c`.
+- **CI HEAD precedente:** [Actions #43688126682](https://github.com/CzekUns/Rtsmobile/actions/runs/43688126682) FAILURE. Node unit tests, Chromium HUD, Chromium PLANT, job acquisizione PLANT e ROCK SUCCESS; solo step `Chromium original landscape depth and occlusion 1x/2x` FAILURE. Log reale: `Error: Landscape occlusion: Loading original landscape…`, quindi il DOM è stato acquisito prima del completamento dell'inizializzazione asincrona, senza messaggio di errore della pagina. Nessun artefatto occlusione prodotto.
+- **Codice pubblicato:** [ad389af](https://github.com/CzekUns/Rtsmobile/commit/ad389af463c9da4d2220b6cd7851a75de85e86b1) modifica `tests/browser/landscape-occlusion.html`: watchdog 10 secondi e identificazione della fase (manifest, decode PNG, readiness, rendering), fallimento esplicito invece di `Loading` indefinito. Non cambia runtime, asset, input o simulazione. **Non ancora certificato come fix del problema asincrono**, serve nuovo log.
+- **Test:** npm locali NOT_RUN, checkout `git ls-remote` → `Could not resolve host: github.com`. CI sul nuovo HEAD NOT_VERIFIED. Nessun merge, Pages, Android o QA visiva eseguita.
+- **HEAD codice:** `ad389af463c9da4d2220b6cd7851a75de85e86b1`; branch HEAD finale = commit del presente checkpoint.
+- **Singolo prossimo passo:** leggere CI/log Chromium sull'HEAD di questo checkpoint; se il watchdog segnala timeout di manifest/decode, correggere l'attesa o il caricamento effettivo, poi ottenere screenshot 1×/2× e ispezionarlo. Non promuovere PR #120 finché Chromium non è verde.
