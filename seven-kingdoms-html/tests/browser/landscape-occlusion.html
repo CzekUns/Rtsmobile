@@ -136,24 +136,41 @@ try {
     // Mark the actual pixel-overlap region, not just unit tile coordinates.
     const tile=view.tile(),anchor=view.screen(pos.x,pos.y);
     const rockMask=opaqueMask(ctx=>view.originalRocks.draw(ctx,anchor.x,anchor.y,tile,game.seed,pos.x,pos.y));
-    const detail=document.createElement('canvas');detail.width=320;detail.height=160;
-    const dc=detail.getContext('2d');dc.imageSmoothingEnabled=false;
-    const sx=Math.max(0,Math.min(copy.width-160,Math.round(anchor.x-80)));
-    const sy=Math.max(0,Math.min(copy.height-80,Math.round(anchor.y-40)));
-    dc.drawImage(copy,sx,sy,160,80,0,0,320,160);
-    const marks=[];
+    // Find intersections over the entire framebuffer first: at 2x the
+    // front unit may lie outside a fixed crop centered on the ROCK anchor.
+    const intersections=[];
     for(const [index,entry] of pair.entries()){
      const unitMask=opaqueMask(ctx=>view.unitDraw(ctx,entry.u,null,tile,false,0));
-     let count=0,sumX=0,sumY=0;
-     for(let y=sy;y<Math.min(sy+80,copy.height);y++)for(let x=sx;x<Math.min(sx+160,copy.width);x++){
+     let count=0,sumX=0,sumY=0,minX=copy.width,minY=copy.height,maxX=-1,maxY=-1;
+     for(let y=0;y<copy.height;y++)for(let x=0;x<copy.width;x++){
       const i=y*copy.width+x;
-      if(rockMask[i]&&unitMask[i]){count++;sumX+=x;sumY+=y;}
+      if(rockMask[i]&&unitMask[i]){
+       count++;sumX+=x;sumY+=y;
+       minX=Math.min(minX,x);minY=Math.min(minY,y);
+       maxX=Math.max(maxX,x);maxY=Math.max(maxY,y);
+      }
      }
-     if(!count)throw Error('ROCK '+zoom+'x intersection outside diagnostic crop: '+entry.u.id);
-     const mx=2*(sumX/count-sx),my=2*(sumY/count-sy);
-     dc.strokeStyle=index===0?'#00ffff':'#ff00ff';dc.lineWidth=1;
+     if(!count)throw Error('ROCK '+zoom+'x missing full-frame alpha intersection: '+entry.u.id);
+     intersections.push({index,entry,count,cx:sumX/count,cy:sumY/count,minX,minY,maxX,maxY});
+    }
+    const left=Math.min(...intersections.map(v=>v.minX));
+    const right=Math.max(...intersections.map(v=>v.maxX));
+    const top=Math.min(...intersections.map(v=>v.minY));
+    const bottom=Math.max(...intersections.map(v=>v.maxY));
+    const cropW=Math.min(copy.width,Math.max(160,right-left+33));
+    const cropH=Math.min(copy.height,Math.max(80,bottom-top+33));
+    const sx=Math.max(0,Math.min(copy.width-cropW,Math.round((left+right-cropW)/2)));
+    const sy=Math.max(0,Math.min(copy.height-cropH,Math.round((top+bottom-cropH)/2)));
+    const detail=document.createElement('canvas');detail.width=cropW*2;detail.height=cropH*2;
+    const dc=detail.getContext('2d');dc.imageSmoothingEnabled=false;
+    dc.drawImage(copy,sx,sy,cropW,cropH,0,0,detail.width,detail.height);
+    const marks=[];
+    for(const v of intersections){
+     const mx=2*(v.cx-sx),my=2*(v.cy-sy);
+     if(mx<0||my<0||mx>=detail.width||my>=detail.height)throw Error('ROCK diagnostic centroid out of bounds: '+v.entry.u.id);
+     dc.strokeStyle=v.index===0?'#00ffff':'#ff00ff';dc.lineWidth=1;
      dc.beginPath();dc.moveTo(mx-8,my);dc.lineTo(mx+8,my);dc.moveTo(mx,my-8);dc.lineTo(mx,my+8);dc.stroke();
-     marks.push(entry.u.id+': '+count+' overlapping opaque pixels, centroid ('+Math.round(sumX/count)+','+Math.round(sumY/count)+')');
+     marks.push(v.entry.u.id+': '+v.count+' overlapping opaque pixels, centroid ('+Math.round(v.cx)+','+Math.round(v.cy)+')');
     }
     const img=document.createElement('img');img.className='rock-detail';
     img.alt='ROCK '+zoom+'x enlarged pixel crop; cyan behind, magenta front; '+marks.join('; ');
