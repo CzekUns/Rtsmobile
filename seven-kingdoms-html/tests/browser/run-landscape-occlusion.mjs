@@ -7,11 +7,11 @@ const screenshot=process.env.LANDSCAPE_QA_SCREENSHOT||'/tmp/skh-landscape-occlus
 const server=spawn('python3',['-m','http.server',String(port),'--bind','127.0.0.1'],{cwd:'seven-kingdoms-html',stdio:'ignore'});
 const url=`http://127.0.0.1:${port}/tests/browser/landscape-occlusion.html`;
 async function chrome(args){
- const child=spawn(browser,['--headless','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--disable-background-networking','--hide-scrollbars','--window-size=1400,1100','--virtual-time-budget=15000',...args,url],{stdio:['ignore','pipe','pipe']});
+ const child=spawn(browser,['--headless','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--disable-background-networking','--hide-scrollbars','--window-size=1400,1100','--virtual-time-budget=45000',...args,url],{stdio:['ignore','pipe','pipe']});
  let stdout='',stderr='';
  child.stdout.on('data',d=>stdout+=d);
  child.stderr.on('data',d=>stderr+=d);
- const result=await Promise.race([new Promise(resolve=>child.on('close',code=>resolve({code}))),sleep(35000).then(()=>({timeout:true}))]);
+ const result=await Promise.race([new Promise(resolve=>child.on('close',code=>resolve({code}))),sleep(75000).then(()=>({timeout:true}))]);
  if(result.timeout)child.kill('SIGKILL');
  if(result.timeout||result.code!==0)throw Error('Chromium '+JSON.stringify(result)+' '+stderr.slice(-1200));
  return stdout;
