@@ -83,3 +83,19 @@ test('firm preview phase uses exact contact sheet frame and does not change coll
  assert.equal(fort.size,3);
  assert.equal(preview.drawFirm(ctx,{...fort,owner:1},30,40,24),false);
 });
+
+test('renderer rejects malformed source catalog geometry without drawing out-of-atlas cells',async()=>{
+ const {OriginalSpritePreview}=await import('../playtest/original-sprites.js');
+ const draws=[];
+ const make=()=>({complete:true,naturalWidth:768,naturalHeight:672,addEventListener(){},set src(_){}});
+ const ctx={save(){},restore(){},drawImage(...args){draws.push(args)}};
+ const unitCatalog={'NORMAN:M':{...getOriginalUnit('NORMAN:M'),frameWidth:95}};
+ const preview=new OriginalSpritePreview({imageFactory:make,canvasFactory:()=>({}),unitCatalog});
+ assert.equal(preview.drawUnit(ctx,{kind:'soldier',raceId:'norman',owner:1},0,0,24,0,0),false);
+ assert.equal(draws.length,0);
+ const firmCatalog={'BASE:NORMAN':{...getOriginalStructure('BASE:NORMAN'),phaseColumns:5}};
+ const firmPreview=new OriginalSpritePreview({imageFactory:make,canvasFactory:()=>({}),structureCatalog:firmCatalog});
+ firmPreview.firmBlue={width:720,height:160};
+ assert.equal(firmPreview.drawFirm(ctx,{kind:'fort',owner:2,size:3},0,0,24),false);
+ assert.equal(draws.length,0);
+});
