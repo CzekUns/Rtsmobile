@@ -14,6 +14,7 @@ export const ORIGINAL_STRUCTURE_CATALOG = frozen({
     atlasHeight:ORIGINAL_SHEETS.firm.height,
     sourceFootprint: frozen({width:4,height:4,unit:'tile'}),
     phases:frozen([0,1,2,3]),
+    constructionPhaseCount:4,
     frameWidth:ORIGINAL_SHEETS.firm.cellWidth,
     frameHeight:ORIGINAL_SHEETS.firm.cellHeight,
     phaseColumns:ORIGINAL_SHEETS.firm.columns,
@@ -31,6 +32,7 @@ export const ORIGINAL_UNIT_CATALOG = frozen({
     frameHeight:ORIGINAL_SHEETS.unit.cellHeight,
     directions:8,
     walkingFrames:6,
+    directionOrder:'N,NE,E,SE,S,SW,W,NW',
     status:'preview-only'
   })
 });
@@ -39,9 +41,23 @@ export function getOriginalUnit(id){return ORIGINAL_UNIT_CATALOG[id]??null}
 export function validateOriginalCatalog(){
   const errors=[];
   for(const [id,entry] of Object.entries({...ORIGINAL_STRUCTURE_CATALOG,...ORIGINAL_UNIT_CATALOG})){
-    if(entry.frameWidth* (entry.phaseColumns??entry.directions)!==entry.atlasWidth)errors.push(id+': atlas width mismatch');
-    if(entry.frameHeight*(entry.walkingFrames??1)!==entry.atlasHeight)errors.push(id+': atlas height mismatch');
-    if(entry.sourceFootprint&&(!Number.isInteger(entry.sourceFootprint.width)||!Number.isInteger(entry.sourceFootprint.height)))errors.push(id+': invalid footprint');
+    const columns=entry.phaseColumns??entry.directions;
+    const rows=entry.walkingFrames??1;
+    const positiveInt=value=>Number.isSafeInteger(value)&&value>0;
+    if(![entry.frameWidth,entry.frameHeight,entry.atlasWidth,entry.atlasHeight,columns,rows].every(positiveInt)){
+      errors.push(id+': invalid atlas geometry');
+      continue;
+    }
+    if(entry.frameWidth*columns!==entry.atlasWidth)errors.push(id+': atlas width mismatch');
+    if(entry.frameHeight*rows!==entry.atlasHeight)errors.push(id+': atlas height mismatch');
+    if(entry.sourceFootprint&&(!positiveInt(entry.sourceFootprint.width)||!positiveInt(entry.sourceFootprint.height)))errors.push(id+': invalid footprint');
+    if(entry.phases){
+      if(!Array.isArray(entry.phases)||entry.phases.length!==columns||
+        entry.phases.some((phase,index)=>phase!==index)||
+        entry.constructionPhaseCount!==entry.phases.length)errors.push(id+': invalid construction phases');
+    }
+    if(entry.directions&&entry.directionOrder!=='N,NE,E,SE,S,SW,W,NW')errors.push(id+': unverified direction order');
+    if(!entry.atlas||entry.status!=='preview-only')errors.push(id+': source or preview status missing');
   }
   return errors;
 }
