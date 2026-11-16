@@ -24,6 +24,17 @@ export async function inventoryOriginalFamilies(root){
   const units=originalTables(set).SPRITE;
   const firms=parseFirmTables(set);
   const races=[...new Set(firms.FBUILD.map(row=>row.raceCode))].filter(Boolean).sort();
+  // Unit SPRITE codes do not encode a reliable race relationship. Inventory every
+  // source record separately; never silently drop valid sprites or assign a race.
+  const spriteCatalog=[];
+  for(const row of units){
+    let bytes=null;
+    try{bytes=await sourceFile(root,'SPRITE',row.code+'.SPR')}
+    catch(error){if(!String(error.message).startsWith('Missing original'))throw error}
+    spriteCatalog.push({code:row.code,sourceAvailable:bytes!==null,
+      sha256:bytes===null?null:sha256(bytes),turnResolution:row.turnResolution,
+      raceAssignment:'unverified'});
+  }
   const candidates=[];
   for(const race of races){
     const buildings=[];
@@ -34,22 +45,12 @@ export async function inventoryOriginalFamilies(root){
           constructionBitmapCount:selected.stages.length,sourceBitmapRecords:selected.main.map(x=>x.recordNo)});
       }catch(error){buildings.push({id:row.firmCode+':'+race,error:String(error.message)})}
     }
-    const sprites=[];
-    for(const row of units){
-      // Sprite names are not necessarily race-prefixed. No invented race assignment.
-      if(row.code===race){
-        let present=false,hash=null;
-        try{const bytes=await sourceFile(root,'SPRITE',row.code+'.SPR');present=true;hash=sha256(bytes)}
-        catch(error){if(!String(error.message).startsWith('Missing original'))throw error}
-        sprites.push({code:row.code,sourceAvailable:present,sha256:hash,turnResolution:row.turnResolution});
-      }
-    }
-    candidates.push({race,buildings,sprites});
+    candidates.push({race,buildings});
   }
   return {schemaVersion:1,status:'source-inventory-only',decoded:false,visuallyVerified:false,
     source:{repository:'the3dfxdude/7kaa',paths:['data/RESOURCE/STD.SET','data/RESOURCE/I_FIRM.RES','data/RESOURCE/PAL_STD.RES'],
       sha256:{set:sha256(set),firm:sha256(firm),palette:sha256(palette)}},
-    candidates};
+    spriteCatalog,candidates};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){
   const args=process.argv.slice(2),value=k=>args[args.indexOf(k)+1];
