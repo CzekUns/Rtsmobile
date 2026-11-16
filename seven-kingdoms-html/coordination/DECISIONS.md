@@ -27,3 +27,7 @@
 **Risultato:** PR #118 unita su `c1a9afb39f4cd52e4a39f94addc4a5efe55444c2`, sorgenti byte/palette 7KAA verificati, 180 tasselli di costa mare/erba con tutti i 14 pattern di angoli, test CI #43439241900 e Pages #43439241935 success. Il rendering è **pixel originale applicato a un mondo dimostrativo**, e NON implementa il generatore di 7KAA o quote/sottotipi completi.
 
 **Decisione:** task `SKH-TERRAIN-001` → `awaiting_manual_qa` con prova device e confronto stessa scena ancora da svolgere; passaggio al prossimo incarico già preconcordato `SKH-TERRAIN-002` (vegetazione, rocce, colline e layering). Non creare un nuovo programma, riusare checkpoint sul branch del task corrente.
+
+
+## 2026-11-16 — transizione tecnica SKH-TERRAIN-002 → SKH-STRUCTURES-001
+PR #120 promossa e squash-merged su main `f914a3ab007a7760026829bbc7216080564e0988` con CI PR HEAD verde (#43778104231) e nessun conflitto (mergeable true, behind main 0). Rimangono QA Android/parità 7KAA e verifica Pages post-merge; registrati come pendenti senza certificazione. Si prosegue nel task già concordato SKH-STRUCTURES-001, senza cambiare ordine.
