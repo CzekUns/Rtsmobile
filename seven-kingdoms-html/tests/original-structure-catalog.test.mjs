@@ -99,3 +99,32 @@ test('renderer rejects malformed source catalog geometry without drawing out-of-
  assert.equal(firmPreview.drawFirm(ctx,{kind:'fort',owner:2,size:3},0,0,24),false);
  assert.equal(draws.length,0);
 });
+
+test('explicit catalogs fail closed for missing records and inconsistent source metadata',async()=>{
+ const {OriginalSpritePreview}=await import('../playtest/original-sprites.js');
+ const make=()=>({complete:true,naturalWidth:768,naturalHeight:672,addEventListener(){},set src(_){}});
+ const draws=[];
+ const ctx={save(){},restore(){},drawImage(...args){draws.push(args)}};
+ const soldier={kind:'soldier',raceId:'norman',owner:1};
+ const fort={kind:'fort',owner:2,size:3};
+ const absent=new OriginalSpritePreview({imageFactory:make,canvasFactory:()=>({}),unitCatalog:{},structureCatalog:{}});
+ absent.firmBlue={width:720,height:160};
+ assert.equal(absent.drawUnit(ctx,soldier,0,0,24,0,0),false);
+ assert.equal(absent.drawFirm(ctx,fort,0,0,24),false);
+ const wrongUnit=new OriginalSpritePreview({imageFactory:make,canvasFactory:()=>({}),unitCatalog:{
+  'NORMAN:M':{...getOriginalUnit('NORMAN:M'),directionOrder:'S,SW,W,NW,N,NE,E,SE'}
+ }});
+ assert.equal(wrongUnit.drawUnit(ctx,soldier,0,0,24,0,0),false);
+ for(const corrupt of [
+  {sourceFootprint:{width:3,height:3,unit:'tile'}},
+  {constructionPhaseCount:3},
+  {phases:[0,1,1,3]}
+ ]){
+  const wrongFirm=new OriginalSpritePreview({imageFactory:make,canvasFactory:()=>({}),structureCatalog:{
+   'BASE:NORMAN':{...getOriginalStructure('BASE:NORMAN'),...corrupt}
+  }});
+  wrongFirm.firmBlue={width:720,height:160};
+  assert.equal(wrongFirm.drawFirm(ctx,fort,0,0,24),false);
+ }
+ assert.equal(draws.length,0);
+});
