@@ -45,3 +45,41 @@ test('catalog construction and directional metadata remain explicit and bounded'
  assert.equal(getOriginalStructure('__proto__'),null);
  assert.equal(getOriginalUnit('constructor'),null);
 });
+
+test('renderer uses exact Norman source cells at 1x and 2x, with fallback for other races',async()=>{
+ const {OriginalSpritePreview}=await import('../playtest/original-sprites.js');
+ const images=[];
+ const make=()=>{
+  const img={complete:true,naturalWidth:0,naturalHeight:0,addEventListener(){},set src(v){this.url=v}};
+  images.push(img);return img;
+ };
+ const preview=new OriginalSpritePreview({imageFactory:make,canvasFactory:()=>({}),structureCatalog:ORIGINAL_STRUCTURE_CATALOG,unitCatalog:ORIGINAL_UNIT_CATALOG});
+ const calls=[];
+ const ctx={save(){calls.push('save')},restore(){calls.push('restore')},drawImage(...args){calls.push(args)},imageSmoothingEnabled:true};
+ images[0].naturalWidth=768;images[0].naturalHeight=672;
+ assert.equal(preview.drawUnit(ctx,{kind:'soldier',raceId:'norman',owner:1},100,200,24,3,4),true);
+ assert.deepEqual(calls[1].slice(1,5),[288,448,96,112]);
+ assert.deepEqual(calls[1].slice(5),[48,118,96,112]);
+ calls.length=0;
+ assert.equal(preview.drawUnit(ctx,{kind:'soldier',raceId:'norman',owner:1},100,200,48,3,4),true);
+ assert.deepEqual(calls[1].slice(5),[-4,36,192,224]);
+ calls.length=0;
+ assert.equal(preview.drawUnit(ctx,{kind:'soldier',raceId:'greek',owner:1},100,200,24,3,4),false);
+ assert.equal(preview.drawUnit(ctx,{kind:'soldier',raceId:'norman',owner:1},100,200,24,8,0),false);
+ assert.equal(preview.drawUnit(ctx,{kind:'soldier',raceId:'norman',owner:1},100,200,24,3,6),false);
+ assert.equal(calls.length,0);
+});
+
+test('firm preview phase uses exact contact sheet frame and does not change collision footprint',async()=>{
+ const {OriginalSpritePreview}=await import('../playtest/original-sprites.js');
+ const preview=new OriginalSpritePreview({imageFactory:()=>({addEventListener(){},set src(_){} }),canvasFactory:()=>({}),structureCatalog:ORIGINAL_STRUCTURE_CATALOG,unitCatalog:ORIGINAL_UNIT_CATALOG});
+ preview.firmBlue={width:720,height:160};
+ const calls=[];
+ const ctx={save(){},restore(){},drawImage(...args){calls.push(args)}};
+ const fort={owner:2,kind:'fort',size:3,underConstruction:false};
+ assert.equal(preview.drawFirm(ctx,fort,30,40,24),true);
+ assert.deepEqual(calls[0].slice(1,5),[540,0,180,160]);
+ assert.equal(calls[0][7],135); // 180 * (3 / 4), visual only
+ assert.equal(fort.size,3);
+ assert.equal(preview.drawFirm(ctx,{...fort,owner:1},30,40,24),false);
+});
