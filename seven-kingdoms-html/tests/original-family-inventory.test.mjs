@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {mkdtemp,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
-import {inventoryOriginalFamilies,inventorySpriteRecords,validateSpriteCode} from '../tools/assets/inventory-families.mjs';
+import {inventoryOriginalFamilies,inventorySpriteRecords,validateSpriteCode,summarizeSpriteActions} from '../tools/assets/inventory-families.mjs';
 
 test('source inventory refuses absent original STD.SET instead of inventing races',async()=>{
   const dir=await mkdtemp(join(tmpdir(),'skh-structures-'));
@@ -52,4 +52,24 @@ test('generic errors with missing-file wording do not get swallowed',async()=>{
   await assert.rejects(inventorySpriteRecords([{code:'NORMAN_M'}],async()=>{
     throw Error('Missing original but upstream parser failed');
   }),/upstream parser failed/);
+});
+
+test('sprite action inventory preserves original directions and frame IDs',()=>{
+  const sprite={code:'GREEK',firstAction:2,actionCount:2};
+  const actions=[{sprite:'OTHER'}, {sprite:'GREEK',action:'M',direction:0,firstFrame:1,frameCount:2,recordNo:2},
+    {sprite:'GREEK',action:'S',direction:0,firstFrame:3,frameCount:1,recordNo:3}];
+  const frames=[{sprite:'GREEK',recordNo:1},{sprite:'GREEK',recordNo:2},{sprite:'GREEK',recordNo:3}];
+  assert.deepEqual(summarizeSpriteActions(sprite,actions,frames),[
+    {action:'M',direction:0,frameCount:2,sourceAction:2,firstFrame:1,sourceFrames:[1,2]},
+    {action:'S',direction:0,frameCount:1,sourceAction:3,firstFrame:3,sourceFrames:[3]}
+  ]);
+});
+test('sprite action inventory rejects out-of-range or foreign source references',()=>{
+  const sprite={code:'GREEK',firstAction:1,actionCount:1};
+  const action={sprite:'GREEK',action:'M',direction:0,firstFrame:1,frameCount:2};
+  const frames=[{sprite:'GREEK',recordNo:1},{sprite:'OTHER',recordNo:2}];
+  assert.throws(()=>summarizeSpriteActions(sprite,[action],frames),/Foreign frame/);
+  assert.throws(()=>summarizeSpriteActions({...sprite,actionCount:2},[action],frames),/Invalid original action range/);
+  assert.throws(()=>summarizeSpriteActions(sprite,[{...action,frameCount:3}],frames),/Invalid original frame range/);
+  assert.throws(()=>summarizeSpriteActions(sprite,[{...action,sprite:'OTHER'}],frames),/Foreign action/);
 });
