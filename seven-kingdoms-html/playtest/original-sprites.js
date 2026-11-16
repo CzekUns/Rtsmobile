@@ -87,13 +87,16 @@ export class OriginalSpritePreview{
   const sheet=record?{...ORIGINAL_SHEETS.unit,cellWidth:record.frameWidth,cellHeight:record.frameHeight,columns:record.directions,rows:record.walkingFrames}:ORIGINAL_SHEETS.unit;
   const image=unit?.owner===2?this.unitBlue:this.unit;
   if(!isUnitPreviewProxy(unit)||!ready(image,sheet))return false;
+  // A supplied catalog is authoritative: absent records must not revive a proxy.
+  if(this.unitCatalog && !Object.hasOwn(this.unitCatalog,'NORMAN:M'))return false;
   if(!Number.isInteger(direction)||direction<0||direction>=sheet.columns)return false;
   if(!Number.isInteger(frame)||frame<0||frame>=sheet.rows)return false;
   if(record && (record.atlas!==ORIGINAL_SHEETS.unit.path || record.atlasWidth!==sheet.width || record.atlasHeight!==sheet.height ||
     !Number.isSafeInteger(record.frameWidth) || !Number.isSafeInteger(record.frameHeight) ||
     !Number.isSafeInteger(record.directions) || !Number.isSafeInteger(record.walkingFrames) ||
     record.frameWidth<=0 || record.frameHeight<=0 || record.directions<=0 || record.walkingFrames<=0 ||
-    record.frameWidth*record.directions!==sheet.width || record.frameHeight*record.walkingFrames!==sheet.height))return false;
+    record.frameWidth*record.directions!==sheet.width || record.frameHeight*record.walkingFrames!==sheet.height ||
+    record.directionOrder!=='N,NE,E,SE,S,SW,W,NW'))return false;
   const scale=t/24;
   ctx.save();ctx.imageSmoothingEnabled=false;
   // Source-frame offsets have been baked into each transparent 96x112 cell.
@@ -107,11 +110,15 @@ export class OriginalSpritePreview{
   const sheet=record?{...ORIGINAL_SHEETS.firm,cellWidth:record.frameWidth,cellHeight:record.frameHeight,columns:record.phaseColumns}:ORIGINAL_SHEETS.firm;
   const image=this.firmBlue;
   if(!isFirmPreviewProxy(firm)||!ready(image,sheet))return false;
+  if(this.structureCatalog && !Object.hasOwn(this.structureCatalog,'BASE:NORMAN'))return false;
   if(record && (record.atlas!==ORIGINAL_SHEETS.firm.path || record.atlasWidth!==sheet.width || record.atlasHeight!==sheet.height ||
     !Number.isSafeInteger(record.frameWidth) || !Number.isSafeInteger(record.frameHeight) ||
     !Number.isSafeInteger(record.phaseColumns) || record.frameWidth<=0 || record.frameHeight<=0 || record.phaseColumns<=0 ||
     record.frameWidth*record.phaseColumns!==sheet.width || record.frameHeight!==sheet.height ||
-    !Array.isArray(record.phases) || !record.phases.includes(originalFirmPhase(firm))))return false;
+    !Array.isArray(record.phases) || record.phases.length!==record.phaseColumns ||
+    record.phases.some((value,index)=>value!==index) || record.constructionPhaseCount!==record.phases.length ||
+    record.sourceFootprint?.width!==4 || record.sourceFootprint?.height!==4 ||
+    !record.phases.includes(originalFirmPhase(firm))))return false;
   const phase=originalFirmPhase(firm);
   // BASE:NORMAN is 4x4 original, but the temporary demo fort has 3x3
   // collision: scale visual only, never change the simulation footprint.
