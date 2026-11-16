@@ -66,7 +66,9 @@ export function blueVariantFromImage(img,makeCanvas){
  }catch(_){return null}
 }
 export class OriginalSpritePreview{
- constructor({imageFactory,canvasFactory}={}){
+ constructor({imageFactory,canvasFactory,structureCatalog=null,unitCatalog=null}={}){
+  this.structureCatalog=structureCatalog;
+  this.unitCatalog=unitCatalog;
   const make=imageFactory||(()=>new Image());
   const canvas=canvasFactory||(()=>document.createElement('canvas'));
   this.unit=make();this.firm=make();
@@ -81,11 +83,13 @@ export class OriginalSpritePreview{
   this.firm.src=new URL(ORIGINAL_SHEETS.firm.path,import.meta.url).href;
  }
  drawUnit(ctx,unit,x,y,t,direction,frame){
-  const sheet=ORIGINAL_SHEETS.unit;
+  const record=this.unitCatalog?.['NORMAN:M'];
+  const sheet=record?{...ORIGINAL_SHEETS.unit,cellWidth:record.frameWidth,cellHeight:record.frameHeight,columns:record.directions,rows:record.walkingFrames}:ORIGINAL_SHEETS.unit;
   const image=unit?.owner===2?this.unitBlue:this.unit;
   if(!isUnitPreviewProxy(unit)||!ready(image,sheet))return false;
   if(!Number.isInteger(direction)||direction<0||direction>=sheet.columns)return false;
   if(!Number.isInteger(frame)||frame<0||frame>=sheet.rows)return false;
+  if(record && (record.atlas!==ORIGINAL_SHEETS.unit.path || record.atlasWidth!==sheet.width || record.atlasHeight!==sheet.height))return false;
   const scale=t/24;
   ctx.save();ctx.imageSmoothingEnabled=false;
   // Source-frame offsets have been baked into each transparent 96x112 cell.
@@ -95,9 +99,11 @@ export class OriginalSpritePreview{
   ctx.restore();return true;
  }
  drawFirm(ctx,firm,x,y,t){
-  const sheet=ORIGINAL_SHEETS.firm;
+  const record=this.structureCatalog?.['BASE:NORMAN'];
+  const sheet=record?{...ORIGINAL_SHEETS.firm,cellWidth:record.frameWidth,cellHeight:record.frameHeight,columns:record.phaseColumns}:ORIGINAL_SHEETS.firm;
   const image=this.firmBlue;
   if(!isFirmPreviewProxy(firm)||!ready(image,sheet))return false;
+  if(record && (record.atlas!==ORIGINAL_SHEETS.firm.path || record.atlasWidth!==sheet.width || record.atlasHeight!==sheet.height || !record.phases.includes(originalFirmPhase(firm))))return false;
   const phase=originalFirmPhase(firm);
   // BASE:NORMAN is 4x4 original, but the temporary demo fort has 3x3
   // collision: scale visual only, never change the simulation footprint.
