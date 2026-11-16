@@ -72,3 +72,11 @@
 - **CI/Node:** `fetch_commit_workflow_runs` per `b9f65bf` restituisce `[]` al momento del controllo: CI nuovo HEAD NON_VERIFIED. `npm --prefix seven-kingdoms-html test` e `run check` NON_ESEGUITI (nessun checkout locale). Pages del branch non applicabile; Android e confronto originale 1×/2× NON_ESEGUITI. PR #122 resta draft, nessun merge.
 - **Limite:** seconda famiglia GPL ancora assente; nessuna attribuzione di parità multirazza.
 - **Singolo prossimo passo:** verificare la CI del nuovo HEAD (incluso checkpoint) e correggere prima eventuali fallimenti; se verde, recuperare da sorgente GPL 7KAA la seconda famiglia autentica con hash e geometrie verificati e integrarla nella PR #122.
+
+
+## Esecuzione 2026-11-16 17:55 CET — lookup catalogo own-only
+- **Stato iniziale:** task SKH-STRUCTURES-001 attivo su main; PR #122 draft, checkpoint precedente `cbe52df854beca387559b259960e5db27d7c87dc`. Actions [#43904227409](https://github.com/CzekUns/Rtsmobile/actions/runs/43904227409) completed/success per quel preciso SHA.
+- **Codice:** commit `850274d7c1103ab76a19cdd41808ec74c45fce4e` in `playtest/original-sprites.js`: i record dei cataloghi espliciti sono letti soltanto se proprietà proprie, prima dell'accesso alla geometria. Impedisce che una proprietà ereditata da un prototipo venga trattata come record fonte.
+- **Test:** commit `5f1135ea48eaa02e5ae48b3e969f337e9c6dfb5e` in `tests/original-structure-catalog.test.mjs`: cataloghi con record ereditati devono rifiutare unità e forti senza Canvas drawImage.
+- **Verifica:** `git ls-remote https://github.com/CzekUns/Rtsmobile.git HEAD` fallisce `Could not resolve host: github.com`; npm test/check NON_ESEGUITI. GitHub Actions per `5f1135ea` restituisce `[]` al momento della lettura: CI nuovo codice NON_VERIFIED. Pages branch non applicabile; Android e confronto originale 1×/2× NON_ESEGUITI. Nessun merge. Nessun nuovo asset: seconda famiglia GPL ancora assente.
+- **Singolo prossimo passo:** verificare Actions sul nuovo HEAD della PR #122 (incluso checkpoint), correggere ogni fallimento; se verde, recuperare e validare da 7KAA GPL una seconda famiglia reale con hash, frame, licenza e prova di provenienza, integrandola nella stessa PR.
