@@ -84,7 +84,7 @@ export class OriginalSpritePreview{
   this.firm.src=new URL(ORIGINAL_SHEETS.firm.path,import.meta.url).href;
  }
  drawUnit(ctx,unit,x,y,t,direction,frame){
-  const record=this.unitCatalog?.['NORMAN:M'];
+  const record=this.unitCatalog && Object.hasOwn(this.unitCatalog,'NORMAN:M') ? this.unitCatalog['NORMAN:M'] : null;
   const sheet=record?{...ORIGINAL_SHEETS.unit,cellWidth:record.frameWidth,cellHeight:record.frameHeight,columns:record.directions,rows:record.walkingFrames}:ORIGINAL_SHEETS.unit;
   const image=unit?.owner===2?this.unitBlue:this.unit;
   if(!isUnitPreviewProxy(unit)||!ready(image,sheet)||!Number.isFinite(t)||t<=0||!Number.isFinite(x)||!Number.isFinite(y))return false;
@@ -107,7 +107,7 @@ export class OriginalSpritePreview{
   ctx.restore();return true;
  }
  drawFirm(ctx,firm,x,y,t){
-  const record=this.structureCatalog?.['BASE:NORMAN'];
+  const record=this.structureCatalog && Object.hasOwn(this.structureCatalog,'BASE:NORMAN') ? this.structureCatalog['BASE:NORMAN'] : null;
   const sheet=record?{...ORIGINAL_SHEETS.firm,cellWidth:record.frameWidth,cellHeight:record.frameHeight,columns:record.phaseColumns}:ORIGINAL_SHEETS.firm;
   const image=this.firmBlue;
   if(!isFirmPreviewProxy(firm)||!ready(image,sheet)||!Number.isFinite(t)||t<=0||!Number.isFinite(x)||!Number.isFinite(y)||!Number.isFinite(firm?.size)||firm.size<=0)return false;
