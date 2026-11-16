@@ -550,3 +550,12 @@ Sostituire un gruppo coerente di elementi naturali provvisori con elementi origi
 - **Pages post-merge:** NOT_VERIFIED at checkpoint creation. This is not proof of deployment.
 - **Branch checkpoint:** release handoff branch `agent/skh-integration/terrain002-release-handoff`, based on merge SHA; this commit records release and transition through PR.
 - **Singolo prossimo passo:** verify main CI and Pages for merge SHA `f914a3ab007a7760026829bbc7216080564e0988`; if green resume SKH-STRUCTURES-001 from its checkpoint, preserving Android/7KAA manual QA pending.
+
+
+## Esecuzione 2026-11-16 03:02 CET — gate transizione #121
+- **Stato verificato:** PR #121 OPEN, non-draft, mergeable=true, HEAD `e46d104a1b70c09283a4d384c1acf6018e1b517c` prima della correzione di coordinamento. PR #120 risulta già integrata su main `f914a3ab007a7760026829bbc7216080564e0988`.
+- **Correzione prodotta:** `57612867fb6b22d64028f5c6848638fb6c0e7955` aggiorna `coordination/STATE.json`: data e note non rimandano più erroneamente all'inizio di TERRAIN-002, e distinguono la CI PR precedente dalla verifica post-merge non ancora ottenuta.
+- **Verifiche tentate:** GitHub connector `fetch_commit_workflow_runs` sull'HEAD PR #121 restituisce lista vuota (l'endpoint espone solo run da evento pull_request); `get_commit_combined_status` per `f914a3a` e `e46d104` restituisce `statuses: []`, che **non** dimostra né SUCCESS né FAILURE. Accesso Actions via web: DisabledError; checkout locale: `Could not resolve host: github.com`. `npm test` e `npm run check` NOT_RUN. Pages post-merge NOT_VERIFIED, Android NOT_RUN.
+- **Ownership e programma:** nessuna modifica a taskOrder; PR #121 resta transizione già concordata verso SKH-STRUCTURES-001, senza nuovo task o PR.
+- **Branch:** `agent/skh-integration/terrain002-release-handoff`; SHA codice di coordinamento `57612867fb6b22d64028f5c6848638fb6c0e7955`; HEAD finale è il commit del presente checkpoint.
+- **Singolo prossimo passo:** ottenere prova Actions per l'HEAD finale di PR #121 e prova CI/Pages del main `f914a3a`; se gate verde, integrare #121, verificare SHA main e iniziare il checkpoint SKH-STRUCTURES-001. Se rosso, correggere il job fallito sullo stesso branch.
