@@ -3,6 +3,7 @@
  */
 import {WORLD_W,WORLD_H,NATIONS,FIRMS,terrain,range} from './rules.js';
 import {OriginalSpritePreview,compassDirection,walkingFrame} from './playtest/original-sprites.js';
+import {ORIGINAL_STRUCTURE_CATALOG,ORIGINAL_UNIT_CATALOG} from './playtest/original-structure-catalog.js';
 import {OriginalTerrainPreview} from './playtest/original-terrain.js';
 import {OriginalCoastPreview} from './playtest/original-coast.js';
 import {OriginalPlantPreview} from './playtest/original-plants.js';
@@ -19,7 +20,7 @@ const lim=(v,a,b)=>Math.max(a,Math.min(b,v));
 export class WorldView{
  constructor(world,mini,{previewOriginalSprites=false,previewOriginalCoasts=true}={}){
   this.canvas=world;this.ctx=world.getContext('2d');
-  this.originalSprites=previewOriginalSprites?new OriginalSpritePreview():null;
+  this.originalSprites=previewOriginalSprites?new OriginalSpritePreview({structureCatalog:ORIGINAL_STRUCTURE_CATALOG,unitCatalog:ORIGINAL_UNIT_CATALOG}):null;
   this.originalTerrain=previewOriginalSprites?new OriginalTerrainPreview():null;
   this.originalCoast=previewOriginalSprites&&previewOriginalCoasts?new OriginalCoastPreview():null;
   this.originalPlants=previewOriginalSprites?new OriginalPlantPreview():null;
