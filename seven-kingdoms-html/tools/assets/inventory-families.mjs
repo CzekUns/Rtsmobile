@@ -62,13 +62,13 @@ export async function inventoryOriginalFamilies(root){
     sourceFile(root,'RESOURCE','I_FIRM.RES'),
     sourceFile(root,'RESOURCE','PAL_STD.RES')
   ]);
-  const units=originalTables(set).SPRITE;
+  const {SPRITE:units,SACTION:actions,SFRAME:frames}=originalTables(set);
   const firms=parseFirmTables(set);
   const races=[...new Set(firms.FBUILD.map(row=>row.raceCode))].filter(Boolean).sort();
   // Unit SPRITE codes do not encode a reliable race relationship. Inventory every
   // source record separately; never silently drop valid sprites or assign a race.
   const spriteCatalog=await inventorySpriteRecords(units,(code)=>sourceFile(root,'SPRITE',code+'.SPR'));
-  for(let i=0;i<units.length;i++)spriteCatalog[i].actions=summarizeSpriteActions(units[i],originalTables(set).SACTION,originalTables(set).SFRAME);
+  for(let i=0;i<units.length;i++)spriteCatalog[i].actions=summarizeSpriteActions(units[i],actions,frames);
   const candidates=[];
   for(const race of races){
     const buildings=[];
