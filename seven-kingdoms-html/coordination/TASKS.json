@@ -124,7 +124,7 @@
       "title": "Foreste, rocce e rilievi originali",
       "priority": 3,
       "ownerStream": "integration",
-      "status": "ready",
+      "status": "awaiting_manual_qa",
       "dependsOn": [
         "SKH-TERRAIN-001"
       ],
@@ -136,20 +136,38 @@
         "Ancoraggi, scale e occlusione unità/edifici",
         "Verifiche visuali a zoom 1x/2x"
       ],
-      "nextAction": "Dal checkpoint SKH-TERRAIN-002, catalogare gli originali overlay di alberi/foreste, rocce e rilievi nei sorgenti e RESOURCE del commit 7KAA pinned; verificare DBF/frame/offset/palette/licenza e rendere un insieme grafico coerente. Poi collegare il layering canvas e provare QA visiva/test, senza alterare la demo pathfinding. Evitare microfix non visibili.",
+      "nextAction": "Merged PR #120. Await Android/7KAA parity QA and verify post-merge Pages; do not reopen without reproducible regression.",
       "acceptance": [
         "Bitmap originali verificabili e manifest con provenienza",
         "Rendering differenziato e profondità compatibili con unità/edifici",
         "Test regressione e CI verde, limitazioni documentate"
       ],
-      "blockingIssue": null
+      "blockingIssue": null,
+      "completion": {
+        "mainSha": "f914a3ab007a7760026829bbc7216080564e0988",
+        "prNumber": 120,
+        "merged": true,
+        "ciUrl": "https://github.com/CzekUns/Rtsmobile/actions/runs/43778104231",
+        "pagesVerified": false,
+        "androidVisualTest": "not_run",
+        "parityCertified": false,
+        "verified": [
+          "Original PLANT/ROCK atlas and manifest with provenance",
+          "Canvas depth ordering and alpha occlusion Chromium 1x/2x",
+          "PR HEAD Actions success"
+        ],
+        "pending": [
+          "main CI and Pages deployment verification",
+          "Physical Android and same-scene 7KAA pixel comparison"
+        ]
+      }
     },
     {
       "id": "SKH-STRUCTURES-001",
       "title": "Catalogo strutture e sprite unità non dimostrativi",
       "priority": 4,
       "ownerStream": "integration",
-      "status": "queued",
+      "status": "ready",
       "dependsOn": [
         "SKH-TERRAIN-002"
       ],
