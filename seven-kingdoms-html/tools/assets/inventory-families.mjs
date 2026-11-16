@@ -3,6 +3,7 @@
 // This tool never emits placeholder sprites or modifies shipped atlases.
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {join,resolve,dirname} from 'node:path';
+import {isAbsolute,basename} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {originalTables} from './render-unit.mjs';
 import {parseFirmTables,selectedBuild} from './render-firm.mjs';
@@ -13,15 +14,25 @@ async function sourceFile(root,kind,name){
   for(const path of [sourcePath(root,kind,name),join(root,kind,name)]){
     try{return await readFile(path)}catch(error){if(error.code!=='ENOENT')throw error}
   }
-  throw Error('Missing original '+kind+'/'+name+' under '+root);
+  throw Object.assign(Error('Missing original '+kind+'/'+name+' under '+root),{missingOriginal:true,code:'ENOENT'});
+}
+export function validateSpriteCode(code){
+  if(typeof code!=='string'||!code.length||code==='.'||code==='..'||isAbsolute(code)||basename(code)!==code||code.includes('\\')||code.includes('/')||code.includes('..')||/[\x00-\x1f\x7f]/.test(code)){
+    throw Error('Invalid original sprite code: '+String(code));
+  }
+  return code;
 }
 export async function inventorySpriteRecords(rows,loadSprite){
   const catalog=[];
+  const seen=new Set();
   for(const row of rows){
+    const code=validateSpriteCode(row.code);
+    if(seen.has(code))throw Error('Duplicate original SPRITE record: '+code);
+    seen.add(code);
     let bytes=null;
-    try{bytes=await loadSprite(row.code)}
-    catch(error){if(!String(error.message).startsWith('Missing original'))throw error}
-    catalog.push({code:row.code,sourceAvailable:bytes!==null,
+    try{bytes=await loadSprite(code)}
+    catch(error){if(error.code!=='ENOENT'&&error.missingOriginal!==true)throw error}
+    catalog.push({code,sourceAvailable:bytes!==null,
       sha256:bytes===null?null:sha256(bytes),turnResolution:row.turnResolution,
       raceAssignment:'unverified'});
   }
