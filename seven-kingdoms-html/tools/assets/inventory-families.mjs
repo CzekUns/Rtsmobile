@@ -38,6 +38,24 @@ export async function inventorySpriteRecords(rows,loadSprite){
   }
   return catalog;
 }
+// Source-table coverage, without inferring race from sprite IDs or decoding artwork.
+export function summarizeSpriteActions(sprite,actions,frames){
+  const start=Number(sprite.firstAction)-1;
+  const count=Number(sprite.actionCount);
+  if(!Number.isSafeInteger(start)||start<0||!Number.isSafeInteger(count)||count<0||start+count>actions.length)
+    throw Error('Invalid original action range for '+sprite.code);
+  return actions.slice(start,start+count).map(action=>{
+    if(action.sprite!==sprite.code)throw Error('Foreign action for '+sprite.code);
+    const first=Number(action.firstFrame)-1,frameCount=Number(action.frameCount);
+    if(!Number.isSafeInteger(first)||first<0||!Number.isSafeInteger(frameCount)||frameCount<=0||first+frameCount>frames.length)
+      throw Error('Invalid original frame range for '+sprite.code);
+    const selected=frames.slice(first,first+frameCount);
+    if(selected.some(frame=>frame.sprite!==sprite.code))throw Error('Foreign frame for '+sprite.code);
+    return {action:action.action,direction:action.direction,frameCount,
+      sourceAction:action.recordNo,firstFrame:action.firstFrame,
+      sourceFrames:selected.map(frame=>frame.recordNo)};
+  });
+}
 export async function inventoryOriginalFamilies(root){
   const [set,firm,palette]=await Promise.all([
     sourceFile(root,'RESOURCE','STD.SET'),
@@ -50,6 +68,7 @@ export async function inventoryOriginalFamilies(root){
   // Unit SPRITE codes do not encode a reliable race relationship. Inventory every
   // source record separately; never silently drop valid sprites or assign a race.
   const spriteCatalog=await inventorySpriteRecords(units,(code)=>sourceFile(root,'SPRITE',code+'.SPR'));
+  for(let i=0;i<units.length;i++)spriteCatalog[i].actions=summarizeSpriteActions(units[i],originalTables(set).SACTION,originalTables(set).SFRAME);
   const candidates=[];
   for(const race of races){
     const buildings=[];
