@@ -50,7 +50,14 @@ export function isUnitPreviewProxy(unit){
   (unit?.raceId==='norman'||(!unit?.raceId&&unit?.culture==='Normanni')||
    (unit?.owner===2&&!unit?.raceId&&!unit?.culture));
 }
-export function isFirmPreviewProxy(firm){return firm?.owner===2&&firm.kind==='fort'}
+// Only the Norman demo fort may use BASE:NORMAN. An explicit foreign
+// race/culture takes precedence over the legacy owner-2 fallback.
+export function isFirmPreviewProxy(firm){
+ if(firm?.kind!=='fort'||firm.owner!==2)return false;
+ if(firm.raceId!=null)return String(firm.raceId).toLowerCase()==='norman';
+ if(firm.culture!=null)return firm.culture==='Normanni';
+ return true;
+}
 function ready(image,config){
  return (image?.complete===true&&image.naturalWidth===config.width&&image.naturalHeight===config.height)||
   (image?.width===config.width&&image?.height===config.height);
