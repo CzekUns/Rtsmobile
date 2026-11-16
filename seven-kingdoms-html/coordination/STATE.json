@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "programRevision": "2026-11-12-orchestrator-v1",
-  "updatedOn": "2026-11-13",
+  "updatedOn": "2026-11-16",
   "lastObservedMainSha": "f914a3ab007a7760026829bbc7216080564e0988",
   "lastVerifiedPagesDeployment": {
     "sha": "c1a9afb39f4cd52e4a39f94addc4a5efe55444c2",
@@ -43,5 +43,5 @@
   ],
   "planChangesRequireOwnerApproval": true,
   "nextTaskAfterActive": "SKH-QA-001",
-  "notes": "SKH-TERRAIN-001 PR #118 integrated source-verified 180 SG coast 32x32 tiles, indexed palette and manifest with live Canvas fallback. CI #43439241900 and Pages #43439241935 successful. Original world generator and device visual parity still outstanding. Begin SKH-TERRAIN-002 with checkpoint; orchestration docs are main source of truth."
+  "notes": "SKH-TERRAIN-002 PR #120 merged at f914a3ab007a7760026829bbc7216080564e0988 with PR-head Actions #43778104231 SUCCESS. Post-merge main CI and Pages are NOT_VERIFIED; latest verified Pages remains coast release c1a9afb. Android and same-scene 7KAA comparison pending. PR #121 records approved transition to SKH-STRUCTURES-001; do not start structures before transition merge gate."
 }
