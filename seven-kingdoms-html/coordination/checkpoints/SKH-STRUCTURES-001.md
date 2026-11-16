@@ -14,3 +14,11 @@
 - **Test:** npm test/check NOT_RUN: `git ls-remote https://github.com/CzekUns/Rtsmobile.git HEAD` → `Could not resolve host: github.com`. CI e Pages post-merge #121 NON_VERIFIED; Android e parità 7KAA NOT_RUN.
 - **Ownership:** SKH-106, scope invariato; nessun cambio del programma concordato.
 - **Singolo prossimo passo:** verificare CI/Pages su main `9ddc888`, poi leggere i manifest NORMAN/BASE-NORMAN effettivamente presenti e implementare sul medesimo branch il primo catalogo validato di frame/footprint originali con test; non inventare geometrie né aprire un task diverso.
+
+
+## Esecuzione 2026-11-16 06:00 CET — catalogo sorgente-backed
+- **Branch:** `agent/skh-integration/original-buildings-units`. Codice commit `84fa4c0fbffa5751da2ec6d337fb51e8dfaa2b4a`, test commit `d82adb419f38b3f4342c226264299e08154053bb`.
+- **File aggiunti:** `playtest/original-structure-catalog.js` e `tests/original-structure-catalog.test.mjs`.
+- **Implementato:** catalogo importabile di BASE:NORMAN (quattro fasi, 4×4 footprint originale dichiarato nella preview, sheet 720×160, frame 180×160) e NORMAN:M (8 direzioni × 6 frame, sheet 768×672, frame 96×112); validazione dimensionale e lookup con fallback null. Le misure provengono da `playtest/original-sprites.js` già integrato; non sono stati inventati nuovi sprite. Limite esplicito: la fortezza demo ha collisione 3×3 e il catalogo non certifica collision parity né civiltà aggiuntive.
+- **Verifica:** `npm --prefix seven-kingdoms-html test` e `run check` NON_ESEGUITI, checkout remoto impedito dal DNS (`Could not resolve host: github.com`). GitHub Actions per main `9ddc888`: endpoint per workflow associati al commit ha restituito lista vuota, quindi CI/Pages post-merge NON_VERIFICATI. Nessun test Android o screenshot 1×/2× eseguito. Nessuna PR aperta in questa esecuzione.
+- **Singolo prossimo passo:** verificare CI per HEAD `d82adb4` e completare l'integrazione del catalogo nel renderer con fallback, dopo aver verificato la corrispondenza sorgente 7KAA delle fasi/footprint; aggiungere test e riutilizzare la PR del task.
