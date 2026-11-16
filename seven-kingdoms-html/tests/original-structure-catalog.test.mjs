@@ -20,3 +20,14 @@ test('unknown races/buildings never silently inherit Norman proxy metadata',()=>
  assert.equal(ORIGINAL_STRUCTURE_CATALOG['BASE:NORMAN'].collisionParity,false);
  assert.equal(ORIGINAL_UNIT_CATALOG['NORMAN:M'].status,'preview-only');
 });
+
+test('live preview adapter accepts the source-backed catalog without changing fallback policy',async()=>{
+ const {OriginalSpritePreview}=await import('../playtest/original-sprites.js');
+ const make=()=>({addEventListener(){},set src(v){this.url=v},complete:false,naturalWidth:0,naturalHeight:0});
+ const preview=new OriginalSpritePreview({imageFactory:make,canvasFactory:()=>({}),structureCatalog:ORIGINAL_STRUCTURE_CATALOG,unitCatalog:ORIGINAL_UNIT_CATALOG});
+ assert.equal(preview.structureCatalog['BASE:NORMAN'].sourceFootprint.width,4);
+ assert.equal(preview.unitCatalog['NORMAN:M'].directions,8);
+ const ctx={};
+ assert.equal(preview.drawUnit(ctx,{kind:'soldier',raceId:'norman'},0,0,24,4,0),false);
+ assert.equal(preview.drawFirm(ctx,{owner:2,kind:'fort'},0,0,24),false);
+});
