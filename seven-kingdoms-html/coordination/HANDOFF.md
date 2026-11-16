@@ -24,3 +24,7 @@ Il giro di integrazione del proprietario ha completato la prima tranche costiera
 - HUD #115: test fisico Android fullscreen/MOD+levetta.
 - SG coast #118: confronto pixel scena 1×/2× e Android, original world generator non ancora portato.
 - Nessun nuovo blocco tecnico di CI/Pages nella release SG.
+
+
+## 16 novembre 2026 — PR #120 integrata
+SKH-TERRAIN-002 merged su main `f914a3ab007a7760026829bbc7216080564e0988`, Actions PR HEAD #43778104231 SUCCESS. Original PLANT/ROCK atlas, manifest, Canvas depth e test Chromium 1x/2x integrati. Pages post-merge non ancora verificato; Android e confronto 7KAA pendenti. Task successivo del programma: SKH-STRUCTURES-001. Verificare Pages prima di dichiarare release deployata.
