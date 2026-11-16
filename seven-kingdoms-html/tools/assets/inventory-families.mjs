@@ -15,6 +15,18 @@ async function sourceFile(root,kind,name){
   }
   throw Error('Missing original '+kind+'/'+name+' under '+root);
 }
+export async function inventorySpriteRecords(rows,loadSprite){
+  const catalog=[];
+  for(const row of rows){
+    let bytes=null;
+    try{bytes=await loadSprite(row.code)}
+    catch(error){if(!String(error.message).startsWith('Missing original'))throw error}
+    catalog.push({code:row.code,sourceAvailable:bytes!==null,
+      sha256:bytes===null?null:sha256(bytes),turnResolution:row.turnResolution,
+      raceAssignment:'unverified'});
+  }
+  return catalog;
+}
 export async function inventoryOriginalFamilies(root){
   const [set,firm,palette]=await Promise.all([
     sourceFile(root,'RESOURCE','STD.SET'),
@@ -26,15 +38,7 @@ export async function inventoryOriginalFamilies(root){
   const races=[...new Set(firms.FBUILD.map(row=>row.raceCode))].filter(Boolean).sort();
   // Unit SPRITE codes do not encode a reliable race relationship. Inventory every
   // source record separately; never silently drop valid sprites or assign a race.
-  const spriteCatalog=[];
-  for(const row of units){
-    let bytes=null;
-    try{bytes=await sourceFile(root,'SPRITE',row.code+'.SPR')}
-    catch(error){if(!String(error.message).startsWith('Missing original'))throw error}
-    spriteCatalog.push({code:row.code,sourceAvailable:bytes!==null,
-      sha256:bytes===null?null:sha256(bytes),turnResolution:row.turnResolution,
-      raceAssignment:'unverified'});
-  }
+  const spriteCatalog=await inventorySpriteRecords(units,(code)=>sourceFile(root,'SPRITE',code+'.SPR'));
   const candidates=[];
   for(const race of races){
     const buildings=[];
