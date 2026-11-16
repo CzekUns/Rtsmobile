@@ -157,3 +157,26 @@ test('invalid sprite canvas coordinates and scales fail closed before drawImage'
  assert.equal(preview.drawFirm(ctx,firm,10,20,24),true);
  assert.equal(calls.length,2);
 });
+
+test('owner-2 preview proxy does not misidentify an explicitly non-Norman culture',async()=>{
+ const {isUnitPreviewProxy,OriginalSpritePreview}=await import('../playtest/original-sprites.js');
+ const nonNorman={kind:'soldier',owner:2,culture:'Greci'};
+ const raceConflict={kind:'soldier',owner:2,raceId:'greek',culture:'Normanni'};
+ const norman={kind:'soldier',owner:2,raceId:'norman'};
+ const legacy={kind:'soldier',owner:2};
+ assert.equal(isUnitPreviewProxy(nonNorman),false);
+ assert.equal(isUnitPreviewProxy(raceConflict),false);
+ assert.equal(isUnitPreviewProxy(norman),true);
+ assert.equal(isUnitPreviewProxy(legacy),true);
+ const images=[];
+ const preview=new OriginalSpritePreview({imageFactory:()=>{const img={complete:true,naturalWidth:768,naturalHeight:672,addEventListener(){},set src(_){} };images.push(img);return img},canvasFactory:()=>({}),unitCatalog:ORIGINAL_UNIT_CATALOG});
+ preview.unitBlue={width:768,height:672};
+ const calls=[];
+ const ctx={save(){},restore(){},drawImage(...args){calls.push(args)}};
+ assert.equal(preview.drawUnit(ctx,nonNorman,10,20,24,0,0),false);
+ assert.equal(preview.drawUnit(ctx,raceConflict,10,20,24,0,0),false);
+ assert.equal(calls.length,0);
+ assert.equal(preview.drawUnit(ctx,norman,10,20,24,0,0),true);
+ assert.equal(preview.drawUnit(ctx,legacy,10,20,24,0,0),true);
+ assert.equal(calls.length,2);
+});
