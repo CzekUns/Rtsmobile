@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><title>SKH-TERRAIN-002 occlusion QA</title>
+<style>body{margin:0;background:#202326;color:white;font:13px monospace}#mini{display:none}.grid{display:grid;grid-template-columns:repeat(2,640px);gap:8px}canvas{image-rendering:pixelated}.rock-detail{display:block;width:640px;height:320px;image-rendering:pixelated;border:1px solid #e7cc68}.rock-detail-label{font:12px monospace;color:#e7cc68;margin:3px 0 10px}#world{display:none}</style>
+<p id="status" role="status">Loading original landscape…</p>
+<canvas id="world" width="640" height="420"></canvas><canvas id="mini" width="160" height="120"></canvas><div class="grid" id="frames"></div>
+<script type="module">
+import {SevenGame,terrain,WORLD_W,WORLD_H} from '../../rules.js';
+import {WorldView} from '../../view.js';
+const status=document.getElementById('status');
+// Bound asynchronous atlas readiness: a stalled fetch/decode must fail with a
+// reproducible stage instead of leaving Chromium's DOM at "Loading" forever.
+let stage='initializing';
+const watchdog=setTimeout(()=>{
+ status.textContent='FAIL: landscape initialization timed out at '+stage;
+ document.body.dataset.failed='true';
+},30000);
+try {
+ const game=new SevenGame();
+ const view=new WorldView(document.getElementById('world'),document.getElementById('mini'),{previewOriginalSprites:true});
+ stage='loading PLANT/ROCK manifests';
+ await Promise.all([view.originalPlants.loading,view.originalRocks.loading]);
+ // Avoid Image.decode() under headless virtual-time: its promise can
+ // remain pending while the image is already decoded and drawable.
+ // isReady() checks the actual renderer contract (complete + dimensions).
+ stage='waiting for PLANT/ROCK image readiness';
+ for(let attempt=0;attempt<120&&(!view.originalPlants.isReady()||!view.originalRocks.isReady());attempt++){
+  await new Promise(resolve=>setTimeout(resolve,100));
+ }
+ stage='validating atlas readiness';
+ if(!view.originalPlants.isReady()||!view.originalRocks.isReady())throw Error('PLANT/ROCK images unavailable after manifest load; plant='+view.originalPlants.image.complete+'/'+view.originalPlants.image.naturalWidth+' rock='+view.originalRocks.image.complete+'/'+view.originalRocks.image.naturalWidth);
+ stage='rendering four occlusion scenes';
+ const places={};const rockCandidates=[];
+ for(let y=12;y<WORLD_H-12;y++)for(let x=12;x<WORLD_W-12;x++){
+  const kind=terrain(game.seed,x,y);
+  if(kind==='forest'&&!places.plant)places.plant={x,y};
+  if(kind==='hill'&&rockCandidates.length<32)rockCandidates.push({x,y});
+  if(kind==='hill'&&!places.rock)places.rock={x,y};
+ }
+ if(!places.plant||!places.rock)throw Error('Forest or hill missing from demo world');
+ // Select ROCK positions by actual nontransparent pixel overlap, rather than
+ // assuming that adjacent tile coordinates intersect the visible bitmap.
+ function opaqueMask(draw){
+  const c=document.createElement('canvas');c.width=view.canvas.width;c.height=view.canvas.height;
+  const ctx=c.getContext('2d',{willReadFrequently:true});draw(ctx);
+  const rgba=ctx.getImageData(0,0,c.width,c.height).data;
+  const mask=new Uint8Array(c.width*c.height);
+  for(let p=0;p<mask.length;p++)mask[p]=rgba[p*4+3]>0?1:0;
+  return mask;
+ }
+ function overlapCount(a,b){
+  let count=0;for(let p=0;p<a.length;p++)if(a[p]&&b[p])count++;
+  return count;
+ }
+ const MIN_ROCK_OVERLAP={1:8,2:24};
+ function rockStraddle(pos,zoom){
+  const t=view.tile(),p=view.screen(pos.x,pos.y),rock=view.originalRocks;
+  const mask=opaqueMask(ctx=>rock.draw(ctx,p.x,p.y,t,game.seed,pos.x,pos.y));
+  if(!mask.some(Boolean))throw Error('ROCK selected bitmap has no opaque pixels');
+  const selected=[];
+  for(const side of [-1,1]){
+   let best=null;
+   // ROCK painter depth is pos.y+1, not pos.y: a front unit must
+   // have y > pos.y+1 or the renderer correctly draws it behind ROCK.
+   const distances=side<0?[.125,.25,.375,.5,.625,.75,.875,1,1.125,1.25]:[1.125,1.25,1.375,1.5,1.625,1.75,1.875,2];
+   for(const dy of distances)for(const dx of [-1.5,-1.25,-1,-.75,-.5,-.25,0,.25,.5,.75,1,1.25,1.5]){
+    const u={id:side<0?'qa-behind':'qa-front',x:pos.x+dx,y:pos.y+side*dy,owner:0,kind:'soldier'};
+    const unitMask=opaqueMask(ctx=>view.unitDraw(ctx,u,null,t,false,0));
+    const pixels=overlapCount(mask,unitMask);
+    if(pixels>0&&(!best||pixels>best.pixels))best={u,pixels};
+   }
+   if(!best||best.pixels<MIN_ROCK_OVERLAP[zoom])throw Error('ROCK '+zoom+'x insufficient opaque intersection for '+(side<0?'behind':'front')+' unit: best='+ (best?.pixels??0)+' required='+MIN_ROCK_OVERLAP[zoom]);
+   selected.push(best);
+  }
+  return selected;
+ }
+ // The first hill can select a ROCK bitmap with no usable front-side alpha.
+ // Choose a real hill whose original ROCK pixels intersect both unit masks;
+ // retain a reproducible failure if none of the sampled hills qualifies.
+ let rockChoice=null,rockFailures=[];
+ for(const candidate of rockCandidates){
+  view.center(candidate.x,candidate.y);view.zoom=1;
+  try{rockStraddle(candidate,1);view.zoom=2;rockStraddle(candidate,2);rockChoice=candidate;break;}
+  catch(error){rockFailures.push(candidate.x+','+candidate.y+': '+error.message);}
+ }
+ if(!rockChoice)throw Error('ROCK no valid alpha-straddle among '+rockCandidates.length+' hills; '+rockFailures.slice(0,4).join(' | '));
+ places.rock=rockChoice;
+ const output=document.getElementById('frames');
+ let frames=0;
+ const signatures=new Map();
+ for(const kind of ['plant','rock']){
+  const pos=places[kind];
+  for(const zoom of [1,2]){
+   view.center(pos.x,pos.y);view.zoom=zoom;
+   // Two entities straddle the overlay baseline; a third is an actual
+   // firm drawn through WorldView. These objects never enter a saved game.
+   // ROCK gets a deliberately tight depth-straddling pair: adjacent tile
+   // baselines exercise overlap instead of merely testing distant entities.
+   const pair=kind==='rock'?rockStraddle(pos,zoom):null;
+   const behind=pair?pair[0].u:{id:'qa-behind',x:pos.x,y:pos.y-2,owner:0,kind:'soldier'};
+   const front=pair?pair[1].u:{id:'qa-front',x:pos.x,y:pos.y+2,owner:0,kind:'soldier'};
+   if(kind==='rock'&&!(behind.y<pos.y+1&&front.y>pos.y+1&&pair.every(v=>v.pixels>=MIN_ROCK_OVERLAP[zoom])))throw Error('ROCK alpha-straddle fixture invalid');
+   const firm={id:'qa-firm',x:pos.x+3,y:pos.y-3,size:2,owner:0,kind:'fort',hp:100,maxHp:100};
+   const originalUnits=game.units,originalFirms=game.firms;
+   game.units=[behind,front];game.firms=[firm];
+   const calls=[];
+   const originalUnitDraw=view.unitDraw,originalFirmDraw=view.firmDraw;
+   const overlay=kind==='plant'?view.originalPlants:view.originalRocks;
+   const originalOverlayDraw=overlay.draw;
+   view.unitDraw=function(ctx,u,...rest){if(u.id.startsWith('qa-'))calls.push(u.id);return originalUnitDraw.call(this,ctx,u,...rest)};
+   view.firmDraw=function(ctx,f,...rest){if(f.id==='qa-firm')calls.push(f.id);return originalFirmDraw.call(this,ctx,f,...rest)};
+   overlay.draw=function(ctx,x,y,...rest){if(Math.abs(x-view.screen(pos.x,pos.y).x)<1&&Math.abs(y-view.screen(pos.x,pos.y).y)<1)calls.push(kind);return originalOverlayDraw.call(this,ctx,x,y,...rest)};
+   try{view.draw(game,null)}finally{
+    game.units=originalUnits;game.firms=originalFirms;
+    view.unitDraw=originalUnitDraw;view.firmDraw=originalFirmDraw;overlay.draw=originalOverlayDraw;
+   }
+   const a=calls.indexOf('qa-behind'),b=calls.indexOf(kind),c=calls.indexOf('qa-front');
+   if(a<0||b<0||c<0||!(a<b&&b<c))throw Error(kind+' '+zoom+'x depth failure: '+calls.join(','));
+   if(!calls.includes('qa-firm'))throw Error('Building missing from painter queue');
+   if((kind==='plant'?view.authenticPlantsDrawn:view.authenticRocksDrawn)<1)throw Error(kind+' original bitmap not drawn');
+   const copy=document.createElement('canvas');copy.width=view.canvas.width;copy.height=view.canvas.height;
+   copy.getContext('2d').drawImage(view.canvas,0,0);
+   // Inspect rendered pixels, not only painter callbacks. Sample the full
+   // world canvas on a fixed grid so empty/identical zoom captures fail.
+   const pixels=copy.getContext('2d').getImageData(0,0,copy.width,copy.height).data;
+   let hash=2166136261, colored=0, opaque=0;
+   for(let i=0;i<pixels.length;i+=4*17){
+    const r=pixels[i],g=pixels[i+1],b=pixels[i+2],a=pixels[i+3];
+    hash=Math.imul(hash^r,16777619)>>>0;
+    hash=Math.imul(hash^g,16777619)>>>0;
+    hash=Math.imul(hash^b,16777619)>>>0;
+    hash=Math.imul(hash^a,16777619)>>>0;
+    if(a>0)opaque++;
+    if(a>0&&(r!==g||g!==b))colored++;
+   }
+   if(opaque<100||colored<100)throw Error(kind+' '+zoom+'x empty/monochrome canvas: opaque='+opaque+' colored='+colored);
+   signatures.set(kind+'-'+zoom,hash);
+   copy.dataset.scene=kind+'-'+zoom+'x';copy.dataset.pixelHash=hash.toString(16);
+   output.append(copy);frames++;
+   if(kind==='rock'){
+    // Diagnostic crops are IMG elements, not extra scene canvases: the
+    // Chromium capture contract still requires exactly four scene canvases.
+    // Mark the actual pixel-overlap region, not just unit tile coordinates.
+    const tile=view.tile(),anchor=view.screen(pos.x,pos.y);
+    const rockMask=opaqueMask(ctx=>view.originalRocks.draw(ctx,anchor.x,anchor.y,tile,game.seed,pos.x,pos.y));
+    // Find intersections over the entire framebuffer first: at 2x the
+    // front unit may lie outside a fixed crop centered on the ROCK anchor.
+    const intersections=[];
+    for(const [index,entry] of pair.entries()){
+     const unitMask=opaqueMask(ctx=>view.unitDraw(ctx,entry.u,null,tile,false,0));
+     let count=0,sumX=0,sumY=0,minX=copy.width,minY=copy.height,maxX=-1,maxY=-1;
+     for(let y=0;y<copy.height;y++)for(let x=0;x<copy.width;x++){
+      const i=y*copy.width+x;
+      if(rockMask[i]&&unitMask[i]){
+       count++;sumX+=x;sumY+=y;
+       minX=Math.min(minX,x);minY=Math.min(minY,y);
+       maxX=Math.max(maxX,x);maxY=Math.max(maxY,y);
+      }
+     }
+     if(count<MIN_ROCK_OVERLAP[zoom])throw Error('ROCK '+zoom+'x insufficient full-frame alpha intersection: '+entry.u.id+' got='+count+' required='+MIN_ROCK_OVERLAP[zoom]);
+     intersections.push({index,entry,count,cx:sumX/count,cy:sumY/count,minX,minY,maxX,maxY});
+    }
+    const left=Math.min(...intersections.map(v=>v.minX));
+    const right=Math.max(...intersections.map(v=>v.maxX));
+    const top=Math.min(...intersections.map(v=>v.minY));
+    const bottom=Math.max(...intersections.map(v=>v.maxY));
+    const cropW=Math.min(copy.width,Math.max(160,right-left+33));
+    const cropH=Math.min(copy.height,Math.max(80,bottom-top+33));
+    const sx=Math.max(0,Math.min(copy.width-cropW,Math.round((left+right-cropW)/2)));
+    const sy=Math.max(0,Math.min(copy.height-cropH,Math.round((top+bottom-cropH)/2)));
+    const detail=document.createElement('canvas');detail.width=cropW*2;detail.height=cropH*2;
+    const dc=detail.getContext('2d');dc.imageSmoothingEnabled=false;
+    dc.drawImage(copy,sx,sy,cropW,cropH,0,0,detail.width,detail.height);
+    const marks=[];
+    for(const v of intersections){
+     const mx=2*(v.cx-sx),my=2*(v.cy-sy);
+     if(mx<0||my<0||mx>=detail.width||my>=detail.height)throw Error('ROCK diagnostic centroid out of bounds: '+v.entry.u.id);
+     dc.strokeStyle=v.index===0?'#00ffff':'#ff00ff';dc.lineWidth=1;
+     dc.beginPath();dc.moveTo(mx-8,my);dc.lineTo(mx+8,my);dc.moveTo(mx,my-8);dc.lineTo(mx,my+8);dc.stroke();
+     marks.push(v.entry.u.id+': '+v.count+' overlapping opaque pixels, centroid ('+Math.round(v.cx)+','+Math.round(v.cy)+')');
+    }
+    const img=document.createElement('img');img.className='rock-detail';
+    img.alt='ROCK '+zoom+'x enlarged pixel crop; cyan behind, magenta front; '+marks.join('; ');
+    img.src=detail.toDataURL('image/png');img.dataset.rockDiagnostic=zoom+'x';
+    const label=document.createElement('p');label.className='rock-detail-label';
+    label.textContent='ROCK '+zoom+'x crop at '+sx+','+sy+' | '+marks.join(' | ');
+    output.append(img,label);
+   }
+  }
+ }
+ for(const kind of ['plant','rock']){
+  if(signatures.get(kind+'-1')===signatures.get(kind+'-2'))throw Error(kind+' zoom 1x/2x identical pixel signatures');
+ }
+ clearTimeout(watchdog);
+ status.textContent='PASS: WorldView original PLANT/ROCK occlusion, building and units, 1x/2x; frames='+frames;
+}catch(e){clearTimeout(watchdog);status.textContent='FAIL: '+stage+': '+e.message;document.body.dataset.failed='true'}
+</script></html>

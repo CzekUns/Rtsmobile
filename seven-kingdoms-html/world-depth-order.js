@@ -14,3 +14,24 @@ export function worldPainterOrder(towns = [], sites = [], firms = [], units = []
   add(units, 'unit', o => o.y);
   return entries.sort((a,b) => a.depth-b.depth || a.sequence-b.sequence);
 }
+
+/**
+ * Merge authentic vegetation/rock overlays into the same depth queue as
+ * world objects. Stable tie order: landscape first, then original object
+ * sequence, so an entity at the same baseline is never hidden by an overlay.
+ * Zoom affects pixels, not the world-space painter order.
+ */
+export function landscapePainterOrder(landscape = [], objects = []) {
+  const entries = [];
+  let sequence = 0;
+  for (const overlay of landscape) {
+    if (!overlay || !['plant','rock'].includes(overlay.kind) ||
+        !Number.isFinite(overlay.x) || !Number.isFinite(overlay.y)) continue;
+    entries.push({...overlay, depth: overlay.y + 1, sequence: sequence++});
+  }
+  for (const object of objects) {
+    if (!object || !Number.isFinite(object.depth)) continue;
+    entries.push({...object, sequence: sequence++});
+  }
+  return entries.sort((a,b) => a.depth-b.depth || a.sequence-b.sequence);
+}
