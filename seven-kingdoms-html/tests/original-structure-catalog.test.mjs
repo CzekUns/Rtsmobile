@@ -31,3 +31,17 @@ test('live preview adapter accepts the source-backed catalog without changing fa
  assert.equal(preview.drawUnit(ctx,{kind:'soldier',raceId:'norman'},0,0,24,4,0),false);
  assert.equal(preview.drawFirm(ctx,{owner:2,kind:'fort'},0,0,24),false);
 });
+
+test('catalog construction and directional metadata remain explicit and bounded',()=>{
+ const b=getOriginalStructure('BASE:NORMAN');
+ const u=getOriginalUnit('NORMAN:M');
+ assert.equal(b.constructionPhaseCount,b.phases.length);
+ assert.deepEqual(b.phases,[0,1,2,3]);
+ assert.equal(b.phaseColumns*b.frameWidth,b.atlasWidth);
+ assert.equal(u.directions*u.frameWidth,u.atlasWidth);
+ assert.equal(u.walkingFrames*u.frameHeight,u.atlasHeight);
+ assert.equal(u.directionOrder,'N,NE,E,SE,S,SW,W,NW');
+ assert.equal(validateOriginalCatalog().length,0);
+ assert.equal(getOriginalStructure('__proto__'),null);
+ assert.equal(getOriginalUnit('constructor'),null);
+});
