@@ -47,7 +47,8 @@ export function remapNormanNationPixels(rgba){
 // the original scheme 1; Greek soldiers must use fallback art.
 export function isUnitPreviewProxy(unit){
  return unit?.kind==='soldier'&&
-  (unit?.raceId==='norman'||unit?.culture==='Normanni'||(unit?.owner===2&&!unit?.raceId));
+  (unit?.raceId==='norman'||(!unit?.raceId&&unit?.culture==='Normanni')||
+   (unit?.owner===2&&!unit?.raceId&&!unit?.culture));
 }
 export function isFirmPreviewProxy(firm){return firm?.owner===2&&firm.kind==='fort'}
 function ready(image,config){
