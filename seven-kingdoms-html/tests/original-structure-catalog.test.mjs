@@ -195,3 +195,25 @@ test('inherited catalog entries cannot supply sprite geometry or bypass explicit
  assert.equal(preview.drawFirm(ctx,{kind:'fort',owner:2,size:3},10,20,24),false);
  assert.equal(draws,0);
 });
+
+test('foreign-culture forts never borrow Norman construction phases',async()=>{
+ const {isFirmPreviewProxy,OriginalSpritePreview}=await import('../playtest/original-sprites.js');
+ const legacy={kind:'fort',owner:2,size:3};
+ const greek={...legacy,culture:'Greci'};
+ const conflict={...legacy,raceId:'greek',culture:'Normanni'};
+ const norman={...legacy,raceId:'norman'};
+ assert.equal(isFirmPreviewProxy(legacy),true);
+ assert.equal(isFirmPreviewProxy(greek),false);
+ assert.equal(isFirmPreviewProxy(conflict),false);
+ assert.equal(isFirmPreviewProxy(norman),true);
+ const preview=new OriginalSpritePreview({imageFactory:()=>({addEventListener(){},set src(_){} }),canvasFactory:()=>({}),structureCatalog:ORIGINAL_STRUCTURE_CATALOG});
+ preview.firmBlue={width:720,height:160};
+ let draws=0;
+ const ctx={save(){},restore(){},drawImage(){draws++}};
+ assert.equal(preview.drawFirm(ctx,greek,10,20,24),false);
+ assert.equal(preview.drawFirm(ctx,conflict,10,20,24),false);
+ assert.equal(draws,0);
+ assert.equal(preview.drawFirm(ctx,norman,10,20,24),true);
+ assert.equal(preview.drawFirm(ctx,legacy,10,20,24),true);
+ assert.equal(draws,2);
+});
