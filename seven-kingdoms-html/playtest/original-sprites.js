@@ -86,7 +86,7 @@ export class OriginalSpritePreview{
   const record=this.unitCatalog?.['NORMAN:M'];
   const sheet=record?{...ORIGINAL_SHEETS.unit,cellWidth:record.frameWidth,cellHeight:record.frameHeight,columns:record.directions,rows:record.walkingFrames}:ORIGINAL_SHEETS.unit;
   const image=unit?.owner===2?this.unitBlue:this.unit;
-  if(!isUnitPreviewProxy(unit)||!ready(image,sheet))return false;
+  if(!isUnitPreviewProxy(unit)||!ready(image,sheet)||!Number.isFinite(t)||t<=0||!Number.isFinite(x)||!Number.isFinite(y))return false;
   // A supplied catalog is authoritative: absent records must not revive a proxy.
   if(this.unitCatalog && !Object.hasOwn(this.unitCatalog,'NORMAN:M'))return false;
   if(!Number.isInteger(direction)||direction<0||direction>=sheet.columns)return false;
@@ -109,7 +109,7 @@ export class OriginalSpritePreview{
   const record=this.structureCatalog?.['BASE:NORMAN'];
   const sheet=record?{...ORIGINAL_SHEETS.firm,cellWidth:record.frameWidth,cellHeight:record.frameHeight,columns:record.phaseColumns}:ORIGINAL_SHEETS.firm;
   const image=this.firmBlue;
-  if(!isFirmPreviewProxy(firm)||!ready(image,sheet))return false;
+  if(!isFirmPreviewProxy(firm)||!ready(image,sheet)||!Number.isFinite(t)||t<=0||!Number.isFinite(x)||!Number.isFinite(y)||!Number.isFinite(firm?.size)||firm.size<=0)return false;
   if(this.structureCatalog && !Object.hasOwn(this.structureCatalog,'BASE:NORMAN'))return false;
   if(record && (record.atlas!==ORIGINAL_SHEETS.firm.path || record.atlasWidth!==sheet.width || record.atlasHeight!==sheet.height ||
     !Number.isSafeInteger(record.frameWidth) || !Number.isSafeInteger(record.frameHeight) ||
