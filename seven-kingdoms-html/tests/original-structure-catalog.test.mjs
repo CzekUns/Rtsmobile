@@ -180,3 +180,18 @@ test('owner-2 preview proxy does not misidentify an explicitly non-Norman cultur
  assert.equal(preview.drawUnit(ctx,legacy,10,20,24,0,0),true);
  assert.equal(calls.length,2);
 });
+
+
+test('inherited catalog entries cannot supply sprite geometry or bypass explicit catalog fallback',async()=>{
+ const {OriginalSpritePreview}=await import('../playtest/original-sprites.js');
+ const make=()=>({complete:true,naturalWidth:768,naturalHeight:672,addEventListener(){},set src(_){}});
+ const inheritedUnit=Object.create({'NORMAN:M':getOriginalUnit('NORMAN:M')});
+ const inheritedFirm=Object.create({'BASE:NORMAN':getOriginalStructure('BASE:NORMAN')});
+ const preview=new OriginalSpritePreview({imageFactory:make,canvasFactory:()=>({}),unitCatalog:inheritedUnit,structureCatalog:inheritedFirm});
+ preview.firmBlue={width:720,height:160};
+ let draws=0;
+ const ctx={save(){},restore(){},drawImage(){draws++}};
+ assert.equal(preview.drawUnit(ctx,{kind:'soldier',raceId:'norman',owner:1},10,20,24,0,0),false);
+ assert.equal(preview.drawFirm(ctx,{kind:'fort',owner:2,size:3},10,20,24),false);
+ assert.equal(draws,0);
+});
