@@ -28,7 +28,7 @@ test('cannot skip program or silently reassign dependent tasks',()=>{
  assert.ok(errors.some(e=>e.includes('Priority and order differ')));
 });
 test('state rejects imaginary SHAs and unsupported plan transitions',()=>{
- const changed=structuredClone(state);changed.lastObservedMainSha='not-a-sha';changed.nextTaskAfterActive='SKH-QA-001';
+ const changed=structuredClone(state);changed.lastObservedMainSha='not-a-sha';changed.nextTaskAfterActive=tasks.taskOrder[0];
  const errors=validateProgram(tasks,changed);
  assert.ok(errors.some(e=>e.includes('main SHA')));
  assert.ok(errors.some(e=>e.includes('agreed plan')));
