@@ -36,8 +36,8 @@ export const ORIGINAL_UNIT_CATALOG = frozen({
     status:'preview-only'
   })
 });
-export function getOriginalStructure(id){return ORIGINAL_STRUCTURE_CATALOG[id]??null}
-export function getOriginalUnit(id){return ORIGINAL_UNIT_CATALOG[id]??null}
+export function getOriginalStructure(id){return Object.hasOwn(ORIGINAL_STRUCTURE_CATALOG,id)?ORIGINAL_STRUCTURE_CATALOG[id]:null}
+export function getOriginalUnit(id){return Object.hasOwn(ORIGINAL_UNIT_CATALOG,id)?ORIGINAL_UNIT_CATALOG[id]:null}
 export function validateOriginalCatalog(){
   const errors=[];
   for(const [id,entry] of Object.entries({...ORIGINAL_STRUCTURE_CATALOG,...ORIGINAL_UNIT_CATALOG})){
