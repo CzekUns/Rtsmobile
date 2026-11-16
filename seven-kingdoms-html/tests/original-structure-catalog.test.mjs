@@ -128,3 +128,32 @@ test('explicit catalogs fail closed for missing records and inconsistent source 
  }
  assert.equal(draws.length,0);
 });
+
+test('invalid sprite canvas coordinates and scales fail closed before drawImage',async()=>{
+ const {OriginalSpritePreview}=await import('../playtest/original-sprites.js');
+ const images=[];
+ const make=()=>{const img={complete:true,naturalWidth:0,naturalHeight:0,addEventListener(){},set src(_){} };images.push(img);return img};
+ const preview=new OriginalSpritePreview({imageFactory:make,canvasFactory:()=>({}),structureCatalog:ORIGINAL_STRUCTURE_CATALOG,unitCatalog:ORIGINAL_UNIT_CATALOG});
+ images[0].naturalWidth=768;images[0].naturalHeight=672;
+ preview.firmBlue={width:720,height:160};
+ const calls=[];
+ const ctx={save(){},restore(){},drawImage(...args){calls.push(args)}};
+ const unit={kind:'soldier',raceId:'norman',owner:1};
+ const firm={kind:'fort',owner:2,size:3};
+ for(const bad of [0,-1,NaN,Infinity,-Infinity]){
+  assert.equal(preview.drawUnit(ctx,unit,10,20,bad,0,0),false);
+  assert.equal(preview.drawFirm(ctx,firm,10,20,bad),false);
+ }
+ for(const bad of [NaN,Infinity,-Infinity]){
+  assert.equal(preview.drawUnit(ctx,unit,bad,20,24,0,0),false);
+  assert.equal(preview.drawUnit(ctx,unit,10,bad,24,0,0),false);
+  assert.equal(preview.drawFirm(ctx,firm,bad,20,24),false);
+  assert.equal(preview.drawFirm(ctx,firm,10,bad,24),false);
+  assert.equal(preview.drawFirm(ctx,{...firm,size:bad},10,20,24),false);
+ }
+ assert.equal(preview.drawFirm(ctx,{...firm,size:0},10,20,24),false);
+ assert.equal(calls.length,0);
+ assert.equal(preview.drawUnit(ctx,unit,10,20,24,0,0),true);
+ assert.equal(preview.drawFirm(ctx,firm,10,20,24),true);
+ assert.equal(calls.length,2);
+});
