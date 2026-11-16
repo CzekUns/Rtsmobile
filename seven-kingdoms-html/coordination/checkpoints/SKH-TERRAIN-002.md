@@ -559,3 +559,12 @@ Sostituire un gruppo coerente di elementi naturali provvisori con elementi origi
 - **Ownership e programma:** nessuna modifica a taskOrder; PR #121 resta transizione già concordata verso SKH-STRUCTURES-001, senza nuovo task o PR.
 - **Branch:** `agent/skh-integration/terrain002-release-handoff`; SHA codice di coordinamento `57612867fb6b22d64028f5c6848638fb6c0e7955`; HEAD finale è il commit del presente checkpoint.
 - **Singolo prossimo passo:** ottenere prova Actions per l'HEAD finale di PR #121 e prova CI/Pages del main `f914a3a`; se gate verde, integrare #121, verificare SHA main e iniziare il checkpoint SKH-STRUCTURES-001. Se rosso, correggere il job fallito sullo stesso branch.
+
+
+## Esecuzione 2026-11-16 03:55 CET — correzione CI transizione #121
+- **Stato iniziale:** PR #121 OPEN non-draft, mergeable=true, HEAD `cb517aeb90c3c7745e85be75f1d52b2b8ae9222e`; Actions #43790046954 e #43790040394 FAILURE, Node 277 PASS / 2 FAIL / 2 SKIP. Errori: test 111 `saved Seven Kingdoms orchestrator program and checkpoint are consistent` (checkpoint SKH-STRUCTURES-001 mancante), test 114 `state rejects imaginary SHAs and unsupported plan transitions` (test con valore hard-coded `SKH-QA-001`, ora successore legittimo).
+- **Codice realmente pubblicato:** `7b8b57d7b015ec74521b92bc2e83fb4eda5a0b53` corregge il test 114 usando `tasks.taskOrder[0]` come next-task volutamente invalido; `bc15fb54f111316e9bc55b6b8ade1700af5493fe` crea il checkpoint SKH-STRUCTURES-001 richiesto dal validatore; `88df66bd99d442ce82a5c41a2778e4d87764fa19` registra Pages verificato in STATE. Nessun runtime o asset modificato.
+- **Prove release #120:** main CI [#43784029511](https://github.com/CzekUns/Rtsmobile/actions/runs/43784029511) SUCCESS e Pages [#43784029495](https://github.com/CzekUns/Rtsmobile/actions/runs/43784029495) SUCCESS, entrambi sul merge SHA `f914a3ab007a7760026829bbc7216080564e0988`. Android e parità 7KAA NOT_RUN.
+- **Test:** log effettivo job `133046162852` esaminato. CI del nuovo HEAD **NOT_VERIFIED**; npm test/check locali NOT_RUN. Nessun merge #121 in questa run.
+- **Branch:** `agent/skh-integration/terrain002-release-handoff`, SHA prima del checkpoint `88df66bd99d442ce82a5c41a2778e4d87764fa19`; HEAD finale è il commit di questo checkpoint.
+- **Singolo prossimo passo:** verificare Actions sul nuovo HEAD #121; se SUCCESS e senza conflitti, integrare #121 su main, verificare SHA e iniziare SKH-STRUCTURES-001 sul branch concordato; se FAILURE, correggere l'errore esatto sul medesimo branch.
