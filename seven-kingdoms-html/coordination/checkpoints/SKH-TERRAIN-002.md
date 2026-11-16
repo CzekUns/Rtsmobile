@@ -542,3 +542,29 @@ Sostituire un gruppo coerente di elementi naturali provvisori con elementi origi
 - **Artefatto visivo:** `skh-terrain-002-landscape-occlusion-1x-2x`, ID `14184886591`, scaricato, estratto e PNG realmente aperto. La scena contiene 4 framebuffer, i marker ciano/magenta e crop diagnostici. Didascalia leggibile: `ROCK 1x crop at 248,182 | qa-behind: 20 overlapping opaque pixels, centroid (327,213) | qa-front: 21 overlapping opaque pixels, centroid (331,231)`. Questo supera la soglia 1×, e la CI conferma il test 2×, ma lo screenshot da solo non certifica parità pixel 7KAA. Restano vistose giunture rettangolari fra texture del terreno; registrare come limite visivo, senza imputazione causale verificata alla PR.
 - **Codice applicativo:** nessuna modifica in questa esecuzione; solo aggiornamento del checkpoint. npm test/check locali NOT_RUN (nessun checkout); CI GitHub HEAD SUCCESS. Nessun merge, Pages nuovo, Android o confronto con scena originale.
 - **Singolo prossimo passo:** verificare i gate della PR #120 sul branch HEAD (draft, mergeability/conflitti, provenienza, compatibilità e test) e, se soddisfatti, promuovere non-draft e integrare su main; se manca prova di compatibilità, correggere la lacuna specifica prima del merge.
+
+
+## Esecuzione 2026-11-16 02:03 CET — release PR #120
+- **PR #120:** promoted from draft; mergeable true, 0 commits behind main, 38 changed files; squash merged to main SHA `f914a3ab007a7760026829bbc7216080564e0988`.
+- **CI HEAD:** Actions #43778104231 SUCCESS on `49f57d608a70a54996110fbccb2494ba56882282`. npm locali NOT_RUN. Original assets PLANT/ROCK and depth-order tests included. Prior ROCK 1x visual overlap 20/21 opaque pixels; 2x automatic threshold passes. Android/parity NOT_RUN.
+- **Pages post-merge:** NOT_VERIFIED at checkpoint creation. This is not proof of deployment.
+- **Branch checkpoint:** release handoff branch `agent/skh-integration/terrain002-release-handoff`, based on merge SHA; this commit records release and transition through PR.
+- **Singolo prossimo passo:** verify main CI and Pages for merge SHA `f914a3ab007a7760026829bbc7216080564e0988`; if green resume SKH-STRUCTURES-001 from its checkpoint, preserving Android/7KAA manual QA pending.
+
+
+## Esecuzione 2026-11-16 03:02 CET — gate transizione #121
+- **Stato verificato:** PR #121 OPEN, non-draft, mergeable=true, HEAD `e46d104a1b70c09283a4d384c1acf6018e1b517c` prima della correzione di coordinamento. PR #120 risulta già integrata su main `f914a3ab007a7760026829bbc7216080564e0988`.
+- **Correzione prodotta:** `57612867fb6b22d64028f5c6848638fb6c0e7955` aggiorna `coordination/STATE.json`: data e note non rimandano più erroneamente all'inizio di TERRAIN-002, e distinguono la CI PR precedente dalla verifica post-merge non ancora ottenuta.
+- **Verifiche tentate:** GitHub connector `fetch_commit_workflow_runs` sull'HEAD PR #121 restituisce lista vuota (l'endpoint espone solo run da evento pull_request); `get_commit_combined_status` per `f914a3a` e `e46d104` restituisce `statuses: []`, che **non** dimostra né SUCCESS né FAILURE. Accesso Actions via web: DisabledError; checkout locale: `Could not resolve host: github.com`. `npm test` e `npm run check` NOT_RUN. Pages post-merge NOT_VERIFIED, Android NOT_RUN.
+- **Ownership e programma:** nessuna modifica a taskOrder; PR #121 resta transizione già concordata verso SKH-STRUCTURES-001, senza nuovo task o PR.
+- **Branch:** `agent/skh-integration/terrain002-release-handoff`; SHA codice di coordinamento `57612867fb6b22d64028f5c6848638fb6c0e7955`; HEAD finale è il commit del presente checkpoint.
+- **Singolo prossimo passo:** ottenere prova Actions per l'HEAD finale di PR #121 e prova CI/Pages del main `f914a3a`; se gate verde, integrare #121, verificare SHA main e iniziare il checkpoint SKH-STRUCTURES-001. Se rosso, correggere il job fallito sullo stesso branch.
+
+
+## Esecuzione 2026-11-16 03:55 CET — correzione CI transizione #121
+- **Stato iniziale:** PR #121 OPEN non-draft, mergeable=true, HEAD `cb517aeb90c3c7745e85be75f1d52b2b8ae9222e`; Actions #43790046954 e #43790040394 FAILURE, Node 277 PASS / 2 FAIL / 2 SKIP. Errori: test 111 `saved Seven Kingdoms orchestrator program and checkpoint are consistent` (checkpoint SKH-STRUCTURES-001 mancante), test 114 `state rejects imaginary SHAs and unsupported plan transitions` (test con valore hard-coded `SKH-QA-001`, ora successore legittimo).
+- **Codice realmente pubblicato:** `7b8b57d7b015ec74521b92bc2e83fb4eda5a0b53` corregge il test 114 usando `tasks.taskOrder[0]` come next-task volutamente invalido; `bc15fb54f111316e9bc55b6b8ade1700af5493fe` crea il checkpoint SKH-STRUCTURES-001 richiesto dal validatore; `88df66bd99d442ce82a5c41a2778e4d87764fa19` registra Pages verificato in STATE. Nessun runtime o asset modificato.
+- **Prove release #120:** main CI [#43784029511](https://github.com/CzekUns/Rtsmobile/actions/runs/43784029511) SUCCESS e Pages [#43784029495](https://github.com/CzekUns/Rtsmobile/actions/runs/43784029495) SUCCESS, entrambi sul merge SHA `f914a3ab007a7760026829bbc7216080564e0988`. Android e parità 7KAA NOT_RUN.
+- **Test:** log effettivo job `133046162852` esaminato. CI del nuovo HEAD **NOT_VERIFIED**; npm test/check locali NOT_RUN. Nessun merge #121 in questa run.
+- **Branch:** `agent/skh-integration/terrain002-release-handoff`, SHA prima del checkpoint `88df66bd99d442ce82a5c41a2778e4d87764fa19`; HEAD finale è il commit di questo checkpoint.
+- **Singolo prossimo passo:** verificare Actions sul nuovo HEAD #121; se SUCCESS e senza conflitti, integrare #121 su main, verificare SHA e iniziare SKH-STRUCTURES-001 sul branch concordato; se FAILURE, correggere l'errore esatto sul medesimo branch.
