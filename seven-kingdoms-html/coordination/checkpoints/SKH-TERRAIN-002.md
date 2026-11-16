@@ -542,3 +542,11 @@ Sostituire un gruppo coerente di elementi naturali provvisori con elementi origi
 - **Artefatto visivo:** `skh-terrain-002-landscape-occlusion-1x-2x`, ID `14184886591`, scaricato, estratto e PNG realmente aperto. La scena contiene 4 framebuffer, i marker ciano/magenta e crop diagnostici. Didascalia leggibile: `ROCK 1x crop at 248,182 | qa-behind: 20 overlapping opaque pixels, centroid (327,213) | qa-front: 21 overlapping opaque pixels, centroid (331,231)`. Questo supera la soglia 1×, e la CI conferma il test 2×, ma lo screenshot da solo non certifica parità pixel 7KAA. Restano vistose giunture rettangolari fra texture del terreno; registrare come limite visivo, senza imputazione causale verificata alla PR.
 - **Codice applicativo:** nessuna modifica in questa esecuzione; solo aggiornamento del checkpoint. npm test/check locali NOT_RUN (nessun checkout); CI GitHub HEAD SUCCESS. Nessun merge, Pages nuovo, Android o confronto con scena originale.
 - **Singolo prossimo passo:** verificare i gate della PR #120 sul branch HEAD (draft, mergeability/conflitti, provenienza, compatibilità e test) e, se soddisfatti, promuovere non-draft e integrare su main; se manca prova di compatibilità, correggere la lacuna specifica prima del merge.
+
+
+## Esecuzione 2026-11-16 02:03 CET — release PR #120
+- **PR #120:** promoted from draft; mergeable true, 0 commits behind main, 38 changed files; squash merged to main SHA `f914a3ab007a7760026829bbc7216080564e0988`.
+- **CI HEAD:** Actions #43778104231 SUCCESS on `49f57d608a70a54996110fbccb2494ba56882282`. npm locali NOT_RUN. Original assets PLANT/ROCK and depth-order tests included. Prior ROCK 1x visual overlap 20/21 opaque pixels; 2x automatic threshold passes. Android/parity NOT_RUN.
+- **Pages post-merge:** NOT_VERIFIED at checkpoint creation. This is not proof of deployment.
+- **Branch checkpoint:** release handoff branch `agent/skh-integration/terrain002-release-handoff`, based on merge SHA; this commit records release and transition through PR.
+- **Singolo prossimo passo:** verify main CI and Pages for merge SHA `f914a3ab007a7760026829bbc7216080564e0988`; if green resume SKH-STRUCTURES-001 from its checkpoint, preserving Android/7KAA manual QA pending.
