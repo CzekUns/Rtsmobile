@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {mkdtemp,readFile,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
-import {parseFirmInteger} from '../tools/assets/render-firm.mjs';
+import {parseFirmInteger,validFirmRecordTrailer} from '../tools/assets/render-firm.mjs';
 import {acquireResources,chooseSecondBuild,parseAcquireArgs,REQUIRED,UPSTREAM_COMMIT} from '../tools/assets/acquire-original-family.mjs';
 
 test('downloads only three pinned upstream GPL resources without fabricating data',async()=>{
@@ -55,4 +55,11 @@ test('original firm DBF blank optional numerics are zero, mandatory references r
  assert.equal(parseFirmInteger(Buffer.from('  12'),{field:'FFRAME.firstBitmap'}),12);
  assert.throws(()=>parseFirmInteger(Buffer.from('   '),{field:'FFRAME.firstBitmap'}),/FFRAME.firstBitmap/);
  assert.throws(()=>parseFirmInteger(Buffer.from(' 1x'),{optional:true,field:'FFRAME.delay'}),/FFRAME.delay/);
+});
+
+test('original firm DBF trailing separator accepts space or NUL only',()=>{
+ assert.equal(validFirmRecordTrailer(32),true);
+ assert.equal(validFirmRecordTrailer(0),true);
+ assert.equal(validFirmRecordTrailer(13),false);
+ assert.equal(validFirmRecordTrailer(undefined),false);
 });
