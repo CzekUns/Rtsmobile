@@ -1,0 +1,49 @@
+name: SKH original second-family extraction
+on:
+  push:
+    branches:
+      - agent/skh-integration/original-buildings-units
+    paths:
+      - 'seven-kingdoms-html/tools/assets/**'
+      - 'seven-kingdoms-html/tests/acquire-original-family.test.mjs'
+      - '.github/workflows/skh-original-family-extraction.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  extract-original-family:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify acquisition and renderer tests
+        run: |
+          npm --prefix seven-kingdoms-html test
+          npm --prefix seven-kingdoms-html run check
+      - name: Acquire pinned GPL resources and render non-Norman building
+        run: node seven-kingdoms-html/tools/assets/acquire-original-family.mjs --out "$RUNNER_TEMP/skh-second-family"
+      - name: Validate actual extracted atlas and provenance
+        run: |
+          node --input-type=module -e '
+            import {readFile,readdir} from "node:fs/promises";
+            import {join} from "node:path";
+            const dir=join(process.env.RUNNER_TEMP,"skh-second-family");
+            const m=JSON.parse(await readFile(join(dir,"firm.json"),"utf8"));
+            if(m.raceCode==="NORMAN" || !m.decoded || m.visuallyVerified || !m.bitmaps?.length || !m.modes?.length) throw Error("Invalid second-family manifest");
+            for(const key of ["tables","bitmap","palette"]) if(!/^[a-f0-9]{64}$/.test(m.source?.sha256?.[key]||"")) throw Error("Missing source SHA-256 "+key);
+            for(const row of [...m.bitmaps,...m.modes]) {
+              const data=await readFile(join(dir,row.path));
+              if(data.subarray(0,8).toString("hex")!=="89504e470d0a1a0a") throw Error("Invalid PNG "+row.path);
+            }
+            console.log(JSON.stringify({race:m.raceCode,bitmaps:m.bitmaps.length,modes:m.modes.length,source:m.source.sha256},null,2));
+          '
+      - name: Upload genuine PNGs and manifest for review (not yet integrated)
+        uses: actions/upload-artifact@v4
+        with:
+          name: skh-original-second-family
+          path: ${{ runner.temp }}/skh-second-family/
+          if-no-files-found: error
+          retention-days: 14
