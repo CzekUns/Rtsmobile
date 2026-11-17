@@ -49,7 +49,7 @@ export async function acquireAndRender(out,{race,firm='BASE',fetcher=fetch}={}){
   }finally{await rm(staging,{recursive:true,force:true})}
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){
-  const args=process.argv.slice(2),arg=name=>args[args.indexOf(name)+1];
+  const args=process.argv.slice(2),arg=name=>{const i=args.indexOf(name);return i>=0&&i+1<args.length&&!args[i+1].startsWith('--')?args[i+1]:undefined;};
   if(!args.includes('--out')){console.error('Usage: node acquire-original-family.mjs --out /tmp/family [--race RACE] [--firm BASE]');process.exitCode=2}
   else acquireAndRender(arg('--out'),{race:arg('--race'),firm:arg('--firm')||'BASE'})
     .then(result=>console.log(JSON.stringify({sourceCommit:result.sourceCommit,
