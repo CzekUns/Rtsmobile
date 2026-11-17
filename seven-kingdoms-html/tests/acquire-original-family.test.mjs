@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {mkdtemp,readFile,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
-import {acquireResources,chooseSecondBuild,REQUIRED,UPSTREAM_COMMIT} from '../tools/assets/acquire-original-family.mjs';
+import {acquireResources,chooseSecondBuild,parseAcquireArgs,REQUIRED,UPSTREAM_COMMIT} from '../tools/assets/acquire-original-family.mjs';
 
 test('downloads only three pinned upstream GPL resources without fabricating data',async()=>{
  const root=await mkdtemp(join(tmpdir(),'7kaa-acquire-test-'));
@@ -38,4 +38,11 @@ test('second family selection uses original FBUILD/FFRAME/FBITMAP references',()
  assert.deepEqual(chooseSecondBuild(tables).constructionRecords,[1]);
  assert.throws(()=>chooseSecondBuild(tables,{race:'NORMAN'}),/non-Norman/);
  assert.throws(()=>chooseSecondBuild(tables,{race:'MISSING'}),/Firm build missing/);
+});
+
+test('acquisition CLI does not interpret --out as an absent --race or --firm',()=>{
+ assert.deepEqual(parseAcquireArgs(['--out','/tmp/7kaa']),{out:'/tmp/7kaa',race:undefined,firm:'BASE'});
+ assert.deepEqual(parseAcquireArgs(['--out','/tmp/7kaa','--race','GREEK','--firm','BASE']),{out:'/tmp/7kaa',race:'GREEK',firm:'BASE'});
+ assert.deepEqual(parseAcquireArgs(['--race','--out','/tmp/7kaa']),{out:'/tmp/7kaa',race:undefined,firm:'BASE'});
+ assert.equal(parseAcquireArgs(['--out']).out,undefined);
 });
