@@ -6,7 +6,7 @@
 <p>Source-backed preview only. This is not an in-game or Android certification.</p>
 <label>Phase <select id="mode"><option value="0">Construction 0</option><option value="1">Construction 1</option><option value="2">Construction 2</option><option value="3" selected>Active</option><option value="4">Idle</option></select></label>
 <label>Scale <select id="zoom"><option value="1">1×</option><option value="2">2×</option></select></label>
-<canvas id="scene" width="420" height="360"></canvas><p id="status">Loading original files…</p>
+<canvas id="scene" width="420" height="360"></canvas><p id="status" role="status">Loading original files…</p>
 <small>Use screenshots at both scales and compare with the same scene in original 7KAA. No synthesized sprites or altered source pixels.</small>
 <script type="module">
 import {CHINESE_BASE,loadChineseBaseImages,drawChineseBase} from '../../playtest/chinese-base.js';
@@ -14,6 +14,9 @@ const canvas=document.querySelector('#scene'),ctx=canvas.getContext('2d');
 const mode=document.querySelector('#mode'),zoom=document.querySelector('#zoom'),status=document.querySelector('#status');
 const root=new URL('../original/chinese-base/',import.meta.url).href;
 const images=await loadChineseBaseImages({assetRoot:root});
+const params=new URLSearchParams(location.search);
+if(['0','1','2','3','4'].includes(params.get('mode')))mode.value=params.get('mode');
+if(['1','2'].includes(params.get('zoom')))zoom.value=params.get('zoom');
 function render(){
  const index=Number(mode.value),z=Number(zoom.value);
  canvas.width=420*z;canvas.height=360*z;
@@ -23,6 +26,8 @@ function render(){
  const firm={kind:'fort',raceId:'CHINESE',size:4,underConstruction:index<3,
   buildProgress:index<3?(index+0.1)/3:1,active:index!==4};
  const ok=drawChineseBase(ctx,firm,130*z,130*z,24*z,images);
+ status.dataset.result=ok?'drawn':'fail';
+ status.dataset.mode=String(index);status.dataset.zoom=String(z);
  status.textContent=(ok?'DRAWN':'FAIL')+' · '+CHINESE_BASE.modes[index].file+' · '+z+'× · source '+CHINESE_BASE.source.repository+' @ '+CHINESE_BASE.source.commit;
 }
 mode.addEventListener('change',render);zoom.addEventListener('change',render);render();
