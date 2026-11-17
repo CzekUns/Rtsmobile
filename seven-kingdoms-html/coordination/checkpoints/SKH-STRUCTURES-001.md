@@ -238,3 +238,13 @@
 - **Verifiche:** CI sul nuovo commit: [{"id":44079005829,"status":"in_progress","conclusion":null}]. npm test/check completi NOT_RUN (nessun checkout disponibile); nessun merge, Pages, QA Android o confronto 7KAA.
 - **Artifact:** `skh-original-second-family` ID `14310785266`, PNG/manifest ancora non committati; la seconda famiglia non è visibile nel gioco.
 - **Singolo prossimo passo:** verificare la CI del nuovo HEAD dopo la correzione; se verde, recuperare artifact `14310785266`, pubblicare PNG/manifest originali con hash e integrare caricamento `chineseBaseImages` e test di rendering nella PR #122; se rossa correggere l'errore esatto.
+
+
+## Esecuzione 2026-11-17 13:55 CET — terza regex CI corretta
+- **Stato iniziale:** PR #122 draft; checkpoint precedente cb3680c49de04e15915f511111775a0d8aa6c5c5. CI [#44079040088](https://github.com/CzekUns/Rtsmobile/actions/runs/44079040088) conclusa **failure**: JS 309 PASS / 1 FAIL / 2 SKIP; estrazione autentica seconda famiglia SUCCESS.
+- **Errore esatto:** test #110 in `tests/chinese-worldview-integration.test.mjs:8` falliva sull'ultima asserzione `/if\\(!originalFirm\\)/` (backslash doppi interpretati letteralmente); il renderer contiene la guardia `if(!originalFirm)`.
+- **Codice pubblicato:** commit `3a94c4b30c388f928e39dde01f3ab89679683f4e`, modifica la regex in `/if\\s*\\(\\s*!originalFirm\\s*\\)/` (tollera spazi). Nessuna modifica al runtime. Un precedente update no-op ha generato commit `e008dfc` senza modificare il blob: non è una correzione.
+- **Test:** log CI HEAD precedente verificato; nuova CI sul commit correttivo non ancora confermata. `npm test` e `npm run check` locali **NON ESEGUITI** (checkout completo non disponibile). Nessun merge, Pages o QA Android/7KAA.
+- **Asset:** artifact originale `14310785266` (10 PNG + firm.json) ancora non committato. Loader produttivo mancante, famiglia cinese non visibile.
+- **Branch/PR:** `agent/skh-integration/original-buildings-units`, [#122](https://github.com/CzekUns/Rtsmobile/pull/122); HEAD codice `3a94c4b30c388f928e39dde01f3ab89679683f4e` prima di questo checkpoint.
+- **Singolo prossimo passo:** verificare la CI sull'HEAD dopo questo fix; se verde, pubblicare PNG/manifest autentici dall'artifact 14310785266 e implementare image loader + test rendering; se rossa correggere esattamente il nuovo errore.
