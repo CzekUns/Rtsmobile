@@ -3,6 +3,7 @@
  */
 import {WORLD_W,WORLD_H,NATIONS,FIRMS,terrain,range} from './rules.js';
 import {OriginalSpritePreview,compassDirection,walkingFrame} from './playtest/original-sprites.js';
+import {drawChineseBase} from './playtest/chinese-base.js';
 import {ORIGINAL_STRUCTURE_CATALOG,ORIGINAL_UNIT_CATALOG} from './playtest/original-structure-catalog.js';
 import {OriginalTerrainPreview} from './playtest/original-terrain.js';
 import {OriginalCoastPreview} from './playtest/original-coast.js';
@@ -18,8 +19,9 @@ const COLORS={
 const hash=(x,y,s)=>Math.abs(Math.sin(x*13.37+y*42.17+s*.13)*7867.3481)%1;
 const lim=(v,a,b)=>Math.max(a,Math.min(b,v));
 export class WorldView{
- constructor(world,mini,{previewOriginalSprites=false,previewOriginalCoasts=true}={}){
+ constructor(world,mini,{previewOriginalSprites=false,previewOriginalCoasts=true,chineseBaseImages=null}={}){
   this.canvas=world;this.ctx=world.getContext('2d');
+  this.chineseBaseImages=previewOriginalSprites?chineseBaseImages:null;
   this.originalSprites=previewOriginalSprites?new OriginalSpritePreview({structureCatalog:ORIGINAL_STRUCTURE_CATALOG,unitCatalog:ORIGINAL_UNIT_CATALOG}):null;
   this.originalTerrain=previewOriginalSprites?new OriginalTerrainPreview():null;
   this.originalCoast=previewOriginalSprites&&previewOriginalCoasts?new OriginalCoastPreview():null;
@@ -201,7 +203,8 @@ export class WorldView{
   const p=this.screen(firm.x,firm.y),s=firm.size*t,color=NATIONS[firm.owner]?.color||'#ccc';
   if(p.x+s<0||p.y+s<0||p.x>this.canvas.width||p.y>this.canvas.height)return;
   // The blue Norman Seat of Power remains a visual proxy for the demo's blue fort.
-  const originalFirm=this.originalSprites?.drawFirm(ctx,firm,p.x,p.y,t)??false;
+  const originalFirm=(this.chineseBaseImages && drawChineseBase(ctx,firm,p.x,p.y,t,this.chineseBaseImages)) ||
+   (this.originalSprites?.drawFirm(ctx,firm,p.x,p.y,t)??false);
   if(!originalFirm){
   ctx.fillStyle='#555449';ctx.fillRect(p.x+s*.08,p.y+s*.16,s*.86,s*.77);
   const shades={fort:'#a3a49b',mine:'#898278',factory:'#aa9385',market:'#c1a57c',research:'#b8b3a1',inn:'#b09b78'};
