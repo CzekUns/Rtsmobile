@@ -1,3 +1,4 @@
+import {createHash} from 'node:crypto';
 import {spawn} from 'node:child_process';
 import {mkdtemp,readFile,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
@@ -18,6 +19,7 @@ async function chrome(args,url){
  if(result.timeout||result.code!==0)throw Error('Chromium '+JSON.stringify(result)+' '+stderr.slice(-1000));
  return stdout;
 }
+const screenshotHashes=new Map();
 try{
  await sleep(1000);
  for(const zoom of [1,2]){
@@ -34,11 +36,15 @@ try{
     await chrome(['--screenshot='+path],url);
     const png=await readFile(path);
     if(!png.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])))throw Error('Invalid screenshot PNG');
-    console.log('Screenshot '+path);
+    if(png.length<1000)throw Error('Screenshot suspiciously small: '+png.length+' bytes');
+    const hash=createHash('sha256').update(png).digest('hex');
+    screenshotHashes.set(zoom,hash);
+    console.log('Screenshot '+path+' sha256='+hash+' bytes='+png.length);
    }
   }
  }
- console.log('PASS: Chromium HTTP Chinese original PNG gallery, all 5 modes at 1x/2x');
+ if(screenshotHashes.size!==2||screenshotHashes.get(1)===screenshotHashes.get(2))throw Error('Chinese screenshots at 1x and 2x are identical or missing');
+ console.log('PASS: Chromium HTTP Chinese original PNG gallery, all 5 modes at 1x/2x; distinct screenshot hashes');
 }finally{
  server.kill('SIGTERM');
  if(!process.env.CHINESE_QA_SCREENSHOT_1X&&!process.env.CHINESE_QA_SCREENSHOT_2X)await rm(dir,{recursive:true,force:true});
