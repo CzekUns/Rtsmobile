@@ -10,7 +10,7 @@ test('WorldView only opts into Chinese art with explicit loaded image map',()=>{
  assert.match(view,/chineseBaseImages=null/);
  assert.match(view,/previewOriginalSprites\s*\?\s*chineseBaseImages\s*:\s*null/);
  assert.match(view,/drawChineseBase\s*\(\s*ctx\s*,\s*firm\s*,\s*p\.x\s*,\s*p\.y\s*,\s*t\s*,\s*this\.chineseBaseImages\s*\)/);
- assert.match(view,/if\\(!originalFirm\\)/);
+ assert.match(view,/if\s*\(\s*!originalFirm\s*\)/);
 });
 test('Chinese preview never draws when images are absent or foreign culture selected',()=>{
  let calls=0;
