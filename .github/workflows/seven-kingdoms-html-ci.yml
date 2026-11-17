@@ -185,6 +185,8 @@ jobs:
     if: github.ref == 'refs/heads/agent/skh-integration/original-buildings-units' || github.head_ref == 'agent/skh-integration/original-buildings-units'
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -215,3 +217,23 @@ jobs:
           path: ${{ runner.temp }}/skh-second-family/
           if-no-files-found: warn
           retention-days: 14
+      - name: Publish verified Chinese building PNGs and manifest to task branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/agent/skh-integration/original-buildings-units'
+        run: |
+          set -euo pipefail
+          src="$RUNNER_TEMP/skh-second-family"
+          dst="seven-kingdoms-html/assets/original/chinese-base"
+          test -s "$src/firm.json"
+          mkdir -p "$dst"
+          # The preceding provenance check must have passed; publish only its exact outputs.
+          find "$src" -maxdepth 1 -type f -name '*.png' -exec cp '{}' "$dst/" \;
+          cp "$src/firm.json" "$dst/firm.json"
+          git add "$dst"
+          if git diff --cached --quiet; then
+            echo "Authentic Chinese assets already committed."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "assets(7kaa): publish original Chinese building family"
+          git push origin "HEAD:refs/heads/agent/skh-integration/original-buildings-units"
