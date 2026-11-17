@@ -29,7 +29,7 @@ function factory({failAt=-1,badSizeAt=-1}={}){
 }
 test('Chinese image loader requires explicit root and returns all five validated modes',async()=>{
  assert.equal(await loadChineseBaseImages({imageFactory:factory(),manifestLoader}),null);
- const images=await loadChineseBaseImages({assetRoot:'/original/chinese-base/',imageFactory:factory()});
+ const images=await loadChineseBaseImages({assetRoot:'/original/chinese-base/',imageFactory:factory(),manifestLoader});
  assert.equal(images.size,5);
  for(const mode of CHINESE_BASE.modes){
   assert.equal(images.get(mode.file).url,'/original/chinese-base/'+mode.file);
