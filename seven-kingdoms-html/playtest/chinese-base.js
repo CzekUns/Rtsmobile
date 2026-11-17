@@ -54,3 +54,32 @@ export function drawChineseBase(ctx,firm,x,y,t,images){
   CHINESE_BASE.bounds.width*scale,CHINESE_BASE.bounds.height*scale);
  ctx.restore();return true;
 }
+
+
+/**
+ * Load source-backed BASE:CHINESE images only after they have been shipped.
+ * Caller must opt in with a verified asset directory; missing/partial sets
+ * resolve to null so WorldView keeps its procedural fallback.
+ * The imageFactory injection makes loading testable without browser globals.
+ */
+export async function loadChineseBaseImages({assetRoot,imageFactory}={}){
+ if(typeof assetRoot!=='string'||!assetRoot.trim())return null;
+ const make=imageFactory||(()=>new Image());
+ const images=new Map();
+ try{
+  for(const mode of CHINESE_BASE.modes){
+   const image=make();
+   if(!image||typeof image.addEventListener!=='function')return null;
+   const ready=new Promise((resolve,reject)=>{
+    image.addEventListener('load',resolve,{once:true});
+    image.addEventListener('error',reject,{once:true});
+   });
+   image.src=assetRoot.replace(/\\/$/,'')+'/'+encodeURIComponent(mode.file);
+   await ready;
+   if(image.complete!==true||image.naturalWidth!==CHINESE_BASE.bounds.width||
+      image.naturalHeight!==CHINESE_BASE.bounds.height)return null;
+   images.set(mode.file,image);
+  }
+  return images.size===CHINESE_BASE.modes.length?images:null;
+ }catch(_){return null}
+}
