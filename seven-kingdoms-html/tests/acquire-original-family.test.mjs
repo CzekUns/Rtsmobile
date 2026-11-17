@@ -57,9 +57,15 @@ test('original firm DBF blank optional numerics are zero, mandatory references r
  assert.throws(()=>parseFirmInteger(Buffer.from(' 1x'),{optional:true,field:'FFRAME.delay'}),/FFRAME.delay/);
 });
 
-test('original firm DBF trailing separator accepts space or NUL only',()=>{
+test('original firm DBF trailer permits DOS EOF only on last record',()=>{
+ // STD.SET from 7KAA pinned commit: final FBUILD row 34, FFRAME row 84,
+ // FBITMAP row 179 use 0x1A; all preceding rows use ASCII space.
  assert.equal(validFirmRecordTrailer(32),true);
- assert.equal(validFirmRecordTrailer(0),true);
- assert.equal(validFirmRecordTrailer(13),false);
+ assert.equal(validFirmRecordTrailer(0),true); // legacy fixture allowance
+ assert.equal(validFirmRecordTrailer(26),false);
+ assert.equal(validFirmRecordTrailer(26,{isLastRecord:false}),false);
+ assert.equal(validFirmRecordTrailer(26,{isLastRecord:true}),true);
+ assert.equal(validFirmRecordTrailer(32,{isLastRecord:true}),true);
+ assert.equal(validFirmRecordTrailer(13,{isLastRecord:true}),false);
  assert.equal(validFirmRecordTrailer(undefined),false);
 });
