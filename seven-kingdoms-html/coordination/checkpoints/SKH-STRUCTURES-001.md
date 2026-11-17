@@ -285,3 +285,11 @@
 - **Test:** CI precedente #44121298004 SUCCESS per `59d4f57`; CI del nuovo commit `bbdac59` non ancora presente al controllo. npm test/check locali NON_ESEGUITI (checkout impedito). Nessun merge/Pages, QA Android e 1×/2× NOT_RUN.
 - **Branch:** `agent/skh-integration/original-buildings-units`; PR [#122](https://github.com/CzekUns/Rtsmobile/pull/122); codice HEAD prima del checkpoint `bbdac59ad80a96962344bcb54e3676b7a4156904`.
 - **Singolo prossimo passo:** eseguire l'importer in un checkout autenticato sul branch, validare i cinque PNG e `firm.json` dall'artifact `14310785266`, committarli nella stessa PR e verificare CI HEAD e rendering Canvas 1×/2×; se CI rossa correggere prima il fallimento specifico.
+
+## Esecuzione 2026-11-17 19:03 CET — asset originali pubblicati automaticamente
+- **Stato iniziale:** PR #122 draft, checkpoint precedente `6e2ed07`; CI [#44131481543](https://github.com/CzekUns/Rtsmobile/actions/runs/44131481543) SUCCESS per l'HEAD precedente.
+- **Codice:** commit `546402c0bbd7459cdb5232be47fca3d3a76290e3` modifica `.github/workflows/seven-kingdoms-html-ci.yml`, concede `contents: write` al job di estrazione originale e pubblica direttamente gli output verificati sul branch del task solo su evento push, senza force.
+- **Risultato binario verificato:** il runner ha effettivamente pubblicato il commit `bf6efd02fca6c47b1341a16101a06b2bc96673d9` sul branch; `assets/original/chinese-base/firm.json` letto da GitHub sull'HEAD, con ID `BASE:CHINESE`, sorgenti 7KAA GPL, footprint 4×4 e cinque mode originali. Il workflow copia tutti i PNG estratti. **Non dichiarare rendering visivo approvato**.
+- **Test:** CI precedente verde; nuova CI esatta su `bf6efd02` e sul successivo checkpoint non ancora verificata. npm test/check locali NOT_RUN (checkout DNS impedito). Nessun merge/Pages nuovo; Android e confronto 7KAA 1×/2× NOT_RUN.
+- **PR/branch:** [#122](https://github.com/CzekUns/Rtsmobile/pull/122), `agent/skh-integration/original-buildings-units`; HEAD binario `bf6efd02` prima di questo checkpoint.
+- **Singolo prossimo passo:** verificare CI sull'HEAD pubblicato, validare presenza e caricamento dei cinque PNG in Canvas con test/screenshot 1×/2× e correggere eventuali errori prima di rendere non-draft la PR.
