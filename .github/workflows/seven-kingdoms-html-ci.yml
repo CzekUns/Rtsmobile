@@ -179,3 +179,39 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "assets(7kaa): publish verified original ROCK atlas"
           git push origin "HEAD:refs/heads/agent/skh-integration/original-landscape-overlays"
+
+  original-second-family:
+    name: Original 7KAA second-family extraction
+    if: github.ref == 'refs/heads/agent/skh-integration/original-buildings-units' || github.head_ref == 'agent/skh-integration/original-buildings-units'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Acquire pinned GPL resources and render non-Norman building
+        run: node seven-kingdoms-html/tools/assets/acquire-original-family.mjs --out "$RUNNER_TEMP/skh-second-family"
+      - name: Validate extracted PNG and provenance
+        run: |
+          node --input-type=module -e '
+            import {readFile} from "node:fs/promises";
+            import {join} from "node:path";
+            const dir=join(process.env.RUNNER_TEMP,"skh-second-family");
+            const m=JSON.parse(await readFile(join(dir,"firm.json"),"utf8"));
+            if(m.raceCode==="NORMAN" || !m.decoded || m.visuallyVerified || !m.bitmaps?.length || !m.modes?.length) throw Error("Invalid second-family manifest");
+            for(const key of ["tables","bitmap","palette"]) if(!/^[a-f0-9]{64}$/.test(m.source?.sha256?.[key]||"")) throw Error("Missing source SHA-256 "+key);
+            for(const row of [...m.bitmaps,...m.modes]) {
+              const data=await readFile(join(dir,row.path));
+              if(data.subarray(0,8).toString("hex")!=="89504e470d0a1a0a") throw Error("Invalid PNG "+row.path);
+            }
+            console.log(JSON.stringify({race:m.raceCode,bitmaps:m.bitmaps.length,modes:m.modes.length,source:m.source.sha256},null,2));
+          '
+      - name: Upload authentic PNGs and manifest for integration
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: skh-original-second-family
+          path: ${{ runner.temp }}/skh-second-family/
+          if-no-files-found: warn
+          retention-days: 14
