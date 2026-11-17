@@ -9,7 +9,9 @@ import {decodeImportedBitmap,decodeStandardPalette,indexedToRgba,encodePng,natio
 
 const check=(v,m)=>{if(!v)throw Error(m)};
 const trim=b=>b.toString('latin1').trim();
-const integer=b=>{const n=trim(b);check(/^\d+$/.test(n),'Invalid firm numeric record '+JSON.stringify(n));return Number(n)};
+const integer=(b,{optional=false,field='unknown'}={})=>{const n=trim(b);if(optional&&n==='')return 0;check(/^\d+$/.test(n),'Invalid firm numeric record '+field+' '+JSON.stringify(n));return Number(n)};
+// Blank numeric cells in the upstream DBF represent absent optional references or delays.
+// Required frame and footprint references remain strict and are validated by selectedBuild.
 const signed=b=>{const n=trim(b);check(/^-?\d+$/.test(n),'Invalid firm offset '+JSON.stringify(n));return Number(n)};
 export function parseFirmTables(set){
  const records=parseRes(set),schemas={
@@ -21,6 +23,7 @@ export function parseFirmTables(set){
  };
  const result={};const stringKeys=new Set(['firmCode','raceCode','mode','filename','animateFull']);
  const signedKeys=new Set(['offsetX','offsetY']);
+ const optionalNumbers=new Set(['constructionFirst','constructionCount','idleBitmap','groundBitmap','raceId','delay']);
  for(const [name,schema] of Object.entries(schemas)){
   const rec=records.find(r=>r.name===name);check(rec,'Missing original firm table '+name);
   const db=parseDbf(set.subarray(rec.offset,rec.offset+rec.size)),size=schema.reduce((n,[,len])=>n+len,0);
@@ -30,7 +33,7 @@ export function parseFirmTables(set){
    const item={recordNo:i+1};let pos=0;
    for(const [key,len] of schema){
     const data=row.subarray(pos,pos+len);pos+=len;
-    item[key]=key==='bitmapOffset'?data.readUInt32LE(0):stringKeys.has(key)?trim(data):signedKeys.has(key)?signed(data):integer(data);
+    item[key]=key==='bitmapOffset'?data.readUInt32LE(0):stringKeys.has(key)?trim(data):signedKeys.has(key)?signed(data):integer(data,{optional:optionalNumbers.has(key),field:name+'.'+key+' record '+(i+1)});
    }
    return item;
   });
