@@ -9,7 +9,7 @@ import {decodeImportedBitmap,decodeStandardPalette,indexedToRgba,encodePng,natio
 
 const check=(v,m)=>{if(!v)throw Error(m)};
 const trim=b=>b.toString('latin1').trim();
-const integer=(b,{optional=false,field='unknown'}={})=>{const n=trim(b);if(optional&&n==='')return 0;check(/^\d+$/.test(n),'Invalid firm numeric record '+field+' '+JSON.stringify(n));return Number(n)};
+export const parseFirmInteger=(b,{optional=false,field='unknown'}={})=>{const n=trim(b);if(optional&&n==='')return 0;check(/^\d+$/.test(n),'Invalid firm numeric record '+field+' '+JSON.stringify(n));return Number(n)};
 // Blank numeric cells in the upstream DBF represent absent optional references or delays.
 // Required frame and footprint references remain strict and are validated by selectedBuild.
 const signed=b=>{const n=trim(b);check(/^-?\d+$/.test(n),'Invalid firm offset '+JSON.stringify(n));return Number(n)};
@@ -33,7 +33,7 @@ export function parseFirmTables(set){
    const item={recordNo:i+1};let pos=0;
    for(const [key,len] of schema){
     const data=row.subarray(pos,pos+len);pos+=len;
-    item[key]=key==='bitmapOffset'?data.readUInt32LE(0):stringKeys.has(key)?trim(data):signedKeys.has(key)?signed(data):integer(data,{optional:optionalNumbers.has(key),field:name+'.'+key+' record '+(i+1)});
+    item[key]=key==='bitmapOffset'?data.readUInt32LE(0):stringKeys.has(key)?trim(data):signedKeys.has(key)?signed(data):parseFirmInteger(data,{optional:optionalNumbers.has(key),field:name+'.'+key+' record '+(i+1)});
    }
    return item;
   });
