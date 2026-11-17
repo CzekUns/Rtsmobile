@@ -29,7 +29,7 @@ export function parseFirmTables(set){
   const db=parseDbf(set.subarray(rec.offset,rec.offset+rec.size)),size=schema.reduce((n,[,len])=>n+len,0);
   check(db.recordSize===size+1,'Unexpected original '+name+' padded record size');
   result[name]=db.records.map((row,i)=>{
-   check(row[size]===32,'Invalid '+name+' DBF record padding');
+   check(row[size]===32 || row[size]===0,'Invalid '+name+' DBF record padding byte '+row[size]+' at record '+(i+1));
    const item={recordNo:i+1};let pos=0;
    for(const [key,len] of schema){
     const data=row.subarray(pos,pos+len);pos+=len;
