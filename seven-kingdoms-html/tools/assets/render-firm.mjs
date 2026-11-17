@@ -13,7 +13,11 @@ export const parseFirmInteger=(b,{optional=false,field='unknown'}={})=>{const n=
 // Blank numeric cells in the upstream DBF represent absent optional references or delays.
 // Required frame and footprint references remain strict and are validated by selectedBuild.
 const signed=b=>{const n=trim(b);check(/^-?\d+$/.test(n),'Invalid firm offset '+JSON.stringify(n));return Number(n)};
-export const validFirmRecordTrailer = byte => byte === 0 || byte === 32;
+// Authentic 7KAA STD.SET DBF uses space (0x20) between rows and DOS EOF (0x1A)
+// as the trailer of the FINAL record in FBUILD, FFRAME and FBITMAP only.
+// Keep 0x00 allowed for legacy fixtures; never allow 0x1A inside the table.
+export const validFirmRecordTrailer = (byte,{isLastRecord=false}={}) =>
+ byte === 0 || byte === 32 || (isLastRecord && byte === 26);
 export function parseFirmTables(set){
  const records=parseRes(set),schemas={
   FBUILD:[['firmCode',8],['raceCode',8],['animateFull',1],['constructionFirst',5],['constructionCount',2],
@@ -30,7 +34,8 @@ export function parseFirmTables(set){
   const db=parseDbf(set.subarray(rec.offset,rec.offset+rec.size)),size=schema.reduce((n,[,len])=>n+len,0);
   check(db.recordSize===size+1,'Unexpected original '+name+' padded record size');
   result[name]=db.records.map((row,i)=>{
-   check(validFirmRecordTrailer(row[size]),'Invalid '+name+' DBF record padding byte '+row[size]+' at record '+(i+1));
+   check(validFirmRecordTrailer(row[size],{isLastRecord:i===db.records.length-1}),
+    'Invalid '+name+' DBF record padding byte '+row[size]+' at record '+(i+1));
    const item={recordNo:i+1};let pos=0;
    for(const [key,len] of schema){
     const data=row.subarray(pos,pos+len);pos+=len;
