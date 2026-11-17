@@ -26,6 +26,8 @@ try{
    const dom=await chrome(['--dump-dom'],url);
    if(!new RegExp(`id="status"[^>]*data-result="drawn"[^>]*data-mode="${mode}"[^>]*data-zoom="${zoom}"`).test(dom))
     throw Error(`Chinese browser render failed mode=${mode} zoom=${zoom}: `+dom.slice(-1200));
+   const changed=dom.match(/id="status"[^>]*data-changed-pixels="(\d+)"/);
+   if(!changed||Number(changed[1])<=0)throw Error(`Chinese Canvas produced no changed pixels mode=${mode} zoom=${zoom}`);
    if(!dom.includes('the3dfxdude/7kaa'))throw Error('Missing upstream attribution');
    if(mode===3){
     const path=process.env[`CHINESE_QA_SCREENSHOT_${zoom}X`]||join(dir,`chinese-${zoom}x.png`);
