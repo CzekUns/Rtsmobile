@@ -74,7 +74,7 @@ export async function loadChineseBaseImages({assetRoot,imageFactory}={}){
     image.addEventListener('load',resolve,{once:true});
     image.addEventListener('error',reject,{once:true});
    });
-   image.src=assetRoot.replace(/\\/$/,'')+'/'+encodeURIComponent(mode.file);
+   image.src=(assetRoot.endsWith('/')?assetRoot.slice(0,-1):assetRoot)+'/'+encodeURIComponent(mode.file);
    await ready;
    if(image.complete!==true||image.naturalWidth!==CHINESE_BASE.bounds.width||
       image.naturalHeight!==CHINESE_BASE.bounds.height)return null;
