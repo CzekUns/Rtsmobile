@@ -229,3 +229,12 @@
 - **Artifact:** `skh-original-second-family` (ID `14310785266`) già prodotto e verificato nel job, ma 10 PNG e `firm.json` non ancora committati. Nessun caricamento immagini produttivo; seconda famiglia non visibile.
 - **Branch:** `agent/skh-integration/original-buildings-units`; PR #122. HEAD codice prima del checkpoint `16ee714daad11cf5779c4a90b439703f06529c24`.
 - **Singolo prossimo passo:** controllare CI sull'HEAD dopo questa correzione; se verde, recuperare artifact `14310785266` e committare PNG/manifest autentici con hash, poi implementare caricamento `chineseBaseImages` e test di rendering; se rossa correggere prima il nuovo errore preciso.
+
+
+## Esecuzione 2026-11-17 12:59 CET — secondo errore regex CI riparato
+- **Stato iniziale:** PR #122 draft, checkpoint precedente `f63a0c6193c5384e548e700bbf7e5e641b36bff3`. CI [#44069752564](https://github.com/CzekUns/Rtsmobile/actions/runs/44069752564) **failure** per quell'HEAD: 312 test, 309 PASS, 1 FAIL, 2 SKIP; job di estrazione della seconda famiglia SUCCESS.
+- **Errore riproducibile:** test #110 `tests/chinese-worldview-integration.test.mjs:8` fallisce sulla regex `drawChineseBase\\\\(ctx,firm,p\\\\.x,...)`: il test cerca backslash letterali, mentre `view.js` contiene `drawChineseBase(ctx,firm,p.x,p.y,t,this.chineseBaseImages)`. Il fix della precedente run correggeva solo la prima regex.
+- **Codice/test pubblicato:** commit [`0924c81`](https://github.com/CzekUns/Rtsmobile/commit/0924c814555d209be57af6111fe0749d27fb3472) modifica la seconda regex con escape JS corretti e tolleranza agli spazi; nessuna modifica al runtime o agli asset. Verifica puntuale della regex con Node locale PASS; **non equivale** a `npm test`/check completi.
+- **Verifiche:** CI sul nuovo commit: [{"id":44079005829,"status":"in_progress","conclusion":null}]. npm test/check completi NOT_RUN (nessun checkout disponibile); nessun merge, Pages, QA Android o confronto 7KAA.
+- **Artifact:** `skh-original-second-family` ID `14310785266`, PNG/manifest ancora non committati; la seconda famiglia non è visibile nel gioco.
+- **Singolo prossimo passo:** verificare la CI del nuovo HEAD dopo la correzione; se verde, recuperare artifact `14310785266`, pubblicare PNG/manifest originali con hash e integrare caricamento `chineseBaseImages` e test di rendering nella PR #122; se rossa correggere l'errore esatto.
