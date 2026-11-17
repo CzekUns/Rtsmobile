@@ -48,12 +48,16 @@ export async function acquireAndRender(out,{race,firm='BASE',fetcher=fetch}={}){
     return {sourceCommit:UPSTREAM_COMMIT,sourceSha256:hashes,selected,manifest};
   }finally{await rm(staging,{recursive:true,force:true})}
 }
+export function parseAcquireArgs(args){
+  const arg=name=>{const i=args.indexOf(name);return i>=0&&i+1<args.length&&!args[i+1].startsWith('--')?args[i+1]:undefined;};
+  return {out:arg('--out'),race:arg('--race'),firm:arg('--firm')||'BASE'};
+}
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){
-  const args=process.argv.slice(2),arg=name=>{const i=args.indexOf(name);return i>=0&&i+1<args.length&&!args[i+1].startsWith('--')?args[i+1]:undefined;};
-  if(!args.includes('--out')){console.error('Usage: node acquire-original-family.mjs --out /tmp/family [--race RACE] [--firm BASE]');process.exitCode=2}
-  else acquireAndRender(arg('--out'),{race:arg('--race'),firm:arg('--firm')||'BASE'})
+  const options=parseAcquireArgs(process.argv.slice(2));
+  if(!options.out){console.error('Usage: node acquire-original-family.mjs --out /tmp/family [--race RACE] [--firm BASE]');process.exitCode=2}
+  else acquireAndRender(options.out,{race:options.race,firm:options.firm})
     .then(result=>console.log(JSON.stringify({sourceCommit:result.sourceCommit,
       sourceSha256:result.sourceSha256,selected:result.selected,
-      manifestPath:resolve(arg('--out'),'firm.json'),visuallyVerified:false},null,2)))
+      manifestPath:resolve(options.out,'firm.json'),visuallyVerified:false},null,2)))
     .catch(error=>{console.error(error.stack);process.exitCode=1});
 }
