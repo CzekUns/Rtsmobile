@@ -20,6 +20,7 @@ async function chrome(args,url){
  return stdout;
 }
 const screenshotHashes=new Map();
+const paintedPixelsByMode=new Map();
 try{
  await sleep(1000);
  for(const zoom of [1,2]){
@@ -30,6 +31,10 @@ try{
     throw Error(`Chinese browser render failed mode=${mode} zoom=${zoom}: `+dom.slice(-1200));
    const changed=dom.match(/id="status"[^>]*data-changed-pixels="(\d+)"/);
    if(!changed||Number(changed[1])<=0)throw Error(`Chinese Canvas produced no changed pixels mode=${mode} zoom=${zoom}`);
+   const painted=Number(changed[1]);
+   if(zoom===1)paintedPixelsByMode.set(mode,painted);
+   else if(painted!==paintedPixelsByMode.get(mode)*4)
+    throw Error(`Chinese pixel-scale regression mode=${mode}: 1x=${paintedPixelsByMode.get(mode)} 2x=${painted}; expected exact 4x area for nearest-neighbor scaling`);
    if(!dom.includes('the3dfxdude/7kaa'))throw Error('Missing upstream attribution');
    if(mode===3){
     const path=process.env[`CHINESE_QA_SCREENSHOT_${zoom}X`]||join(dir,`chinese-${zoom}x.png`);
@@ -44,7 +49,7 @@ try{
   }
  }
  if(screenshotHashes.size!==2||screenshotHashes.get(1)===screenshotHashes.get(2))throw Error('Chinese screenshots at 1x and 2x are identical or missing');
- console.log('PASS: Chromium HTTP Chinese original PNG gallery, all 5 modes at 1x/2x; distinct screenshot hashes');
+ console.log('PASS: Chromium HTTP Chinese original PNG gallery, all 5 modes at 1x/2x; 4x painted-pixel area at 2x; distinct screenshot hashes');
 }finally{
  server.kill('SIGTERM');
  if(!process.env.CHINESE_QA_SCREENSHOT_1X&&!process.env.CHINESE_QA_SCREENSHOT_2X)await rm(dir,{recursive:true,force:true});
