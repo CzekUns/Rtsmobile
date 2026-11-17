@@ -62,8 +62,20 @@ export function drawChineseBase(ctx,firm,x,y,t,images){
  * resolve to null so WorldView keeps its procedural fallback.
  * The imageFactory injection makes loading testable without browser globals.
  */
-export async function loadChineseBaseImages({assetRoot,imageFactory}={}){
+export async function loadChineseBaseImages({assetRoot,imageFactory,manifestLoader}={}){
  if(typeof assetRoot!=='string'||!assetRoot.trim())return null;
+ const root=assetRoot.endsWith('/')?assetRoot.slice(0,-1):assetRoot;
+ // Refuse to render images without the source manifest shipped alongside them.
+ // This is a metadata/provenance gate, not a cryptographic PNG hash check.
+ try{
+  const manifest=await (manifestLoader
+   ?manifestLoader(root+'/firm.json')
+   :fetch(root+'/firm.json').then(response=>{
+     if(!response.ok)throw new Error('Chinese BASE manifest unavailable');
+     return response.json();
+    }));
+  if(!validateChineseBaseAssets(manifest,new Set(CHINESE_BASE.modes.map(mode=>mode.file))))return null;
+ }catch(_){return null;}
  const make=imageFactory||(()=>new Image());
  const images=new Map();
  try{
@@ -74,7 +86,7 @@ export async function loadChineseBaseImages({assetRoot,imageFactory}={}){
     image.addEventListener('load',resolve,{once:true});
     image.addEventListener('error',reject,{once:true});
    });
-   image.src=(assetRoot.endsWith('/')?assetRoot.slice(0,-1):assetRoot)+'/'+encodeURIComponent(mode.file);
+   image.src=root+'/'+encodeURIComponent(mode.file);
    await ready;
    if(image.complete!==true||image.naturalWidth!==CHINESE_BASE.bounds.width||
       image.naturalHeight!==CHINESE_BASE.bounds.height)return null;
