@@ -1,3 +1,4 @@
+import {loadChineseBaseImages} from './playtest/chinese-base.js';
 /* Seven Kingdoms HTML Edition — browser runtime and controls.
  * Game rules live in rules.js, drawing in view.js. GPL-2.0-only.
  */
@@ -28,6 +29,13 @@ const saveKey=playtest?'seven-kingdoms-html-quick-playtest-v1':SAVE_KEY;
 let fixedClock=createFrameAccumulator({tickUs:50000,maxFrameUs:250000});
 let game=SevenGame.load(saveKey)||new SevenGame();
 const view=new WorldView($('world'),$('minimap'),{previewOriginalSprites,previewOriginalCoasts:query.get('coasts')!=='0'});
+// Optional verified Chinese source sprites: until PNGs are published, a
+// missing asset fails closed and the existing WorldView fallback remains.
+if(previewOriginalSprites&&query.get('chinese')==='1'){
+ loadChineseBaseImages({assetRoot:new URL('./assets/original/chinese-base/',import.meta.url).href})
+  .then(images=>{if(images){view.chineseBaseImages=images;}})
+  .catch(()=>{});
+}
 installReportToolbar(document.querySelector('.reports'),$('reportsPrev'),$('reportsNext'));
 let selection=game.towns.find(t=>t.owner===1)?.id||null;
 let report=null,placing=null,placingBuilderId=null,builderMenuId=null,trainingMenuTownId=null,ghost=null,newsUntil=0,last=0,lastPanel=0,lastSave=0;
