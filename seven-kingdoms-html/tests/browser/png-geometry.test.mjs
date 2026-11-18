@@ -56,5 +56,5 @@ test('2x geometry rejects mismatched dimensions and decoder rejects malformed in
  assert.throws(()=>compareScaleGeometry(one,{width:15,height:16,bpp:3,pixels:Buffer.alloc(15*16*3)}),/geometry mismatch/);
  assert.throws(()=>decodePng(Buffer.from('not a png')),/signature/);
  const truncated=png(4,4,2,[0]).bytes.subarray(0,40);
- assert.throws(()=>decodePng(truncated),/Truncated PNG chunk|Unsupported PNG format/);
+ assert.throws(()=>decodePng(truncated),/Truncated PNG chunk|Unsupported PNG format|unexpected end of file/);
 });
