@@ -16,3 +16,11 @@
 - **CI e Pages post-merge:** CI su SHA main non ancora presente nel risultato delle workflow runs al controllo; Pages post-merge NON_VERIFIED. CI precedente della PR #123 verde, non equivale a Pages. npm test/check locali NON_ESEGUITI. Android landscape e parità stessa scena 7KAA NON_ESEGUITI.
 - **File modificati:** solo questo checkpoint QA. Nessun runtime modificato, nessuna PR QA ancora aperta. Branch `agent/skh-integration/fidelity-regression-qa`, base main `c276b5806a2812df1ac8ad493057f62e2d7f83f8`.
 - **Singolo prossimo passo:** verificare CI main e Pages per `c276b5806a2812df1ac8ad493057f62e2d7f83f8`, poi implementare sul medesimo branch un test browser riproducibile di regressione HUD/terreno/strutture 1×/2× con screenshot archiviati, prima della QA manuale Android e confronto originale.
+
+## 2026-11-18 08:55 CET — regressione browser integrata
+- **Branch:** `agent/skh-integration/fidelity-regression-qa`; ultimo commit di codice/workflow `c19e1c097626aa367d9fdc3f2d8b8d03a2bcb240` (prima `e06aa9bbde499c366dcf134c1a7a0aae5b01dc81`).
+- **File:** `tests/browser/run-integrated-regression.mjs` aggiunto; `.github/workflows/seven-kingdoms-html-ci.yml` esteso per eseguire test Chromium e caricare due screenshot come artifact.
+- **Cosa prova:** fixture HUD già esistente con stato PASS; produzione `WorldView` con fortezza cinese in-world a 1×/2×, differenze pixel positive rispetto al fallback, PNG validi e SHA distinti. **Non** prova parità originale né device Android, e non confronta ancora ogni categoria di terreno.
+- **CI/Node:** test npm locali NON ESEGUITI; il workflow sul nuovo HEAD è in attesa di verifica. Query workflow su main `c276b5806a2812df1ac8ad493057f62e2d7f83f8` ha restituito lista vuota (endpoint connector filtra run PR); Pages post-merge NON VERIFICATO, non dichiarare fallimento né successo.
+- **QA:** Android fisico NOT_RUN, stessa scena originale 7KAA NOT_RUN.
+- **Singolo prossimo passo:** controllare CI HEAD della PR QA; se rosso correggere il test; se verde scaricare artifact `skh-qa-001-worldview-1x-2x`, ispezionare screenshot e completare i gate di regressione prima del merge.
