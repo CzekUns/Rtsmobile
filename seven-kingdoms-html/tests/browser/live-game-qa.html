@@ -21,8 +21,19 @@ frame.addEventListener('load',async()=>{
   const pixels=canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data;
   let opaque=0;for(let i=3;i<pixels.length;i+=4)if(pixels[i])opaque++;
   if(opaque<1000)throw Error('World canvas not rendered: '+opaque);
+  const ticker=get('ticker');
+  if(!ticker)throw Error('ticker missing');
+  // Freeze the visible notification to compare identical UI states at 1x/2x.
+  // A short message avoids clipping unrelated to HUD geometry.
+  const baseline='QA · Corinto';
+  const freezeTicker=()=>{if(ticker.textContent!==baseline)ticker.textContent=baseline};
+  freezeTicker();
+  new w.MutationObserver(freezeTicker).observe(ticker,{childList:true,characterData:true,subtree:true});
+  qa.dataset.ticker=baseline;
   qa.dataset.result='ready';qa.dataset.canvasPixels=String(opaque);
   qa.textContent='PASS · actual game HUD + world + COMANDI';
+  // Keep diagnostic state readable by --dump-dom but out of screenshots.
+  qa.style.display='none';
  }catch(e){qa.dataset.result='failed';qa.textContent='FAIL: '+e.message}
 });
 setTimeout(()=>{if(qa.dataset.result==='pending'){qa.dataset.result='failed';qa.textContent='FAIL: game timeout'}},11000);
