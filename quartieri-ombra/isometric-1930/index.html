@@ -36,6 +36,16 @@ button.wide,a.wide{grid-column:span 2}
 <script src="../board-world.js?v=qo-iso-1" defer></script>
 <script src="./iso-core.js?v=qo-iso-1" defer></script>
 <script type="module" src="./iso-scene.js?v=qo-iso-1"></script>
+<script>
+window.addEventListener("error",e=>{
+ const box=document.getElementById("loading");
+ if(box)box.textContent="Impossibile avviare il LAB ISO: "+(e.message||"errore grafico");
+});
+window.addEventListener("unhandledrejection",e=>{
+ const box=document.getElementById("loading");
+ if(box)box.textContent="LAB ISO non avviato: "+String(e.reason?.message||e.reason||"caricamento librerie");
+});
+</script>
 </head><body>
 <div id="game" aria-label="Nuova versione di Five Points con grafica isometrica"></div>
 <div id="loading" role="status">Preparazione della scena isometrica…</div>
