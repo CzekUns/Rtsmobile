@@ -359,3 +359,11 @@
 - **Test:** CI verde **solo** sul checkpoint precedente `999e35b`. Nuova CI sul codice `fd5f733` e checkpoint successivo **NON_VERIFIED**. npm test/check locali NON_ESEGUITI (checkout non disponibile in questo ambiente). Il nuovo test browser è pubblicato ma **non ancora attestato come superato**. Nessun merge, nessun Pages nuovo, Android e confronto originale 7KAA NOT_RUN.
 - **Branch:** `agent/skh-integration/original-buildings-units`; codice HEAD prima del checkpoint `fd5f73345f57046b06a2a3d2e8265757006d296f`.
 - **Singolo prossimo passo:** verificare CI sull'HEAD di questo checkpoint; se rossa, leggere il log e correggere lo specifico smoke in-world; se verde, scaricare/ispezionare i due nuovi screenshot della scena e procedere ai gate di compatibilità/merge.
+
+
+## Esecuzione 2026-11-18 03:57 CET — CI in-world verde, artifact disponibile
+- **Stato iniziale:** checkpoint precedente `a2a43fa2ba21c518f786be556c95a8f28f7b6cbc`; PR #122 draft. Incarico e programma su main invariati.
+- **CI verificata sull'HEAD esatto:** [Actions #44219921222](https://github.com/CzekUns/Rtsmobile/actions/runs/44219921222) completed/success per `a2a43fa2ba21c518f786be556c95a8f28f7b6cbc`. Job JS tests & stream scope success, incluso step `Chromium original Chinese BASE HTTP visual smoke 1x/2x`; acquisizione asset GPL success. Test npm locali NOT_RUN (nessun checkout locale completo).
+- **Screenshot in-world:** artifact `skh-structures-001-chinese-base-chromium-1x-2x` ID `14390452070`, 278933 byte, sha256 ZIP `d55808371b231ba7ae928d3d00b4ab73168ed950ba73b083291044ac38515c4d`, scadenza 2026-12-02. Screenshot prodotti dal runner ma **non ancora scaricati/ispezionati visivamente** in questa run: nessuna certificazione della scena reale o parità 7KAA. Nessun merge/Pages/Android.
+- **Codice:** nessuna modifica runtime o test in questa run; aggiornamento del solo checkpoint per registrare l'esito CI verificato. Branch `agent/skh-integration/original-buildings-units`, PR #122.
+- **Singolo prossimo passo:** scaricare l'artifact `14390452070` e **ispezionare realmente le due immagini in-world 1×/2×**; se corrette, verificare compatibilità e gate PR per passaggio non-draft/merge, altrimenti correggere il difetto osservato.
