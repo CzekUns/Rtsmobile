@@ -28,3 +28,7 @@ Il giro di integrazione del proprietario ha completato la prima tranche costiera
 
 ## 16 novembre 2026 — PR #120 integrata
 SKH-TERRAIN-002 merged su main `f914a3ab007a7760026829bbc7216080564e0988`, Actions PR HEAD #43778104231 SUCCESS. Original PLANT/ROCK atlas, manifest, Canvas depth e test Chromium 1x/2x integrati. Pages post-merge non ancora verificato; Android e confronto 7KAA pendenti. Task successivo del programma: SKH-STRUCTURES-001. Verificare Pages prima di dichiarare release deployata.
+
+
+## 18 novembre 2026 — PR #122 integrata
+SKH-STRUCTURES-001 merged con squash su main `8197e8e322b750c7cdbdb170198ade91b0c257e7`. CI HEAD PR [#44234823855](https://github.com/CzekUns/Rtsmobile/actions/runs/44234823855) SUCCESS (Node, Chromium in-world 1×/2×, estrazione originale). Fortezza BASE:CHINESE con PNG/manifest GPL e fallback; screenshot Chromium ispezionati. Main CI/Pages post-merge ancora da verificare. Android e confronto stessa scena 7KAA NOT_RUN; sprite direzionali multirazza e recolor non certificati. Prossimo ID concordato: SKH-QA-001.

@@ -167,7 +167,7 @@
       "title": "Catalogo strutture e sprite unità non dimostrativi",
       "priority": 4,
       "ownerStream": "integration",
-      "status": "ready",
+      "status": "awaiting_manual_qa",
       "dependsOn": [
         "SKH-TERRAIN-002"
       ],
@@ -179,20 +179,40 @@
         "Atlanti sprite con frame direzionali e palette per nazione",
         "Integrazione incrementale con fallback e test"
       ],
-      "nextAction": "Partire dai manifest NORMAN/BASE-NORMAN già pubblicati; creare matrice edifici e sprite mancanti, confermando formato upstream e license.",
+      "nextAction": "PR #122 merged on main 8197e8e. Verify post-merge CI/Pages; physical Android and same-scene 7KAA parity remain pending.",
       "acceptance": [
         "Catalogo con id sorgente/fasi/frame/offset senza geometrie inventate",
         "Più di una famiglia/civiltà integrata nel gioco",
         "Test animazioni, recolor, posizionamento, QA e deployment documentati"
       ],
-      "blockingIssue": null
+      "blockingIssue": null,
+      "completion": {
+        "mainSha": "8197e8e322b750c7cdbdb170198ade91b0c257e7",
+        "prNumber": 122,
+        "merged": true,
+        "ciUrl": "https://github.com/CzekUns/Rtsmobile/actions/runs/44234823855",
+        "pagesVerified": false,
+        "androidVisualTest": "not_run",
+        "parityCertified": false,
+        "verified": [
+          "Chinese BASE authentic PNG/manifest integrated with Norman preview catalog",
+          "Chromium in-world 1x/2x screenshot and Canvas pixel smoke",
+          "PR HEAD CI success and ownership checks"
+        ],
+        "pending": [
+          "Main CI and Pages post-merge",
+          "Physical Android landscape",
+          "Same-scene comparison with original 7KAA",
+          "Authentic directional unit sprite and nation recolor parity not certified"
+        ]
+      }
     },
     {
       "id": "SKH-QA-001",
       "title": "Audit Android, parità grafica e chiusura release",
       "priority": 5,
       "ownerStream": "integration",
-      "status": "queued",
+      "status": "ready",
       "dependsOn": [
         "SKH-STRUCTURES-001"
       ],
@@ -204,7 +224,7 @@
         "Gestione asset, transizioni e comandi Android landscape",
         "Registro limiti e regressioni"
       ],
-      "nextAction": "Raccogliere screenshot datati e verificabili della stessa scena; pianificare controlli a zoom 1x/2x e Android landscape.",
+      "nextAction": "Verify main CI/Pages for PR #122 merge 8197e8e, then collect dated same-scene 1x/2x screenshots and Android landscape evidence; keep unverified cases explicit.",
       "acceptance": [
         "Rapporto visivo con evidenze riproducibili e differenze residue",
         "Test regressione completa e dati prestazionali ove ottenibili",
