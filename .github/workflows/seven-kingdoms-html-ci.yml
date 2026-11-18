@@ -80,6 +80,8 @@ jobs:
           CHROME_BIN: google-chrome
           CHINESE_QA_SCREENSHOT_1X: ${{ runner.temp }}/chinese-base-1x.png
           CHINESE_QA_SCREENSHOT_2X: ${{ runner.temp }}/chinese-base-2x.png
+          CHINESE_WORLD_SCREENSHOT_1X: ${{ runner.temp }}/chinese-world-1x.png
+          CHINESE_WORLD_SCREENSHOT_2X: ${{ runner.temp }}/chinese-world-2x.png
         run: node seven-kingdoms-html/tests/browser/run-chinese-visual-smoke.mjs
       - name: Upload Chinese BASE real Chromium screenshots
         if: always() && (github.head_ref == 'agent/skh-integration/original-buildings-units' || github.ref == 'refs/heads/agent/skh-integration/original-buildings-units')
@@ -89,6 +91,8 @@ jobs:
           path: |
             ${{ runner.temp }}/chinese-base-1x.png
             ${{ runner.temp }}/chinese-base-2x.png
+            ${{ runner.temp }}/chinese-world-1x.png
+            ${{ runner.temp }}/chinese-world-2x.png
           if-no-files-found: warn
           retention-days: 14
       - name: Enforce ownership on agent branches only
