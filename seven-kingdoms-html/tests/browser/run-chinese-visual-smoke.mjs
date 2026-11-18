@@ -56,7 +56,7 @@ try{
   const status=dom.match(/<output id="status"[^>]*>/)?.[0]||'';
   if(!status.includes('data-result="drawn"')||!status.includes(`data-zoom="${zoom}"`))
    throw Error(`Chinese in-world render failed at ${zoom}x: `+dom.slice(-1800));
-  const changed=Number(status.match(/data-different-pixels="(\\d+)"/)?.[1]||0);
+  const changed=Number(status.match(/data-different-pixels="(\d+)"/)?.[1]||0);
   if(changed<100)throw Error(`Chinese in-world renderer did not paint original asset at ${zoom}x`);
   const path=process.env[`CHINESE_WORLD_SCREENSHOT_${zoom}X`]||join(dir,`chinese-world-${zoom}x.png`);
   await chrome(['--screenshot='+path],url);
