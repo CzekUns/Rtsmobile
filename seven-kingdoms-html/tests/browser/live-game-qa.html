@@ -26,9 +26,12 @@ frame.addEventListener('load',async()=>{
   // Freeze the visible notification to compare identical UI states at 1x/2x.
   // A short message avoids clipping unrelated to HUD geometry.
   const baseline='QA · Corinto';
-  const freezeTicker=()=>{if(ticker.textContent!==baseline)ticker.textContent=baseline};
-  freezeTicker();
-  new w.MutationObserver(freezeTicker).observe(ticker,{childList:true,characterData:true,subtree:true});
+  // Do not observe/rewrite ticker mutations: the game continuously updates this
+  // node and a MutationObserver can keep Chromium busy during 2x screenshots.
+  // Present a fixed visual label while leaving the game's DOM updates untouched.
+  const css=d.createElement('style');
+  css.textContent='#ticker{font-size:0!important}#ticker::after{content:"QA · Corinto";font-size:12px;white-space:nowrap}';
+  d.head.appendChild(css);
   qa.dataset.ticker=baseline;
   qa.dataset.result='ready';qa.dataset.canvasPixels=String(opaque);
   qa.textContent='PASS · actual game HUD + world + COMANDI';
