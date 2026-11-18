@@ -77,3 +77,12 @@
 - **Test:** npm test/check locali NON ESEGUITI (checkout locale non disponibile); nuova CI sul commit `3a3393b` non ancora verificata. **Merge/Pages:** PR #125 non integrata, Pages nuovo non verificato. **Android e confronto stessa scena 7KAA:** NOT_RUN.
 - **HEAD codice prima del checkpoint:** `3a3393bf352abfbcec9ea95eea74d28311f15c0c`. SHA branch finale = commit di aggiornamento di questo checkpoint.
 - **Singolo prossimo passo:** verificare CI HEAD dopo questo checkpoint; se verde scaricare e ispezionare live-game PNG 1×/2× (badge e ticker), se ancora timeout acquisire tempi per fase e ridurre carico screenshot 2× nella stessa PR.
+
+
+## 2026-11-18 16:58 CET — timeout 2× persiste, budget virtuale ridotto
+- **Task/PR/branch:** SKH-QA-001, [#125](https://github.com/CzekUns/Rtsmobile/pull/125), `agent/skh-integration/fidelity-regression-qa`.
+- **CI verificata su HEAD precedente:** [Actions #44330781851](https://github.com/CzekUns/Rtsmobile/actions/runs/44330781851), SHA `b24b8b6e0737b9d33227dccf112194c463f9c3ff`, **failure**. HUD e WorldView 1×/2× PASS. Live-game 1× PNG generato (SHA256 `9bb96fee85a3cdb2be3c7c9b0cef1624fb373b7b5c5eb15174db98b43fd13ddb`), live-game 2× `Chromium failed {"timeout":true}` dopo 90 secondi. Artifact parziale [#14438169417](https://github.com/CzekUns/Rtsmobile/actions/runs/44330781851/artifacts/14438169417), tre PNG. Log: https://github.com/CzekUns/Rtsmobile/actions/runs/44330781851 . Gli errori DBus non dimostrano la causa.
+- **Fix pubblicato:** commit `d3c11441b17edf55c04eaf2e26419060a20f156f`, `tests/browser/run-integrated-regression.mjs`: il flag `--virtual-time-budget` usa 3500 ms per le catture PNG e conserva 14000 ms per le verifiche DOM. Ipotesi verificabile: la lunga simulazione di frame nel gioco animato rallenta la rasterizzazione 2×. Timeout di sicurezza 90s mantenuto. Nessun runtime o asset modificato.
+- **Test:** npm test/check locali NON_ESEGUITI; CI sul nuovo HEAD ancora da verificare. Pages nuovo, Android fisico e parità stessa scena 7KAA NON_VERIFICATI. PR ancora draft, nessun merge.
+- **HEAD codice prima del checkpoint:** `d3c11441b17edf55c04eaf2e26419060a20f156f`; SHA branch finale è il commit del checkpoint.
+- **Singolo prossimo passo:** controllare Actions sull'HEAD del checkpoint; se verde scaricare e aprire i PNG live-game 1×/2×; se timeout persiste profilare le fasi Chromium e ridurre il lavoro del gioco durante lo screenshot, nella stessa PR #125.
