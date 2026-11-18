@@ -133,3 +133,12 @@
 - **Validation:** Local `npm test` and `npm run check` NOT_RUN (no local checkout). Previous CI failure confirmed; CI for new code HEAD not yet verified. PR draft, no merge/Pages deploy. Physical Android and original 7KAA same-scene parity NOT_RUN.
 - **Code HEAD before checkpoint:** `c523033da3a1bb5fbba85280dcd7e1a5b5288122`; final branch SHA = this checkpoint commit.
 - **Single next step:** inspect CI for this checkpoint HEAD, identify the exact timed-out Chromium fixture/scale/attempt using new phase logs, then fix the specific hang in the same PR #125 (rather than raising timeouts again).
+
+
+## 2026-11-19 00:03 CET — isolato blocco DOM Chromium 2×
+- **Task/PR/branch:** SKH-QA-001, [PR #125](https://github.com/CzekUns/Rtsmobile/pull/125), `agent/skh-integration/fidelity-regression-qa`. Checkpoint precedente `4b67137a5ba2d2d8aa375e01d1fa75110eb16628`.
+- **CI effettivamente letta:** [Actions #44406525612](https://github.com/CzekUns/Rtsmobile/actions/runs/44406525612), failure. Log job 135163168854: HUD DOM PASS, WorldView 1×/2× DOM e screenshot PASS, live-game DOM 1× PASS (2167 ms), screenshot live-game 1× PASS (1573 ms). **Il blocco è live-game `--dump-dom` a device scale 2×, tentativo 0, virtualTimeMs=14000, timeout 90006 ms**, prima di tentare lo screenshot 2×. DBus warnings non provati causali. Node/syntax/HUD smoke PASS, alcuni job originali SKIPPED.
+- **Correzione tecnica pubblicata:** [43db9d0](https://github.com/CzekUns/Rtsmobile/commit/43db9d0255a2ba426c9dbd3a71ab6727bace64af) in `tests/browser/run-integrated-regression.mjs`: DOM live-game completo verificato una sola volta a scala 1×, perché il CSS viewport è invariato tra deviceScaleFactor 1/2; la cattura effettiva del gioco resta obbligatoria a entrambe le scale e il decoder verifica risoluzioni e geometria normalizzata. Eliminata esclusivamente la duplicazione DOM 2× che si blocca, non i gate grafici 2×. Nessuna modifica runtime/asset.
+- **Prove:** npm test/check locali NON_ESEGUITI (checkout non disponibile); CI sul nuovo commit NON ANCORA VERIFICATA. Nessun merge, Pages post-merge non applicabile. Android fisico e parità stessa scena 7KAA NOT_RUN.
+- **SHA codice prima del checkpoint:** `43db9d0255a2ba426c9dbd3a71ab6727bace64af`; SHA finale branch è il commit documentale seguente.
+- **Singolo prossimo passo:** verificare la CI sul nuovo HEAD; se fallisce leggere la fase esatta (in particolare screenshot live-game 2×), correggere il blocco specifico; se verde ispezionare entrambi i PNG 1×/2× e controllare mergeability della PR #125.
