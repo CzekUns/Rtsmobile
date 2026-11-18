@@ -47,9 +47,17 @@ export function remapNormanNationPixels(rgba){
 // the original scheme 1; Greek soldiers must use fallback art.
 export function isUnitPreviewProxy(unit){
  return unit?.kind==='soldier'&&
-  (unit?.raceId==='norman'||unit?.culture==='Normanni'||(unit?.owner===2&&!unit?.raceId));
+  (unit?.raceId==='norman'||(!unit?.raceId&&unit?.culture==='Normanni')||
+   (unit?.owner===2&&!unit?.raceId&&!unit?.culture));
 }
-export function isFirmPreviewProxy(firm){return firm?.owner===2&&firm.kind==='fort'}
+// Only the Norman demo fort may use BASE:NORMAN. An explicit foreign
+// race/culture takes precedence over the legacy owner-2 fallback.
+export function isFirmPreviewProxy(firm){
+ if(firm?.kind!=='fort'||firm.owner!==2)return false;
+ if(firm.raceId!=null)return String(firm.raceId).toLowerCase()==='norman';
+ if(firm.culture!=null)return firm.culture==='Normanni';
+ return true;
+}
 function ready(image,config){
  return (image?.complete===true&&image.naturalWidth===config.width&&image.naturalHeight===config.height)||
   (image?.width===config.width&&image?.height===config.height);
@@ -66,7 +74,9 @@ export function blueVariantFromImage(img,makeCanvas){
  }catch(_){return null}
 }
 export class OriginalSpritePreview{
- constructor({imageFactory,canvasFactory}={}){
+ constructor({imageFactory,canvasFactory,structureCatalog=null,unitCatalog=null}={}){
+  this.structureCatalog=structureCatalog;
+  this.unitCatalog=unitCatalog;
   const make=imageFactory||(()=>new Image());
   const canvas=canvasFactory||(()=>document.createElement('canvas'));
   this.unit=make();this.firm=make();
@@ -81,11 +91,20 @@ export class OriginalSpritePreview{
   this.firm.src=new URL(ORIGINAL_SHEETS.firm.path,import.meta.url).href;
  }
  drawUnit(ctx,unit,x,y,t,direction,frame){
-  const sheet=ORIGINAL_SHEETS.unit;
+  const record=this.unitCatalog && Object.hasOwn(this.unitCatalog,'NORMAN:M') ? this.unitCatalog['NORMAN:M'] : null;
+  const sheet=record?{...ORIGINAL_SHEETS.unit,cellWidth:record.frameWidth,cellHeight:record.frameHeight,columns:record.directions,rows:record.walkingFrames}:ORIGINAL_SHEETS.unit;
   const image=unit?.owner===2?this.unitBlue:this.unit;
-  if(!isUnitPreviewProxy(unit)||!ready(image,sheet))return false;
+  if(!isUnitPreviewProxy(unit)||!ready(image,sheet)||!Number.isFinite(t)||t<=0||!Number.isFinite(x)||!Number.isFinite(y))return false;
+  // A supplied catalog is authoritative: absent records must not revive a proxy.
+  if(this.unitCatalog && !Object.hasOwn(this.unitCatalog,'NORMAN:M'))return false;
   if(!Number.isInteger(direction)||direction<0||direction>=sheet.columns)return false;
   if(!Number.isInteger(frame)||frame<0||frame>=sheet.rows)return false;
+  if(record && (record.atlas!==ORIGINAL_SHEETS.unit.path || record.atlasWidth!==sheet.width || record.atlasHeight!==sheet.height ||
+    !Number.isSafeInteger(record.frameWidth) || !Number.isSafeInteger(record.frameHeight) ||
+    !Number.isSafeInteger(record.directions) || !Number.isSafeInteger(record.walkingFrames) ||
+    record.frameWidth<=0 || record.frameHeight<=0 || record.directions<=0 || record.walkingFrames<=0 ||
+    record.frameWidth*record.directions!==sheet.width || record.frameHeight*record.walkingFrames!==sheet.height ||
+    record.directionOrder!=='N,NE,E,SE,S,SW,W,NW'))return false;
   const scale=t/24;
   ctx.save();ctx.imageSmoothingEnabled=false;
   // Source-frame offsets have been baked into each transparent 96x112 cell.
@@ -95,9 +114,19 @@ export class OriginalSpritePreview{
   ctx.restore();return true;
  }
  drawFirm(ctx,firm,x,y,t){
-  const sheet=ORIGINAL_SHEETS.firm;
+  const record=this.structureCatalog && Object.hasOwn(this.structureCatalog,'BASE:NORMAN') ? this.structureCatalog['BASE:NORMAN'] : null;
+  const sheet=record?{...ORIGINAL_SHEETS.firm,cellWidth:record.frameWidth,cellHeight:record.frameHeight,columns:record.phaseColumns}:ORIGINAL_SHEETS.firm;
   const image=this.firmBlue;
-  if(!isFirmPreviewProxy(firm)||!ready(image,sheet))return false;
+  if(!isFirmPreviewProxy(firm)||!ready(image,sheet)||!Number.isFinite(t)||t<=0||!Number.isFinite(x)||!Number.isFinite(y)||!Number.isFinite(firm?.size)||firm.size<=0)return false;
+  if(this.structureCatalog && !Object.hasOwn(this.structureCatalog,'BASE:NORMAN'))return false;
+  if(record && (record.atlas!==ORIGINAL_SHEETS.firm.path || record.atlasWidth!==sheet.width || record.atlasHeight!==sheet.height ||
+    !Number.isSafeInteger(record.frameWidth) || !Number.isSafeInteger(record.frameHeight) ||
+    !Number.isSafeInteger(record.phaseColumns) || record.frameWidth<=0 || record.frameHeight<=0 || record.phaseColumns<=0 ||
+    record.frameWidth*record.phaseColumns!==sheet.width || record.frameHeight!==sheet.height ||
+    !Array.isArray(record.phases) || record.phases.length!==record.phaseColumns ||
+    record.phases.some((value,index)=>value!==index) || record.constructionPhaseCount!==record.phases.length ||
+    record.sourceFootprint?.width!==4 || record.sourceFootprint?.height!==4 ||
+    !record.phases.includes(originalFirmPhase(firm))))return false;
   const phase=originalFirmPhase(firm);
   // BASE:NORMAN is 4x4 original, but the temporary demo fort has 3x3
   // collision: scale visual only, never change the simulation footprint.

@@ -1,0 +1,206 @@
+{
+  "id": "BASE:CHINESE",
+  "category": "building",
+  "firmCode": "BASE",
+  "raceCode": "CHINESE",
+  "source": {
+    "repository": "the3dfxdude/7kaa",
+    "originalFilePaths": {
+      "tables": "data/RESOURCE/STD.SET",
+      "bitmap": "data/RESOURCE/I_FIRM.RES",
+      "palette": "data/RESOURCE/PAL_STD.RES"
+    },
+    "sha256": {
+      "tables": "6e56e633db1578e1a24597808818f4bc5749ac54d2707d3410e0789ed07074db",
+      "bitmap": "f937ab083ba15f26ece9e35a0a7834b1807444afc7a1229e4023ce3f8a84fdd9",
+      "palette": "8bda65c749340446edb6debe73a5b0f67b1a4af8dd0fdb1fa0222a69848b6ef7"
+    }
+  },
+  "license": {
+    "status": "upstream-gpl-release",
+    "notice": "Enlight 7kaa GPL release; music excluded"
+  },
+  "colorSchemeId": 1,
+  "nationColorIndices": "E0-E7 -> original game primary/secondary palettes",
+  "remappablePixelCount": 1174,
+  "locWidth": 4,
+  "locHeight": 4,
+  "unionBounds": {
+    "x": -12,
+    "y": -1,
+    "width": 147,
+    "height": 139
+  },
+  "pivotX": 12,
+  "pivotY": 1,
+  "pivotStatus": "original map-tile origin; ground contact not visually approved",
+  "modes": [
+    {
+      "mode": "construction",
+      "phase": 0,
+      "path": "BASE-CHINESE-construction-0.png",
+      "sourceBitmapRecords": [
+        26
+      ],
+      "note": "No ground in earlier phases"
+    },
+    {
+      "mode": "construction",
+      "phase": 1,
+      "path": "BASE-CHINESE-construction-1.png",
+      "sourceBitmapRecords": [
+        27
+      ],
+      "note": "No ground in earlier phases"
+    },
+    {
+      "mode": "construction",
+      "phase": 2,
+      "path": "BASE-CHINESE-construction-2.png",
+      "sourceBitmapRecords": [
+        30,
+        28
+      ],
+      "note": "Original ground becomes visible in last construction phase"
+    },
+    {
+      "mode": "active",
+      "frame": 0,
+      "delayTenths": 0,
+      "path": "BASE-CHINESE-active-0.png",
+      "sourceBitmapRecords": [
+        30,
+        29
+      ],
+      "layers": [
+        4,
+        1
+      ]
+    },
+    {
+      "mode": "idle",
+      "path": "BASE-CHINESE-idle.png",
+      "sourceBitmapRecords": [
+        30,
+        29
+      ]
+    }
+  ],
+  "bitmaps": [
+    {
+      "recordNo": 26,
+      "sourceBitmapName": "CH_U1",
+      "bitmapOffset": 616435,
+      "mode": "U",
+      "layer": 1,
+      "offsetX": 9,
+      "offsetY": 38,
+      "width": 103,
+      "height": 91,
+      "locWidth": 4,
+      "locHeight": 4,
+      "opaquePixels": 5422,
+      "transparentPixels": 3951,
+      "remappableSourcePixels": 65,
+      "pixelHash": "a14d57b29877e23e39e9bab0c5d5d77125de347a7b3bb55fb0b0a47c3800e173",
+      "palette": "PAL_STD.RES",
+      "path": "BASE-CHINESE-bitmap-26.png",
+      "decoded": true,
+      "visuallyVerified": false
+    },
+    {
+      "recordNo": 27,
+      "sourceBitmapName": "CH_U2",
+      "bitmapOffset": 622068,
+      "mode": "U",
+      "layer": 1,
+      "offsetX": 9,
+      "offsetY": 28,
+      "width": 111,
+      "height": 101,
+      "locWidth": 4,
+      "locHeight": 4,
+      "opaquePixels": 6967,
+      "transparentPixels": 4244,
+      "remappableSourcePixels": 321,
+      "pixelHash": "24e7ac8dc81fc9ecd34c61e713540456943022c105ff05e706ee3c8e74882987",
+      "palette": "PAL_STD.RES",
+      "path": "BASE-CHINESE-bitmap-27.png",
+      "decoded": true,
+      "visuallyVerified": false
+    },
+    {
+      "recordNo": 28,
+      "sourceBitmapName": "CH_U3",
+      "bitmapOffset": 633661,
+      "mode": "U",
+      "layer": 1,
+      "offsetX": 9,
+      "offsetY": 8,
+      "width": 111,
+      "height": 113,
+      "locWidth": 4,
+      "locHeight": 4,
+      "opaquePixels": 8339,
+      "transparentPixels": 4204,
+      "remappableSourcePixels": 341,
+      "pixelHash": "9fccfd9db83cf35430717835a07bf076cc70edbd20acd7f6bf7abd731695370a",
+      "palette": "PAL_STD.RES",
+      "path": "BASE-CHINESE-bitmap-28.png",
+      "decoded": true,
+      "visuallyVerified": false
+    },
+    {
+      "recordNo": 29,
+      "sourceBitmapName": "CH_BASE",
+      "bitmapOffset": 8600,
+      "mode": "A",
+      "layer": 1,
+      "offsetX": -12,
+      "offsetY": -1,
+      "width": 143,
+      "height": 128,
+      "locWidth": 4,
+      "locHeight": 4,
+      "opaquePixels": 10987,
+      "transparentPixels": 7317,
+      "remappableSourcePixels": 447,
+      "pixelHash": "05c8719ef405884be64f4f6a15a6c5ece41a0db0e4acd2649f4b532458353b1d",
+      "palette": "PAL_STD.RES",
+      "path": "BASE-CHINESE-bitmap-29.png",
+      "decoded": true,
+      "visuallyVerified": false
+    },
+    {
+      "recordNo": 30,
+      "sourceBitmapName": "CH_DIRT",
+      "bitmapOffset": 102087,
+      "mode": "G",
+      "layer": 4,
+      "offsetX": -9,
+      "offsetY": 64,
+      "width": 144,
+      "height": 74,
+      "locWidth": 4,
+      "locHeight": 4,
+      "opaquePixels": 3794,
+      "transparentPixels": 6862,
+      "remappableSourcePixels": 0,
+      "pixelHash": "52548b7e9256fe0bca519a4d1d8c8ea2649a7a5e21385dbef53e977bd7c7b978",
+      "palette": "PAL_STD.RES",
+      "path": "BASE-CHINESE-bitmap-30.png",
+      "decoded": true,
+      "visuallyVerified": false
+    }
+  ],
+  "status": "pixels-decoded-not-visual-reviewed",
+  "decoded": true,
+  "visuallyVerified": false,
+  "integrated": false,
+  "notes": [
+    "C++ OFIRMDRW.cpp draws ground in layer 4; main construction/active in their own layers",
+    "Construction frame 0..N-1 chosen by hit points; preview does not include dynamic FLAG-S0 overlays",
+    "Nation-colour scheme is original index mapping, not arbitrary whole-building tint",
+    "Visual original screenshot and full renderer layer ordering still need comparison"
+  ]
+}
