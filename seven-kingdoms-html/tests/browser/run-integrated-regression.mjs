@@ -13,12 +13,17 @@ await mkdir(output,{recursive:true});
 const server=spawn('python3',['-m','http.server',String(port),'--bind','127.0.0.1'],{cwd:'seven-kingdoms-html',stdio:'ignore'});
 async function browser(url,mode,path,scale=1,attempt=0){
  const args=['--headless','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--disable-background-networking','--hide-scrollbars','--window-size=1100,900','--force-device-scale-factor='+scale,'--virtual-time-budget='+(mode==='image'?(attempt===0?1800:3500):14000),mode==='image'?'--screenshot='+path:'--dump-dom',url];
+ const started=Date.now();
+ const phase={mode,scale,attempt,fixture:new URL(url).pathname,virtualTimeMs:mode==='image'?(attempt===0?1800:3500):14000};
+ console.log('Chromium phase start '+JSON.stringify(phase));
  const proc=spawn(chrome,args,{stdio:['ignore','pipe','pipe']});
  let stdout='',stderr='';
  proc.stdout.on('data',b=>stdout+=b);
  proc.stderr.on('data',b=>stderr+=b);
  // Screenshot mode uses a short virtual-time window: the full game's animation loop\n // otherwise keeps Chrome rendering thousands of frames before a 2x capture.\n // Retain a bounded timeout to report genuine hangs.
  const result=await Promise.race([new Promise(resolve=>proc.on('close',code=>resolve({code}))),sleep(mode==='image'?35000:90000).then(()=>({timeout:true}))]);
+ const elapsedMs=Date.now()-started;
+ console.log('Chromium phase end '+JSON.stringify({...phase,elapsedMs,exitCode:result.code??null,timeout:!!result.timeout,stderrTail:result.timeout?stderr.slice(-500):undefined}));
  if(result.timeout)proc.kill('SIGKILL');
  if(result.timeout||result.code!==0){
   if(mode==='image'&&attempt===0){
