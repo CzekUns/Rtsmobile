@@ -48,6 +48,22 @@ try{
    }
   }
  }
+ // Exercise the production WorldView painter on an actual world fixture,
+ // not only the isolated building adapter preview.
+ for(const zoom of [1,2]){
+  const url=`http://127.0.0.1:${port}/tests/browser/chinese-in-world.html?zoom=${zoom}`;
+  const dom=await chrome(['--dump-dom'],url);
+  const status=dom.match(/<output id="status"[^>]*>/)?.[0]||'';
+  if(!status.includes('data-result="drawn"')||!status.includes(`data-zoom="${zoom}"`))
+   throw Error(`Chinese in-world render failed at ${zoom}x: `+dom.slice(-1800));
+  const changed=Number(status.match(/data-different-pixels="(\\d+)"/)?.[1]||0);
+  if(changed<100)throw Error(`Chinese in-world renderer did not paint original asset at ${zoom}x`);
+  const path=process.env[`CHINESE_WORLD_SCREENSHOT_${zoom}X`]||join(dir,`chinese-world-${zoom}x.png`);
+  await chrome(['--screenshot='+path],url);
+  const png=await readFile(path);
+  if(png.length<1000)throw Error('Chinese in-world screenshot missing at '+zoom+'x');
+  console.log('In-world screenshot '+path+' sha256='+createHash('sha256').update(png).digest('hex')+' changed='+changed);
+ }
  if(screenshotHashes.size!==2||screenshotHashes.get(1)===screenshotHashes.get(2))throw Error('Chinese screenshots at 1x and 2x are identical or missing');
  console.log('PASS: Chromium HTTP Chinese original PNG gallery, all 5 modes at 1x/2x; 4x painted-pixel area at 2x; distinct screenshot hashes');
 }finally{
