@@ -8,3 +8,11 @@
 - **CI/Node:** npm test/check locali NON_ESEGUITI (checkout locale non disponibile); CI precedente fallita; CI sul nuovo HEAD DA VERIFICARE. Pages post-merge PR #122 e test Android/parità originale NON_VERIFICATI.
 - **Ambito:** solo documentazione coordinamento della PR #123, nessuna modifica runtime o asset.
 - **Prossimo passo unico:** controllare Actions sull'HEAD del commit che aggiunge questo checkpoint; se fallisce leggere il job specifico e correggerlo; se verde e mergeability confermata integrare PR #123, poi verificare main e Pages e proseguire sul branch assegnato `agent/skh-integration/fidelity-regression-qa`.
+
+
+## 2026-11-18 07:55 CET — transizione integrata, avvio QA
+- **Fonte verificata:** main STATE.json ora indica SKH-QA-001, TASKS.json mantiene l'ordine approvato. PR #123 non-draft, mergeable e CI [#44248390487](https://github.com/CzekUns/Rtsmobile/actions/runs/44248390487) completed/success sul suo HEAD esatto `7bea6fda7a8a52536ab53d4f8523691b796731dd`.
+- **Merge effettivo:** PR #123 squash-merged su main `c276b5806a2812df1ac8ad493057f62e2d7f83f8`. Creato questo branch QA da tale commit, senza alterare il programma.
+- **CI e Pages post-merge:** CI su SHA main non ancora presente nel risultato delle workflow runs al controllo; Pages post-merge NON_VERIFIED. CI precedente della PR #123 verde, non equivale a Pages. npm test/check locali NON_ESEGUITI. Android landscape e parità stessa scena 7KAA NON_ESEGUITI.
+- **File modificati:** solo questo checkpoint QA. Nessun runtime modificato, nessuna PR QA ancora aperta. Branch `agent/skh-integration/fidelity-regression-qa`, base main `c276b5806a2812df1ac8ad493057f62e2d7f83f8`.
+- **Singolo prossimo passo:** verificare CI main e Pages per `c276b5806a2812df1ac8ad493057f62e2d7f83f8`, poi implementare sul medesimo branch un test browser riproducibile di regressione HUD/terreno/strutture 1×/2× con screenshot archiviati, prima della QA manuale Android e confronto originale.
