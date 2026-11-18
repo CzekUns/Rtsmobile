@@ -124,3 +124,12 @@
 - **Validation:** GitHub Actions on new HEAD NOT_YET_VERIFIED; local npm test/check NOT_RUN. No merge, Pages deployment, Android physical test or original 7KAA parity certified.
 - **Code HEAD before checkpoint:** `633a5e24e5e7ab2e9eefe48dd205a54b96cb77f6`; final branch HEAD is this checkpoint commit.
 - **Single next step:** inspect Actions for checkpoint HEAD and specifically the live-game 2× capture; if timeout persists, instrument Chromium screenshot lifecycle and isolate the live-game animation loop before changing further timeouts; if green, inspect 1×/2× artifacts and proceed to merge gate.
+
+
+## 2026-11-18 22:55 CET — screenshot timeout persisted; lifecycle instrumentation
+- **Task/PR/branch:** SKH-QA-001, [PR #125](https://github.com/CzekUns/Rtsmobile/pull/125), `agent/skh-integration/fidelity-regression-qa`. Prior checkpoint HEAD `76f6411e0226fb11c60c7dda07de8ac810c598ac`.
+- **Exact CI checked:** [Actions #44396408358](https://github.com/CzekUns/Rtsmobile/actions/runs/44396408358) **failure** on prior HEAD. GitHub jobs report Node unit tests, syntax, HUD and PLANT gallery PASS; integrated HUD/WorldView Chromium regression FAIL. The job summary does **not** identify which screenshot/phase timed out; root cause remains unproven. No assumption that the retry resolved it.
+- **Code published:** [commit c523033](https://github.com/CzekUns/Rtsmobile/commit/c523033da3a1bb5fbba85280dcd7e1a5b5288122) in `tests/browser/run-integrated-regression.mjs`: per Chromium subprocess log structured fixture pathname, mode, scale, attempt, virtual-time budget, elapsed wall time, exit status, timeout and bounded stderr tail. No runtime or asset change. This makes the failing phase observable in CI without changing the retry policy.
+- **Validation:** Local `npm test` and `npm run check` NOT_RUN (no local checkout). Previous CI failure confirmed; CI for new code HEAD not yet verified. PR draft, no merge/Pages deploy. Physical Android and original 7KAA same-scene parity NOT_RUN.
+- **Code HEAD before checkpoint:** `c523033da3a1bb5fbba85280dcd7e1a5b5288122`; final branch SHA = this checkpoint commit.
+- **Single next step:** inspect CI for this checkpoint HEAD, identify the exact timed-out Chromium fixture/scale/attempt using new phase logs, then fix the specific hang in the same PR #125 (rather than raising timeouts again).
