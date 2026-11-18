@@ -31,3 +31,7 @@
 
 ## 2026-11-16 — transizione tecnica SKH-TERRAIN-002 → SKH-STRUCTURES-001
 PR #120 promossa e squash-merged su main `f914a3ab007a7760026829bbc7216080564e0988` con CI PR HEAD verde (#43778104231) e nessun conflitto (mergeable true, behind main 0). Rimangono QA Android/parità 7KAA e verifica Pages post-merge; registrati come pendenti senza certificazione. Si prosegue nel task già concordato SKH-STRUCTURES-001, senza cambiare ordine.
+
+
+## 2026-11-18 — Transizione concordata SKH-STRUCTURES-001 → SKH-QA-001
+Nessuna ripianificazione: si segue `TASKS.json.taskOrder`. PR #122 integrata su main `8197e8e322b750c7cdbdb170198ade91b0c257e7` con CI PR HEAD #44234823855 verde. Stato strutture `awaiting_manual_qa` per Android/parità 7KAA e limiti degli sprite direzionali. CI main/Pages da verificare. Si attiva SKH-QA-001, senza certificare parità o test fisici.
