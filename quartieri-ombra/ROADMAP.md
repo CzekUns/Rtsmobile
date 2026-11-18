@@ -1,3 +1,11 @@
+### 2026-11-18 — LAB ISO B · nuova direzione Chicago 1930 (indipendente)
+- [x] Salvaguardate tutte le versioni precedenti; nuova cartella `isometric-1930/` e nuova voce LAB ISO nella plancia originale.
+- [x] Ricerca reference del gioco Chicago 1930 (Spellbound, 2003): Steam, GameWatcher, Old-Games.ru, MobyGames, PCGames, Masque; collage inviato dall'utente conservato su Drive; guide solo come studio, non copiare screenshot/asset protetti.
+- [x] Primo esperimento giocabile ortografico isometrico con **26 lotti reali**, superfici di mattoni/ardesia/selciato/legno generate originali, luci di strada, arredi, figure umane e pannello tattico. Seleziona un edificio per tagliare tetto e pareti vicine, mostrando stanza e mobili; pan, zoom, rotazione 90° e touch.
+- [x] Test logici di integrità della mappa, proiezione, cutaway e asset, e sintassi JS.
+- [ ] **Priorità QA estetico**: browser WebGL reale Android e desktop, vedere screenshot non sintetici, misurare FPS, correggere facciate, proporzioni interni, materiali e art del 1860; non dichiarare approvazione prima del confronto dell'utente.
+- [ ] Solo dopo approvazione del feel valutare se portare questa versione nel gioco vero, mantenendo intatti gli altri renderer.
+
 ### 2026-11-06 — Streaming WebGL: evitare palazzi che scompaiono vicino alla camera
 - [x] Selezione dei lotti da disegnare basata sulla distanza minima dal **poligono reale**, non solo dal centro: edifici lunghi visibili sul bordo del raggio non spariscono più prematuramente.
 - [x] Quattro controlli eseguiti in runtime JavaScript (4/4 PASS); aggiunta suite Node persistente, **non eseguita con Node** in questo run.
