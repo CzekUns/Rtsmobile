@@ -16,7 +16,8 @@ async function browser(url,mode,path,scale=1){
  let stdout='',stderr='';
  proc.stdout.on('data',b=>stdout+=b);
  proc.stderr.on('data',b=>stderr+=b);
- const result=await Promise.race([new Promise(resolve=>proc.on('close',code=>resolve({code}))),sleep(30000).then(()=>({timeout:true}))]);
+ // A 2x full-game raster can exceed 30s on shared CI runners; preserve a bounded 90s timeout.
+ const result=await Promise.race([new Promise(resolve=>proc.on('close',code=>resolve({code}))),sleep(90000).then(()=>({timeout:true}))]);
  if(result.timeout)proc.kill('SIGKILL');
  if(result.timeout||result.code!==0)throw Error('Chromium failed '+JSON.stringify(result)+' '+stderr.slice(-1200));
  return stdout;
