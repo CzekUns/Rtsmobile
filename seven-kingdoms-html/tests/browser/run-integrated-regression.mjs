@@ -11,16 +11,22 @@ const port=18759;
 const output=process.env.SKH_QA_DIR||'/tmp/skh-qa-001';
 await mkdir(output,{recursive:true});
 const server=spawn('python3',['-m','http.server',String(port),'--bind','127.0.0.1'],{cwd:'seven-kingdoms-html',stdio:'ignore'});
-async function browser(url,mode,path,scale=1){
- const args=['--headless','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--disable-background-networking','--hide-scrollbars','--window-size=1100,900','--force-device-scale-factor='+scale,'--virtual-time-budget='+(mode==='image'?3500:14000),mode==='image'?'--screenshot='+path:'--dump-dom',url];
+async function browser(url,mode,path,scale=1,attempt=0){
+ const args=['--headless','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--disable-background-networking','--hide-scrollbars','--window-size=1100,900','--force-device-scale-factor='+scale,'--virtual-time-budget='+(mode==='image'?(attempt===0?1800:3500):14000),mode==='image'?'--screenshot='+path:'--dump-dom',url];
  const proc=spawn(chrome,args,{stdio:['ignore','pipe','pipe']});
  let stdout='',stderr='';
  proc.stdout.on('data',b=>stdout+=b);
  proc.stderr.on('data',b=>stderr+=b);
  // Screenshot mode uses a short virtual-time window: the full game's animation loop\n // otherwise keeps Chrome rendering thousands of frames before a 2x capture.\n // Retain a bounded timeout to report genuine hangs.
- const result=await Promise.race([new Promise(resolve=>proc.on('close',code=>resolve({code}))),sleep(90000).then(()=>({timeout:true}))]);
+ const result=await Promise.race([new Promise(resolve=>proc.on('close',code=>resolve({code}))),sleep(mode==='image'?35000:90000).then(()=>({timeout:true}))]);
  if(result.timeout)proc.kill('SIGKILL');
- if(result.timeout||result.code!==0)throw Error('Chromium failed '+JSON.stringify(result)+' '+stderr.slice(-1200));
+ if(result.timeout||result.code!==0){
+  if(mode==='image'&&attempt===0){
+   console.warn('Chromium screenshot first attempt failed; retrying once with fresh process: '+JSON.stringify(result));
+   return browser(url,mode,path,scale,1);
+  }
+  throw Error('Chromium failed '+JSON.stringify(result)+' '+stderr.slice(-1200));
+ }
  return stdout;
 }
 try{
