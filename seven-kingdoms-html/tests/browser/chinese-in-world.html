@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><title>SKH-STRUCTURES-001 in-world QA</title>
+<style>body{margin:0;background:#292b28;color:#eee;font:14px sans-serif}canvas{display:block;image-rendering:pixelated}#world{width:800px;height:600px}#minimap{display:none}#status{padding:8px}</style>
+<canvas id="world" width="800" height="600"></canvas><canvas id="minimap" width="184" height="137"></canvas><output id="status" data-result="pending">Loading authentic assets</output>
+<script type="module">
+import {SevenGame} from '../../rules.js';
+import {WorldView} from '../../view.js';
+import {loadChineseBaseImages} from '../../playtest/chinese-base.js';
+const out=document.getElementById('status');
+try{
+ const zoom=Number(new URLSearchParams(location.search).get('zoom')||1);
+ if(![1,2].includes(zoom))throw Error('Invalid zoom');
+ const images=await loadChineseBaseImages({assetRoot:'../../assets/original/chinese-base/'});
+ if(!images||images.size!==5)throw Error('Chinese PNGs/manifest failed to load');
+ const game=new SevenGame();
+ // Isolated deterministic world fixture rendered through the actual WorldView
+ // painter pipeline. Never mutate the player's save or production simulation.
+ game.towns=[];game.units=[];game.constructionSites=[];
+ game.firms=[{id:'qa-chinese-fort',kind:'fort',raceId:'CHINESE',x:30,y:30,size:4,owner:1,hp:100,maxHp:100,active:true}];
+ const view=new WorldView(document.getElementById('world'),document.getElementById('minimap'),{previewOriginalSprites:true,previewOriginalCoasts:true,chineseBaseImages:images});
+ view.center(32,32);view.zoom=zoom;
+ view.draw(game,null);
+ const ctx=view.canvas.getContext('2d');
+ const original=ctx.getImageData(0,0,view.canvas.width,view.canvas.height).data.slice();
+ view.chineseBaseImages=null;
+ view.draw(game,null);
+ const fallback=ctx.getImageData(0,0,view.canvas.width,view.canvas.height).data;
+ let different=0;
+ for(let i=0;i<original.length;i+=4)if(original[i]!==fallback[i]||original[i+1]!==fallback[i+1]||original[i+2]!==fallback[i+2]||original[i+3]!==fallback[i+3])different++;
+ if(different<100)throw Error('Original Chinese fort not distinguishable from fallback: '+different);
+ view.chineseBaseImages=images;view.draw(game,null);
+ out.dataset.result='drawn';out.dataset.zoom=String(zoom);out.dataset.differentPixels=String(different);
+ out.textContent='PASS in-world Chinese fort '+zoom+'x; source-vs-fallback changed pixels='+different;
+}catch(error){out.dataset.result='failed';out.textContent='FAIL '+error.stack;}
+</script></html>
