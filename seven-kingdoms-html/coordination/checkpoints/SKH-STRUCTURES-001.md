@@ -342,3 +342,12 @@
 - **Verifica:** CI del precedente checkpoint SUCCESS; nuova CI per `a8e325f` e questo checkpoint NON_VERIFIED. npm test/check locali NON_ESEGUITI: `git ls-remote https://github.com/CzekUns/Rtsmobile.git HEAD` restituisce `Could not resolve host: github.com`. Screenshot artifact precedente non ispezionato visivamente; nessun merge/Pages nuovo, Android e parità 7KAA NOT_RUN.
 - **Branch/PR:** `agent/skh-integration/original-buildings-units`, [#122](https://github.com/CzekUns/Rtsmobile/pull/122). SHA codice prima del checkpoint `a8e325f431a3d52ddc583ff92f46825564db9587`.
 - **Singolo prossimo passo:** controllare CI HEAD; se il nuovo assert fallisce, correggere l'esatto errore di scaling; se verde, scaricare e ispezionare realmente gli screenshot Chromium 1×/2× prima di rendere la PR non-draft/mergiare.
+
+
+## Esecuzione 2026-11-18 01:56 CET — CI HEAD verde e screenshot Chromium realmente ispezionati
+- **Stato iniziale:** checkpoint precedente commit `2265d06f48300b422406fea77771c66a0ce834f1`, PR #122 draft.
+- **CI HEAD esatta:** [Actions #44203830355](https://github.com/CzekUns/Rtsmobile/actions/runs/44203830355) completed/success per `2265d06f48300b422406fea77771c66a0ce834f1`; verifica include nuovo assert geometrico 2×. Artifact `14383625158`, digest ZIP sha256 `d589fac53118128db3195261c2d2d1082abcb84bcfdb4fb6b3441c244ef4b608`, acquisito e aperto realmente; PNG 1×/2× entrambi 1100×900. 
+- **QA visivo reale:** nelle due screenshot Chromium il palazzo/fortezza BASE:CHINESE appare completo, con torri, tetto e ombre senza ritagli evidenti; a 2× l'ingrandimento è coerente e mantiene il pixel art, senza interpolazione sfocata evidente. La screenshot 2× taglia in basso la riga diagnostica della pagina (layout preview, non sprite); questo non impedisce la visibilità dell'edificio ma è un difetto della pagina QA da considerare. È una preview isolata su fondo uniforme, **non** una scena reale in partita e **non** confronto originale stessa scena.
+- **Codice runtime:** nessuna modifica in questa run; nessun commit codice aggiuntivo. npm test/check locali NOT_RUN; prova CI esatta positiva. Nessun merge né Pages nuovo, Android e parità 7KAA NOT_RUN.
+- **Branch/PR:** `agent/skh-integration/original-buildings-units`, [#122](https://github.com/CzekUns/Rtsmobile/pull/122).
+- **Singolo prossimo passo:** aggiungere e verificare smoke browser di **scena di gioco effettiva** con fortezza CHINESE e screenshot a 1×/2× (non soltanto preview isolata); se verde e compatibilità verificata, procedere ai gate PR/merge. 
