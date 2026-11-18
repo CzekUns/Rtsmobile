@@ -5,6 +5,7 @@ import {createHash} from 'node:crypto';
 import {mkdir,readFile} from 'node:fs/promises';
 import {setTimeout as sleep} from 'node:timers/promises';
 import {join} from 'node:path';
+import {decodePng,compareScaleGeometry} from './png-geometry.mjs';
 const chrome=process.env.CHROME_BIN||'google-chrome';
 const port=18759;
 const output=process.env.SKH_QA_DIR||'/tmp/skh-qa-001';
@@ -47,6 +48,7 @@ try{
  // Capture the actual shipped index.html (not only the WorldView fixture).
  // Device scale factor controls raster resolution while CSS viewport stays fixed.
  const liveHashes=[];
+ const liveImages=[];
  for(const scale of [1,2]){
   const url='http://127.0.0.1:'+port+'/tests/browser/live-game-qa.html';
   const dom=await browser(url,'dom',undefined,scale);
@@ -59,8 +61,11 @@ try{
   const width=png.readUInt32BE(16),height=png.readUInt32BE(20);
   if(width<1000*scale||height<800*scale)throw Error('Unexpected screenshot resolution '+width+'x'+height+' at '+scale+'x');
   const sha=createHash('sha256').update(png).digest('hex');liveHashes.push(sha);
+  liveImages.push(decodePng(png));
   console.log(JSON.stringify({fixture:'actual-game',scale,width,height,screenshot:path,sha256:sha}));
  }
+ const geometry=compareScaleGeometry(liveImages[0],liveImages[1]);
+ console.log('Live HUD 1x/2x normalized geometry: '+JSON.stringify(geometry));
  if(liveHashes[0]===liveHashes[1])throw Error('Live 1x/2x screenshots identical');
  if(hashes[0]===hashes[1])throw Error('1x and 2x screenshots identical');
  console.log('PASS: integrated live game HUD and WorldView 1x/2x Chromium regressions; Android/7KAA parity NOT tested');
