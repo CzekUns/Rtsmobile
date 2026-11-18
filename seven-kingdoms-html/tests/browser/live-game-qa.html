@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SKH-QA-001 · live game viewport</title>
+<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#161616}iframe{display:block;width:100vw;height:100vh;border:0}#qa{position:fixed;top:0;right:0;z-index:9999;font:10px monospace;background:#111;color:#fff;padding:2px}</style></head>
+<body><iframe id="game" src="../../index.html?chinese=1" title="Actual Seven Kingdoms game"></iframe><output id="qa" data-result="pending">PENDING</output>
+<script>
+const frame=document.getElementById('game'),qa=document.getElementById('qa');
+const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+frame.addEventListener('load',async()=>{
+ try{
+  await wait(1200);
+  const d=frame.contentDocument,w=frame.contentWindow;
+  const get=id=>d.getElementById(id);
+  if(get('helpDialog')?.open)get('helpDialog').close();
+  const commands=get('touchControlsToggle');commands.click();
+  await wait(300);
+  const required=['world','minimap','orderSidebar','touchJoystick','touchModifier','touchControlsToggle','sidebarToggle','date','cash'];
+  for(const id of required){const el=get(id);if(!el||!el.getBoundingClientRect().width)throw Error(id+' missing/hidden');}
+  if(commands.getAttribute('aria-expanded')!=='true')throw Error('COMANDI closed');
+  const canvas=get('world');
+  const pixels=canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data;
+  let opaque=0;for(let i=3;i<pixels.length;i+=4)if(pixels[i])opaque++;
+  if(opaque<1000)throw Error('World canvas not rendered: '+opaque);
+  qa.dataset.result='ready';qa.dataset.canvasPixels=String(opaque);
+  qa.textContent='PASS · actual game HUD + world + COMANDI';
+ }catch(e){qa.dataset.result='failed';qa.textContent='FAIL: '+e.message}
+});
+setTimeout(()=>{if(qa.dataset.result==='pending'){qa.dataset.result='failed';qa.textContent='FAIL: game timeout'}},11000);
+</script></body></html>
