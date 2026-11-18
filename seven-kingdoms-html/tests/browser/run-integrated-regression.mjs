@@ -10,8 +10,8 @@ const port=18759;
 const output=process.env.SKH_QA_DIR||'/tmp/skh-qa-001';
 await mkdir(output,{recursive:true});
 const server=spawn('python3',['-m','http.server',String(port),'--bind','127.0.0.1'],{cwd:'seven-kingdoms-html',stdio:'ignore'});
-async function browser(url,mode,path){
- const args=['--headless','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--disable-background-networking','--hide-scrollbars','--window-size=1100,900','--virtual-time-budget=14000',mode==='image'?'--screenshot='+path:'--dump-dom',url];
+async function browser(url,mode,path,scale=1){
+ const args=['--headless','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--disable-background-networking','--hide-scrollbars','--window-size=1100,900','--force-device-scale-factor='+scale,'--virtual-time-budget=14000',mode==='image'?'--screenshot='+path:'--dump-dom',url];
  const proc=spawn(chrome,args,{stdio:['ignore','pipe','pipe']});
  let stdout='',stderr='';
  proc.stdout.on('data',b=>stdout+=b);
@@ -43,6 +43,24 @@ try{
   hashes.push(sha);
   console.log(JSON.stringify({zoom,differentPixels:different,screenshot:path,sha256:sha,bytes:png.length}));
  }
+ // Capture the actual shipped index.html (not only the WorldView fixture).
+ // Device scale factor controls raster resolution while CSS viewport stays fixed.
+ const liveHashes=[];
+ for(const scale of [1,2]){
+  const url='http://127.0.0.1:'+port+'/tests/browser/live-game-qa.html';
+  const dom=await browser(url,'dom',undefined,scale);
+  const qa=dom.match(/<output id="qa"[^>]*>/)?.[0]||'';
+  if(!qa.includes('data-result="ready"'))throw Error('Live HUD/game viewport '+scale+'x: '+dom.slice(-1600));
+  const path=join(output,'live-game-hud-'+scale+'x.png');
+  await browser(url,'image',path,scale);
+  const png=await readFile(path);
+  if(!png.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10]))||png.length<1000)throw Error('Invalid live screenshot '+path);
+  const width=png.readUInt32BE(16),height=png.readUInt32BE(20);
+  if(width<1000*scale||height<800*scale)throw Error('Unexpected screenshot resolution '+width+'x'+height+' at '+scale+'x');
+  const sha=createHash('sha256').update(png).digest('hex');liveHashes.push(sha);
+  console.log(JSON.stringify({fixture:'actual-game',scale,width,height,screenshot:path,sha256:sha}));
+ }
+ if(liveHashes[0]===liveHashes[1])throw Error('Live 1x/2x screenshots identical');
  if(hashes[0]===hashes[1])throw Error('1x and 2x screenshots identical');
- console.log('PASS: integrated HUD and WorldView 1x/2x Chromium regressions; Android/7KAA parity NOT tested');
+ console.log('PASS: integrated live game HUD and WorldView 1x/2x Chromium regressions; Android/7KAA parity NOT tested');
 }finally{server.kill('SIGTERM')}
