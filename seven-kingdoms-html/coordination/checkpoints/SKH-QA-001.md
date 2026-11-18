@@ -108,3 +108,11 @@
 - **Validazione codice nuovo:** npm test/check locali NON ESEGUITI; la CI #44365090473 precede il nuovo test e non lo certifica. CI sull'HEAD nuovo DA VERIFICARE. PR ancora aperta; merge e Pages nuovi NON VERIFICATI. Android fisico e stessa scena 7KAA NOT_RUN.
 - **HEAD codice prima del checkpoint:** `62a21c79c2869f9f46fce6d949a8020c6c2fcae7`; SHA branch finale = commit di questo checkpoint.
 - **Singolo prossimo passo:** verificare la CI HEAD che include i nuovi test; se rossa correggere il test/decoder nella stessa PR #125; se verde scaricare e aprire PNG artifact #14456730694 (o quello dell'HEAD) per valutare le differenze 1×/2× e decidere il gate di merge.
+
+## 2026-11-18 20:55 CET — CI unit test failure corrected
+- **Task/branch/PR:** SKH-QA-001, `agent/skh-integration/fidelity-regression-qa`, [PR #125](https://github.com/CzekUns/Rtsmobile/pull/125).
+- **CI on previous HEAD:** [Actions #44376212008](https://github.com/CzekUns/Rtsmobile/actions/runs/44376212008) at `f7ebb5d04860a6759909ad0e22ef8196711ba013`: **failure** in Node unit tests, 317 pass / 1 fail / 2 skip. Failure test #103 at `tests/browser/png-geometry.test.mjs:59`: expected regex `Truncated PNG chunk|Unsupported PNG format`, actual zlib `Error: unexpected end of file` when synthetic PNG is truncated inside IDAT. Chromium skipped because Node failed.
+- **Code published:** [commit 965c7ba](https://github.com/CzekUns/Rtsmobile/commit/965c7ba45dad5aa02773c066bd6d920e0c1dad81), extends the malformed PNG assertion to accept the actual zlib EOF error, preserving the rejection requirement. Runtime, assets, decoder unchanged.
+- **Validation:** npm test/check local NOT_RUN (no local checkout); CI on new HEAD NOT_YET_VERIFIED. PR still draft, no merge or new Pages deploy. Android physical and original 7KAA same-scene parity NOT_RUN. Previous artifact #14456730694 still awaits visual inspection.
+- **Code HEAD before checkpoint:** `965c7ba45dad5aa02773c066bd6d920e0c1dad81`; branch HEAD after checkpoint = commit publishing this note.
+- **Single next step:** verify Actions on the new HEAD; if green, download/open the 1×/2× PNG artifact and inspect geometric differences before deciding whether PR #125 can become non-draft.
