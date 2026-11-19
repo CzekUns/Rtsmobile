@@ -18,6 +18,25 @@ frame.addEventListener('load',async()=>{
   for(const id of required){const el=get(id);if(!el||!el.getBoundingClientRect().width)throw Error(id+' missing/hidden');}
   if(commands.getAttribute('aria-expanded')!=='true')throw Error('COMANDI closed');
   const canvas=get('world');
+  // Observe real game Canvas labels rather than relying solely on synthetic DOM
+  // text. The instrumentation is fixture-only and preserves the original draw.
+  const context=canvas.getContext('2d');
+  const labelDraws=[];
+  const originalFillText=context.fillText;
+  context.fillText=function(text,x,y,...rest){
+   if(typeof text==='string' && text.trim()){
+    const font=this.font;
+    const measured=this.measureText(text);
+    labelDraws.push({text,font,width:Number(measured.width.toFixed(3)),
+     x:Number(x.toFixed(3)),y:Number(y.toFixed(3))});
+    if(labelDraws.length>256)labelDraws.shift();
+   }
+   return originalFillText.call(this,text,x,y,...rest);
+  };
+  // Wait for the next real render frame; do not fabricate or paint labels.
+  await wait(350);
+  context.fillText=originalFillText;
+  qa.dataset.canvasLabelDraws=JSON.stringify(labelDraws);
   const pixels=canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data;
   let opaque=0;for(let i=3;i<pixels.length;i+=4)if(pixels[i])opaque++;
   if(opaque<1000)throw Error('World canvas not rendered: '+opaque);
