@@ -263,3 +263,11 @@
 - **Validation:** previous exact CI FAILED as above; CI on this new code/checkpoint HEAD NOT_YET_VERIFIED. Local `npm --prefix seven-kingdoms-html test` and `npm --prefix seven-kingdoms-html run check` NOT_RUN (no local checkout); GitHub Actions is the executable test route. Product main `ce27463` push CI #44511174668 and Pages #44511174523 previously SUCCESS; not a verification of this branch. Android and original 7KAA same-scene 1×/2× NOT_RUN.
 - **Branch code SHA before checkpoint:** `5b950a63471b7e56f314984e8255edd1a1496b4b`. Final branch HEAD is the checkpoint commit following this entry.
 - **Single next step:** check the exact PR #126 HEAD Actions run; if SUCCESS and PR non-draft/no conflicts, merge with expected HEAD SHA and verify final main push CI/Pages; if FAILED, read its failing job log and correct that specific test.
+
+
+## 2026-11-19 20:55 CET — PR #126 merged after green HEAD CI
+- **Starting HEAD:** `46a4cf81632fc298d3d57e21d4fc287cbdc18dcf`, branch `agent/skh-integration/qa-release-handoff`, PR #126 non-draft, mergeable; comparison main→branch: 9 commits ahead, 0 behind, only coordination and coordination-state tests changed.
+- **Exact PR HEAD Actions:** [run #44593392526](https://github.com/CzekUns/Rtsmobile/actions/runs/44593392526), completed **SUCCESS**. Local npm test/check NOT_RUN; CI is the verification route.
+- **Merge completed:** PR [#126](https://github.com/CzekUns/Rtsmobile/pull/126) squash merged successfully; resulting **main SHA `00cdcc1b4e90d2667e2e5a4566a3564649f1bc02`**. Product runtime/assets unchanged; STATE/TASKS/HANDOFF/DECISIONS and terminal-state tests integrated. Technical program ends with `activeTaskId=null`, SKH-QA-001 `awaiting_manual_qa`; no new task authorized.
+- **Release gates:** preceding product main `ce27463` CI [#44511174668](https://github.com/CzekUns/Rtsmobile/actions/runs/44511174668) and Pages [#44511174523](https://github.com/CzekUns/Rtsmobile/actions/runs/44511174523) SUCCESS. **New main SHA `00cdcc1b` CI and Pages NOT_YET_VERIFIED.** Physical Android and same-scene original 7KAA comparison at 1×/2× NOT_RUN, no parity certification.
+- **Single next step:** verify GitHub Actions main push CI and Pages deployment for exact `00cdcc1b4e90d2667e2e5a4566a3564649f1bc02`; record results, retaining physical QA pending.
