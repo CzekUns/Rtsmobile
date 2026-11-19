@@ -77,6 +77,26 @@ try{
    const metrics=JSON.parse(encoded.replaceAll('&quot;','"'));
    if(metrics.length!==2||metrics.some(pair=>pair.length!==2||pair.some(v=>!Number.isFinite(v)||v<=0)))throw Error('Invalid Forte/Mercato metrics: '+JSON.stringify(metrics));
    console.log('Forte/Mercato reference CSS geometry (1x): '+JSON.stringify(metrics));
+   // Actual game Canvas draw calls are collected by the fixture, independently
+   // of the hidden DOM reference. Validate the capture rather than mistaking
+   // synthetic reference metrics for proof of rendered label geometry.
+   const encodedDraws=qa.match(/data-canvas-label-draws="([^"]+)"/)?.[1];
+   if(!encodedDraws)throw Error('Missing actual Canvas label draw capture');
+   const draws=JSON.parse(encodedDraws.replaceAll('&quot;','"').replaceAll('&amp;','&'));
+   if(!Array.isArray(draws)||!draws.length)throw Error('No actual Canvas fillText calls captured');
+   const invalid=draws.find(draw=>typeof draw.text!=='string'||!draw.text.trim()
+    ||typeof draw.font!=='string'||!draw.font.trim()
+    ||!Number.isFinite(draw.width)||draw.width<=0
+    ||!Number.isFinite(draw.x)||!Number.isFinite(draw.y));
+   if(invalid)throw Error('Invalid actual Canvas text geometry: '+JSON.stringify(invalid));
+   const labels=draws.filter(draw=>/forte|mercato/i.test(draw.text));
+   console.log('Actual Canvas label draws (1x): '+JSON.stringify({
+    count:draws.length,matchedLabels:labels,otherSamples:draws.slice(0,8)
+   }));
+   // A missing Forte/Mercato draw is an explicit coverage gap, not a parity PASS:
+   // the current demo scene may not paint these strings in the capture window.
+   if(!labels.length)console.warn('Canvas Forte/Mercato draw not observed; 1x/2x label parity remains unverified');
+
   }
   const path=join(output,'live-game-hud-'+scale+'x.png');
   await browser(url,'image',path,scale);
