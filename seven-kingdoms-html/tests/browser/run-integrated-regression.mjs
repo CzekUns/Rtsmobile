@@ -20,7 +20,9 @@ async function browser(url,mode,path,scale=1,attempt=0){
  let stdout='',stderr='';
  proc.stdout.on('data',b=>stdout+=b);
  proc.stderr.on('data',b=>stderr+=b);
- // Screenshot mode uses a short virtual-time window: the full game's animation loop\n // otherwise keeps Chrome rendering thousands of frames before a 2x capture.\n // Retain a bounded timeout to report genuine hangs.
+ // Screenshot mode uses a short virtual-time window: the full game's animation loop
+ // otherwise keeps Chrome rendering thousands of frames before a 2x capture.
+ // Retain a bounded timeout to report genuine hangs.
  const result=await Promise.race([new Promise(resolve=>proc.on('close',code=>resolve({code}))),sleep(mode==='image'?35000:90000).then(()=>({timeout:true}))]);
  const elapsedMs=Date.now()-started;
  console.log('Chromium phase end '+JSON.stringify({...phase,elapsedMs,exitCode:result.code??null,timeout:!!result.timeout,stderrTail:result.timeout?stderr.slice(-500):undefined}));
