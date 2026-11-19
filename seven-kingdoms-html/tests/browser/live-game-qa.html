@@ -39,6 +39,32 @@ frame.addEventListener('load',async()=>{
   for(const id of required){const el=get(id);if(!el||!el.getBoundingClientRect().width)throw Error(id+' missing/hidden');}
   if(commands.getAttribute('aria-expanded')!=='true')throw Error('COMANDI closed');
   const canvas=get('world');
+  // Controlled raster comparison using fonts actually observed in the live
+  // renderer. This is a same-process 1x/2x text test, not a claim about the
+  // separately captured full-game screenshots or original 7KAA.
+  const labelSamples=[...new Map(labelDraws.filter(draw=>/^(Forte|Mercato)$/i.test(draw.text))
+   .map(draw=>[draw.text,draw])).values()];
+  const rasterChecks=labelSamples.map(draw=>{
+   const paint=scale=>{
+    const c=d.createElement('canvas');c.width=240*scale;c.height=48*scale;
+    const ctx=c.getContext('2d',{willReadFrequently:true});
+    ctx.scale(scale,scale);ctx.font=draw.font;ctx.textBaseline='alphabetic';
+    ctx.fillStyle='#ffffff';ctx.fillText(draw.text,8,26);
+    const bytes=ctx.getImageData(0,0,c.width,c.height).data;
+    let minX=c.width,minY=c.height,maxX=-1,maxY=-1,count=0;
+    for(let y=0;y<c.height;y++)for(let x=0;x<c.width;x++){
+     if(bytes[(y*c.width+x)*4+3]<16)continue;
+     minX=Math.min(minX,x);minY=Math.min(minY,y);
+     maxX=Math.max(maxX,x);maxY=Math.max(maxY,y);count++;
+    }
+    if(!count)throw Error('Empty controlled raster: '+draw.text);
+    return {width:(maxX-minX+1)/scale,height:(maxY-minY+1)/scale,
+     x:minX/scale,y:minY/scale,inkPixels:count};
+   };
+   return {text:draw.text,font:draw.font,canvasMeasuredWidth:draw.width,
+    at1x:paint(1),at2x:paint(2)};
+  });
+  qa.dataset.canvasRasterChecks=JSON.stringify(rasterChecks);
   qa.dataset.canvasLabelDraws=JSON.stringify(labelDraws);
   const pixels=canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data;
   let opaque=0;for(let i=3;i<pixels.length;i+=4)if(pixels[i])opaque++;
