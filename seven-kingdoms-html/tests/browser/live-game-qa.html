@@ -32,7 +32,7 @@ frame.addEventListener('load',async()=>{
   const css=d.createElement('style');
   css.textContent='#ticker{font-size:0!important}#ticker::after{content:"QA · Corinto";font-size:12px;white-space:nowrap}';
   d.head.appendChild(css);
-  qa.dataset.ticker=baseline;
+  // Deterministic reference labels in CSS pixels. The game's animated Canvas\n  // cannot provide identical pixels across separate Chromium processes; these\n  // DOM metrics isolate device-scale-dependent text geometry instead.\n  const reference=d.createElement('div');\n  reference.id='qa-label-reference';\n  reference.style.cssText='position:fixed;left:12px;top:12px;z-index:99999;visibility:hidden;pointer-events:none;font:12px Arial,sans-serif;white-space:nowrap';\n  reference.innerHTML='<span>Forte</span><span style="margin-left:16px">Mercato</span>';\n  d.body.appendChild(reference);\n  const spans=[...reference.querySelectorAll('span')];\n  const sizes=spans.map(el=>{const r=el.getBoundingClientRect();return [r.width,r.height].map(n=>Number(n.toFixed(3)))});\n  qa.dataset.labelMetrics=JSON.stringify(sizes);\n  qa.dataset.ticker=baseline;
   qa.dataset.result='ready';qa.dataset.canvasPixels=String(opaque);
   qa.textContent='PASS · actual game HUD + world + COMANDI';
   // Keep diagnostic state readable by --dump-dom but out of screenshots.
