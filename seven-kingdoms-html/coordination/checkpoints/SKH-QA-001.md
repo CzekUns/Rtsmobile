@@ -142,3 +142,11 @@
 - **Prove:** npm test/check locali NON_ESEGUITI (checkout non disponibile); CI sul nuovo commit NON ANCORA VERIFICATA. Nessun merge, Pages post-merge non applicabile. Android fisico e parità stessa scena 7KAA NOT_RUN.
 - **SHA codice prima del checkpoint:** `43db9d0255a2ba426c9dbd3a71ab6727bace64af`; SHA finale branch è il commit documentale seguente.
 - **Singolo prossimo passo:** verificare la CI sul nuovo HEAD; se fallisce leggere la fase esatta (in particolare screenshot live-game 2×), correggere il blocco specifico; se verde ispezionare entrambi i PNG 1×/2× e controllare mergeability della PR #125.
+
+
+## 2026-11-19 00:59 CET — CI HEAD verde, artifact disponibili; ispezione PNG ancora pendente
+- **Task/branch/PR:** SKH-QA-001, `agent/skh-integration/fidelity-regression-qa`, [PR #125](https://github.com/CzekUns/Rtsmobile/pull/125). HEAD precedente `2d1ba1767b1a83acddcb937ecb7556f72a146841`.
+- **CI verificata sull'HEAD esatto:** [Actions #44417469447](https://github.com/CzekUns/Rtsmobile/actions/runs/44417469447) `completed/success` su `2d1ba1767b1a83acddcb937ecb7556f72a146841`. Job JS tests & stream scope success: syntax, Node unit tests, Chromium HUD, PLANT 1×/2×, integrated HUD/WorldView Chromium 1×/2×, ownership. Tre job di acquisizione originali skipped; non equivale a prova di parità.
+- **Artifact presenti:** [#14480595619](https://github.com/CzekUns/Rtsmobile/actions/runs/44417469447/artifacts/14480595619) `skh-qa-001-worldview-1x-2x` (3.666.608 byte) e [#14480880198](https://github.com/CzekUns/Rtsmobile/actions/runs/44417469447/artifacts/14480880198) `skh-terrain-002-chromium-plant-1x-2x` (616.234 byte). La presenza è verificata via Actions; **PNG non scaricati/aperti in questa run**, dunque niente attestazione visiva nuova.
+- **Codice/runtime:** nessuna modifica; questo commit aggiorna solo il checkpoint con prova CI. npm test/check locali NON_ESEGUITI. Nessun merge né Pages post-merge. Android fisico e confronto stessa scena originale 7KAA NOT_RUN.
+- **Singolo prossimo passo:** scaricare/aprire l'artifact #14480595619 e confrontare effettivamente screenshot live-game 1×/2×, registrare clipping, geometria e differenze; poi verificare lo stato draft/conflitti della PR #125 prima di procedere al gate merge.
