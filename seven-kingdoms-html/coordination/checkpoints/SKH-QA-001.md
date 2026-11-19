@@ -176,3 +176,12 @@
 - **Reproducible risk:** Chromium `--dump-dom` on live-game at 2× previously timed out; new metrics deliberately read from 1× DOM only. A CSS reference alone does not prove canvas label sizes at 2×.
 - **Code HEAD before checkpoint:** `28219b7bbbbefb020ca1695b36676fc667afccb9`; final branch HEAD is this checkpoint commit.
 - **Single next step:** inspect CI on checkpoint HEAD and fix any failure; then implement a controlled **actual canvas** label-region comparison at 1×/2× (freeze frame or equivalent), before considering draft→ready and merge.
+
+
+## 2026-11-19 05:00 CET — CI failure fixed: escaped newlines disabled label metrics
+- **Task/branch/PR:** SKH-QA-001 / `agent/skh-integration/fidelity-regression-qa` / [#125](https://github.com/CzekUns/Rtsmobile/pull/125). Previous checkpoint HEAD `5563a7e9d50dcff804de4028b01a6892cc284dea`.
+- **Exact CI failure:** [Actions #44448635263](https://github.com/CzekUns/Rtsmobile/actions/runs/44448635263), job 135306855025, integrated Chromium regression failed with `Error: Missing deterministic label metrics` at `run-integrated-regression.mjs:74`. Earlier HUD and WorldView 1×/2× passed. Cause confirmed in `live-game-qa.html`: literal backslash-n sequences inside a `//` comment made all subsequent reference-label JavaScript part of the comment, so `data-label-metrics` was never assigned. Also found two literal backslash-n comment sequences in runner.
+- **Code published:** [ae448f4](https://github.com/CzekUns/Rtsmobile/commit/ae448f4557bc8fbc4eaaef3b728cd85dc95ae4e2) converts 11 literal escaped newlines to actual newlines in `tests/browser/live-game-qa.html`, restoring reference-label creation and metrics; [19fc779](https://github.com/CzekUns/Rtsmobile/commit/19fc77991b168c9e0df9b6875355bd2beb7d98d2) corrects two escaped comment newlines in `tests/browser/run-integrated-regression.mjs`. No runtime or asset modifications.
+- **Validation:** CI on corrected HEAD NOT_YET_VERIFIED; local npm test/check NOT_RUN (connector-based source edits). No merge or Pages deployment. This restores reference DOM metrics only; frozen actual Canvas label-size parity remains open. Android physical and 7KAA same-scene comparison NOT_RUN.
+- **Code HEAD before checkpoint:** `19fc77991b168c9e0df9b6875355bd2beb7d98d2`; final branch HEAD is this checkpoint commit.
+- **Single next step:** inspect CI on this checkpoint HEAD; if green, implement a controlled actual Canvas label-region comparison at 1×/2× (rather than relying solely on hidden DOM reference labels), and only then reassess PR #125 merge gates.
