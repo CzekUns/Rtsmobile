@@ -95,6 +95,7 @@ try{
     ||!Number.isFinite(draw.x)||!Number.isFinite(draw.y));
    if(invalid)throw Error('Invalid actual Canvas text geometry: '+JSON.stringify(invalid));
    const labels=draws.filter(draw=>/forte|mercato/i.test(draw.text));
+   for(const name of ['Forte','Mercato'])if(!labels.some(draw=>draw.text.toLowerCase()===name.toLowerCase()))throw Error('Missing observed live Canvas label: '+name);
    console.log('Actual Canvas label draws (1x): '+JSON.stringify({
     count:draws.length,matchedLabels:labels,otherSamples:draws.slice(0,8)
    }));
@@ -104,6 +105,7 @@ try{
    if(!encodedRaster)throw Error('Missing controlled Canvas raster diagnostics');
    const rasters=JSON.parse(encodedRaster.replaceAll('&quot;','"').replaceAll('&amp;','&'));
    if(!Array.isArray(rasters)||!rasters.length)throw Error('No Forte/Mercato raster samples');
+   for(const name of ['Forte','Mercato'])if(!rasters.some(sample=>sample.text.toLowerCase()===name.toLowerCase()))throw Error('Missing controlled raster sample: '+name);
    for(const sample of rasters){
     if(!/^(Forte|Mercato)$/i.test(sample.text))throw Error('Unexpected raster label '+sample.text);
     for(const scale of ['at1x','at2x']){
@@ -111,6 +113,8 @@ try{
      if(!box||['width','height','x','y','inkPixels'].some(key=>!Number.isFinite(box[key])||box[key]<=0))
       throw Error('Invalid controlled Canvas raster '+JSON.stringify(sample));
     }
+    const live=labels.find(draw=>draw.text.toLowerCase()===sample.text.toLowerCase());
+    if(!live||!Number.isFinite(sample.canvasMeasuredWidth)||Math.abs(sample.canvasMeasuredWidth-live.width)>0.5)throw Error('Raster font measurement diverges from observed Canvas draw: '+JSON.stringify(sample));
     const a=sample.at1x,b=sample.at2x;
     // Glyph hinting differs across raster scales. Bound geometric drift to
     // 2 CSS pixels; report exact measured bounds for regression triage.
