@@ -95,6 +95,20 @@ jobs:
             ${{ runner.temp }}/chinese-world-2x.png
           if-no-files-found: warn
           retention-days: 14
+      - name: Integrated HUD and WorldView Chromium regression 1x/2x
+        if: github.head_ref == 'agent/skh-integration/fidelity-regression-qa' || github.ref == 'refs/heads/agent/skh-integration/fidelity-regression-qa'
+        env:
+          CHROME_BIN: google-chrome
+          SKH_QA_DIR: ${{ runner.temp }}/skh-qa-integrated
+        run: node seven-kingdoms-html/tests/browser/run-integrated-regression.mjs
+      - name: Upload integrated HUD and WorldView QA screenshots
+        if: always() && (github.head_ref == 'agent/skh-integration/fidelity-regression-qa' || github.ref == 'refs/heads/agent/skh-integration/fidelity-regression-qa')
+        uses: actions/upload-artifact@v4
+        with:
+          name: skh-qa-001-worldview-1x-2x
+          path: ${{ runner.temp }}/skh-qa-integrated/*.png
+          if-no-files-found: warn
+          retention-days: 14
       - name: Enforce ownership on agent branches only
         if: github.event_name == 'pull_request'
         env:
