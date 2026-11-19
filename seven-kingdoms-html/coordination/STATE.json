@@ -10,9 +10,9 @@
     "url": "https://czekuns.github.io/Rtsmobile/seven-kingdoms-html/",
     "androidVisualTest": "not_run"
   },
-  "activeTaskId": "SKH-QA-001",
-  "activeTaskBranch": "agent/skh-integration/qa-release-handoff",
-  "currentStep": "SKH-QA-001 technical release verified on main; awaiting physical Android landscape and original 7KAA same-scene 1x/2x QA. No successor task in approved order.",
+  "activeTaskId": null,
+  "activeTaskBranch": null,
+  "currentStep": "Programma tecnico concluso fino a SKH-QA-001; nessun task successivo approvato. QA manuale Android landscape/fullscreen/multitouch e confronto stessa scena originale 7KAA a 1×/2× ancora pendenti.",
   "lastExecution": {
     "recorded": true,
     "runId": "SKH-QA-001-PR125-postmerge-2026-11-19",
@@ -53,5 +53,5 @@
   ],
   "planChangesRequireOwnerApproval": true,
   "nextTaskAfterActive": null,
-  "notes": "SKH-TERRAIN-002 PR #120 merged at f914a3a. Main CI #43784029511 and Pages #43784029495 SUCCESS. Android and 7KAA same-scene parity pending. PR #121 transition to SKH-STRUCTURES-001: CI initially failed due to missing active checkpoint and hard-coded next-task test; fixed on branch; verify new HEAD CI before merge. PR #125 squash merged ce27463; exact main push CI #44511174668 and Pages #44511174523 SUCCESS (19 Nov 2026). Android/7KAA manual QA not run."
+  "notes": "SKH-TERRAIN-002 PR #120 merged at f914a3a. Main CI #43784029511 and Pages #43784029495 SUCCESS. Android and 7KAA same-scene parity pending. PR #121 transition to SKH-STRUCTURES-001: CI initially failed due to missing active checkpoint and hard-coded next-task test; fixed on branch; verify new HEAD CI before merge. PR #125 squash merged ce27463; exact main push CI #44511174668 and Pages #44511174523 SUCCESS (19 Nov 2026). Android/7KAA manual QA not run. PR #126 coordination CI initial failure #44571783592 at Node unit tests: activeTaskId SKH-QA-001 conflicted with TASKS status awaiting_manual_qa; closure uses activeTaskId=null per validate.mjs (no approved successor)."
 }
