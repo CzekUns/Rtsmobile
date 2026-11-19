@@ -211,3 +211,12 @@
 - **Verifiche:** npm test/check locali NON_ESEGUITI (nessun checkout locale). CI del nuovo commit NON ANCORA VERIFICATA; nessun merge/Pages #125. Android fisico e stessa scena 7KAA NOT_RUN. **Il confronto delle etichette Canvas 1×/2× resta aperto** e non va certificato in assenza di campioni.
 - **SHA codice prima di questo checkpoint:** `2ebc13214b6db98b18c6c426cebfd969d11a2869`; HEAD finale è il commit checkpoint successivo.
 - **Singolo prossimo passo:** verificare Actions sull'HEAD del checkpoint; se verde, rendere osservabili le etichette reali strumentando il Canvas prima dell'avvio del renderer (oppure usando una scena fissa che le disegni) e confrontare 1×/2× senza riattivare `--dump-dom` 2×; se rosso correggere l'errore specifico.
+
+
+## 2026-11-19 09:02 CET — CI precedente verde; probe Canvas anticipato
+- **Task/PR/branch:** SKH-QA-001 / [#125](https://github.com/CzekUns/Rtsmobile/pull/125) / `agent/skh-integration/fidelity-regression-qa`. Previous checkpoint HEAD `0ca848775e52daaa2911b80bda3139ae4df2a190`.
+- **CI verificata:** [Actions #44476608262](https://github.com/CzekUns/Rtsmobile/actions/runs/44476608262) completed/success per il precedente HEAD `0ca8487`. La correzione che classifica zero chiamate Canvas come UNVERIFIED non interrompe più la CI.
+- **Codice pubblicato:** commit `ab1f989da7cf9075a1b31d2f024d4fea4a981fc1` modifica `tests/browser/live-game-qa.html`: installa il wrapper di `fillText` subito all'evento load dell'iframe, prima dei 1200ms di attesa e della configurazione HUD, ed estende la finestra osservata a 1500ms. Il wrapper è rimosso dopo la cattura. È una correzione mirata del precedente zero-observations, senza modifiche a runtime/asset. Il renderer può aver già disegnato prima dell'evento load; quindi la copertura resta da dimostrare.
+- **Test:** npm test/check locali NON_ESEGUITI; CI sul nuovo HEAD NON ANCORA VERIFICATA. Nessun merge/Pages #125. Android fisico e confronto stessa scena 7KAA NOT_RUN. Il confronto Canvas 1×/2× resta NON_VERIFICATO.
+- **SHA codice prima del checkpoint:** `ab1f989da7cf9075a1b31d2f024d4fea4a981fc1`; HEAD finale è il commit checkpoint successivo.
+- **Singolo prossimo passo:** verificare la CI esatta del nuovo HEAD e leggere il conteggio reale `Actual Canvas label draws`; se ancora zero, strumentare il renderer prima dell'inizializzazione anziché aumentare ancora timeout, poi realizzare un confronto geometrico 1×/2× realmente osservato.
