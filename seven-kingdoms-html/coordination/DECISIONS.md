@@ -35,3 +35,7 @@ PR #120 promossa e squash-merged su main `f914a3ab007a7760026829bbc7216080564e09
 
 ## 2026-11-18 — Transizione concordata SKH-STRUCTURES-001 → SKH-QA-001
 Nessuna ripianificazione: si segue `TASKS.json.taskOrder`. PR #122 integrata su main `8197e8e322b750c7cdbdb170198ade91b0c257e7` con CI PR HEAD #44234823855 verde. Stato strutture `awaiting_manual_qa` per Android/parità 7KAA e limiti degli sprite direzionali. CI main/Pages da verificare. Si attiva SKH-QA-001, senza certificare parità o test fisici.
+
+
+## 2026-11-19 — DEC-005 · SKH-QA-001 in awaiting_manual_qa
+Nel programma immutato DEC-001, la PR #125 è stata integrata su main `ce27463932b040d6c2ce54348cd13a8e6e16604a`. CI push [#44511174668](https://github.com/CzekUns/Rtsmobile/actions/runs/44511174668) e workflow Pages [#44511174523](https://github.com/CzekUns/Rtsmobile/actions/runs/44511174523) completati con `success` sullo SHA esatto. I gate automatici di rilascio sono verificati; manca la prova fisica Android e il confronto stessa scena con 7KAA a 1×/2×. Si registra `awaiting_manual_qa`, senza dichiarare parità e senza introdurre un task nuovo. Il calendario esistente rimane invariato.

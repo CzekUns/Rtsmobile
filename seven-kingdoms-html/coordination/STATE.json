@@ -1,27 +1,27 @@
 {
   "schemaVersion": 1,
   "programRevision": "2026-11-12-orchestrator-v1",
-  "updatedOn": "2026-11-18",
-  "lastObservedMainSha": "8197e8e322b750c7cdbdb170198ade91b0c257e7",
+  "updatedOn": "2026-11-19",
+  "lastObservedMainSha": "ce27463932b040d6c2ce54348cd13a8e6e16604a",
   "lastVerifiedPagesDeployment": {
-    "sha": "f914a3ab007a7760026829bbc7216080564e0988",
-    "runId": 43784029495,
+    "sha": "ce27463932b040d6c2ce54348cd13a8e6e16604a",
+    "runId": 44511174523,
     "result": "success",
     "url": "https://czekuns.github.io/Rtsmobile/seven-kingdoms-html/",
     "androidVisualTest": "not_run"
   },
-  "activeTaskId": "SKH-QA-001",
+  "activeTaskId": null,
   "activeTaskBranch": null,
-  "currentStep": "Raccogliere evidenze della stessa scena 7KAA/HTML a 1×/2×, verificare Android landscape e regressioni, senza dichiarare parità non provata.",
+  "currentStep": "Programma tecnico concluso fino a SKH-QA-001; nessun task successivo approvato. QA manuale Android landscape/fullscreen/multitouch e confronto stessa scena originale 7KAA a 1×/2× ancora pendenti.",
   "lastExecution": {
     "recorded": true,
-    "runId": "SKH-STRUCTURES-001-PR122-merge-2026-11-18",
-    "at": "2026-11-18",
-    "taskId": "SKH-STRUCTURES-001",
-    "outcome": "merged-awaiting-main-ci-pages-and-manual-qa",
-    "commitSha": "8197e8e322b750c7cdbdb170198ade91b0c257e7",
-    "prNumber": 122,
-    "ciRunUrl": "https://github.com/CzekUns/Rtsmobile/actions/runs/44234823855",
+    "runId": "SKH-QA-001-PR125-postmerge-2026-11-19",
+    "at": "2026-11-19",
+    "taskId": "SKH-QA-001",
+    "outcome": "awaiting_manual_qa",
+    "commitSha": "ce27463932b040d6c2ce54348cd13a8e6e16604a",
+    "prNumber": 125,
+    "ciRunUrl": "https://github.com/CzekUns/Rtsmobile/actions/runs/44511174668",
     "blockingReason": null
   },
   "awaitingManualValidation": [
@@ -44,9 +44,14 @@
       "taskId": "SKH-STRUCTURES-001",
       "scope": "Physical Android landscape and same-scene original 7KAA parity; main CI/Pages deployment require verification",
       "releaseSha": "8197e8e322b750c7cdbdb170198ade91b0c257e7"
+    },
+    {
+      "taskId": "SKH-QA-001",
+      "scope": "Physical Android landscape, true fullscreen and multi-touch MOD+joystick; same-scene original 7KAA versus HTML 1x/2x screenshots; visual parity not certified",
+      "releaseSha": "ce27463932b040d6c2ce54348cd13a8e6e16604a"
     }
   ],
   "planChangesRequireOwnerApproval": true,
   "nextTaskAfterActive": null,
-  "notes": "SKH-TERRAIN-002 PR #120 merged at f914a3a. Main CI #43784029511 and Pages #43784029495 SUCCESS. Android and 7KAA same-scene parity pending. PR #121 transition to SKH-STRUCTURES-001: CI initially failed due to missing active checkpoint and hard-coded next-task test; fixed on branch; verify new HEAD CI before merge."
+  "notes": "SKH-TERRAIN-002 PR #120 merged at f914a3a. Main CI #43784029511 and Pages #43784029495 SUCCESS. Android and 7KAA same-scene parity pending. PR #121 transition to SKH-STRUCTURES-001: CI initially failed due to missing active checkpoint and hard-coded next-task test; fixed on branch; verify new HEAD CI before merge. PR #125 squash merged ce27463; exact main push CI #44511174668 and Pages #44511174523 SUCCESS (19 Nov 2026). Android/7KAA manual QA not run. PR #126 coordination CI initial failure #44571783592 at Node unit tests: activeTaskId SKH-QA-001 conflicted with TASKS status awaiting_manual_qa; closure uses activeTaskId=null per validate.mjs (no approved successor)."
 }
