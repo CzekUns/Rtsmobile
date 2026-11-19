@@ -32,3 +32,7 @@ SKH-TERRAIN-002 merged su main `f914a3ab007a7760026829bbc7216080564e0988`, Actio
 
 ## 18 novembre 2026 — PR #122 integrata
 SKH-STRUCTURES-001 merged con squash su main `8197e8e322b750c7cdbdb170198ade91b0c257e7`. CI HEAD PR [#44234823855](https://github.com/CzekUns/Rtsmobile/actions/runs/44234823855) SUCCESS (Node, Chromium in-world 1×/2×, estrazione originale). Fortezza BASE:CHINESE con PNG/manifest GPL e fallback; screenshot Chromium ispezionati. Main CI/Pages post-merge ancora da verificare. Android e confronto stessa scena 7KAA NOT_RUN; sprite direzionali multirazza e recolor non certificati. Prossimo ID concordato: SKH-QA-001.
+
+
+## 19 novembre 2026 — SKH-QA-001 release tecnica verificata
+PR [#125](https://github.com/CzekUns/Rtsmobile/pull/125) squash-merged su main `ce27463932b040d6c2ce54348cd13a8e6e16604a`. [CI push #44511174668](https://github.com/CzekUns/Rtsmobile/actions/runs/44511174668) **SUCCESS** e [Pages #44511174523](https://github.com/CzekUns/Rtsmobile/actions/runs/44511174523) **SUCCESS**, entrambe su SHA esatto. Screenshot Chromium 1×/2× e metriche font Canvas costituiscono regressione automatica, non confronto paritario con l'originale. Stato `awaiting_manual_qa`: Android landscape/fullscreen/MOD+levetta e screenshot stessa scena 7KAA/HTML 1×/2× ancora **NOT_RUN**. Nessun task successivo nell'ordine approvato.
