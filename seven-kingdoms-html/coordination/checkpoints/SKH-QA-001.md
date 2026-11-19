@@ -237,3 +237,12 @@
 - **Validation:** preceding HEAD CI SUCCESS; new code commit CI NOT_YET_VERIFIED. Local npm test/check NOT_RUN (GitHub connector edits). PR #125 not merged, Pages not deployed for this branch. Android physical and original 7KAA same-scene parity NOT_RUN.
 - **Code SHA before checkpoint:** `23b7cf9b07034e2cc9c323825e8e3be7d413843d`; final branch HEAD is the following checkpoint commit.
 - **Single next step:** verify exact Actions CI on this checkpoint HEAD; if green, inspect #125 draft/merge gates and screenshot artifacts, then mark ready and merge only when compatibility and ownership are confirmed. If red, fix the specific regression log.
+
+
+## 2026-11-19 12:02 CET — PR #125 merged after exact HEAD CI
+- **Task/branch:** SKH-QA-001 / `agent/skh-integration/fidelity-regression-qa`. Starting branch HEAD `4ec45ef29cbf253b09c30aab2f2937966fbc381b`.
+- **CI verified:** [Actions #44501750362](https://github.com/CzekUns/Rtsmobile/actions/runs/44501750362) completed SUCCESS on exact PR HEAD `4ec45ef29cbf253b09c30aab2f2937966fbc381b`. Screenshot artifact `skh-qa-001-worldview-1x-2x` ID `14517203246` available. npm local test/check NOT_RUN; CI covers repository checks. No new runtime/asset code in this run.
+- **Integration:** [PR #125](https://github.com/CzekUns/Rtsmobile/pull/125) changed from draft to ready and squash-MERGED. New main SHA `ce27463932b040d6c2ce54348cd13a8e6e16604a`. PR files: CI workflow, Chromium fixture/runner, PNG geometry tests and checkpoint. No conflicts at merge.
+- **Not yet verified:** main CI on `ce27463`, Pages deployment on this SHA, physical Android landscape, same-scene original 7KAA parity. Automated 1x/2x glyph geometry passing is not original parity. Do not declare task done yet.
+- **Checkpoint note:** this checkpoint update is a branch-only follow-up to merged PR #125; the merged code SHA remains `ce27463`. No force push.
+- **Single next step:** verify main CI and Pages deployment for `ce27463932b040d6c2ce54348cd13a8e6e16604a`; then use an integration PR to update STATE.json, TASKS.json, HANDOFF.md and DECISIONS.md marking SKH-QA-001 awaiting_manual_qa (Android/7KAA evidence pending) without inventing a new task.
