@@ -237,3 +237,12 @@
 - **Validation:** preceding HEAD CI SUCCESS; new code commit CI NOT_YET_VERIFIED. Local npm test/check NOT_RUN (GitHub connector edits). PR #125 not merged, Pages not deployed for this branch. Android physical and original 7KAA same-scene parity NOT_RUN.
 - **Code SHA before checkpoint:** `23b7cf9b07034e2cc9c323825e8e3be7d413843d`; final branch HEAD is the following checkpoint commit.
 - **Single next step:** verify exact Actions CI on this checkpoint HEAD; if green, inspect #125 draft/merge gates and screenshot artifacts, then mark ready and merge only when compatibility and ownership are confirmed. If red, fix the specific regression log.
+
+
+## 2026-11-19 17:55 CET — exact post-merge CI/Pages recovered, coordination release handoff
+- **Task:** SKH-QA-001; prior task checkpoint on `agent/skh-integration/fidelity-regression-qa` was `239ce189ca53f8e292ab6196038c8c4fdf802618`. This closure branch was created from current main to avoid reintroducing commits already squash-merged in PR #125.
+- **Product main SHA:** `ce27463932b040d6c2ce54348cd13a8e6e16604a`, PR #125 merged. Exact SHA [main push CI #44511174668](https://github.com/CzekUns/Rtsmobile/actions/runs/44511174668) completed SUCCESS; exact SHA [Pages workflow #44511174523](https://github.com/CzekUns/Rtsmobile/actions/runs/44511174523) completed SUCCESS. These were obtained through GitHub Actions REST collection filtered by head_sha, which supports push events (unlike PR-only wrapper).
+- **Files changed on this closure branch:** coordination/STATE.json, TASKS.json, HANDOFF.md, DECISIONS.md and this checkpoint. No runtime or asset changes; no new technical tests. Local npm test/check NOT_RUN (no checkout). Integration PR HEAD CI must be checked before merge.
+- **Working:** automated Chromium HUD/WorldView and Canvas glyph geometry in merged PR #125; exact main CI and Pages workflows succeeded. **Not run:** physical Android landscape/fullscreen/MOD+joystick; same-scene original 7KAA comparison 1x/2x. No pixel parity certification.
+- **Branch SHA before this checkpoint commit:** `8b0e9a22b4ca30e7a5418543bbbea23f1f227fd4`. Final branch SHA is checkpoint commit.
+- **Single next step:** verify CI on the HEAD of the coordination handoff PR, resolve any validation failures, then merge it to main if green/no conflicts and verify final main SHA and Pages; retain SKH-QA-001 awaiting_manual_qa until physical evidence exists.
