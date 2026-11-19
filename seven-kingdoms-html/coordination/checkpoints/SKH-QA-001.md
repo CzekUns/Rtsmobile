@@ -288,3 +288,11 @@
 - **Validation:** exact main CI [#44603344885](https://github.com/CzekUns/Rtsmobile/actions/runs/44603344885) SUCCESS. Pages `00cdcc1b` NOT_DEPLOYED by this run. npm local test/check NOT_RUN. Android physical and 7KAA same-scene 1×/2× NOT_RUN.
 - **Changes:** checkpoint only on existing QA branch; no game/runtime/asset changes, no new task, no workflow changes.
 - **Single next step:** dispatch a fresh `pages.yml` workflow on `main` (not rerun of #44603344897), verify its exact SHA `00cdcc1b` and SUCCESS deployment; if it fails, inspect that new run's deploy job log.
+
+
+## 2026-11-20 00:04 CET — fresh-run Pages gate still blocked by dispatch permissions
+- **Main HEAD verified:** `00cdcc1b4e90d2667e2e5a4566a3564649f1bc02` via GitHub branches/main. Approved program remains terminal, `STATE.activeTaskId=null`; no new task assigned.
+- **Exact-SHA run listing checked via GitHub REST** `GET /repos/CzekUns/Rtsmobile/actions/runs?head_sha=00cdcc1b4e90d2667e2e5a4566a3564649f1bc02`: only CI #44603344885 (completed SUCCESS, attempt 1) and Pages #44603344897 (completed FAILURE, attempt 2). No new Pages run exists for this SHA at this check.
+- **Blocker persists:** previous Pages retry duplicated `github-pages` artifacts within the same run. Available authorized GitHub connector exposes rerun actions but **not** `workflow_dispatch` or artifact deletion. Re-running #44603344897 would repeat the known failure. No new code/PR or deployment was produced; local npm test/check NOT_RUN. Physical Android and 7KAA parity NOT_RUN.
+- **Checkpoint branch:** `agent/skh-integration/qa-release-handoff`; prior HEAD `c990a7884567b92e0012de6abb78b2195cf1678a`; this checkpoint update becomes new branch HEAD (commit SHA returned by GitHub). No changes to main or schedules.
+- **Single next step:** trigger a **new** `.github/workflows/pages.yml` workflow_dispatch on `main` through an authorized GitHub Actions interface, then verify that new run's `head_sha=00cdcc1b4e90d2667e2e5a4566a3564649f1bc02` and `conclusion=success`; if red, inspect its deploy job log. Do not retry #44603344897.
