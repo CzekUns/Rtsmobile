@@ -185,3 +185,12 @@
 - **Validation:** CI on corrected HEAD NOT_YET_VERIFIED; local npm test/check NOT_RUN (connector-based source edits). No merge or Pages deployment. This restores reference DOM metrics only; frozen actual Canvas label-size parity remains open. Android physical and 7KAA same-scene comparison NOT_RUN.
 - **Code HEAD before checkpoint:** `19fc77991b168c9e0df9b6875355bd2beb7d98d2`; final branch HEAD is this checkpoint commit.
 - **Single next step:** inspect CI on this checkpoint HEAD; if green, implement a controlled actual Canvas label-region comparison at 1×/2× (rather than relying solely on hidden DOM reference labels), and only then reassess PR #125 merge gates.
+
+
+## 2026-11-19 05:56 CET — live Canvas draw instrumentation (partial)
+- **Task/branch/PR:** SKH-QA-001 / `agent/skh-integration/fidelity-regression-qa` / [#125](https://github.com/CzekUns/Rtsmobile/pull/125). Previous checkpoint HEAD `fd77839e4ae9ac28c94dd56fb055ff4cbc66e58d`.
+- **Exact previous HEAD CI:** [Actions #44455324459](https://github.com/CzekUns/Rtsmobile/actions/runs/44455324459) completed SUCCESS on `fd77839e4ae9ac28c94dd56fb055ff4cbc66e58d`; confirms the repaired escaped-newline fixture and Node/Chromium pipeline. Local npm test/check NOT_RUN.
+- **Code published:** [47f56c6](https://github.com/CzekUns/Rtsmobile/commit/47f56c6ced5693de11625d9a9e37ae84e0b025aa) in `tests/browser/live-game-qa.html`: temporarily wraps the actual game Canvas 2D `fillText` for 350ms after HUD initialization, records real draw text, font, measured width and canvas positions into `data-canvas-label-draws`, then restores original `fillText`. This is diagnostic capture of actual game labels, not a claim of 1×/2× parity. No runtime/asset changes.
+- **Validation:** New code HEAD CI NOT_YET_VERIFIED. No merge or Pages deployment for #125; physical Android and original 7KAA same-scene parity NOT_RUN. Chromium 2× DOM previously hung; do not reintroduce unbounded DOM capture.
+- **Code HEAD before checkpoint:** `47f56c6ced5693de11625d9a9e37ae84e0b025aa`; final branch HEAD is the subsequent checkpoint commit.
+- **Single next step:** verify CI on the new checkpoint HEAD; if green, consume `data-canvas-label-draws` in the runner, assert actual Forte/Mercato (or the scene's real labels) geometry and build a controlled 1×/2× comparison without a second live-game `--dump-dom`.
