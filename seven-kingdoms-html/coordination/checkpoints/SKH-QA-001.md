@@ -194,3 +194,11 @@
 - **Validation:** New code HEAD CI NOT_YET_VERIFIED. No merge or Pages deployment for #125; physical Android and original 7KAA same-scene parity NOT_RUN. Chromium 2× DOM previously hung; do not reintroduce unbounded DOM capture.
 - **Code HEAD before checkpoint:** `47f56c6ced5693de11625d9a9e37ae84e0b025aa`; final branch HEAD is the subsequent checkpoint commit.
 - **Single next step:** verify CI on the new checkpoint HEAD; if green, consume `data-canvas-label-draws` in the runner, assert actual Forte/Mercato (or the scene's real labels) geometry and build a controlled 1×/2× comparison without a second live-game `--dump-dom`.
+
+
+## 2026-11-19 07:02 CET — consume actual Canvas label diagnostics
+- **Task/branch/PR:** SKH-QA-001 / `agent/skh-integration/fidelity-regression-qa` / [#125](https://github.com/CzekUns/Rtsmobile/pull/125). Starting HEAD `15b5b182c9ad4d1c4e5aa5e2dddd947b7f40d55e`.
+- **Exact previous HEAD CI:** [Actions #44461816618](https://github.com/CzekUns/Rtsmobile/actions/runs/44461816618) completed/success for `15b5b18` (GitHub workflow association). This validates the prior instrumentation, not today's runner change.
+- **Code published:** `3d293700290d72b98bc50de6540349e112dde9ee` modifies `tests/browser/run-integrated-regression.mjs` to consume the fixture's actual `data-canvas-label-draws` during the existing 1× DOM pass. It validates nonempty capture, finite Canvas text coordinates/widths and font; reports actual Forte/Mercato matches, or an explicit coverage warning if absent. No extra 2× DOM process (previously hangs), no runtime/assets changes. DOM reference metrics alone remain insufficient for Canvas parity.
+- **Validation:** local `npm --prefix seven-kingdoms-html test` and `npm --prefix seven-kingdoms-html run check` NOT_RUN (no local checkout); new HEAD CI PENDING/NOT_VERIFIED. No merge or Pages deploy for #125. Physical Android and original 7KAA same-scene comparison NOT_RUN. Draft PR remains open.
+- **Single next step:** inspect exact CI on checkpoint HEAD; if failed fix its specific log; if green inspect actual Canvas draw log and add a bounded, reproducible 1×/2× label-region comparison without reintroducing the 2× `--dump-dom` timeout.
