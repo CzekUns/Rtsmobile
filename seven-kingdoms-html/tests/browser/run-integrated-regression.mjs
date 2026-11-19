@@ -98,6 +98,27 @@ try{
    console.log('Actual Canvas label draws (1x): '+JSON.stringify({
     count:draws.length,matchedLabels:labels,otherSamples:draws.slice(0,8)
    }));
+   // Validate controlled 1x/2x raster bounds using the actual fonts captured
+   // from the live renderer. Full-game screenshots remain independently animated.
+   const encodedRaster=qa.match(/data-canvas-raster-checks="([^"]+)"/)?.[1];
+   if(!encodedRaster)throw Error('Missing controlled Canvas raster diagnostics');
+   const rasters=JSON.parse(encodedRaster.replaceAll('&quot;','"').replaceAll('&amp;','&'));
+   if(!Array.isArray(rasters)||!rasters.length)throw Error('No Forte/Mercato raster samples');
+   for(const sample of rasters){
+    if(!/^(Forte|Mercato)$/i.test(sample.text))throw Error('Unexpected raster label '+sample.text);
+    for(const scale of ['at1x','at2x']){
+     const box=sample[scale];
+     if(!box||['width','height','x','y','inkPixels'].some(key=>!Number.isFinite(box[key])||box[key]<=0))
+      throw Error('Invalid controlled Canvas raster '+JSON.stringify(sample));
+    }
+    const a=sample.at1x,b=sample.at2x;
+    // Glyph hinting differs across raster scales. Bound geometric drift to
+    // 2 CSS pixels; report exact measured bounds for regression triage.
+    if(Math.abs(a.width-b.width)>2||Math.abs(a.height-b.height)>2
+     ||Math.abs(a.x-b.x)>2||Math.abs(a.y-b.y)>2)
+     throw Error('Canvas label raster scale drift '+JSON.stringify(sample));
+   }
+   console.log('Controlled actual-font Canvas label raster 1x/2x: '+JSON.stringify(rasters));
    // A missing Forte/Mercato draw is an explicit coverage gap, not a parity PASS:
    // the current demo scene may not paint these strings in the capture window.
    if(!labels.length)console.warn('Canvas Forte/Mercato draw not observed; 1x/2x label parity remains unverified');
