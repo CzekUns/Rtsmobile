@@ -70,6 +70,11 @@ try{
    const dom=await browser(url,'dom',undefined,scale);
    const qa=dom.match(/<output id="qa"[^>]*>/)?.[0]||'';
    if(!qa.includes('data-result="ready"'))throw Error('Live HUD/game viewport '+scale+'x: '+dom.slice(-1600));
+   const encoded=qa.match(/data-label-metrics="([^"]+)"/)?.[1];
+   if(!encoded)throw Error('Missing deterministic label metrics');
+   const metrics=JSON.parse(encoded.replaceAll('&quot;','"'));
+   if(metrics.length!==2||metrics.some(pair=>pair.length!==2||pair.some(v=>!Number.isFinite(v)||v<=0)))throw Error('Invalid Forte/Mercato metrics: '+JSON.stringify(metrics));
+   console.log('Forte/Mercato reference CSS geometry (1x): '+JSON.stringify(metrics));
   }
   const path=join(output,'live-game-hud-'+scale+'x.png');
   await browser(url,'image',path,scale);
