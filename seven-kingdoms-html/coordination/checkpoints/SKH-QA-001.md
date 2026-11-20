@@ -306,3 +306,11 @@
 - **Validation:** CI main #44603344885 SUCCESS for exact SHA; npm local test/check NOT_RUN; Pages deployment for `00cdcc1b` NOT_VERIFIED. Physical Android and same-scene original 7KAA at 1×/2× NOT_RUN.
 - **Changes:** checkpoint only, existing QA branch; runtime/assets, main, task order and automation unchanged. Branch HEAD is the commit produced by this checkpoint update.
 - **Single next step:** start a **fresh** `Deploy static site to Pages` workflow via GitHub Actions `Run workflow` on `main` (or an authorized `workflow_dispatch` integration), then verify new run `head_sha=00cdcc1b4e90d2667e2e5a4566a3564649f1bc02` and `conclusion=success`; if it fails, inspect its deploy log.
+
+
+## 2026-11-20 01:55 CET — Pages fresh dispatch still unavailable
+- **Starting point:** latest checkpoint on existing QA branch; approved task order exhausted and `STATE.activeTaskId=null`. No new technical task authorized. Main release SHA `00cdcc1b4e90d2667e2e5a4566a3564649f1bc02`.
+- **New evidence:** queried `GET https://api.github.com/repos/CzekUns/Rtsmobile/actions/runs?head_sha=00cdcc1b4e90d2667e2e5a4566a3564649f1bc02&per_page=20` at this run: CI #44603344885 remains completed SUCCESS; Pages #44603344897 remains completed FAILURE (attempt 2). **No fresh Pages workflow exists** for this SHA.
+- **Attempted alternative:** inspected available GitHub connector actions; none exposes workflow_dispatch or artifact deletion. Read-only GitHub API fetch cannot POST workflow dispatch. Existing `.github/workflows/pages.yml` has `workflow_dispatch`, so a fresh run from GitHub Actions UI is possible with authorized account. Re-running #44603344897 is unsafe due to duplicate artifacts. Creating an unrelated PR/main commit solely to force a push would violate the closed program; not attempted.
+- **Code/PR:** no game/runtime/asset changes, no new PR. This checkpoint is the only branch change. No local npm test/check run; exact main CI above is verified. Pages for `00cdcc1b` NOT_VERIFIED; Android physical and 7KAA same-scene 1×/2× NOT_RUN.
+- **Single next step:** initiate a **fresh** `Deploy static site to Pages` workflow using `Run workflow → main` at https://github.com/CzekUns/Rtsmobile/actions/workflows/pages.yml, then verify the new run's `head_sha=00cdcc1b4e90d2667e2e5a4566a3564649f1bc02` and `conclusion=success` (or diagnose the new run's deployment log).
